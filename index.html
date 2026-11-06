@@ -161,7 +161,7 @@
             color: #64748b;
         }
 
-        /* 전화번호 저장 팝업 (모달) */
+        /* 연락처 저장 팝업 (모달) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -186,7 +186,7 @@
         .modal-title {
             font-size: 16px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             color: var(--text-main);
         }
 
@@ -238,14 +238,14 @@
         <p class="bio">영화 '동승', '나탈리', '동대문'<br>파리텍사스 브랜드 &amp; 여수국제영화제</p>
 
         <div class="action-grid">
-            <a href="tel:010-0000-0000" class="btn-action btn-primary">
+            <a href="tel:010-5870-5815" class="btn-action btn-primary">
                 <i class="fa-solid fa-phone"></i> 전화 연결
             </a>
-            <a href="sms:010-0000-0000" class="btn-action">
+            <a href="sms:010-5870-5815" class="btn-action">
                 <i class="fa-solid fa-comment"></i> 문자 보내기
             </a>
             <button class="btn-action" onclick="openSaveModal()">
-                <i class="fa-solid fa-address-book"></i> 전화번호 자동저장
+                <i class="fa-solid fa-address-book"></i> 연락처 저장
             </button>
             <button class="btn-action" onclick="shareKakao()">
                 <i class="fa-solid fa-share-nodes"></i> 공유하기
@@ -276,17 +276,17 @@
 <!-- 전화번호 저장 팝업 창 -->
 <div class="modal-overlay" id="saveModal">
     <div class="modal-box">
-        <div class="modal-title">주경중 감독 연락처</div>
-        <div class="modal-phone" id="userPhone">010-0000-0000</div>
+        <div class="modal-title">주경중 감독</div>
+        <div class="modal-phone">010-5870-5815</div>
         <div class="modal-btns">
-            <button class="modal-btn btn-save" onclick="downloadVCard()">저장</button>
+            <button class="modal-btn btn-save" onclick="saveToPhoneBook()">내 전화번호부에 저장</button>
             <button class="modal-btn btn-close" onclick="closeSaveModal()">닫기</button>
         </div>
     </div>
 </div>
 
 <script>
-    const phoneNumber = "010-0000-0000"; // 감독님 실제 번호로 수정
+    const phoneNumber = "010-5870-5815";
 
     function openSaveModal() {
         document.getElementById('saveModal').style.display = 'flex';
@@ -296,8 +296,16 @@
         document.getElementById('saveModal').style.display = 'none';
     }
 
-    function downloadVCard() {
-        const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:주경중 감독\nTEL;TYPE=CELL:${phoneNumber}\nEND:VCARD`;
+    // 내 전화번호부에 직접 저장 (vCard 직접 실행)
+    function saveToPhoneBook() {
+        const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:주경중 감독
+TITLE:영화감독 / 총괄프로듀서
+ORG:파리텍사스
+TEL;TYPE=CELL:${phoneNumber}
+END:VCARD`;
+
         const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');

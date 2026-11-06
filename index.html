@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>주경중 감독 - 모바일 프로필 명함</title>
+    
+    <!-- 카카오톡 공유 썸네일(OG 태그) 설정 -->
+    <meta property="og:title" content="영화감독 주경중 - 공식 프로필 명함">
+    <meta property="og:description" content="여수국제영화제준비위원장 공식 모바일 명함입니다.">
+    <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/thumb.jpg">
+    <meta property="og:url" content="https://directorjoo.github.io/ssaka-app/">
+    <meta property="og:type" content="website">
+
     <style>
         * {
             margin: 0;
@@ -11,129 +19,56 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: url('bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #111;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-        .card {
-            background: rgba(20, 20, 20, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
+        /* 명함 전체 프레임 컨테이너 */
+        .card-container {
+            position: relative;
             width: 100%;
-            max-width: 400px;
-            padding: 32px 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            max-width: 420px;
+            aspect-ratio: 1 / 1;
+            background-image: url('bg.jpg'); /* 캔바에서 만든 전체 이미지 파일명 */
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        .profile-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: -0.5px;
-        }
-        .title-sub {
-            font-size: 14px;
-            color: #d1d5db;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-        .bio {
-            font-size: 13px;
-            color: #9ca3af;
-            line-height: 1.5;
-            margin-bottom: 24px;
-            padding: 0 10px;
-        }
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
+        
+        /* 하단 4개 버튼을 위한 투명 터치 영역 스타일 */
+        .touch-link {
+            position: absolute;
+            bottom: 3%; /* 하단 배치 위치 */
+            width: 22%; /* 4개 버튼 너비 배분 */
+            height: 20%; /* 높이 설정 */
             cursor: pointer;
-            border: none;
+            z-index: 10;
         }
-        .btn-primary {
-            background: rgba(255, 255, 255, 0.9);
-            color: #111111;
-        }
-        .btn-primary:hover {
-            background: #ffffff;
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
+
+        /* 각 버튼별 좌측 위치(left) 개별 지정 */
+        .btn-vcard { left: 4%; }   /* 1번째: 연락처 저장 (곰돌이 아이콘 영역) */
+        .btn-blog { left: 28%; }   /* 2번째: 블로그 바로가기 */
+        .btn-news { left: 52%; }   /* 3번째: 뉴스 검색 */
+        .btn-home { left: 76%; }   /* 4번째: 홈페이지 바로가기 */
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- 프로필 사진 (필요시 수정 가능) -->
-        <img src="bg.jpg" alt="주경중 감독" class="profile-img">
-        
-        <h1>주경중 감독</h1>
-        <div class="title-sub">영화감독 / 제작자</div>
-        
-        <div class="bio">
-            즐겁고 행복한 세상을 위해 우리 모두 함께 해요!!<br>여수국제웹페스티벌 조직위원장
-        </div>
+    <div class="card-container">
+        <!-- 1. 연락처 자동 저장 (vCard) -->
+        <a href="data:text/vcard;charset=utf-8,%F%FE%FFBEGIN%3AVCARDS%0AVERSION%3A3.0%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%90%EB%8F%85%0ATITLE%3A%EC%97%85%EC%88%98%EA%B5%AD%EC%3%BC%EC%A0%9C%EC%98%81%ED%99%94%EC%A0%9C%EC%A4%80%EB%B9%84%EC%9C%84%EC%9B%90%EC%9E%A5%0ATEL%3A01058705815%0AURL%3Ahttps%3A%2F%2Fyeosuiff.com%0AEND%3AVCARD" download="주경중_감독.vcf" class="touch-link btn-vcard" title="연락처 저장"></a>
 
-        <div class="btn-group">
-            <!-- 1. 연락처 자동 저장 (vCard 직접 연동) -->
-            <a href="data:text/vcard;charset=utf-8,%F%FE%FFBEGIN%3AVCARDS%0AVERSION%3A3.0%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%90%EB%8F%85%0ATITLE%3A%EC%98%81%ED%99%94%EA%B0%90%EB%8F%85%0ATEL%3A01058705815%0AURL%3Ahttps%3A%2F%2Fyeosuiff.com%0AEND%3AVCARD" download="주경중_감독.vcf" class="btn btn-primary">
-                📇 연락처 저장하기
-            </a>
+        <!-- 2. 블로그 주소 -->
+        <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+site%3Ablog.naver.com" target="_blank" class="touch-link btn-blog" title="블로그"></a>
 
-            <!-- 2. 공식 홈페이지 -->
-            <a href="https://yeosuiff.com" target="_blank" class="btn btn-secondary">
-                🌐 공식 홈페이지
-            </a>
+        <!-- 3. 뉴스 검색 URL -->
+        <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="touch-link btn-news" title="뉴스 검색"></a>
 
-            <!-- 3. 네이버 블로그 검색 -->
-            <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+site%3Ablog.naver.com" target="_blank" class="btn btn-secondary">
-                ✍️ 네이버 블로그 검색
-            </a>
-
-            <!-- 4. 네이버 뉴스 검색 -->
-            <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="btn btn-secondary">
-                📰 네이버 뉴스 검색
-            </a>
-        </div>
+        <!-- 4. 홈페이지 바로가기 -->
+        <a href="https://yeosuiff.com" target="_blank" class="touch-link btn-home" title="홈페이지"></a>
     </div>
 
 </body>

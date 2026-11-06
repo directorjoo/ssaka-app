@@ -23,12 +23,12 @@
             width: 100%;
             max-width: 420px;
             aspect-ratio: 1 / 1;
-            background-image: url('bg2.jpg'); /* 캔바에서 만든 영문 파일명 배경 */
+            background-image: url('bg2.jpg'); /* 배경 이미지 파일명 */
             background-size: cover;
             background-position: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        /* 하단 4개 버튼을 위한 투명 터치 영역 스타일 */
+        /* 하단 4개 버튼 투명 터치 영역 */
         .touch-link {
             position: absolute;
             bottom: 3%; /* 하단 배치 위치 */
@@ -36,12 +36,12 @@
             height: 20%; /* 높이 설정 */
             cursor: pointer;
             z-index: 10;
-            opacity: 0; /* 투명하게 만들어 배경 이미지가 보이게 함 */
+            opacity: 0; /* 투명 처리 */
         }
-        /* 버튼 개별 위치 (왼쪽부터 1, 2, 3, 4번째) */
+        /* 4개 버튼 위치 (왼쪽부터 1, 2, 3, 4) */
         .btn-1 { left: 4%; }   /* 1번: 전화번호 저장 */
-        .btn-2 { left: 28%; }  /* 2번: 블로그 */
-        .btn-3 { left: 52%; }  /* 3번: 네이버 뉴스 */
+        .btn-2 { left: 28%; }  /* 2번: 블로그 (주경중 블로그 검색) */
+        .btn-3 { left: 52%; }  /* 3번: 네이버 뉴스 (주경중 동대문) */
         .btn-4 { left: 76%; }  /* 4번: 홈페이지 */
     </style>
 </head>
@@ -51,14 +51,14 @@
         <!-- 1번 버튼: 전화번호 연락처 자동 저장 (.vcf 파일 다운로드) -->
         <a href="주경중_감독.vcf" download class="touch-link btn-1" title="전화번호 저장"></a>
 
-        <!-- 2번 버튼: 블로그 링크 (실제 블로그 주소로 수정 가능) -->
-        <a href="https://blog.naver.com" target="_blank" class="touch-link btn-2" title="블로그"></a>
+        <!-- 2번 버튼: 네이버 블로그 '주경중' 검색 결과 페이지 -->
+        <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="touch-link btn-2" title="블로그"></a>
 
-        <!-- 3번 버튼: 네이버 뉴스 (주경중 동대문 자동 검색) -->
+        <!-- 3번 버튼: 네이버 뉴스 '주경중 동대문' 검색 결과 페이지 -->
         <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="touch-link btn-3" title="네이버뉴스"></a>
 
-        <!-- 4번 버튼: 홈페이지 링크 (실제 홈페이지 주소로 수정 가능) -->
-        <a href="#" target="_blank" class="touch-link btn-4" title="홈페이지"></a>
+        <!-- 4번 버튼: 홈페이지 링크 (실제 열릴 주소 입력) -->
+        <a href="https://directorjoo.github.io/ssaka-app/" target="_blank" class="touch-link btn-4" title="홈페이지"></a>
     </div>
 
 </body>

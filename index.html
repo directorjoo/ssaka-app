@@ -25,7 +25,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        /* 메인 배너 이미지 */
+        /* 메인 배너 이미지 (bg2.jpg 연동) */
         .banner-img {
             width: 100%;
             height: auto;
@@ -72,32 +72,32 @@
 <body>
 
 <div class="card-container">
-    <!-- 메인 일러스트 배너 -->
-    <img src="main_banner.jpg" alt="YIFF 주경중 감독 여수국제영화제준비위원장" class="banner-img">
+    <!-- 메인 일러스트 배너 (이미 업로드된 bg2.jpg 파일 사용) -->
+    <img src="bg2.jpg" alt="YIFF 주경중 감독 여수국제영화제준비위원장" class="banner-img">
 
     <!-- 하단 4대 버튼 -->
     <div class="button-grid">
-        <!-- 1. 전화번호 저장 (Blob URL 대신 Data URI 방식을 사용하여 아이폰 사파리 호환성 강화) -->
-        <a href="data:text/vcard;charset=utf-8,BEGIN%3AVCARD%0AVERSION%3A3.0%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%8d%EB%94%95%0ATEL%3BTYPE%3ACELL%3A010-5870-5815%0AEND%3AVCARD" download="주경중_감독.vcf" class="btn-item">
-            <img src="icon_contacts.png" alt="전화번호 저장" class="btn-icon">
+        <!-- 1. 전화번호 저장 (CELL 단어 제외, 01058705815만 입력) -->
+        <a href="data:text/vcard;charset=utf-8,BEGIN%3AVCARD%0AVERSION%3A3.0%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%8d%EB%94%95%0ATEL%3A01058705815%0AEND%3AVCARD" download="주경중_감독.vcf" class="btn-item">
+            <img src="icon1.png" alt="전화번호 저장" class="btn-icon">
             <span class="btn-text">전화번호<br>저장</span>
         </a>
 
         <!-- 2. 블로그 주경중 검색 -->
         <a href="https://search.naver.com/search.naver?query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="btn-item">
-            <img src="icon_blog.png" alt="블로그 검색" class="btn-icon">
+            <img src="icon2.png" alt="블로그 검색" class="btn-icon">
             <span class="btn-text">블로그<br>주경중검색</span>
         </a>
 
         <!-- 3. 네이버 뉴스 주경중 동대문 검색 -->
         <a href="https://search.naver.com/search.naver?where=news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="btn-item">
-            <img src="icon_news.png" alt="네이버 뉴스" class="btn-icon">
+            <img src="icon3.png" alt="네이버 뉴스" class="btn-icon">
             <span class="btn-text">네이버뉴스<br>주경중 동대문</span>
         </a>
 
         <!-- 4. 홈페이지 이동 -->
         <a href="http://Yeosuiff.com" target="_blank" class="btn-item">
-            <img src="icon_home.png" alt="홈페이지" class="btn-icon">
+            <img src="icon4.png" alt="홈페이지" class="btn-icon">
             <span class="btn-text">홈페이지<br>바로가기</span>
         </a>
     </div>

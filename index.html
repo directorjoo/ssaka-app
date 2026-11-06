@@ -3,138 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>영화감독 주경중 - 프로필 명함</title>
+    <title>주경중 감독 - 모바일 프로필 명함</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-        .card-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .card {
+            background: rgba(20, 20, 20, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 24px;
-            padding: 40px 28px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            padding: 32px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
-        .profile-header h1 {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 8px;
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
-        .profile-header p {
+        .title-sub {
             font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 32px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+            font-weight: 400;
         }
-        .links-group {
+        .bio {
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            padding: 0 10px;
+        }
+        .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
-        .link-btn {
+        .btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px 20px;
-            background: #ffffff;
-            color: #1e293b;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 14px;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             transition: all 0.2s ease;
             cursor: pointer;
+            border: none;
         }
-        .link-btn:active {
-            transform: scale(0.98);
-            background: #f8fafc;
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #111111;
         }
-        .link-btn.highlight {
-            background: #2563eb;
+        .btn-primary:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.12);
             color: #ffffff;
-            border: none;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .link-btn.highlight:active {
-            background: #1d4ed8;
-        }
-        .link-btn.kakao {
-            background: #fee500;
-            color: #000000;
-            border: none;
-            box-shadow: 0 10px 15px -3px rgba(254, 229, 0, 0.4);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <div class="card-container">
-        <div class="profile-header">
-            <h1 id="user-name">주경중 감독</h1>
-            <p id="user-bio">영화감독 · 프로듀서 · 제작자</p>
+
+    <div class="card">
+        <!-- 프로필 사진 (필요시 수정 가능) -->
+        <img src="bg.jpg" alt="주경중 감독" class="profile-img">
+        
+        <h1>주경중 감독</h1>
+        <div class="title-sub">영화감독 / 제작자</div>
+        
+        <div class="bio">
+            즐겁고 행복한 세상을 위해 우리 모두 함께 해요!!<br>여수국제웹페스티벌 조직위원장
         </div>
-        <div class="links-group">
-            <a href="https://yeosuiff.com" class="link-btn" target="_blank">🌐 공식 홈페이지 바로가기</a>
-            <a href="https://blog.naver.com/directorjoo" class="link-btn" target="_blank">📝 감독 공식 블로그 바로가기</a>
-            <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+site%3Ablog.naver.com" class="link-btn" target="_blank">🔍 네이버 블로그 검색결과 보기</a>
-            <a href="https://m.search.naver.com/search.naver?where=m_news&sm=mtb_jum&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+%EB%8F%99%EB%8C%80%EB%AC%B8" class="link-btn" target="_blank">📰 네이버 뉴스 보도기사 보기</a>
-            <a href="#" class="link-btn highlight" onclick="downloadVCard(); return false;">🎴 내 연락처 전화번호에 자동 저장</a>
-            <a href="tel:01058705815" class="link-btn">📞 주경중 감독에게 바로 전화하기</a>
-            <a href="#" class="link-btn kakao" onclick="shareCard(); return false;">💬 카카오톡 / 명함 공유하기</a>
+
+        <div class="btn-group">
+            <!-- 1. 연락처 자동 저장 (vCard 직접 연동) -->
+            <a href="data:text/vcard;charset=utf-8,%F%FE%FFBEGIN%3AVCARDS%0AVERSION%3A3.0%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%90%EB%8F%85%0ATITLE%3A%EC%98%81%ED%99%94%EA%B0%90%EB%8F%85%0ATEL%3A01058705815%0AURL%3Ahttps%3A%2F%2Fyeosuiff.com%0AEND%3AVCARD" download="주경중_감독.vcf" class="btn btn-primary">
+                📇 연락처 저장하기
+            </a>
+
+            <!-- 2. 공식 홈페이지 -->
+            <a href="https://yeosuiff.com" target="_blank" class="btn btn-secondary">
+                🌐 공식 홈페이지
+            </a>
+
+            <!-- 3. 네이버 블로그 검색 -->
+            <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+site%3Ablog.naver.com" target="_blank" class="btn btn-secondary">
+                ✍️ 네이버 블로그 검색
+            </a>
+
+            <!-- 4. 네이버 뉴스 검색 -->
+            <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91+%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="btn btn-secondary">
+                📰 네이버 뉴스 검색
+            </a>
         </div>
     </div>
 
-    <script>
-        function downloadVCard() {
-            const vcardData = 
-`BEGIN:VCARD
-VERSION:3.0
-FN:주경중 감독
-TITLE:영화감독 / 프로듀서 / 제작자
-TEL;TYPE=CELL:01058705815
-URL;TYPE=WORK:https://yeosuiff.com
-NOTE:싸카(SSAKA) 모바일 명함 연락처
-END:VCARD`;
-
-            const blob = new Blob([vcardData], { type: 'text/v-card;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', '주경중_감독.vcf');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function shareCard() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '영화감독 주경중 모바일 명함',
-                    text: '주경중 감독의 프로필 명함입니다.',
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('명함 주소가 복사되었습니다. 카카오톡에 붙여넣기 해주세요!');
-            }
-        }
-    </script>
 </body>
 </html>

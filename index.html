@@ -23,7 +23,7 @@
             width: 100%;
             max-width: 420px;
             aspect-ratio: 1 / 1;
-            background-image: url('bg2.jpg'); /* 배경 이미지 파일명 */
+            background-image: url('bg2.jpg');
             background-size: cover;
             background-position: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
@@ -31,16 +31,16 @@
         /* 하단 4개 버튼 투명 터치 영역 */
         .touch-link {
             position: absolute;
-            bottom: 3%; /* 하단 배치 위치 */
-            width: 22%; /* 4개 버튼 너비 배분 */
-            height: 20%; /* 높이 설정 */
+            bottom: 3%;
+            width: 22%;
+            height: 20%;
             cursor: pointer;
             z-index: 10;
-            opacity: 0; /* 투명 처리 */
+            opacity: 0;
         }
-        /* 4개 버튼 위치 (왼쪽부터 1, 2, 3, 4) */
+        /* 버튼 4개 위치 (왼쪽부터 1, 2, 3, 4) */
         .btn-1 { left: 4%; }   /* 1번: 전화번호 저장 */
-        .btn-2 { left: 28%; }  /* 2번: 블로그 (주경중 블로그 검색) */
+        .btn-2 { left: 28%; }  /* 2번: 주경중 블로그 검색 */
         .btn-3 { left: 52%; }  /* 3번: 네이버 뉴스 (주경중 동대문) */
         .btn-4 { left: 76%; }  /* 4번: 홈페이지 */
     </style>
@@ -48,16 +48,16 @@
 <body>
 
     <div class="container">
-        <!-- 1번 버튼: 전화번호 연락처 자동 저장 (.vcf 파일 다운로드) -->
-        <a href="주경중_감독.vcf" download class="touch-link btn-1" title="전화번호 저장"></a>
+        <!-- 1번 버튼: 전화번호 연락처 자동 저장 (.vcf 파일 직접 연결) -->
+        <a href="./주경중_감독.vcf" download class="touch-link btn-1" title="전화번호 저장"></a>
 
-        <!-- 2번 버튼: 네이버 블로그 '주경중' 검색 결과 페이지 -->
-        <a href="https://m.search.naver.com/search.naver?where=m_blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="touch-link btn-2" title="블로그"></a>
+        <!-- 2번 버튼: 네이버 블로그 '주경중' 통합검색 결과 -->
+        <a href="https://m.search.naver.com/search.naver?where=blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="touch-link btn-2" title="블로그"></a>
 
-        <!-- 3번 버튼: 네이버 뉴스 '주경중 동대문' 검색 결과 페이지 -->
+        <!-- 3번 버튼: 네이버 뉴스 '주경중 동대문' 검색 결과 (정상 작동 확인 완료) -->
         <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="touch-link btn-3" title="네이버뉴스"></a>
 
-        <!-- 4번 버튼: 홈페이지 링크 (실제 열릴 주소 입력) -->
+        <!-- 4번 버튼: 현재 명함 사이트 주소 정상 연결 -->
         <a href="https://directorjoo.github.io/ssaka-app/" target="_blank" class="touch-link btn-4" title="홈페이지"></a>
     </div>
 

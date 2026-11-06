@@ -1,24 +1,40 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>싸카(SSAKA) - 모바일 명함</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영화감독 주경중 - 프로필 명함</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="card-container">
-    <div class="profile-header">
-      <h1 id="userName">싸카 (SSAKA)</h1>
-      <p id="userBio">모바일 명함 & 셀프 템플릿 마켓</p>
+    <div class="card-container">
+        <div class="profile-header">
+            <h1 id="user-name">주경중 감독</h1>
+            <p id="user-bio">영화감독 · 프로듀서 · 제작자</p>
+        </div>
+        <div class="links-group">
+            <a href="https://yeosuiff.com" class="link-btn" target="_blank">🌐 공식 홈페이지 바로가기</a>
+            <a href="https://blog.naver.com/directorjoo" class="link-btn" target="_blank">📝 네이버 블로그 바로가기</a>
+            <a href="http://www.newswhoplus.com/news/articleView.html?idxno=3203" class="link-btn" target="_blank">📰 네이버 뉴스 보도기사 보기</a>
+            <a href="tel:01058705815" class="link-btn">🎴 내 전화번호 연락처 저장 및 안내</a>
+            <a href="tel:01058705815" class="link-btn">📞 주경중 감독에게 바로 전화하기</a>
+            <a href="#" class="link-btn" onclick="shareCard(); return false;">💬 카카오톡 / 명함 공유하기</a>
+        </div>
     </div>
-    
-    <div class="links-group">
-      <a href="#" class="link-btn">📌 대치동 학원 수강신청</a>
-      <a href="#" class="link-btn">🍽️ 식당/카페 메뉴판 및 배민</a>
-      <a href="#" class="link-btn">🎬 프로필 및 영화 작품집</a>
-    </div>
-  </div>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function shareCard() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '영화감독 주경중 모바일 명함',
+                    text: '주경중 감독의 프로필 명함입니다.',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('명함 주소가 복사되었습니다. 카카오톡에 붙여넣기 해주세요!');
+            }
+        }
+    </script>
 </body>
 </html>

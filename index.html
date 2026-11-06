@@ -3,63 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주경중 감독 모바일 명함</title>
+    <title>주경중 감독 - SSAKA 프로필 카드</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #e11d48;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --btn-bg: #334155;
+            --btn-hover: #475569;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #111;
-            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
         }
-        .container {
-            position: relative;
+
+        .card-container {
             width: 100%;
-            max-width: 420px;
-            aspect-ratio: 1 / 1;
-            background-image: url('bg2.jpg');
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 400px;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* 하단 4개 버튼 투명 터치 영역 */
-        .touch-link {
-            position: absolute;
-            bottom: 3%;
-            width: 22%;
-            height: 20%;
+
+        .header-banner {
+            height: 140px;
+            background: linear-gradient(135deg, #e11d48 0%, #4c0519 100%);
+            position: relative;
+        }
+
+        .profile-section {
+            padding: 0 24px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .avatar-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #334155;
+            border: 4px solid var(--card-bg);
+            margin: -50px auto 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .title {
+            font-size: 14px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .bio {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--btn-bg);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
             cursor: pointer;
-            z-index: 10;
-            opacity: 0;
         }
-        /* 버튼 4개 위치 (왼쪽부터 1, 2, 3, 4) */
-        .btn-1 { left: 4%; }   /* 1번: 전화번호 저장 */
-        .btn-2 { left: 28%; }  /* 2번: 주경중 블로그 검색 */
-        .btn-3 { left: 52%; }  /* 3번: 네이버 뉴스 (주경중 동대문) */
-        .btn-4 { left: 76%; }  /* 4번: 홈페이지 */
+
+        .btn-action:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .btn-primary {
+            grid-column: span 2;
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: #be123c;
+        }
+
+        .info-list {
+            text-align: left;
+            background-color: rgba(15, 23, 42, 0.5);
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: var(--text-sub);
+        }
+
+        .info-item:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-item i {
+            color: var(--accent-color);
+            width: 16px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 24px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* 전화번호 저장 팝업 (모달) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .modal-phone {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin: 16px 0;
+            letter-spacing: 1px;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-close {
+            background-color: var(--btn-bg);
+            color: var(--text-sub);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- 1번 버튼: 전화번호 연락처 자동 저장 (.vcf 파일 직접 연결) -->
-        <a href="./주경중_감독.vcf" download class="touch-link btn-1" title="전화번호 저장"></a>
+<div class="card-container">
+    <div class="header-banner"></div>
+    <div class="profile-section">
+        <div class="avatar-box">
+            <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <h1 class="name">주경중</h1>
+        <p class="title">영화감독 / 총괄프로듀서</p>
+        <p class="bio">영화 '동승', '나탈리', '동대문'<br>파리텍사스 브랜드 &amp; 여수국제영화제</p>
 
-        <!-- 2번 버튼: 네이버 블로그 '주경중' 통합검색 결과 -->
-        <a href="https://m.search.naver.com/search.naver?where=blog&query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="touch-link btn-2" title="블로그"></a>
+        <div class="action-grid">
+            <a href="tel:010-0000-0000" class="btn-action btn-primary">
+                <i class="fa-solid fa-phone"></i> 전화 연결
+            </a>
+            <a href="sms:010-0000-0000" class="btn-action">
+                <i class="fa-solid fa-comment"></i> 문자 보내기
+            </a>
+            <button class="btn-action" onclick="openSaveModal()">
+                <i class="fa-solid fa-address-book"></i> 전화번호 자동저장
+            </button>
+            <button class="btn-action" onclick="shareKakao()">
+                <i class="fa-solid fa-share-nodes"></i> 공유하기
+            </button>
+        </div>
 
-        <!-- 3번 버튼: 네이버 뉴스 '주경중 동대문' 검색 결과 (정상 작동 확인 완료) -->
-        <a href="https://m.search.naver.com/search.naver?where=m_news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="touch-link btn-3" title="네이버뉴스"></a>
+        <div class="info-list">
+            <div class="info-item">
+                <i class="fa-solid fa-film"></i>
+                <span>주요작품: 동승, 나탈리, 동대문</span>
+            </div>
+            <div class="info-item">
+                <i class="fa-solid fa-utensils"></i>
+                <span>브랜드: 파리텍사스 (바베큐)</span>
+            </div>
+            <div class="info-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>대한민국 서울특별시</span>
+            </div>
+        </div>
 
-        <!-- 4번 버튼: 현재 명함 사이트 주소 정상 연결 -->
-        <a href="https://directorjoo.github.io/ssaka-app/" target="_blank" class="touch-link btn-4" title="홈페이지"></a>
+        <div class="footer">
+            SSAKA Interactive Card Platform © 2026
+        </div>
     </div>
+</div>
+
+<!-- 전화번호 저장 팝업 창 -->
+<div class="modal-overlay" id="saveModal">
+    <div class="modal-box">
+        <div class="modal-title">주경중 감독 연락처</div>
+        <div class="modal-phone" id="userPhone">010-0000-0000</div>
+        <div class="modal-btns">
+            <button class="modal-btn btn-save" onclick="downloadVCard()">저장</button>
+            <button class="modal-btn btn-close" onclick="closeSaveModal()">닫기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const phoneNumber = "010-0000-0000"; // 감독님 실제 번호로 수정
+
+    function openSaveModal() {
+        document.getElementById('saveModal').style.display = 'flex';
+    }
+
+    function closeSaveModal() {
+        document.getElementById('saveModal').style.display = 'none';
+    }
+
+    function downloadVCard() {
+        const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:주경중 감독\nTEL;TYPE=CELL:${phoneNumber}\nEND:VCARD`;
+        const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', '주경중_감독.vcf');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        closeSaveModal();
+    }
+
+    function shareKakao() {
+        if (navigator.share) {
+            navigator.share({
+                title: '주경중 감독 명함',
+                text: '영화감독 주경중의 모바일 프로필 카드입니다.',
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            alert('링크가 복사되었습니다!');
+        }
+    }
+</script>
 
 </body>
 </html>

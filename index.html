@@ -62,7 +62,7 @@
             -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* 팝업 레이어 스타일 */
+        /* 슬림해진 팝업 레이어 스타일 */
         .modal-overlay {
             display: none;
             position: absolute;
@@ -78,36 +78,46 @@
         }
         .modal-box {
             background: #fff;
-            width: 100%;
+            width: 85%;
+            max-height: 50%; /* 팝업창을 반쯤 크기로 축소 */
             border-radius: 16px;
-            padding: 20px;
+            padding: 24px 20px 20px 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             text-align: center;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .modal-close-btn {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
+        /* 우측 상단 X 닫기 버튼 */
+        .modal-close-x {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 22px;
             font-weight: bold;
-            border-radius: 20px;
+            color: #888;
             cursor: pointer;
-            margin-bottom: 15px;
-            display: inline-block;
+            background: none;
+            border: none;
+            line-height: 1;
         }
+        .modal-close-x:hover {
+            color: #000;
+        }
+        /* 글씨체 크기 12pt(약 16px) 이상으로 시원하게 설정 */
         .modal-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: bold;
             color: #111;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .modal-desc {
-            font-size: 14px;
-            color: #555;
+            font-size: 16px; /* 12pt 이상 확대 */
+            color: #333;
             line-height: 1.5;
             margin-bottom: 20px;
+            word-break: keep-all;
         }
         .modal-link-btn {
             display: block;
@@ -117,7 +127,7 @@
             padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
         }
     </style>
 </head>
@@ -145,19 +155,19 @@
     <!-- 팝업창 1: 블로그 안내 -->
     <div id="blogModal" class="modal-overlay">
         <div class="modal-box">
-            <button class="modal-close-btn" onclick="closeModal('blogModal')">✕ 명함으로 돌아가기</button>
+            <button class="modal-close-x" onclick="closeModal('blogModal')">✕</button>
             <div class="modal-title">네이버 블로그 검색</div>
             <div class="modal-desc">주경중 감독의 최신 소식 및 블로그 검색 결과를 확인하시겠습니까?</div>
-            <a href="https://search.naver.com/search.naver?query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="modal-link-btn">네이버 블로그 검색 결과 보기</a>
+            <a href="https://search.naver.com/search.naver?query=%EC%A3%BC%EA%B2%BD%EC%A4%91" target="_blank" class="modal-link-btn">네이버 블로그 바로가기</a>
         </div>
     </div>
 
     <!-- 팝업창 2: 네이버 뉴스 안내 -->
     <div id="newsModal" class="modal-overlay">
         <div class="modal-box">
-            <button class="modal-close-btn" onclick="closeModal('newsModal')">✕ 명함으로 돌아가기</button>
+            <button class="modal-close-x" onclick="closeModal('newsModal')">✕</button>
             <div class="modal-title">네이버 뉴스 검색</div>
-            <div class="modal-desc">주경중 감독 동대문 관련 최신 뉴스 기사를 확인하시겠습니까?</div>
+            <div class="modal-desc">주경중 감독의 최신 뉴스를 확인하시겠습니까?</div>
             <a href="https://search.naver.com/search.naver?where=news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="modal-link-btn" style="background:#0066cc;">네이버 뉴스 바로가기</a>
         </div>
     </div>
@@ -165,9 +175,9 @@
     <!-- 팝업창 3: 공식 홈페이지 안내 -->
     <div id="homeModal" class="modal-overlay">
         <div class="modal-box">
-            <button class="modal-close-btn" onclick="closeModal('homeModal')">✕ 명함으로 돌아가기</button>
+            <button class="modal-close-x" onclick="closeModal('homeModal')">✕</button>
             <div class="modal-title">공식 홈페이지 이동</div>
-            <div class="modal-desc">주경중 감독 공식 홈페이지(Yeosuiff.com)로 이동하시겠습니까?</div>
+            <div class="modal-desc">여수국제영화제 홈페이지로 이동하시겠습니까?</div>
             <a href="http://Yeosuiff.com" target="_blank" class="modal-link-btn" style="background:#8a2be2;">홈페이지 바로가기</a>
         </div>
     </div>

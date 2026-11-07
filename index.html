@@ -6,11 +6,12 @@
     
     <!-- 카카오톡 / SNS 링크 공유 시 미리보기 (Open Graph) 최적화 -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://directorjoo.github.io/ssaka-app/">
     <meta property="og:title" content="주경중 감독 - 싸바카드">
-    <meta property="og:description" content="주경중 감독&#10;여수국제영화제준비위원장&#10;https://directorjoo.github.io">
-    <meta property="og:image" content="https://directorjoo.github.io/bg2.jpg?v=12">
-    <meta property="og:image:width" content="800">
-    <meta property="og:image:height" content="800">
+    <meta property="og:description" content="주경중 감독&#10;여수국제영화제준비위원장&#10;https://directorjoo.github.io/ssaka-app/">
+    <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/bg2.jpg?v=13">
+    <meta property="og:image:width" content="1080">
+    <meta property="og:image:height" content="1080">
 
     <title>주경중 감독 - 싸바카드</title>
     <style>
@@ -128,18 +129,35 @@
             font-weight: bold;
             font-size: 15px;
         }
+        /* 이미지 + 투명 버튼을 한 묶음으로 (아래에 버튼이 추가돼도 위치 고정) */
+        .banner-wrap { position: relative; }
+        /* 카톡으로 보내기 버튼 */
+        .share-bar {
+            display: block;
+            width: 100%;
+            border: 0;
+            background: #fee500;
+            color: #191919;
+            font-size: 17px;
+            font-weight: 800;
+            padding: 18px 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .share-bar:active { background: #f2d900; }
     </style>
 </head>
 <body>
 
 <div class="card-container">
     <!-- 메인 배너 이미지 (bg2.jpg) -->
+    <div class="banner-wrap">
     <img src="bg2.jpg" alt="주경중 감독 - 싸바카드" class="banner-img">
 
     <!-- 배너 그림 하단 투명 터치 영역 (4개 버튼) -->
     <div class="overlay-buttons">
-        <!-- 1. 전화번호 & URL 저장 (Base64 인코딩으로 한글 깨짐 및 번호 오류 완벽 해결) -->
-        <a href="data:text/vcard;charset=utf-8;base64,QkVHSU46VkNBUkQNClZFUlNJT046My4wDQpOTjp0ZXN0Ow==;QSvA7qSp7KeAIOyCrOuwljs7Ow0KRk467KGg7KSuIOyCrOuwljsNClRFTDt0eXBlPUNFTEx,MTA1ODcwNTgxNQ0KVVJMOmh0dHBzOi8vZGlyZWN0b3Jqb28uZ2l0aHViLmlvDQpFTkQ6VkNBUkQ=" download="주경중_감독.vcf" class="touch-area" aria-label="연락처 및 명함URL 저장"></a>
+        <!-- 1. 연락처 저장: 같은 폴더의 joo.vcf 파일을 내려받음 (내용 수정은 joo.vcf에서) -->
+        <a href="joo.vcf" download="주경중_감독.vcf" class="touch-area" aria-label="연락처 및 명함URL 저장"></a>
 
         <!-- 2. 블로그 주경중 검색 (팝업창) -->
         <div class="touch-area" onclick="openModal('blogModal')" aria-label="블로그 검색"></div>
@@ -150,6 +168,11 @@
         <!-- 4. 여수국제영화제 홈페이지 이동 (팝업창) -->
         <div class="touch-area" onclick="openModal('homeModal')" aria-label="홈페이지 바로가기"></div>
     </div>
+
+    </div>
+
+    <!-- 카톡으로 보내기 (무료 공유) -->
+    <button type="button" class="share-bar" onclick="SsakaShare()">💬 이 카드 카톡으로 보내기</button>
 
     <!-- 팝업창 1: 블로그 안내 -->
     <div id="blogModal" class="modal-overlay">
@@ -191,5 +214,6 @@
     }
 </script>
 
+<script src="js/share.js"></script>
 </body>
 </html>

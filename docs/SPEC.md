@@ -65,3 +65,11 @@
 
 공유 메시지의 제목·설명·사진은 페이지의 og:title / og:description / og:image 를 그대로 씁니다.
 SDK: https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js (2026-10 기준 최신)
+
+## 만든 카드의 링크 (c/?d=…)
+
+- 만들기 화면(make/)에서 적은 내용을 JSON으로 묶고, UTF-8 → base64url 로 바꿔 링크 뒤에 붙입니다 (js/codec.js).
+- 서버·DB가 없으므로 비용 0원. 대신 카드를 고치면 링크가 새로 생기고, 이미 보낸 링크는 바뀌지 않습니다.
+- 링크 안의 사진·영상 주소는 http/https 만 허용합니다 (javascript: 등 차단).
+- 장소는 좌표 없이 이름만 있어도 됩니다 → 카카오맵 link/search, 네이버지도 검색으로 연결.
+- 카톡으로 보내기 버튼은 카드의 제목·소개·사진을 공유 메시지에 직접 넣습니다. 사진이 없으면 img/ssaka-share.png.

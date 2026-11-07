@@ -28,7 +28,8 @@
 
   function download(c) {
     var text = build(c);
-    var blob = new Blob([text], { type: 'text/vcard;charset=utf-8' });
+    // 맨 앞 BOM(\uFEFF): 맥 연락처 앱이 한글을 깨뜨리지 않게 UTF-8임을 표시
+    var blob = new Blob(['\uFEFF' + text], { type: 'text/vcard;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;

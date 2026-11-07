@@ -1,4 +1,7 @@
-/* 싸카 카드 뷰어 — ?card=<이름> 으로 cards/<이름>.json 을 불러와 그립니다 */
+/* 싸카 카드 뷰어
+ *  ?d=<데이터>    — 만들기 화면(make/)에서 만든 카드. 카드 내용이 링크 안에 들어 있음 (서버 불필요)
+ *  ?card=<이름>   — cards/<이름>.json 샘플 카드
+ */
 (function () {
   var app = document.getElementById('app');
   var toastEl = document.getElementById('toast');
@@ -22,6 +25,15 @@
     toastEl.classList.add('show');
     clearTimeout(toast._t);
     toast._t = setTimeout(function () { toastEl.classList.remove('show'); }, 2000);
+  }
+
+  // 링크에 들어온 주소는 http/https 만 허용 (javascript: 등 차단)
+  function safeUrl(u) {
+    if (!u) return '';
+    try {
+      var x = new URL(String(u), location.href);
+      return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : '';
+    } catch (e) { return ''; }
   }
 
   function telHref(phone) { return 'tel:' + String(phone).replace(/[^\d+]/g, ''); }
@@ -48,13 +60,17 @@
     });
   }
 
+  function hasCoords(p) { return isFinite(parseFloat(p.lat)) && isFinite(parseFloat(p.lng)); }
   function kakaoMapUrl(p) {
+    if (!hasCoords(p)) return 'https://map.kakao.com/link/search/' + encodeURIComponent(p.name);
     return 'https://map.kakao.com/link/to/' + encodeURIComponent(p.name) + ',' + p.lat + ',' + p.lng;
   }
   function naverMapUrl(p) {
     // 앱이 있으면 앱, 없으면 사용자가 아래 웹 링크를 이용
+    var app = '&appname=' + encodeURIComponent(location.hostname || 'ssaka');
+    if (!hasCoords(p)) return 'nmap://search?query=' + encodeURIComponent(p.name) + app;
     return 'nmap://route/public?dlat=' + p.lat + '&dlng=' + p.lng +
-      '&dname=' + encodeURIComponent(p.name) + '&appname=' + encodeURIComponent(location.hostname || 'ssaka');
+      '&dname=' + encodeURIComponent(p.name) + app;
   }
   function naverWebUrl(p) {
     return 'https://map.naver.com/p/search/' + encodeURIComponent(p.name);
@@ -95,6 +111,9 @@
     app.innerHTML = '';
 
     var c = card.contact || {};
+    card.image = safeUrl(card.image);
+    card.video = safeUrl(card.video);
+    if (c.url) c.url = safeUrl(c.url);
     var buttons = card.buttons || ['call', 'map', 'save', 'copy'];
 
     // 1. 메인 비주얼
@@ -136,7 +155,7 @@
       if (b === 'call' && c.phone) {
         grid.appendChild(btn('📞', '바로 통화', c.callLabel || null, { href: telHref(c.phone) }));
       }
-      if (b === 'map' && card.place) {
+      if (b === 'map' && card.place && card.place.name) {
         var choice = h('div', { class: 'map-choice' }, [
           h('a', { class: 'btn', href: kakaoMapUrl(card.place), text: '카카오맵' }),
           h('a', { class: 'btn', href: naverMapUrl(card.place), text: '네이버지도 앱',
@@ -177,27 +196,40 @@
     // 카톡으로 보내기 (무료)
     app.appendChild(h('button', { type: 'button', class: 'share', text: '💬 카톡으로 보내기',
       onclick: function () {
-        if (window.SsakaShare) window.SsakaShare({ title: card.title, description: card.subtitle || '', url: location.href });
+        if (window.SsakaShare) window.SsakaShare({
+          title: card.title, description: card.subtitle || '',
+          imageUrl: card.image || undefined, url: location.href
+        });
       } }));
 
     // 3. 바이럴 바
-    app.appendChild(h('a', { class: 'viral', href: card.makeUrl || '#make' }, [
+    var makeHref = new URL('../make/', location.href).href;
+    app.appendChild(h('a', { class: 'viral', href: makeHref }, [
       document.createTextNode('🚀 나도 '),
       h('span', { text: '10초 만에' }),
       document.createTextNode(' 싸카 만들기')
     ]));
   }
 
+  function fail(msg) {
+    app.innerHTML = '';
+    app.appendChild(h('p', { class: 'error', text: msg }));
+  }
+
   function load() {
     var params = new URLSearchParams(location.search);
+    var data = params.get('d');
+    if (data) {
+      var card = window.SsakaCodec && SsakaCodec.decode(data);
+      if (card) render(card); else fail('카드 링크가 잘렸거나 잘못됐어요');
+      return;
+    }
+    var base = window.SSAKA_CARDS || 'cards/';
     var name = (params.get('card') || 'actor').replace(/[^a-z0-9_-]/gi, '');
-    fetch('cards/' + name + '.json', { cache: 'no-cache' })
+    fetch(base + name + '.json', { cache: 'no-cache' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(render)
-      .catch(function () {
-        app.innerHTML = '';
-        app.appendChild(h('p', { class: 'error', text: '카드를 찾을 수 없어요 (' + name + ')' }));
-      });
+      .catch(function () { fail('카드를 찾을 수 없어요 (' + name + ')'); });
   }
 
   load();

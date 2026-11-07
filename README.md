@@ -4,6 +4,7 @@
 통화 · 길찾기 · 주소록 저장 · 계좌/링크 복사, 그리고 단톡방 바이럴 게임까지.
 
 - 실사용 카드 (주경중 감독): https://directorjoo.github.io/ssaka-app/
+- 카드 만들기: https://directorjoo.github.io/ssaka-app/make/
 - 템플릿 데모: https://directorjoo.github.io/ssaka-app/demo/?card=actor
   (card= actor · kid · senior · club · shop)
 
@@ -14,6 +15,11 @@ ssaka-app/
 ├── index.html      # 주경중 감독 카드 — 배너 이미지 위 투명 터치 버튼 4개
 ├── bg2.jpg         # 배너 이미지 (1080×1080) + 카톡 미리보기 이미지
 ├── joo.vcf         # 연락처 저장 파일 (이름·번호 수정은 여기서)
+├── make/           # "10초 만에 싸카 만들기" 화면
+├── c/              # 만든 카드를 여는 화면 (c/?d=카드내용)
+├── img/            # 사진 없는 카드의 기본 공유 이미지
+├── js/share.js     # 카톡으로 보내기
+├── js/codec.js     # 카드 내용 ↔ 링크 변환
 ├── demo/           # 범용 카드 템플릿 엔진 (JSON 하나로 카드 생성)
 │   ├── index.html
 │   ├── css/card.css

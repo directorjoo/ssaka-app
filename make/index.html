@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>싸카 만들기</title>
+  <meta property="og:title" content="10초 만에 싸카 만들기">
+  <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
+  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/ssaka-share.png">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #f4f1ec; --surface: #fff; --text: #1b1b1f; --muted: #6b6870;
+      --line: #e3ded6; --accent: #ff5a36; --kakao: #fee500; --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+    header h1 { font-size: 26px; margin: 4px 0 4px; letter-spacing: -0.02em; }
+    header p { margin: 0 0 18px; color: var(--muted); font-size: 15px; }
+    .layout { display: grid; gap: 20px; }
+    @media (min-width: 860px) { .layout { grid-template-columns: 1fr 380px; align-items: start; } .preview { position: sticky; top: 16px; } }
+
+    .types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+    .types button {
+      border: 2px solid var(--line); background: var(--surface); border-radius: var(--radius);
+      padding: 12px 4px; font: inherit; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .types button span { font-size: 22px; }
+    .types button[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: #fff; }
+
+    fieldset { border: 0; margin: 0 0 14px; padding: 16px; background: var(--surface); border-radius: var(--radius); }
+    legend { font-weight: 800; font-size: 15px; padding: 0; margin-bottom: 6px; float: left; width: 100%; }
+    fieldset > div, .hint { clear: both; }
+    label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; clear: both; }
+    input, textarea, select {
+      width: 100%; font: inherit; font-size: 16px; color: var(--text);
+      background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+    input:focus, textarea:focus { outline: 2px solid var(--text); outline-offset: 1px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; clear: both; }
+    .row > div { min-width: 0; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    [hidden] { display: none !important; }
+
+    .preview h2 { font-size: 15px; margin: 0 0 8px; }
+    .phone {
+      border: 8px solid #1b1b1f; border-radius: 34px; overflow: hidden; background: #1b1b1f;
+      height: 620px; max-height: 80vh;
+    }
+    .phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+
+    .done { margin-top: 14px; display: grid; gap: 8px; }
+    .done button, .done a {
+      display: flex; align-items: center; justify-content: center; min-height: 54px;
+      border: 0; border-radius: var(--radius); font: inherit; font-size: 16px; font-weight: 800;
+      text-decoration: none; cursor: pointer;
+    }
+    .kakao { background: var(--kakao); color: #191919; }
+    .dark { background: var(--text); color: #fff; }
+    .ghost { background: var(--surface); color: var(--text); border: 1px solid var(--line) !important; }
+    .link { font-size: 12px; color: var(--muted); word-break: break-all; background: var(--surface); padding: 10px 12px; border-radius: 10px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px); background: #1b1b1f; color: #fff;
+      padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s; max-width: calc(100% - 32px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🚀 10초 만에 싸카 만들기</h1>
+    <p>적으면 오른쪽(아래)에 바로 보여요. 다 되면 카톡으로 보내기를 누르세요.</p>
+  </header>
+
+  <div class="layout">
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <div class="types" role="group" aria-label="카드 종류">
+        <button type="button" data-type="profile" aria-pressed="true"><span>🎬</span>프로필</button>
+        <button type="button" data-type="club" aria-pressed="false"><span>⛰️</span>모임 공지</button>
+        <button type="button" data-type="shop" aria-pressed="false"><span>🏪</span>가게 홍보</button>
+        <button type="button" data-type="safe" aria-pressed="false"><span>🆘</span>안심</button>
+      </div>
+
+      <fieldset>
+        <legend>카드 앞면</legend>
+        <label for="title" data-l="title">제목</label>
+        <input id="title" maxlength="40">
+        <label for="subtitle" data-l="subtitle">한 줄 소개</label>
+        <input id="subtitle" maxlength="60">
+        <div data-for="profile club shop">
+          <label for="image">사진 주소 (선택)</label>
+          <input id="image" type="url" inputmode="url" placeholder="https://… .jpg">
+          <div class="hint">인터넷에 올린 사진 주소를 붙여넣으세요. 휴대폰 사진 바로 올리기는 다음 단계에서 지원해요.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend data-l="contact">연락처</legend>
+        <div class="row">
+          <div>
+            <label for="name" data-l="name">이름</label>
+            <input id="name" maxlength="30">
+          </div>
+          <div>
+            <label for="phone" data-l="phone">전화번호</label>
+            <input id="phone" type="tel" inputmode="tel" placeholder="010-0000-0000" maxlength="20">
+          </div>
+        </div>
+        <div data-for="profile">
+          <label for="org">소속 (선택)</label>
+          <input id="org" maxlength="40">
+        </div>
+        <div data-for="safe">
+          <label for="sosLabel">큰 버튼 글씨</label>
+          <input id="sosLabel" maxlength="20" placeholder="📞 엄마한테 전화">
+          <label for="locMsg">위치 보낼 때 문구</label>
+          <input id="locMsg" maxlength="40" placeholder="나 지금 여기야!">
+        </div>
+      </fieldset>
+
+      <fieldset data-for="club shop">
+        <legend>장소</legend>
+        <label for="place">장소 이름 또는 주소</label>
+        <input id="place" maxlength="60" placeholder="예: 북한산 우이역 2번 출구">
+        <div class="hint">받는 사람이 누르면 카카오맵·네이버지도에서 이 이름으로 찾아줘요.</div>
+      </fieldset>
+
+      <fieldset>
+        <legend>내용</legend>
+        <label for="body" data-l="body">한 줄에 하나씩</label>
+        <textarea id="body" maxlength="600"></textarea>
+        <div data-for="profile">
+          <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
+          <input id="video" type="url" inputmode="url" placeholder="https://youtu.be/…">
+        </div>
+      </fieldset>
+
+      <fieldset data-for="profile club shop">
+        <legend>복사 버튼 (선택)</legend>
+        <div class="row">
+          <div>
+            <label for="copyLabel">버튼 이름</label>
+            <input id="copyLabel" maxlength="12">
+          </div>
+          <div>
+            <label for="copyValue">복사될 내용</label>
+            <input id="copyValue" maxlength="120">
+          </div>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="preview" aria-label="미리보기">
+      <h2>미리보기</h2>
+      <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
+      <div class="done">
+        <button type="button" class="kakao" id="send">💬 카톡으로 보내기</button>
+        <button type="button" class="ghost" id="copy">🔗 링크 복사</button>
+        <a class="dark" id="open" target="_blank" rel="noopener">새 창에서 열어보기</a>
+        <div class="link" id="link"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="toast" class="toast" role="status"></div>
+
+<script src="../js/codec.js"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var TYPES = {
+    profile: {
+      theme: 'dark', buttons: ['call', 'save', 'copy'],
+      labels: { title: '이름 · 직함', subtitle: '한 줄 소개', contact: '연락처', name: '저장될 이름', phone: '전화번호', body: '경력·필모그래피 (한 줄에 하나씩)' },
+      ex: { title: '배우 김싸카', subtitle: '신인 배우 · 178cm · 서울', name: '김싸카', body: '단편 「바다의 문」 주연 (2026)\n웹드라마 「식탁」 조연 (2025)', copyLabel: '인스타 링크', copyValue: 'https://instagram.com/' }
+    },
+    club: {
+      theme: 'light', buttons: ['call', 'map', 'save', 'copy'],
+      labels: { title: '모임 제목', subtitle: '날짜 · 시간', contact: '총무 연락처', name: '총무 이름', phone: '총무 전화번호', body: '코스 · 준비물 · 회비 (한 줄에 하나씩)' },
+      ex: { title: '11월 정기산행 — 북한산', subtitle: '11월 16일(일) 오전 9시', name: '총무 박총무', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 싸카산악회', place: '북한산 우이역 2번 출구' }
+    },
+    shop: {
+      theme: 'light', buttons: ['call', 'map', 'save', 'copy'],
+      labels: { title: '가게 이름 · 오늘의 소식', subtitle: '영업시간', contact: '예약 연락처', name: '가게 이름', phone: '예약 전화번호', body: '오늘의 메뉴 · 행사 (한 줄에 하나씩)' },
+      ex: { title: '싸카식당 — 오늘의 메뉴', subtitle: '11:30 – 22:00 · 월요일 휴무', name: '싸카식당', body: '오늘의 특선: 갓김치 삼겹살\n점심 백반 9,000원', copyLabel: '주소 복사', copyValue: '여수시 중앙동 (예시)', place: '여수 이순신광장' }
+    },
+    safe: {
+      theme: 'contrast', buttons: [], sos: true,
+      labels: { title: '카드 제목', subtitle: '안내 문구', contact: '보호자 연락처', name: '보호자 이름', phone: '보호자 전화번호', body: '주소 · 복용약 · 특이사항 (한 줄에 하나씩)' },
+      ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
+    }
+  };
+  var FIELDS = ['title', 'subtitle', 'image', 'name', 'phone', 'org', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue'];
+  var $ = function (id) { return document.getElementById(id); };
+  var type = 'profile';
+  var viewer = new URL('../c/', location.href).href;
+  var DRAFT = 'ssaka-draft-v1';
+
+  function toast(m) {
+    var t = $('toast'); t.textContent = m; t.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2000);
+  }
+  window.SsakaToast = toast;
+
+  function setType(t) {
+    type = t;
+    var cfg = TYPES[t];
+    document.querySelectorAll('.types button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.type === t ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-for]').forEach(function (el) {
+      el.hidden = el.dataset.for.split(' ').indexOf(t) < 0;
+    });
+    document.querySelectorAll('[data-l]').forEach(function (el) {
+      if (cfg.labels[el.dataset.l]) el.textContent = cfg.labels[el.dataset.l];
+    });
+    FIELDS.forEach(function (f) { if ($(f)) $(f).placeholder = cfg.ex[f] || $(f).getAttribute('data-ph') || ''; });
+    update();
+  }
+
+  function v(id) { return ($(id) && !$(id).closest('[hidden]')) ? $(id).value.trim() : ''; }
+
+  function buildCard() {
+    var cfg = TYPES[type];
+    var ex = cfg.ex;
+    // 비어 있으면 예시로 미리보기 (실제 링크에는 적은 내용만)
+    var isEmpty = FIELDS.every(function (f) { return !v(f); });
+    var g = function (f) { return v(f) || (isEmpty ? (ex[f] || '') : ''); };
+    var card = {
+      template: type,
+      theme: cfg.theme,
+      title: g('title'),
+      subtitle: g('subtitle'),
+      image: g('image'),
+      video: g('video'),
+      body: g('body').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
+      contact: { name: g('name'), org: g('org'), phone: g('phone') },
+      buttons: cfg.buttons.slice()
+    };
+    if (g('place')) card.place = { name: g('place') };
+    if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
+    if (cfg.sos) {
+      card.sos = true;
+      card.sosLabel = g('sosLabel') || '📞 SOS 전화';
+      card.locationMessage = g('locMsg');
+    }
+    return { card: card, isExample: isEmpty };
+  }
+
+  var timer = null, lastSrc = '';
+  function update() {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      var r = buildCard();
+      var url = viewer + '?d=' + SsakaCodec.encode(r.card);
+      if (url !== lastSrc) { $('frame').src = url; lastSrc = url; }
+      $('link').textContent = r.isExample ? '예시 카드예요. 내용을 적으면 내 카드 링크가 생겨요.' : url;
+      $('open').href = url;
+      saveDraft();
+    }, 300);
+  }
+
+  function current() {
+    var r = buildCard();
+    if (r.isExample) { toast('먼저 내용을 적어주세요'); return null; }
+    if (!r.card.title) { toast('제목을 적어주세요'); $('title').focus(); return null; }
+    return { card: r.card, url: viewer + '?d=' + SsakaCodec.encode(r.card) };
+  }
+
+  $('send').addEventListener('click', function () {
+    var c = current(); if (!c) return;
+    window.SsakaShare({
+      title: c.card.title,
+      description: c.card.subtitle || '눌러서 카드를 열어보세요',
+      imageUrl: c.card.image || undefined,
+      url: c.url
+    });
+  });
+  $('copy').addEventListener('click', function () {
+    var c = current(); if (!c) return;
+    var done = function () { toast('링크를 복사했어요'); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(c.url).then(done, function () { prompt('링크를 복사하세요', c.url); });
+    else prompt('링크를 복사하세요', c.url);
+  });
+  $('open').addEventListener('click', function (e) {
+    if (!current()) e.preventDefault();
+  });
+
+  document.querySelectorAll('.types button').forEach(function (b) {
+    b.addEventListener('click', function () { setType(b.dataset.type); });
+  });
+  $('form').addEventListener('input', update);
+
+  // 쓰던 내용 기억 (이 기기·이 브라우저에서만)
+  function saveDraft() {
+    try {
+      var d = { type: type };
+      FIELDS.forEach(function (f) { if ($(f)) d[f] = $(f).value; });
+      localStorage.setItem(DRAFT, JSON.stringify(d));
+    } catch (e) {}
+  }
+  function loadDraft() {
+    try {
+      var d = JSON.parse(localStorage.getItem(DRAFT) || 'null');
+      if (!d) return 'profile';
+      FIELDS.forEach(function (f) { if ($(f) && typeof d[f] === 'string') $(f).value = d[f]; });
+      return TYPES[d.type] ? d.type : 'profile';
+    } catch (e) { return 'profile'; }
+  }
+
+  setType(loadDraft());
+})();
+</script>
+</body>
+</html>

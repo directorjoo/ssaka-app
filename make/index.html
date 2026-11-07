@@ -26,14 +26,41 @@
     .layout { display: grid; gap: 20px; }
     @media (min-width: 860px) { .layout { grid-template-columns: 1fr 380px; align-items: start; } .preview { position: sticky; top: 16px; } }
 
-    .types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-    .types button {
-      border: 2px solid var(--line); background: var(--surface); border-radius: var(--radius);
-      padding: 12px 4px; font: inherit; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    #form, .preview { min-width: 0; }
+    .step { font-weight: 800; font-size: 15px; margin: 4px 0 8px; }
+    .step span { font-weight: 500; color: var(--muted); font-size: 13px; margin-left: 4px; }
+    .inds { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .inds::-webkit-scrollbar { display: none; }
+    .inds button {
+      flex: 0 0 auto; border: 2px solid var(--line); background: var(--surface); border-radius: 999px;
+      padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; white-space: nowrap;
     }
-    .types button span { font-size: 22px; }
-    .types button[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: #fff; }
+    .inds button[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: #fff; }
+    .gallery { display: grid; grid-auto-flow: column; grid-auto-columns: 112px; gap: 10px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 12px; scrollbar-width: none; }
+    .gallery::-webkit-scrollbar { display: none; }
+    @media (min-width: 860px) { .inds { flex-wrap: wrap; overflow: visible; } }
+    @media (min-width: 860px) { .gallery { grid-auto-flow: row; grid-template-columns: repeat(6, 1fr); grid-auto-columns: auto; overflow: visible; } }
+    .tcard {
+      position: relative; height: 176px; border-radius: 14px; overflow: hidden; cursor: pointer; padding: 8px;
+      background: var(--bg); border: 3px solid transparent; outline: 1px solid var(--line); text-align: left;
+      font-family: var(--font-body); display: flex; flex-direction: column; gap: 5px;
+    }
+    .tcard.fx-gradient { background: linear-gradient(180deg, var(--bg), var(--bg2)); }
+    .tcard.fx-dots { background-color: var(--bg); background-image: radial-gradient(var(--bg2) 1.2px, transparent 1.4px); background-size: 10px 10px; }
+    .tcard[aria-pressed="true"] { border-color: var(--accent-ui, #ff5a36); outline-color: transparent; }
+    .tcard .tv { background: var(--surface); border-radius: 8px; height: 58px; display: grid; place-items: center; color: var(--accent); font: 800 26px var(--font-head); }
+    .tcard.layout-banner .tv { height: 44px; }
+    .tcard.layout-circle .tv { width: 54px; height: 54px; border-radius: 50%; margin: 0 auto; border: 2px solid var(--btn); }
+    .tcard.layout-hero { padding-top: 0; }
+    .tcard.layout-hero .tv { margin: 0 -8px; height: 74px; border-radius: 0 0 10px 10px; background: linear-gradient(150deg, var(--btn), var(--bg2)); color: var(--btn-text); }
+    .tcard .tt { font: 700 13px/1.25 var(--font-head); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tcard.layout-circle .tt { text-align: center; }
+    .tcard .ts { height: 5px; width: 70%; border-radius: 3px; background: var(--muted); opacity: .6; }
+    .tcard .tb { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: auto; }
+    .tcard .tb i { display: block; height: 18px; border-radius: 5px; background: var(--btn); }
+    .tcard.btn-pill .tb i { border-radius: 999px; }
+    .tcard.btn-outline .tb i { background: transparent; border: 2px solid var(--btn); }
+    .tcard .tn { position: absolute; right: 6px; top: 6px; font: 700 10px/1 -apple-system, sans-serif; background: rgba(0,0,0,.55); color: #fff; padding: 3px 5px; border-radius: 6px; }
 
     fieldset { border: 0; margin: 0 0 14px; padding: 16px; background: var(--surface); border-radius: var(--radius); }
     legend { font-weight: 800; font-size: 15px; padding: 0; margin-bottom: 6px; float: left; width: 100%; }
@@ -68,6 +95,24 @@
     .ghost { background: var(--surface); color: var(--text); border: 1px solid var(--line) !important; }
     .link { font-size: 12px; color: var(--muted); word-break: break-all; background: var(--surface); padding: 10px 12px; border-radius: 10px; }
 
+    .photo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .photo img { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; }
+    .pick {
+      display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; margin: 0;
+      border-radius: 12px; background: var(--text); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .mini {
+      min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
+      background: var(--surface); color: var(--text); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .addr { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    #addr1, #addr2 { margin-top: 8px; }
+    input[readonly] { color: var(--muted); }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: flex-end; justify-content: center; z-index: 50; }
+    .modal[hidden] { display: none !important; }
+    .modal-box { background: var(--surface); width: 100%; max-width: 520px; border-radius: 18px 18px 0 0; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 10px; }
+    #postWrap { height: 70vh; max-height: 520px; overflow: hidden; }
     .toast {
       position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
       transform: translateX(-50%) translateY(20px); background: #1b1b1f; color: #fff;
@@ -86,12 +131,11 @@
 
   <div class="layout">
     <form id="form" autocomplete="off" onsubmit="return false">
-      <div class="types" role="group" aria-label="카드 종류">
-        <button type="button" data-type="profile" aria-pressed="true"><span>🎬</span>프로필</button>
-        <button type="button" data-type="club" aria-pressed="false"><span>⛰️</span>모임 공지</button>
-        <button type="button" data-type="shop" aria-pressed="false"><span>🏪</span>가게 홍보</button>
-        <button type="button" data-type="safe" aria-pressed="false"><span>🆘</span>안심</button>
-      </div>
+      <div class="step">1. 업종 고르기</div>
+      <div class="inds" id="inds" role="group" aria-label="업종"></div>
+
+      <div class="step">2. 디자인 고르기 <span id="designInfo"></span></div>
+      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
 
       <fieldset>
         <legend>카드 앞면</legend>
@@ -100,9 +144,15 @@
         <label for="subtitle" data-l="subtitle">한 줄 소개</label>
         <input id="subtitle" maxlength="60">
         <div data-for="profile club shop">
-          <label for="image">사진 주소 (선택)</label>
-          <input id="image" type="url" inputmode="url" placeholder="https://… .jpg">
-          <div class="hint">인터넷에 올린 사진 주소를 붙여넣으세요. 휴대폰 사진 바로 올리기는 다음 단계에서 지원해요.</div>
+          <label>사진 (선택)</label>
+          <div class="photo">
+            <img id="thumb" alt="" hidden>
+            <label class="pick" for="photoFile">📷 사진 앨범에서 고르기</label>
+            <input id="photoFile" type="file" accept="image/*" hidden>
+            <button type="button" class="mini" id="photoRemove" hidden>사진 빼기</button>
+          </div>
+          <div class="hint" id="photoStatus">고른 사진은 크기를 줄여서 카카오 서버에 올려요.</div>
+          <input id="image" type="hidden">
         </div>
       </fieldset>
 
@@ -119,8 +169,25 @@
           </div>
         </div>
         <div data-for="profile">
-          <label for="org">소속 (선택)</label>
-          <input id="org" maxlength="40">
+          <div class="row">
+            <div>
+              <label for="org">소속 (선택)</label>
+              <input id="org" maxlength="40">
+            </div>
+            <div>
+              <label for="email">이메일 (선택)</label>
+              <input id="email" type="email" inputmode="email" maxlength="60">
+            </div>
+          </div>
+        </div>
+        <div data-for="profile shop">
+          <label for="addr1">주소 (선택 — 주소록에 함께 저장돼요)</label>
+          <div class="addr">
+            <input id="zip" placeholder="우편번호" readonly>
+            <button type="button" class="mini" data-postcode="contact">🔍 우편번호 찾기</button>
+          </div>
+          <input id="addr1" placeholder="주소 찾기를 누르세요" readonly>
+          <input id="addr2" maxlength="60" placeholder="상세 주소 (동·호수, 층)">
         </div>
         <div data-for="safe">
           <label for="sosLabel">큰 버튼 글씨</label>
@@ -133,7 +200,10 @@
       <fieldset data-for="club shop">
         <legend>장소</legend>
         <label for="place">장소 이름 또는 주소</label>
-        <input id="place" maxlength="60" placeholder="예: 북한산 우이역 2번 출구">
+        <div class="addr">
+          <input id="place" maxlength="60" placeholder="예: 북한산 우이역 2번 출구">
+          <button type="button" class="mini" data-postcode="place">🔍 주소 찾기</button>
+        </div>
         <div class="hint">받는 사람이 누르면 카카오맵·네이버지도에서 이 이름으로 찾아줘요.</div>
       </fieldset>
 
@@ -143,6 +213,7 @@
         <textarea id="body" maxlength="600"></textarea>
         <div data-for="profile">
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
+          <div class="hint">동영상은 유튜브에 "일부 공개"로 올린 뒤 그 링크를 붙여넣으세요.</div>
           <input id="video" type="url" inputmode="url" placeholder="https://youtu.be/…">
         </div>
       </fieldset>
@@ -175,9 +246,17 @@
   </div>
 </div>
 <div id="toast" class="toast" role="status"></div>
+<div class="modal" id="postModal" hidden>
+  <div class="modal-box">
+    <div class="modal-head"><b>주소 찾기</b><button type="button" class="mini" id="postClose">닫기</button></div>
+    <div id="postWrap"></div>
+  </div>
+</div>
 
 <script src="../js/codec.js"></script>
+<script src="../js/designs.js"></script>
 <script src="../js/share.js"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
 (function () {
   var TYPES = {
@@ -202,9 +281,13 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['title', 'subtitle', 'image', 'name', 'phone', 'org', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue'];
+  var FIELDS = ['title', 'subtitle', 'image', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
+  var industry = 'actor';
+  var design = 'actor-1';
+  var D = window.SsakaDesigns;
+  function EX() { var ind = D.industry(industry); return (ind && ind.ex) || TYPES[type].ex; }
   var viewer = new URL('../c/', location.href).href;
   var DRAFT = 'ssaka-draft-v1';
 
@@ -214,19 +297,74 @@
   }
   window.SsakaToast = toast;
 
+  // ---------- 업종 · 디자인 고르기 ----------
+  function renderIndustries() {
+    var box = $('inds'); box.innerHTML = '';
+    D.INDUSTRIES.forEach(function (ind) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.dataset.ind = ind.id;
+      b.textContent = ind.emoji + ' ' + ind.label;
+      b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
+      b.addEventListener('click', function () { setIndustry(ind.id, true); });
+      box.appendChild(b);
+    });
+  }
+  function thumb(d, ex) {
+    var el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'tcard layout-' + d.layout + ' btn-' + d.button + ' fx-' + d.effect;
+    el.setAttribute('aria-pressed', d.id === design ? 'true' : 'false');
+    el.setAttribute('aria-label', d.name);
+    D.apply(el, d);
+    var title = ex.title || '';
+    el.innerHTML = '<span class="tn"></span><div class="tv"></div><div class="tt"></div><div class="ts"></div><div class="tb"><i></i><i></i><i></i><i></i></div>';
+    el.querySelector('.tn').textContent = d.id.split('-').pop();
+    el.querySelector('.tv').textContent = title.trim().charAt(0);
+    el.querySelector('.tt').textContent = title;
+    el.addEventListener('click', function () { setDesign(d.id); });
+    return el;
+  }
+  function renderGallery() {
+    var box = $('gallery'); box.innerHTML = '';
+    var list = D.list(industry), ex = EX();
+    var shown = Object.assign({}, ex, { title: v('title') || ex.title });
+    list.forEach(function (d) { box.appendChild(thumb(d, shown)); });
+    $('designInfo').textContent = list.length + '개 중 ' + design.split('-').pop() + '번';
+  }
+  function setDesign(id) {
+    design = id;
+    document.querySelectorAll('.tcard').forEach(function (t) {
+      t.setAttribute('aria-pressed', t.getAttribute('aria-label') === (D.get(id) || {}).name ? 'true' : 'false');
+    });
+    $('designInfo').textContent = D.list(industry).length + '개 중 ' + id.split('-').pop() + '번';
+    update();
+  }
+  function setIndustry(id, userPicked) {
+    var ind = D.industry(id) || D.INDUSTRIES[0];
+    industry = ind.id;
+    if (!D.get(design) || D.get(design).industry !== industry) design = D.list(industry)[0].id;
+    document.querySelectorAll('.inds button').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.ind === industry ? 'true' : 'false');
+    });
+    setType(ind.type);
+    renderGallery();
+    if (userPicked) {
+      var on = document.querySelector('.inds button[aria-pressed="true"]');
+      if (on && on.scrollIntoView) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
   function setType(t) {
     type = t;
     var cfg = TYPES[t];
-    document.querySelectorAll('.types button').forEach(function (b) {
-      b.setAttribute('aria-pressed', b.dataset.type === t ? 'true' : 'false');
-    });
     document.querySelectorAll('[data-for]').forEach(function (el) {
       el.hidden = el.dataset.for.split(' ').indexOf(t) < 0;
     });
     document.querySelectorAll('[data-l]').forEach(function (el) {
       if (cfg.labels[el.dataset.l]) el.textContent = cfg.labels[el.dataset.l];
     });
-    FIELDS.forEach(function (f) { if ($(f)) $(f).placeholder = cfg.ex[f] || $(f).getAttribute('data-ph') || ''; });
+    var ex = EX();
+    FIELDS.forEach(function (f) { if ($(f) && !$(f).readOnly) $(f).placeholder = ex[f] || $(f).getAttribute('data-ph') || ''; });
     update();
   }
 
@@ -234,19 +372,24 @@
 
   function buildCard() {
     var cfg = TYPES[type];
-    var ex = cfg.ex;
+    var ex = EX();
     // 비어 있으면 예시로 미리보기 (실제 링크에는 적은 내용만)
     var isEmpty = FIELDS.every(function (f) { return !v(f); });
-    var g = function (f) { return v(f) || (isEmpty ? (ex[f] || '') : ''); };
+    var exFill = Object.assign({ phone: '010-0000-0000' }, ex);
+    var g = function (f) { return v(f) || (isEmpty ? (exFill[f] || '') : ''); };
     var card = {
       template: type,
+      design: design,
       theme: cfg.theme,
       title: g('title'),
       subtitle: g('subtitle'),
       image: g('image'),
       video: g('video'),
       body: g('body').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
-      contact: { name: g('name'), org: g('org'), phone: g('phone') },
+      contact: {
+        name: g('name'), org: g('org'), phone: g('phone'), email: g('email'),
+        address: v('addr1') ? { zip: v('zip'), street: (v('addr1') + ' ' + v('addr2')).trim() } : undefined
+      },
       buttons: cfg.buttons.slice()
     };
     if (g('place')) card.place = { name: g('place') };
@@ -298,15 +441,15 @@
     if (!current()) e.preventDefault();
   });
 
-  document.querySelectorAll('.types button').forEach(function (b) {
-    b.addEventListener('click', function () { setType(b.dataset.type); });
+  $('form').addEventListener('input', function (e) {
+    update();
+    if (e.target && e.target.id === 'title') renderGallery();
   });
-  $('form').addEventListener('input', update);
 
   // 쓰던 내용 기억 (이 기기·이 브라우저에서만)
   function saveDraft() {
     try {
-      var d = { type: type };
+      var d = { type: type, industry: industry, design: design };
       FIELDS.forEach(function (f) { if ($(f)) d[f] = $(f).value; });
       localStorage.setItem(DRAFT, JSON.stringify(d));
     } catch (e) {}
@@ -314,13 +457,96 @@
   function loadDraft() {
     try {
       var d = JSON.parse(localStorage.getItem(DRAFT) || 'null');
-      if (!d) return 'profile';
+      if (!d) return 'actor';
       FIELDS.forEach(function (f) { if ($(f) && typeof d[f] === 'string') $(f).value = d[f]; });
-      return TYPES[d.type] ? d.type : 'profile';
-    } catch (e) { return 'profile'; }
+      if (d.design && D.get(d.design)) design = d.design;
+      if (d.industry && D.industry(d.industry)) return d.industry;
+      var byType = { profile: 'actor', club: 'club', shop: 'restaurant', safe: 'kid' };
+      return byType[d.type] || 'actor';
+    } catch (e) { return 'actor'; }
   }
 
-  setType(loadDraft());
+  // ---------- 사진: 앨범에서 골라 크기 줄이고 카카오 서버에 올리기 ----------
+  function showThumb(url) {
+    $('thumb').hidden = !url; if (url) $('thumb').src = url;
+    $('photoRemove').hidden = !url;
+  }
+  function resize(file, max) {
+    return new Promise(function (resolve) {
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var r = Math.min(1, max / Math.max(img.width, img.height));
+        var cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * r); cv.height = Math.round(img.height * r);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(u);
+        cv.toBlob(function (b) { resolve(b ? new File([b], 'ssaka.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); resolve(file); };
+      img.src = u;
+    });
+  }
+  $('photoFile').addEventListener('change', function () {
+    var input = this, file = input.files && input.files[0];
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { toast('사진 파일만 올릴 수 있어요'); return; }
+    $('photoStatus').textContent = '사진 올리는 중…';
+    showThumb(URL.createObjectURL(file));
+    resize(file, 1080).then(function (small) {
+      var list = input.files;
+      try { var dt = new DataTransfer(); dt.items.add(small); list = dt.files; } catch (e) {}
+      if (!window.SsakaKakao) throw new Error('kakao');
+      return window.SsakaKakao().then(function (Kakao) { return Kakao.Share.uploadImage({ file: list }); });
+    }).then(function (res) {
+      var info = (res && (res.infos || res)) || {};
+      var url = info.original && info.original.url;
+      if (!url) throw new Error('no url');
+      $('image').value = url.replace(/^http:/, 'https:');
+      $('photoStatus').textContent = '사진이 올라갔어요 ✓';
+      update();
+    }).catch(function () {
+      $('photoStatus').textContent = '사진을 올리지 못했어요. 잠시 뒤 다시 골라주세요.';
+      showThumb($('image').value);
+    });
+    input.value = '';
+  });
+  $('photoRemove').addEventListener('click', function () {
+    $('image').value = ''; showThumb(''); $('photoStatus').textContent = '사진을 뺐어요.'; update();
+  });
+
+  // ---------- 주소: 카카오(다음) 우편번호 검색 ----------
+  function openPostcode(target) {
+    if (!window.daum || !daum.Postcode) { toast('주소 검색을 불러오는 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
+    var wrap = $('postWrap'); wrap.innerHTML = '';
+    $('postModal').hidden = false;
+    new daum.Postcode({
+      width: '100%', height: '100%',
+      oncomplete: function (d) {
+        var road = d.roadAddress || d.jibunAddress || d.address || '';
+        var bld = d.buildingName ? ' (' + d.buildingName + ')' : '';
+        if (target === 'place') {
+          $('place').value = (road + bld).slice(0, 60);
+        } else {
+          $('zip').value = d.zonecode || '';
+          $('addr1').value = road + bld;
+          if (type === 'shop' && !$('place').value) $('place').value = (road + bld).slice(0, 60);
+          setTimeout(function () { $('addr2').focus(); }, 50);
+        }
+        $('postModal').hidden = true;
+        update();
+      }
+    }).embed(wrap);
+  }
+  document.querySelectorAll('[data-postcode]').forEach(function (b) {
+    b.addEventListener('click', function () { openPostcode(b.dataset.postcode); });
+  });
+  $('addr1').addEventListener('click', function () { openPostcode('contact'); });
+  $('postClose').addEventListener('click', function () { $('postModal').hidden = true; });
+
+  industry = loadDraft();
+  renderIndustries();
+  setIndustry(industry);
+  showThumb($('image').value);
 })();
 </script>
 </body>

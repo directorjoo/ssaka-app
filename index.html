@@ -157,7 +157,7 @@
     <!-- 배너 그림 하단 투명 터치 영역 (4개 버튼) -->
     <div class="overlay-buttons">
         <!-- 1. 연락처 저장: 같은 폴더의 joo.vcf 파일을 내려받음 (내용 수정은 joo.vcf에서) -->
-        <a href="joo.vcf" download="주경중_감독.vcf" class="touch-area" aria-label="연락처 및 명함URL 저장"></a>
+        <a href="joo.vcf" download="주경중_감독.vcf" id="saveContact" class="touch-area" aria-label="연락처 및 명함URL 저장"></a>
 
         <!-- 2. 블로그 주경중 검색 (팝업창) -->
         <div class="touch-area" onclick="openModal('blogModal')" aria-label="블로그 검색"></div>
@@ -215,5 +215,27 @@
 </script>
 
 <script src="js/share.js"></script>
+<script src="js/inapp.js"></script>
+<script>
+    // 연락처 저장: 카톡 안에서는 막혀 있어서 사파리·크롬으로 넘겨 저장
+    (function () {
+        var a = document.getElementById('saveContact');
+        if (!a || !window.SsakaInApp) return;
+        function save() {
+            if (SsakaInApp.isIOS) location.href = 'joo.vcf';   // 아이폰: 연락처 화면이 바로 열림
+            else a.click();                                    // 안드로이드: 파일로 내려받기
+        }
+        a.addEventListener('click', function (e) {
+            if (SsakaInApp.isKakao) {
+                e.preventDefault();
+                SsakaInApp.openExternal(SsakaInApp.withSaveFlag(location.origin + location.pathname));
+            } else if (SsakaInApp.isIOS) {
+                e.preventDefault();
+                location.href = 'joo.vcf';
+            }
+        });
+        if (SsakaInApp.takeSaveFlag()) setTimeout(save, 600);
+    })();
+</script>
 </body>
 </html>

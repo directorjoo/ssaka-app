@@ -84,4 +84,5 @@
   if (KAKAO_JS_KEY) loadKakao().catch(function () {});
 
   window.SsakaShare = shareToKakao;
+  window.SsakaKakao = loadKakao; // 사진 올리기 등 다른 카카오 기능에서 사용
 })();

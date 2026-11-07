@@ -193,3 +193,57 @@ body {
   font-weight: 800;
   cursor: pointer;
 }
+
+/* ---------- 디자인 템플릿 (js/designs.js) ---------- */
+body { font-family: var(--font-body, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif); }
+.head h1, .sos { font-family: var(--font-head, inherit); }
+.visual .initial { font-family: var(--font-head, inherit); }
+
+/* 배경 효과 */
+body.fx-gradient { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2, var(--bg)) 100%); background-attachment: fixed; }
+body.fx-dots {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--bg2, transparent) 1.6px, transparent 1.8px);
+  background-size: 18px 18px;
+}
+
+/* 버튼 모양 */
+body.btn-pill .btn, body.btn-pill .share, body.btn-pill .viral, body.btn-pill .video { border-radius: 999px; }
+body.btn-pill .grid .btn { min-height: 64px; }
+body.btn-outline .grid .btn {
+  background: transparent; color: var(--text);
+  border: 2px solid var(--btn);
+}
+body.btn-outline .grid .btn .ico { filter: none; }
+
+/* 배치: banner — 넓은 사진 */
+body.layout-banner .visual { aspect-ratio: 16 / 9; }
+
+/* 배치: circle — 동그란 프로필 사진, 가운데 정렬 */
+body.layout-circle .visual {
+  width: 168px; aspect-ratio: 1 / 1; border-radius: 50%; margin: 12px auto 0;
+  border: 4px solid var(--btn);
+}
+body.layout-circle .visual .initial { font-size: 72px; }
+body.layout-circle .head { text-align: center; }
+
+/* 배치: hero — 화면 꽉 찬 사진 위에 제목 */
+body.layout-hero .visual.hero {
+  position: relative; margin: -16px -16px 0; border-radius: 0 0 28px 28px;
+  aspect-ratio: 4 / 5; place-items: stretch;
+}
+body.layout-hero .visual.hero.noimg {
+  aspect-ratio: 5 / 4;
+  background: linear-gradient(150deg, var(--btn) 0%, var(--bg2, var(--bg)) 100%);
+}
+body.layout-hero .visual.hero.noimg .initial {
+  position: absolute; top: 18%; left: 0; right: 0; text-align: center; color: var(--btn-text); opacity: .9;
+}
+body.layout-hero .visual.hero .head {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 48px 20px 22px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.62));
+}
+body.layout-hero .visual.hero.noimg .head { background: none; }
+body.layout-hero .visual.hero .head h1 { color: #fff; }
+body.layout-hero .visual.hero .head p { color: rgba(255,255,255,.88); }
+body.layout-hero .visual.hero.noimg .head h1, body.layout-hero .visual.hero.noimg .head p { color: var(--btn-text); }

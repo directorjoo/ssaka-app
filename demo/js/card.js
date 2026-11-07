@@ -60,20 +60,25 @@
     });
   }
 
+  // 지도 검색어: "서울 강남구 신사동 609-1 지하1층 (압구정역 3번출구 50m)" → 괄호 설명은 빼고 검색
+  function searchQuery(p) {
+    var q = String(p.name || '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+    return q || String(p.name || '');
+  }
   function hasCoords(p) { return isFinite(parseFloat(p.lat)) && isFinite(parseFloat(p.lng)); }
   function kakaoMapUrl(p) {
-    if (!hasCoords(p)) return 'https://map.kakao.com/link/search/' + encodeURIComponent(p.name);
+    if (!hasCoords(p)) return 'https://map.kakao.com/link/search/' + encodeURIComponent(searchQuery(p));
     return 'https://map.kakao.com/link/to/' + encodeURIComponent(p.name) + ',' + p.lat + ',' + p.lng;
   }
   function naverMapUrl(p) {
     // 앱이 있으면 앱, 없으면 사용자가 아래 웹 링크를 이용
     var app = '&appname=' + encodeURIComponent(location.hostname || 'ssaka');
-    if (!hasCoords(p)) return 'nmap://search?query=' + encodeURIComponent(p.name) + app;
+    if (!hasCoords(p)) return 'nmap://search?query=' + encodeURIComponent(searchQuery(p)) + app;
     return 'nmap://route/public?dlat=' + p.lat + '&dlng=' + p.lng +
       '&dname=' + encodeURIComponent(p.name) + app;
   }
   function naverWebUrl(p) {
-    return 'https://map.naver.com/p/search/' + encodeURIComponent(p.name);
+    return 'https://map.naver.com/p/search/' + encodeURIComponent(searchQuery(p));
   }
 
   function btn(icon, label, sub, attrs) {
@@ -106,7 +111,15 @@
   }
 
   function render(card) {
-    document.body.dataset.theme = card.theme || 'light';
+    var design = window.SsakaDesigns && card.design ? SsakaDesigns.get(card.design) : null;
+    var layout = design && !card.sos ? design.layout : 'classic';
+    if (design) {
+      delete document.body.dataset.theme;
+      document.body.className = 'layout-' + layout + ' btn-' + design.button + ' fx-' + design.effect;
+      SsakaDesigns.apply(document.body, design);
+    } else {
+      document.body.dataset.theme = card.theme || 'light';
+    }
     document.title = card.title ? card.title + ' · 싸카' : '싸카';
     app.innerHTML = '';
 
@@ -124,12 +137,13 @@
       visual.className += ' noimg';
       visual.appendChild(h('span', { class: 'initial', text: (card.title || '싸').trim().charAt(0) }));
     }
-    if (!card.sos) app.appendChild(visual);
-
-    app.appendChild(h('div', { class: 'head' }, [
+    var head = h('div', { class: 'head' }, [
       h('h1', { text: card.title || '' }),
       card.subtitle ? h('p', { text: card.subtitle }) : null
-    ]));
+    ]);
+    if (!card.sos) app.appendChild(visual);
+    if (layout === 'hero' && !card.sos) { visual.classList.add('hero'); visual.appendChild(head); }
+    else app.appendChild(head);
 
     // SOS 모드 (어린이/어르신 안심)
     if (card.sos && c.phone) {
@@ -139,6 +153,9 @@
       }));
     }
 
+    if (c.address && c.address.street) {
+      card.body = (card.body || []).concat(['📍 ' + c.address.street]);
+    }
     if (card.body && card.body.length) {
       app.appendChild(h('div', { class: 'body' }, [
         h('ul', {}, card.body.map(function (line) { return h('li', { text: line }); }))
@@ -172,9 +189,20 @@
       }
       if (b === 'save' && c.name && (c.phone || c.email)) {
         grid.appendChild(btn('📇', '주소록 저장', null, {
+          'data-save': '1',
           onclick: function () {
-            try { SsakaVCard.download(c); toast('연락처 파일을 열어 저장하세요'); }
-            catch (e) { toast('저장 실패: ' + e.message); }
+            // 만들기 화면의 미리보기 안에서는 휴대폰이 저장을 막음
+            if (window.self !== window.top) { toast('미리보기에선 저장이 안 돼요. "새 창에서 열어보기"로 확인하세요'); return; }
+            // 카톡 안에서는 저장이 막혀 있으므로 사파리·크롬으로 넘겨서 저장
+            if (window.SsakaInApp && SsakaInApp.isKakao) {
+              toast('저장하려고 사파리(크롬)로 열어요');
+              setTimeout(function () { SsakaInApp.openExternal(SsakaInApp.withSaveFlag()); }, 300);
+              return;
+            }
+            try {
+              var how = SsakaVCard.download(c);
+              toast(how === 'ios' ? '연락처 화면에서 "새로운 연락처 생성"을 누르세요' : '내려받은 연락처 파일을 열어 저장하세요');
+            } catch (e) { toast('저장 실패: ' + e.message); }
           }
         }));
       }
@@ -192,6 +220,15 @@
     if (btns.length % 2 === 1) btns[btns.length - 1].classList.add('wide');
     if (grid._mapChoice) grid.appendChild(grid._mapChoice);
     if (grid.children.length) app.appendChild(grid);
+
+    // 카톡에서 넘어온 경우(save=1): 바로 저장 이어서 진행
+    if (window.SsakaInApp && SsakaInApp.takeSaveFlag()) {
+      var saveBtn = grid.querySelector('[data-save]');
+      if (saveBtn) {
+        toast('연락처 저장을 이어서 할게요');
+        setTimeout(function () { saveBtn.click(); }, 700);
+      }
+    }
 
     // 카톡으로 보내기 (무료)
     app.appendChild(h('button', { type: 'button', class: 'share', text: '💬 카톡으로 보내기',

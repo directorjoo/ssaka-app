@@ -129,7 +129,7 @@
 
     <!-- 배너 그림 하단 투명 터치 영역 (4개 버튼) -->
     <div class="overlay-buttons">
-        <!-- 1. 전화번호 저장 ('알 수 없음' 제거 및 '주경중 감독' vCard) -->
+        <!-- 1. 전화번호 저장 (이전과 동일한 아이폰 한글 깨짐 및 '알 수 없음' 제거 vCard) -->
         <a href="data:text/vcard;charset=utf-8;base64,QkVHSU46VkNBUkQNClZFUlNJT046My4wDQpOTjp3cnU7IO2gOyEuOuhnCDrg7TrjIDri6g7OztODANQ0ZOOua2gOyEuOuhnCDrg7TrjIDri6gNCk9SRzrv77sIO2gOyEuOuhnCDrg7TrjIDri6gNCnRlbjowMTA1ODcwNTgxNQ0KRU5EOlZDQVJE" download="주경중_감독.vcf" class="touch-area" aria-label="전화번호 저장"></a>
 
         <!-- 2. 블로그 주경중 검색 (팝업 띄우기) -->
@@ -138,8 +138,8 @@
         <!-- 3. 네이버 뉴스 주경중 동대문 검색 (팝업 띄우기) -->
         <div class="touch-area" onclick="openModal('newsModal')" aria-label="네이버 뉴스 검색"></div>
 
-        <!-- 4. 홈페이지 이동 -->
-        <a href="http://Yeosuiff.com" target="_blank" class="touch-area" aria-label="홈페이지 바로가기"></a>
+        <!-- 4. 홈페이지 이동 (팝업 띄우기) -->
+        <div class="touch-area" onclick="openModal('homeModal')" aria-label="홈페이지 바로가기"></div>
     </div>
 
     <!-- 팝업창 1: 블로그 안내 -->
@@ -159,6 +159,16 @@
             <div class="modal-title">네이버 뉴스 검색</div>
             <div class="modal-desc">주경중 감독 동대문 관련 최신 뉴스 기사를 확인하시겠습니까?</div>
             <a href="https://search.naver.com/search.naver?where=news&query=%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EB%8F%99%EB%8C%80%EB%AC%B8" target="_blank" class="modal-link-btn" style="background:#0066cc;">네이버 뉴스 바로가기</a>
+        </div>
+    </div>
+
+    <!-- 팝업창 3: 공식 홈페이지 안내 -->
+    <div id="homeModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeModal('homeModal')">✕ 명함으로 돌아가기</button>
+            <div class="modal-title">공식 홈페이지 이동</div>
+            <div class="modal-desc">주경중 감독 공식 홈페이지(Yeosuiff.com)로 이동하시겠습니까?</div>
+            <a href="http://Yeosuiff.com" target="_blank" class="modal-link-btn" style="background:#8a2be2;">홈페이지 바로가기</a>
         </div>
     </div>
 </div>

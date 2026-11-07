@@ -6,7 +6,7 @@
  * 3순위: 링크 복사
  */
 (function () {
-  var KAKAO_JS_KEY = 'github.com/directorjoo/ssaka-app/edit/main/js/share.js'; // 예: 'a1b2c3d4e5...'  (비워두면 2순위로 동작)
+  var KAKAO_JS_KEY = '34e9c66cdbd5573434f8c38415aad6d7';
   var SDK_URL = 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js';
 
   function meta(prop) {

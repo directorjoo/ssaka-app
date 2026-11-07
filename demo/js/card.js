@@ -81,17 +81,6 @@
     return 'https://map.naver.com/p/search/' + encodeURIComponent(searchQuery(p));
   }
 
-  function btn(icon, label, sub, attrs) {
-    var tag = attrs && attrs.href ? 'a' : 'button';
-    var a = Object.assign({ class: 'btn' }, attrs || {});
-    if (tag === 'button') a.type = 'button';
-    return h(tag, a, [
-      h('span', { class: 'ico', text: icon, 'aria-hidden': 'true' }),
-      h('span', { text: label }),
-      sub ? h('small', { text: sub }) : null
-    ]);
-  }
-
   function sendMyLocation(card) {
     var guardian = card.guardianPhone || (card.contact && card.contact.phone);
     if (!navigator.geolocation) { toast('이 브라우저는 위치를 지원하지 않아요'); return; }
@@ -111,141 +100,122 @@
   }
 
   function render(card) {
-    var design = window.SsakaDesigns && card.design ? SsakaDesigns.get(card.design) : null;
-    var layout = design && !card.sos ? design.layout : 'classic';
-    if (design) {
-      delete document.body.dataset.theme;
-      document.body.className = 'layout-' + layout + ' btn-' + design.button + ' fx-' + design.effect;
-      SsakaDesigns.apply(document.body, design);
-    } else {
-      document.body.dataset.theme = card.theme || 'light';
-    }
-    document.title = card.title ? card.title + ' · 싸카' : '싸카';
-    app.innerHTML = '';
-
     var c = card.contact || {};
     card.image = safeUrl(card.image);
     card.video = safeUrl(card.video);
     if (c.url) c.url = safeUrl(c.url);
-    var buttons = card.buttons || ['call', 'map', 'save', 'copy'];
+    if (c.address && c.address.street) card.body = (card.body || []).concat(['📍 ' + c.address.street]);
+    document.title = card.title ? card.title + ' · 싸카' : '싸카';
 
-    // 1. 메인 비주얼
-    var visual = h('div', { class: 'visual' });
-    if (card.image) {
-      visual.appendChild(h('img', { src: card.image, alt: card.title || '', loading: 'eager' }));
-    } else {
-      visual.className += ' noimg';
-      visual.appendChild(h('span', { class: 'initial', text: (card.title || '싸').trim().charAt(0) }));
-    }
-    var head = h('div', { class: 'head' }, [
-      h('h1', { text: card.title || '' }),
-      card.subtitle ? h('p', { text: card.subtitle }) : null
-    ]);
-    if (!card.sos) app.appendChild(visual);
-    if (layout === 'hero' && !card.sos) { visual.classList.add('hero'); visual.appendChild(head); }
-    else app.appendChild(head);
+    var D = window.SsakaDesigns;
+    var design = D ? (D.get(card.design) || D.fallback(card)) : null;
 
-    // SOS 모드 (어린이/어르신 안심)
-    if (card.sos && c.phone) {
-      app.appendChild(h('a', { class: 'sos', href: telHref(c.phone), text: card.sosLabel || '📞 SOS' }));
-      app.appendChild(btn('📍', '내 위치 보내기', '보호자에게 문자로', {
-        class: 'btn sos-sub', onclick: function () { sendMyLocation(card); }
-      }));
-    }
-
-    if (c.address && c.address.street) {
-      card.body = (card.body || []).concat(['📍 ' + c.address.street]);
-    }
-    if (card.body && card.body.length) {
-      app.appendChild(h('div', { class: 'body' }, [
-        h('ul', {}, card.body.map(function (line) { return h('li', { text: line }); }))
-      ]));
-    }
-
-    if (card.video) {
-      app.appendChild(h('a', { class: 'video', href: card.video, target: '_blank', rel: 'noopener', text: '▶ 영상 보기' }));
-    }
-
-    // 2. 4대 버튼
-    var grid = h('div', { class: 'grid' });
-    buttons.forEach(function (b) {
-      if (b === 'call' && c.phone) {
-        grid.appendChild(btn('📞', '바로 통화', c.callLabel || null, { href: telHref(c.phone) }));
+    function onSave() {
+      // 만들기 화면의 미리보기 안에서는 휴대폰이 저장을 막음
+      if (window.self !== window.top) { toast('미리보기에선 저장이 안 돼요. "새 창에서 열어보기"로 확인하세요'); return; }
+      // 카톡 안에서는 저장이 막혀 있으므로 사파리·크롬으로 넘겨서 저장
+      if (window.SsakaInApp && SsakaInApp.isKakao) {
+        toast('저장하려고 사파리(크롬)로 열어요');
+        setTimeout(function () { SsakaInApp.openExternal(SsakaInApp.withSaveFlag()); }, 300);
+        return;
       }
-      if (b === 'map' && card.place && card.place.name) {
-        var choice = h('div', { class: 'map-choice' }, [
-          h('a', { class: 'btn', href: kakaoMapUrl(card.place), text: '카카오맵' }),
-          h('a', { class: 'btn', href: naverMapUrl(card.place), text: '네이버지도 앱',
-            onclick: function () {
-              // 앱이 없으면 1.5초 뒤 웹으로
-              var t = setTimeout(function () { location.href = naverWebUrl(card.place); }, 1500);
-              window.addEventListener('pagehide', function () { clearTimeout(t); }, { once: true });
-            } })
-        ]);
-        grid.appendChild(btn('📍', '길찾기', card.place.name, {
-          onclick: function () { choice.classList.toggle('open'); }
-        }));
-        grid._mapChoice = choice;
-      }
-      if (b === 'save' && c.name && (c.phone || c.email)) {
-        grid.appendChild(btn('📇', '주소록 저장', null, {
-          'data-save': '1',
-          onclick: function () {
-            // 만들기 화면의 미리보기 안에서는 휴대폰이 저장을 막음
-            if (window.self !== window.top) { toast('미리보기에선 저장이 안 돼요. "새 창에서 열어보기"로 확인하세요'); return; }
-            // 카톡 안에서는 저장이 막혀 있으므로 사파리·크롬으로 넘겨서 저장
-            if (window.SsakaInApp && SsakaInApp.isKakao) {
-              toast('저장하려고 사파리(크롬)로 열어요');
-              setTimeout(function () { SsakaInApp.openExternal(SsakaInApp.withSaveFlag()); }, 300);
-              return;
-            }
-            try {
-              var how = SsakaVCard.download(c);
-              toast(how === 'ios' ? '연락처 화면에서 "새로운 연락처 생성"을 누르세요' : '내려받은 연락처 파일을 열어 저장하세요');
-            } catch (e) { toast('저장 실패: ' + e.message); }
+      try {
+        var how = SsakaVCard.download(c);
+        toast(how === 'ios' ? '연락처 화면에서 "새로운 연락처 생성"을 누르세요' : '내려받은 연락처 파일을 열어 저장하세요');
+      } catch (e) { toast('저장하지 못했어요: ' + e.message); }
+    }
+
+    var ctx = {
+      tel: telHref,
+      mapUrls: function (p) {
+        return {
+          kakao: kakaoMapUrl(p),
+          naver: naverMapUrl(p),
+          onNaver: function () {
+            // 네이버지도 앱이 없으면 1.5초 뒤 웹으로
+            var t = setTimeout(function () { location.href = naverWebUrl(p); }, 1500);
+            window.addEventListener('pagehide', function () { clearTimeout(t); }, { once: true });
           }
-        }));
-      }
-      if (b === 'copy' && card.copy && card.copy.value) {
-        grid.appendChild(btn('🔗', card.copy.label || '복사', null, {
-          onclick: function () {
-            copyText(card.copy.value)
-              .then(function () { toast('복사했어요: ' + card.copy.value); })
-              .catch(function () { toast('복사하지 못했어요'); });
-          }
-        }));
-      }
-    });
-    var btns = grid.querySelectorAll(':scope > .btn');
-    if (btns.length % 2 === 1) btns[btns.length - 1].classList.add('wide');
-    if (grid._mapChoice) grid.appendChild(grid._mapChoice);
-    if (grid.children.length) app.appendChild(grid);
-
-    // 카톡에서 넘어온 경우(save=1): 바로 저장 이어서 진행
-    if (window.SsakaInApp && SsakaInApp.takeSaveFlag()) {
-      var saveBtn = grid.querySelector('[data-save]');
-      if (saveBtn) {
-        toast('연락처 저장을 이어서 할게요');
-        setTimeout(function () { saveBtn.click(); }, 700);
-      }
-    }
-
-    // 카톡으로 보내기 (무료)
-    app.appendChild(h('button', { type: 'button', class: 'share', text: '💬 카톡으로 보내기',
-      onclick: function () {
+        };
+      },
+      onSave: onSave,
+      onCopy: function () {
+        copyText(card.copy.value)
+          .then(function () { toast('복사했어요: ' + card.copy.value); })
+          .catch(function () { toast('복사하지 못했어요'); });
+      },
+      onLocation: function () { sendMyLocation(card); },
+      onShare: function () {
         if (window.SsakaShare) window.SsakaShare({
           title: card.title, description: card.subtitle || '',
           imageUrl: card.image || undefined, url: location.href
         });
-      } }));
+      },
+      onSms: function () {
+        if (window.SsakaSms) window.SsakaSms({ title: card.title, description: card.subtitle || '', url: location.href });
+      },
+      onReserve: function () {
+        if (window.self !== window.top) { toast('미리보기에선 예약 창만 보여드려요'); }
+        SsakaReserve.open(card, root, { toast: toast, copy: copyText, sms: smsHref });
+      },
+      makeHref: new URL('../make/', location.href).href
+    };
 
-    // 3. 바이럴 바
-    var makeHref = new URL('../make/', location.href).href;
-    app.appendChild(h('a', { class: 'viral', href: makeHref }, [
-      document.createTextNode('🚀 나도 '),
-      h('span', { text: '10초 만에' }),
-      document.createTextNode(' 싸카 만들기')
-    ]));
+    var root = SsakaRender.build(card, design, ctx);
+    // 받은 카드함에 기록 (만들기 화면 미리보기는 제외)
+    if (window.SsakaStore && window.self === window.top && /[?&]d=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
+    app.innerHTML = '';
+    app.className = 'sk-host';
+    app.appendChild(root);
+
+    // 소리: 열자마자 먼저 재생해 보고, 브라우저가 막으면 "싸카 도착" 화면을 띄워 첫 탭에 재생
+    if (card.sound && window.SsakaSound && window.self === window.top && !new URL(location.href).searchParams.get('save')) {
+      var replay = document.createElement('button');
+      replay.type = 'button';
+      replay.className = 'sk-replay';
+      replay.setAttribute('aria-label', '소리 다시 듣기');
+      replay.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+      replay.addEventListener('click', function () { SsakaSound.play(card.sound); });
+      root.appendChild(replay);
+
+      SsakaSound.tryAutoplay(card.sound).then(function (played) {
+        if (played) return;
+        var intro = document.createElement('div');
+        intro.className = 'sk-intro';
+        intro.setAttribute('role', 'button');
+        intro.tabIndex = 0;
+        intro.setAttribute('aria-label', '탭해서 카드 열기');
+        intro.innerHTML = '<div class="sk-intro-in"><div class="sk-ring"><div class="sk-envelope"></div></div><div class="sk-intro-b">띠링! 싸카 도착</div><div class="sk-intro-t"></div><div class="sk-intro-s">아무 데나 탭하세요</div></div>';
+        intro.querySelector('.sk-intro-t').textContent = (card.contact && card.contact.name ? card.contact.name + '님의 ' : '') + '카드가 도착했어요';
+        var opened = false;
+        var openCard = function () {
+          if (opened) return; opened = true;
+          SsakaSound.play(card.sound);
+          intro.classList.add('gone');
+          setTimeout(function () { intro.remove(); }, 400);
+        };
+        intro.addEventListener('click', openCard);
+        intro.addEventListener('touchstart', openCard, { passive: true });
+        intro.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(); } });
+        root.appendChild(intro);
+        setTimeout(function () { intro.focus(); }, 50);
+      });
+    }
+    if (design) {
+      document.documentElement.style.background = design.colors.bg;
+      document.body.style.background = design.colors.bg;
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
+      meta.content = design.colors.bg;
+    }
+
+    // 카톡에서 넘어온 경우(save=1): 바로 저장 이어서 진행
+    if (window.SsakaInApp && SsakaInApp.takeSaveFlag()) {
+      if (root.querySelector('[data-save]')) {
+        toast('연락처 저장을 이어서 할게요');
+        setTimeout(onSave, 700);
+      }
+    }
   }
 
   function fail(msg) {

@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F23A4E">
+  <title>어디야?</title>
+  <meta property="og:title" content="어디야?">
+  <meta property="og:description" content="눌러서 확인하세요">
+  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/eodiya-share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    button, input, textarea { font: inherit; color: inherit; }
+    .wrap { max-width: 520px; margin: 0 auto; padding: calc(18px + env(safe-area-inset-top)) 18px calc(32px + env(safe-area-inset-bottom)); }
+    [hidden] { display: none !important; }
+
+    .brand { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .brand a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink-2); font-size: 13.5px; font-weight: 700; min-height: 40px; }
+    .logo { font-size: 34px; font-weight: 900; letter-spacing: -0.04em; color: var(--ssaka); line-height: 1; }
+    .lead { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+
+    /* 모드 고르기 */
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    .mode { display: grid; gap: 6px; align-content: start; text-align: left; padding: 16px 14px; min-height: 118px; border-radius: 20px; border: 2px solid var(--line); background: #fff; cursor: pointer; }
+    .mode b { font-size: 21px; letter-spacing: -0.03em; }
+    .mode span { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+    .mode i { font-style: normal; font-size: 26px; }
+    .mode[aria-pressed="true"] { border-color: var(--ssaka); background: var(--ssaka-soft); }
+
+    .box { padding: 16px; border-radius: 20px; background: var(--bg-2); margin-bottom: 12px; }
+    .box h2 { margin: 0 0 10px; font-size: 15px; }
+    label.l { display: block; font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 12px 0 6px; }
+    label.l:first-of-type { margin-top: 0; }
+    input[type=text], input[type=tel], input[type=time] {
+      width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-size: 16px;
+    }
+    input:focus { outline: 2px solid var(--ssaka); outline-offset: 1px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .chip[aria-pressed="true"] { background: var(--ssaka-deep); border-color: var(--ssaka-deep); color: #fff; }
+    .placebtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .pbtn { min-height: 52px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .pbtn.on { border-color: var(--ssaka); color: var(--ssaka-deep); background: var(--ssaka-soft); }
+    .note { font-size: 12.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.5; }
+    .map { width: 100%; height: 190px; border: 0; border-radius: 16px; display: block; background: #e9e9e9; margin-top: 8px; }
+
+    .send { display: grid; gap: 10px; margin-top: 16px; }
+    .big { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 58px; border-radius: 18px; border: 0; font-size: 18px; font-weight: 800; cursor: pointer; text-decoration: none; }
+    .kakao { background: #FEE500; color: #191919; }
+    .red { background: var(--ssaka-deep); color: #fff; }
+    .ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+
+    /* 받는 화면 */
+    .who { font-size: 15px; color: var(--ink-2); font-weight: 700; margin: 6px 0 4px; }
+    .q { font-size: clamp(48px, 16vw, 72px); font-weight: 900; letter-spacing: -0.05em; line-height: 1.02; color: var(--ssaka); margin: 0 0 14px; }
+    .place { font-size: 22px; font-weight: 800; line-height: 1.35; margin: 0 0 6px; word-break: keep-all; overflow-wrap: anywhere; }
+    .when { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--ssaka-soft); color: var(--ssaka-deep); font-weight: 800; font-size: 15px; margin: 6px 0 4px; }
+    .memo { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--bg-2); font-size: 16px; line-height: 1.5; }
+    .nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .replies { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+    .reply { min-height: 54px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .sec-t { font-size: 13px; font-weight: 800; color: var(--ink-2); margin: 22px 0 0; }
+    .here { width: 100%; min-height: 150px; border-radius: 28px; border: 0; background: var(--ssaka); color: #fff; font-size: 34px; font-weight: 900; letter-spacing: -0.03em; cursor: pointer; display: grid; place-items: center; gap: 4px; box-shadow: 0 18px 36px -18px rgba(242,58,78,.9); }
+    .here small { display: block; font-size: 14px; font-weight: 700; opacity: .92; letter-spacing: 0; }
+    .or { display: flex; gap: 8px; margin-top: 12px; }
+    .or input { flex: 1; min-width: 0; }
+    .or button { flex: none; min-height: 50px; padding: 0 16px; border-radius: 14px; border: 0; background: var(--ink); color: #fff; font-weight: 800; cursor: pointer; }
+    .mk { display: block; text-align: center; margin-top: 26px; font-size: 14px; font-weight: 700; color: var(--ink-2); text-decoration: none; }
+    .mk b { color: var(--ssaka-deep); }
+    .replay { position: fixed; right: 14px; top: calc(14px + env(safe-area-inset-top)); width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--bg-2); display: grid; place-items: center; cursor: pointer; }
+    .replay svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .tap { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-align: center; cursor: pointer; }
+    .tap b { display: block; font-size: 56px; font-weight: 900; color: var(--ssaka); letter-spacing: -0.05em; }
+    .tap span { color: var(--ink-2); font-size: 15px; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
+
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 40; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 보내는 화면 ===== -->
+  <section id="maker">
+    <div class="brand">
+      <div class="logo">어디야?</div>
+      <a href="../app/">싸카 홈</a>
+    </div>
+    <p class="lead">약속 장소를 보내거나, 친구가 어디 있는지 물어보세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+
+    <div class="modes" role="group" aria-label="무엇을 보낼까요">
+      <button type="button" class="mode" data-mode="come" aria-pressed="true"><i>📍</i><b>여기로 와!</b><span>약속 장소와 시간을 보내요</span></button>
+      <button type="button" class="mode" data-mode="ask" aria-pressed="false"><i>🙋</i><b>어디야?</b><span>친구 위치를 물어봐요</span></button>
+    </div>
+
+    <div class="box" id="comeBox">
+      <h2>어디로 올까요?</h2>
+      <div class="placebtns">
+        <button type="button" class="pbtn" id="useGps">📍 지금 내 위치</button>
+        <button type="button" class="pbtn" id="usePost">🔍 주소 찾기</button>
+      </div>
+      <input type="text" id="placeName" maxlength="60" placeholder="장소 이름 (예: 강남역 11번 출구)">
+      <div class="note" id="placeNote">이름만 적어도 받는 사람이 지도에서 찾을 수 있어요.</div>
+      <iframe class="map" id="mapPrev" title="약속 장소 지도" hidden loading="lazy"></iframe>
+
+      <label class="l">몇 시까지?</label>
+      <div class="chips" id="timeChips">
+        <button type="button" class="chip" data-t="0" aria-pressed="true">지금 바로</button>
+        <button type="button" class="chip" data-t="30" aria-pressed="false">30분 뒤</button>
+        <button type="button" class="chip" data-t="60" aria-pressed="false">1시간 뒤</button>
+        <button type="button" class="chip" data-t="x" aria-pressed="false">시간 정하기</button>
+      </div>
+      <input type="time" id="timeAt" hidden style="margin-top:8px">
+      <label class="l" for="memo">한마디 (선택)</label>
+      <input type="text" id="memo" maxlength="60" placeholder="예: 2번 출구 앞 편의점!">
+    </div>
+
+    <div class="box">
+      <h2>보내는 사람</h2>
+      <div class="row2">
+        <div><label class="l" for="from">이름</label><input type="text" id="from" maxlength="12" placeholder="홍길동"></div>
+        <div><label class="l" for="myPhone">내 번호 (선택)</label><input type="tel" id="myPhone" maxlength="20" inputmode="tel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="note">번호를 적으면 친구 답장이 문자로 바로 와요. 안 적으면 카톡으로 답장해요.</div>
+    </div>
+
+    <div class="send">
+      <button type="button" class="big kakao" id="sendKakao">💬 카톡으로 보내기</button>
+      <button type="button" class="big ghost" id="sendSms">📱 문자로 보내기</button>
+    </div>
+  </section>
+
+  <!-- ===== 받는 화면: 여기로 와! ===== -->
+  <section id="viewCome" hidden>
+    <div class="who" id="cWho"></div>
+    <h1 class="q">여기로 와!</h1>
+    <p class="place" id="cPlace"></p>
+    <div class="when" id="cWhen" hidden></div>
+    <div class="memo" id="cMemo" hidden></div>
+    <iframe class="map" id="cMap" title="약속 장소 지도" hidden loading="lazy"></iframe>
+    <div class="nav">
+      <a class="big red" id="cKakaoMap" style="font-size:16px">카카오맵 길찾기</a>
+      <a class="big ghost" id="cNaver" style="font-size:16px">네이버 길찾기</a>
+    </div>
+    <div class="sec-t">한 번에 답장하기</div>
+    <div class="replies">
+      <button type="button" class="reply" data-r="지금 가는 중! 🏃">🏃 가는 중!</button>
+      <button type="button" class="reply" data-r="10분 뒤 도착해요">⏱ 10분 뒤</button>
+      <button type="button" class="reply" data-r="도착했어! 어디 있어?">✅ 도착!</button>
+      <button type="button" class="reply" data-r="조금 늦어요, 미안해요 🙏">🙏 조금 늦어</button>
+    </div>
+    <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
+  </section>
+
+  <!-- ===== 받는 화면: 어디야? ===== -->
+  <section id="viewAsk" hidden>
+    <div class="who" id="aWho"></div>
+    <h1 class="q">어디야?</h1>
+    <button type="button" class="here" id="hereBtn">여기야!<small>버튼 누르면 지금 내 위치를 보내요</small></button>
+    <div class="sec-t">또는 직접 쓰기</div>
+    <div class="or">
+      <input type="text" id="hereText" maxlength="60" placeholder="예: 강남역 2번 출구 앞">
+      <button type="button" id="hereSend">보내기</button>
+    </div>
+    <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="../js/codec.js"></script>
+<script src="../js/share.js"></script>
+<script src="../js/sound.js"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var BASE = new URL('./', location.href).href.split('?')[0];
+  var SHARE_IMG = 'https://directorjoo.github.io/ssaka-app/img/eodiya-share.png';
+  function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
+  window.SsakaToast = toast;
+  function sms(phone, body) {
+    var to = String(phone || '').replace(/[^\d+]/g, '');
+    return 'sms:' + to + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body);
+  }
+  function osm(lat, lng) {
+    var d = 0.004;
+    return 'https://www.openstreetmap.org/export/embed.html?bbox=' + (lng - d) + ',' + (lat - d * 0.7) + ',' + (lng + d) + ',' + (lat + d * 0.7) + '&layer=mapnik&marker=' + lat + ',' + lng;
+  }
+  function hasXY(p) { return p && isFinite(parseFloat(p.lat)) && isFinite(parseFloat(p.lng)); }
+  function clockText(ts) {
+    var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
+    return (h < 12 ? '오전 ' : '오후 ') + ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m;
+  }
+  function getPos() {
+    return new Promise(function (ok, no) {
+      if (!navigator.geolocation) return no(new Error('위치를 지원하지 않는 브라우저예요'));
+      navigator.geolocation.getCurrentPosition(function (p) { ok({ lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }); },
+        function () { no(new Error('위치 권한을 허용해 주세요')); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 20000 });
+    });
+  }
+  // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
+  function shareKakao(title, desc, url) {
+    window.SsakaShare({ title: title, description: desc, imageUrl: SHARE_IMG, url: url });
+  }
+  function shareSms(title, desc, url, phone) {
+    var body = title + (desc ? '\n' + desc : '') + '\n' + url;
+    if (phone) { location.href = sms(phone, body); return; }
+    window.SsakaSms({ title: title, description: desc, url: url });
+  }
+  function playSound(id) {
+    if (!window.SsakaSound) return;
+    var replay = document.createElement('button'); replay.className = 'replay'; replay.type = 'button'; replay.setAttribute('aria-label', '소리 다시 듣기');
+    replay.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>';
+    replay.addEventListener('click', function () { SsakaSound.play(id); });
+    document.body.appendChild(replay);
+    SsakaSound.tryAutoplay(id).then(function (ok) {
+      if (ok) return;
+      var t = document.createElement('div'); t.className = 'tap'; t.setAttribute('role', 'button'); t.tabIndex = 0;
+      t.innerHTML = '<div><b>' + (id === 'where' ? '어디야?' : '여기야!') + '</b><span>아무 데나 탭하세요</span></div>';
+      var go = function () { SsakaSound.play(id); t.remove(); };
+      t.addEventListener('click', go); t.addEventListener('touchstart', go, { passive: true });
+      document.body.appendChild(t); t.focus();
+    });
+  }
+
+  var data = new URLSearchParams(location.search).get('d');
+  var card = data && window.SsakaCodec ? SsakaCodec.decode(data) : null;
+
+  // ================= 받는 화면 =================
+  if (card) {
+    $('maker').hidden = true;
+    var who = card.from ? card.from + '님이' : '친구가';
+    function reply(text, extraUrl) {
+      var body = text + (extraUrl ? '\n' + extraUrl : '');
+      if (card.phone) { location.href = sms(card.phone, body); return; }
+      // 번호가 없으면 카톡 공유 (텍스트 메시지)
+      var K = window.SsakaKakao;
+      var url = extraUrl || BASE;
+      if (K) K().then(function (Kakao) {
+        Kakao.Share.sendDefault({ objectType: 'text', text: text, link: { mobileWebUrl: url, webUrl: url }, buttonTitle: extraUrl ? '지도 보기' : '어디야? 열기' });
+      }).catch(function () { window.SsakaShare({ title: text, description: '', url: url }); });
+      else window.SsakaShare({ title: text, description: '', url: url });
+    }
+
+    if (card.m === 'come') {
+      $('viewCome').hidden = false;
+      document.title = '여기로 와! · 어디야?';
+      var p = card.place || {};
+      if (card.here) {
+        document.querySelector('#viewCome .q').textContent = '여기야!';
+        document.title = '여기야! · 어디야?';
+        $('cWho').textContent = who + ' 지금 여기 있어요';
+      } else {
+        $('cWho').textContent = who + ' 기다려요';
+      }
+      $('cPlace').textContent = p.name || (hasXY(p) ? '보낸 사람의 현재 위치' : '');
+      if (card.at) {
+        var left = Math.round((card.at - Date.now()) / 60000);
+        $('cWhen').hidden = false;
+        $('cWhen').textContent = '⏰ ' + clockText(card.at) + (left > 0 ? ' · ' + left + '분 남음' : left > -1 ? ' · 지금!' : ' · ' + (-left) + '분 지남');
+      }
+      if (card.memo) { $('cMemo').hidden = false; $('cMemo').textContent = '💬 ' + card.memo; }
+      var name = p.name || '약속 장소';
+      if (hasXY(p)) {
+        $('cMap').hidden = false; $('cMap').src = osm(p.lat, p.lng);
+        $('cKakaoMap').href = 'https://map.kakao.com/link/to/' + encodeURIComponent(name) + ',' + p.lat + ',' + p.lng;
+        $('cNaver').href = 'https://map.naver.com/p/directions/-/' + p.lng + ',' + p.lat + ',' + encodeURIComponent(name) + '/-/transit';
+      } else {
+        var q = String(name).replace(/\([^)]*\)/g, ' ').trim();
+        $('cKakaoMap').href = 'https://map.kakao.com/link/search/' + encodeURIComponent(q);
+        $('cNaver').href = 'https://map.naver.com/p/search/' + encodeURIComponent(q);
+      }
+      if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
+      document.querySelectorAll('.reply').forEach(function (b) {
+        b.addEventListener('click', function () { reply('[어디야?] ' + b.dataset.r); });
+      });
+      playSound(card.sound || 'here');
+    } else {
+      $('viewAsk').hidden = false;
+      document.title = '어디야? · 싸카';
+      $('aWho').textContent = who + ' 물어봐요';
+      $('hereBtn').addEventListener('click', function () {
+        toast('위치를 확인하는 중…');
+        getPos().then(function (pos) {
+          var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, place: { name: '', lat: pos.lat, lng: pos.lng } });
+          reply('[어디야?] 여기야! 지도에서 내 위치 보기', back);
+        }, function (e) { toast(e.message + ' — 아래에 직접 써서 보낼 수 있어요'); $('hereText').focus(); });
+      });
+      $('hereSend').addEventListener('click', function () {
+        var t = $('hereText').value.trim();
+        if (!t) { toast('어디인지 적어주세요'); $('hereText').focus(); return; }
+        var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, place: { name: t } });
+        reply('[어디야?] 여기야! ' + t, back);
+      });
+      playSound(card.sound || 'where');
+    }
+    return;
+  }
+
+  // ================= 보내는 화면 =================
+  var mode = 'come', place = null, minutes = 0;
+  var DRAFT = 'eodiya-me-v1';
+  try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; if (me.phone) $('myPhone').value = me.phone; } catch (e) {}
+  function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim(), phone: $('myPhone').value.trim() })); } catch (e) {} }
+
+  document.querySelectorAll('.mode').forEach(function (b) {
+    b.addEventListener('click', function () {
+      mode = b.dataset.mode;
+      document.querySelectorAll('.mode').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      $('comeBox').hidden = mode !== 'come';
+    });
+  });
+  function setPlace(p, note) {
+    place = p;
+    $('useGps').classList.toggle('on', !!(p && hasXY(p) && !p.addr));
+    $('usePost').classList.toggle('on', !!(p && p.addr));
+    if (p && p.name) $('placeName').value = p.name;
+    $('placeNote').textContent = note || '이름만 적어도 받는 사람이 지도에서 찾을 수 있어요.';
+    if (p && hasXY(p)) { $('mapPrev').hidden = false; $('mapPrev').src = osm(p.lat, p.lng); } else $('mapPrev').hidden = true;
+  }
+  $('useGps').addEventListener('click', function () {
+    toast('위치를 확인하는 중…');
+    getPos().then(function (pos) {
+      setPlace({ lat: pos.lat, lng: pos.lng, name: $('placeName').value.trim() }, '지금 내 위치를 보내요. 장소 이름을 적으면 더 찾기 쉬워요.');
+    }, function (e) { toast(e.message); });
+  });
+  $('usePost').addEventListener('click', function () {
+    if (!window.daum || !daum.Postcode) { toast('주소 검색을 불러오는 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
+    new daum.Postcode({
+      oncomplete: function (d) {
+        var road = d.roadAddress || d.jibunAddress || d.address || '';
+        setPlace({ name: (road + (d.buildingName ? ' (' + d.buildingName + ')' : '')).slice(0, 60), addr: true }, '이 주소로 받는 사람이 길찾기를 할 수 있어요.');
+      }
+    }).open();
+  });
+  $('placeName').addEventListener('input', function () { if (place) place.name = this.value.trim(); });
+  document.querySelectorAll('#timeChips .chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('#timeChips .chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+      $('timeAt').hidden = c.dataset.t !== 'x';
+      minutes = c.dataset.t === 'x' ? null : parseInt(c.dataset.t, 10);
+      if (c.dataset.t === 'x') $('timeAt').focus();
+    });
+  });
+
+  function build() {
+    var from = $('from').value.trim(), phone = $('myPhone').value.trim();
+    if (!from) { toast('보내는 사람 이름을 적어주세요'); $('from').focus(); return null; }
+    remember();
+    var d = { m: mode, from: from, phone: phone };
+    if (mode === 'come') {
+      var name = $('placeName').value.trim();
+      var p = place && hasXY(place) ? { name: name, lat: place.lat, lng: place.lng } : (name ? { name: name } : null);
+      if (!p) { toast('어디로 올지 정해주세요'); $('placeName').focus(); return null; }
+      d.place = p;
+      if (minutes === null) {
+        var v = $('timeAt').value;
+        if (v) { var t = new Date(); var hm = v.split(':'); t.setHours(+hm[0], +hm[1], 0, 0); if (t < Date.now() - 3600000) t.setDate(t.getDate() + 1); d.at = t.getTime(); }
+      } else if (minutes > 0) d.at = Date.now() + minutes * 60000;
+      else d.at = Date.now();
+      d.memo = $('memo').value.trim();
+    }
+    var url = BASE + '?d=' + SsakaCodec.encode(d);
+    var title = mode === 'come' ? from + ': 여기로 와!' : from + ': 어디야?';
+    var desc = mode === 'come' ? ((d.place.name || '내 위치') + (d.at ? ' · ' + clockText(d.at) : '')) : '눌러서 "여기야!" 답장하기';
+    return { url: url, title: title, desc: desc, phone: phone };
+  }
+  $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });
+  $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
+})();
+</script>
+</body>
+</html>

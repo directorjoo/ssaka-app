@@ -83,6 +83,31 @@
   // 미리 불러두면 버튼 누를 때 빠름
   if (KAKAO_JS_KEY) loadKakao().catch(function () {});
 
+  // ---------- 문자로 보내기 ----------
+  // 안드로이드 크롬: 전화번호부에서 여러 명 고르기 → 문자 앱
+  // 아이폰: 문자 앱이 열리고, 받는 사람 칸의 (+)로 연락처에서 고르기
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function smsLink(numbers, body) {
+    var to = (numbers || []).map(function (n) { return String(n).replace(/[^\d+]/g, ''); }).filter(Boolean).join(isIOS ? ',' : ';');
+    return 'sms:' + (isIOS ? (to ? '/open?addresses=' + to + '&' : '&') : to + '?') + 'body=' + encodeURIComponent(body);
+  }
+  function shareBySms(extra) {
+    var c = cardInfo(extra);
+    var body = c.title + (c.description ? '\n' + c.description : '') + '\n' + c.url;
+    var picker = navigator.contacts && navigator.contacts.select;
+    if (picker && !isIOS) {
+      navigator.contacts.select(['name', 'tel'], { multiple: true }).then(function (list) {
+        var nums = [];
+        (list || []).forEach(function (p) { if (p.tel && p.tel[0]) nums.push(p.tel[0]); });
+        location.href = smsLink(nums, body);
+      }).catch(function () { location.href = smsLink([], body); });
+    } else {
+      notify('문자 앱에서 받는 사람 (+)를 눌러 연락처에서 고르세요');
+      setTimeout(function () { location.href = smsLink([], body); }, 600);
+    }
+  }
+
   window.SsakaShare = shareToKakao;
+  window.SsakaSms = shareBySms;
   window.SsakaKakao = loadKakao; // 사진 올리기 등 다른 카카오 기능에서 사용
 })();

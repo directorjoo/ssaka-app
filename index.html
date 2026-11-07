@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- 카카오톡 / SNS 링크 공유 시 미리보기 (Open Graph) 최적화 -->
+    <!-- 카카오톡 링크 공유 시 썸네일 강제 갱신 최적화 -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="주경중 감독 - 싸바카드">
     <meta property="og:description" content="영화감독 주경중의 모바일 프로필 카드입니다.">
-    <meta property="og:image" content="https://directorjoo.github.io/bg2.jpg">
+    <meta property="og:image" content="https://directorjoo.github.io/bg2.jpg?v=8">
     <meta property="og:image:width" content="800">
     <meta property="og:image:height" content="800">
 
@@ -138,8 +138,8 @@
 
     <!-- 배너 그림 하단 투명 터치 영역 (4개 버튼) -->
     <div class="overlay-buttons">
-        <!-- 1. 전화번호 자동저장 (PASS 우회 및 주소록 앱 직접 연동 vCard) -->
-        <a href="data:text/vcard;charset=utf-8,BEGIN%3AVCARD%0AVERSION%3A3.0%0AN%3A%3B%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%8d%EB%94%95%3B%3B%3B%0AFN%3A%EC%A3%BC%EA%B2%BD%EC%A4%91%20%EA%B0%8d%EB%94%95%0ATEL%3BTYPE%3AVICE%2CMSG%3A01058705815%0AEND%3AVCARD" class="touch-area" aria-label="전화번호 저장"></a>
+        <!-- 1. 전화번호 저장/연동 (PASS 방해 없는 직통 연결) -->
+        <a href="tel:01058705815" class="touch-area" aria-label="전화번호 저장 및 전화 걸기"></a>
 
         <!-- 2. 블로그 주경중 검색 (팝업창) -->
         <div class="touch-area" onclick="openModal('blogModal')" aria-label="블로그 검색"></div>

@@ -11,6 +11,7 @@
     play: '<path d="M8 5v14l11-7z"/>',
     reserve: '<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3M8 17h6"/>',
     sms: '<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8 10h8M8 13h5"/>',
+    rsvp: '<path d="M4 12.5l4.5 4.5L20 5.5"/><path d="M4 20h16"/>',
     locate: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/>',
     talk: '<path class="fill" d="M12 3.5C6.8 3.5 2.5 6.9 2.5 11c0 2.6 1.7 4.9 4.3 6.3l-.9 3.4 3.9-2.5c.7.1 1.4.2 2.2.2 5.2 0 9.5-3.4 9.5-7.4S17.2 3.5 12 3.5z"/>'
   };
@@ -48,6 +49,21 @@
     var bg = el('div', 'sk-bg');
     bg.innerHTML = '<i></i><i></i><i></i>';
     root.appendChild(bg);
+    var SEASON = { snow: '첫눈 오는 날', xmas: 'Merry Christmas', yearend: '올해도 고마웠어요', newyear: '새해 복 많이 받으세요' };
+    if (card.season && SEASON[card.season]) {
+      root.classList.add('sk-season-' + card.season);
+      var sea = el('div', 'sk-season');
+      sea.setAttribute('aria-hidden', 'true');
+      for (var f = 0; f < 18; f++) {
+        var flake = el('i');
+        flake.style.left = ((f * 37) % 100) + '%';
+        flake.style.animationDelay = (-(f * 1.3) % 9).toFixed(1) + 's';
+        flake.style.animationDuration = (7 + (f % 5)) + 's';
+        if (f % 3 === 0) flake.className = 'big';
+        sea.appendChild(flake);
+      }
+      root.appendChild(sea);
+    }
 
     var wrap = el('div', 'sk-wrap');
     var main = el('div', 'sk-main');
@@ -65,7 +81,26 @@
     titles.appendChild(el('h1', 'sk-title', card.title || ''));
     if (card.subtitle) titles.appendChild(el('p', 'sk-sub', card.subtitle));
     hero.appendChild(titles);
+    if (card.season && SEASON[card.season]) {
+      var rib = el('div', 'sk-ribbon', SEASON[card.season]);
+      hero.insertBefore(rib, titles);
+    }
     main.appendChild(hero);
+
+    var pics = (card.gallery || []).filter(Boolean).slice(0, 10);
+    if (pics.length) {
+      var gal = el('div', 'sk-gal');
+      gal.setAttribute('aria-label', '사진 ' + pics.length + '장');
+      pics.forEach(function (src, i) {
+        var b = el(live ? 'button' : 'div', 'sk-gal-i');
+        if (live) { b.type = 'button'; b.setAttribute('aria-label', '사진 ' + (i + 1) + ' 크게 보기'); }
+        var im = el('img'); im.src = src; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async';
+        b.appendChild(im);
+        if (live) on(b, function () { openViewer(root, pics, i); });
+        gal.appendChild(b);
+      });
+      main.appendChild(gal);
+    }
 
     if (card.sos && c.phone) {
       var sos = el('div', 'sk-sos');
@@ -98,7 +133,12 @@
     var mapc = null;
     (card.buttons || ['call', 'map', 'save', 'copy']).forEach(function (b) {
       if (b === 'call' && c.phone) acts.appendChild(action('call', '바로 통화', c.callLabel || null, live && ctx.tel(c.phone), null, live));
-      if (b === 'reserve' && card.reserve) acts.appendChild(action('reserve', '예약하기', card.reserve.menu && card.reserve.menu.length ? '메뉴·인원·시간' : '인원·시간', null, live && ctx.onReserve, live));
+      if (b === 'reserve' && card.reserve) {
+        var rv = card.reserve, word = rv.word || '메뉴';
+        var rmeta = (rv.solo || rv.people === false) ? (rv.menu && rv.menu.length ? word + '·날짜·시간' : '날짜·시간') : (rv.menu && rv.menu.length ? word + '·인원·시간' : '인원·시간');
+        acts.appendChild(action('reserve', rv.label || '예약하기', rmeta, null, live && ctx.onReserve, live));
+      }
+      if (b === 'rsvp' && c.phone) acts.appendChild(action('rsvp', '참석 답장', (c.name || '총무') + '에게 문자', null, live && ctx.onRsvp, live));
       if (b === 'map' && card.place && card.place.name) {
         if (live) {
           var u = ctx.mapUrls(card.place);
@@ -139,6 +179,34 @@
 
     root.appendChild(wrap);
     return root;
+  }
+
+  // 사진 크게 보기 (옆으로 넘기기)
+  function openViewer(root, pics, start) {
+    var i = start;
+    var v = el('div', 'sk-viewer');
+    v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true'); v.setAttribute('aria-label', '사진 보기');
+    var img = el('img'); img.alt = '';
+    var count = el('div', 'sk-viewer-n');
+    var x = el('button', 'sk-viewer-x', '닫기'); x.type = 'button';
+    var prev = el('button', 'sk-viewer-p', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', '이전 사진');
+    var next = el('button', 'sk-viewer-q', '›'); next.type = 'button'; next.setAttribute('aria-label', '다음 사진');
+    function show() { img.src = pics[i]; count.textContent = (i + 1) + ' / ' + pics.length; prev.hidden = next.hidden = pics.length < 2; }
+    function go(d) { i = (i + d + pics.length) % pics.length; show(); }
+    function shut() { v.remove(); document.removeEventListener('keydown', key); }
+    function key(e) { if (e.key === 'Escape') shut(); if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); }
+    on(prev, function (e) { e.stopPropagation(); go(-1); });
+    on(next, function (e) { e.stopPropagation(); go(1); });
+    on(x, shut);
+    v.addEventListener('click', function (e) { if (e.target === v) shut(); });
+    var sx = 0;
+    v.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    v.addEventListener('touchend', function (e) { var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); });
+    document.addEventListener('keydown', key);
+    v.appendChild(img); v.appendChild(count); v.appendChild(x); v.appendChild(prev); v.appendChild(next);
+    show();
+    root.appendChild(v);
+    setTimeout(function () { x.focus(); }, 30);
   }
 
   global.SsakaRender = { build: build };

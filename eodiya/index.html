@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F23A4E">
+  <meta name="theme-color" content="#B3132B">
   <title>어디야?</title>
   <meta property="og:title" content="어디야?">
   <meta property="og:description" content="눌러서 확인하세요">
-  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/eodiya-share.png">
+  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/eodiya-share.png?v=5">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:type" content="website">
@@ -69,7 +69,7 @@
     .replies { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
     .reply { min-height: 54px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font-size: 16px; font-weight: 800; cursor: pointer; }
     .sec-t { font-size: 13px; font-weight: 800; color: var(--ink-2); margin: 22px 0 0; }
-    .here { width: 100%; min-height: 150px; border-radius: 28px; border: 0; background: var(--ssaka); color: #fff; font-size: 34px; font-weight: 900; letter-spacing: -0.03em; cursor: pointer; display: grid; place-items: center; gap: 4px; box-shadow: 0 18px 36px -18px rgba(242,58,78,.9); }
+    .here { width: 100%; min-height: 150px; border-radius: 28px; border: 0; background: var(--ssaka); color: #fff; font-size: 34px; font-weight: 900; letter-spacing: -0.03em; cursor: pointer; display: grid; place-items: center; gap: 4px; box-shadow: 0 18px 36px -18px rgba(179,19,43,.9); }
     .here small { display: block; font-size: 14px; font-weight: 700; opacity: .92; letter-spacing: 0; }
     .or { display: flex; gap: 8px; margin-top: 12px; }
     .or input { flex: 1; min-width: 0; }
@@ -186,7 +186,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var BASE = new URL('./', location.href).href.split('?')[0];
-  var SHARE_IMG = 'https://directorjoo.github.io/ssaka-app/img/eodiya-share.png';
+  var SHARE_IMG = 'https://directorjoo.github.io/ssaka-app/img/eodiya-share.png?v=5';
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
   window.SsakaToast = toast;
   function sms(phone, body) {

@@ -7,7 +7,7 @@
   <title>싸카</title>
   <meta property="og:title" content="싸카 — 앱 없이 카톡으로 보내는 카드">
   <meta property="og:description" content="명함 · 가게 홍보 · 모임 공지 · 초대장을 10초 만에">
-  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/ssaka-share.png">
+  <meta property="og:image" content="https://directorjoo.github.io/ssaka-app/img/ssaka-share.png?v=5">
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
@@ -66,6 +66,19 @@
     .hero a { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 18px; border-radius: 999px; background: #fff; color: var(--ssaka-deep); font-weight: 800; text-decoration: none; }
 
     /* 어디야? 바로가기 */
+    .camp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 4px 18px 12px; }
+    .camp a { position: relative; display: flex; flex-direction: column; min-height: 168px; padding: 16px 14px; border-radius: 20px; text-decoration: none; overflow: hidden; color: #1a1a1a; }
+    .camp b { font-size: 17px; line-height: 1.3; letter-spacing: -0.02em; word-break: keep-all; }
+    .camp span { margin-top: 6px; font-size: 13px; line-height: 1.4; opacity: .85; word-break: keep-all; }
+    .camp i { position: absolute; right: 10px; bottom: 6px; font-style: normal; font-size: 52px; line-height: 1; }
+    .camp a.dark { color: #fff; }
+    .camp a:focus-visible, .svc button:focus-visible, .svc a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
+    .svc { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 4px; margin: 6px 14px 10px; padding: 18px 6px; background: #fff; border-radius: 22px; }
+    .svc a, .svc button { position: relative; display: grid; justify-items: center; gap: 7px; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; cursor: pointer; word-break: keep-all; text-align: center; line-height: 1.25; }
+    .svc i { font-style: normal; width: 50px; height: 50px; border-radius: 17px; display: grid; place-items: center; font-size: 25px; background: var(--tint, var(--bg-2)); }
+    .svc .soon i { filter: grayscale(.35); opacity: .75; }
+    .svc em { position: absolute; top: -4px; right: 10%; font-style: normal; font-size: 10.5px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--ssaka); color: #fff; }
+    .svc-cap { margin: 2px 22px 0; font-size: 13.5px; color: var(--ink-2); }
     .eodiya { display: flex; align-items: center; gap: 14px; margin: 10px 18px 4px; padding: 16px; border-radius: 20px; background: var(--ssaka-soft); text-decoration: none; }
     .eodiya i { font-style: normal; width: 52px; height: 52px; border-radius: 18px; background: var(--ssaka); display: grid; place-items: center; font-size: 26px; flex: none; }
     .eodiya b { display: block; font-size: 19px; color: var(--ssaka-deep); letter-spacing: -0.02em; }
@@ -74,9 +87,9 @@
 
     /* 업종 바로가기 */
     .inds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 6px; padding: 4px 12px 10px; }
-    .ind { display: grid; justify-items: center; gap: 6px; padding: 10px 2px; border-radius: 14px; text-decoration: none; font-size: 12.5px; font-weight: 600; text-align: center; word-break: keep-all; }
+    .ind { display: grid; justify-items: center; gap: 6px; padding: 10px 2px; border-radius: 14px; text-decoration: none; font-size: 15px; font-weight: 700; line-height: 1.25; color: var(--text, #1a1a1a); text-align: center; word-break: keep-all; }
     .ind:active { background: var(--bg-2); }
-    .ind i { font-style: normal; width: 52px; height: 52px; border-radius: 18px; background: var(--bg-2); display: grid; place-items: center; font-size: 26px; }
+    .ind i { font-style: normal; width: 56px; height: 56px; border-radius: 20px; background: var(--tint, var(--bg-2)); display: grid; place-items: center; font-size: 28px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.06); }
 
     .empty { padding: 48px 24px; text-align: center; color: var(--ink-2); }
     .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
@@ -95,7 +108,7 @@
     .tab[aria-selected="true"] { color: var(--ink); }
     .tab[aria-selected="true"] svg { stroke-width: 2.2; }
     .tab .dot { position: absolute; top: 8px; left: 56%; width: 8px; height: 8px; border-radius: 50%; background: var(--ssaka); }
-    .tab-make i { width: 48px; height: 48px; border-radius: 17px; background: var(--ssaka); color: #fff; display: grid; place-items: center; box-shadow: 0 8px 18px -8px rgba(242,58,78,.8); margin-top: -10px; }
+    .tab-make i { width: 48px; height: 48px; border-radius: 17px; background: var(--ssaka); color: #fff; display: grid; place-items: center; box-shadow: 0 8px 18px -8px rgba(179,19,43,.8); margin-top: -10px; }
     .tab-make i svg { stroke-width: 2.4; }
     .tab-make { color: var(--ink); }
     .icon-btn:focus-visible, .tab:focus-visible, .row:focus-visible, .ind:focus-visible, .row-act:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
@@ -109,7 +122,7 @@
   <header class="top">
     <div class="top-in">
       <div class="logo" id="topTitle">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#F23A4E"/><path d="M9 9.5h14a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H13l-3.5 3v-3H9a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="#fff"/><text x="16" y="19.3" text-anchor="middle" font-size="9" font-weight="900" fill="#F23A4E" font-family="Apple SD Gothic Neo, Noto Sans KR, sans-serif">싸</text></svg>
+        <img src="../img/cherry.svg" alt="" width="32" height="32" style="display:block">
         <h1>홈</h1>
       </div>
       <div class="top-act">
@@ -204,6 +217,34 @@
     return e;
   }
 
+  // ---------- 시즌 캠페인 (날짜에 맞춰 바뀜) ----------
+  function campaigns() {
+    var now = new Date(), m = now.getMonth() + 1, d = now.getDate();
+    var all = [
+      { from: [11, 1], to: [12, 31], t: '첫눈 오면 보내는 카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', href: '../make/?ind=greeting&season=snow' },
+      { from: [11, 10], to: [12, 31], t: '송년회 공지, 카드 한 장으로', s: '장소 · 회비 · 참석 답장까지', e: '🥂', bg: '#FFE0E6', href: '../make/?ind=party&season=yearend' },
+      { from: [11, 15], to: [1, 31], t: '겨울방학 특강 모집', s: '학부모 단톡·인스타에 바로', e: '📚', bg: '#FFF3B8', href: '../make/?ind=academy&season=snow' },
+      { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, href: '../make/?ind=greeting&season=xmas' },
+      { from: [12, 15], to: [2, 10], t: '새해 인사 미리 만들기', s: '신년회 초대도 함께', e: '🎉', bg: '#FFEFD1', href: '../make/?ind=greeting&season=newyear' },
+      { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', href: '../eodiya/' }
+    ];
+    function key(md) { return md[0] * 100 + md[1]; }
+    var today = m * 100 + d;
+    var on = all.filter(function (c) {
+      var a = key(c.from), b = key(c.to);
+      return a <= b ? (today >= a && today <= b) : (today >= a || today <= b);
+    });
+    if (on.length < 2) on = all.slice(0, 4);
+    var g = el('div', 'camp');
+    on.slice(0, 4).forEach(function (c) {
+      var a = el('a', c.dark ? 'dark' : ''); a.href = c.href; a.style.background = c.bg;
+      a.appendChild(el('b', '', c.t)); a.appendChild(el('span', '', c.s));
+      var i = el('i', '', c.e); i.setAttribute('aria-hidden', 'true'); a.appendChild(i);
+      g.appendChild(a);
+    });
+    return g;
+  }
+
   // ---------- 홈 ----------
   function renderHome() {
     var v = $('v-home'); v.innerHTML = '';
@@ -222,11 +263,19 @@
     var eo = el('a', 'eodiya'); eo.href = '../eodiya/';
     eo.innerHTML = '<i>📍</i><div><b>어디야?</b><span>약속 장소 보내기 · 친구 위치 물어보기</span></div>';
     v.appendChild(eo);
+    v.appendChild(secHead('지금 보내기 좋은 카드'));
+    v.appendChild(campaigns());
     v.appendChild(el('div', 'divider'));
     v.appendChild(secHead('업종별로 바로 만들기'));
     var g = el('div', 'inds');
+    // 업종마다 또렷이 구분되는 파스텔 바탕 (이모지가 잘 보이도록 밝게)
+    var TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
+      cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
+      arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
+      greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
     D.INDUSTRIES.forEach(function (ind) {
       var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
+      if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
       var i = el('i', '', ind.emoji); a.appendChild(i); a.appendChild(document.createTextNode(ind.label));
       g.appendChild(a);
     });
@@ -285,6 +334,28 @@
   // ---------- 더보기 ----------
   function renderMore() {
     var v = $('v-more'); v.innerHTML = '';
+    v.appendChild(secHead('SAVA — 태어나서 떠날 때까지, 괜찮아? 나 여기 있어'));
+    var SVC = [
+      ['카드 만들기', '🍒', '#FBE9EC', '../make/'], ['어디야?', '📍', '#FFE1CF', '../eodiya/'], ['모임 카드', '🥂', '#FFE0E6', '../make/?ind=party'], ['연말·새해 인사', '❄️', '#E2EEFB', '../make/?ind=greeting'],
+      ['돌잔치·초대', '🎈', '#FFEFD1', '../make/?ind=event'], ['가게 카드', '🍲', '#FFE8D6', '../make/?ind=restaurant'], ['학원 카드', '📚', '#FFF3B8', '../make/?ind=academy'], ['배우 프로필', '🎬', '#FFE8B8', '../make/?ind=actor'],
+      ['청첩장', '💍', '#F6E4FA'], ['부고·추모', '🕊️', '#E9ECEF'], ['가족 소식지', '📰', '#E4F5DC'], ['AI 자서전', '📖', '#EDE4FF'],
+      ['자동 블로그', '✍️', '#DDF1FF'], ['디자인 마켓', '🎨', '#FDE2F7'], ['목소리 팩', '🎙️', '#D9F5E6'], ['파트너스', '🤝', '#E3E8F0']
+    ];
+    var g = el('div', 'svc');
+    SVC.forEach(function (x) {
+      var soon = !x[3];
+      var a = el(soon ? 'button' : 'a', soon ? 'soon' : '');
+      if (soon) { a.type = 'button'; a.addEventListener('click', function () { toast(x[0] + '은(는) 곧 열려요!'); }); }
+      else a.href = x[3];
+      a.style.setProperty('--tint', x[2]);
+      var i = el('i', '', x[1]); i.setAttribute('aria-hidden', 'true'); a.appendChild(i);
+      a.appendChild(document.createTextNode(x[0]));
+      if (soon) a.appendChild(el('em', '', '곧'));
+      g.appendChild(a);
+    });
+    v.appendChild(g);
+    v.appendChild(el('p', 'svc-cap', '"곧" 표시는 준비 중인 서비스예요.'));
+    v.appendChild(el('div', 'divider'));
     var tip = el('div', 'tip');
     tip.innerHTML = '<b>싸카를 앱처럼 쓰기</b><br>아이폰: 사파리 아래 공유 버튼 → "홈 화면에 추가"<br>안드로이드: 크롬 메뉴(⋮) → "홈 화면에 추가"';
     v.appendChild(tip);

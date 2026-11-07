@@ -103,6 +103,7 @@
     var c = card.contact || {};
     card.image = safeUrl(card.image);
     card.video = safeUrl(card.video);
+    card.gallery = (Array.isArray(card.gallery) ? card.gallery : []).map(safeUrl).filter(Boolean).slice(0, 10);
     if (c.url) c.url = safeUrl(c.url);
     if (c.address && c.address.street) card.body = (card.body || []).concat(['📍 ' + c.address.street]);
     document.title = card.title ? card.title + ' · 싸카' : '싸카';
@@ -158,6 +159,7 @@
         if (window.self !== window.top) { toast('미리보기에선 예약 창만 보여드려요'); }
         SsakaReserve.open(card, root, { toast: toast, copy: copyText, sms: smsHref });
       },
+      onRsvp: function () { openRsvp(card, root); },
       makeHref: new URL('../make/', location.href).href
     };
 
@@ -216,6 +218,48 @@
         setTimeout(onSave, 700);
       }
     }
+  }
+
+  // 모임 참석 답장: 총무에게 정리된 문자를 보냄 (서버 없음)
+  function openRsvp(card, root) {
+    var c = card.contact || {};
+    var sheet = document.createElement('div');
+    sheet.className = 'sk-sheet';
+    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '참석 답장');
+    var box = document.createElement('div'); box.className = 'sk-sheet-box';
+    var head = document.createElement('div'); head.className = 'sk-sheet-head';
+    var t = document.createElement('strong'); t.textContent = '참석 답장'; head.appendChild(t);
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'sk-x'; x.textContent = '닫기'; head.appendChild(x);
+    box.appendChild(head);
+    var lab = document.createElement('label'); lab.className = 'sk-f';
+    var ls = document.createElement('span'); ls.className = 'sk-f-l'; ls.textContent = '내 이름'; lab.appendChild(ls);
+    var nm = document.createElement('input'); nm.type = 'text'; nm.maxLength = 20; nm.autocomplete = 'name'; nm.placeholder = '홍길동';
+    try { nm.value = localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
+    lab.appendChild(nm); box.appendChild(lab);
+    var row = document.createElement('div'); row.className = 'sk-rsvp';
+    [['yes', '🙋 참석할게요'], ['maybe', '🤔 아직 몰라요'], ['no', '🙏 이번엔 못 가요']].forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-rsvp-b sk-rsvp-' + o[0]; b.textContent = o[1];
+      b.addEventListener('click', function () {
+        var who = nm.value.trim();
+        if (!who) { toast('이름을 적어주세요'); nm.focus(); return; }
+        try { localStorage.setItem('ssaka-my-name', who); } catch (e) {}
+        var msg = '[' + (card.title || '모임') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + who + ' — ' + o[1].replace(/^\S+\s/, '') + '\n싸바!';
+        shut();
+        if (window.self !== window.top) { toast('미리보기에선 문자가 열리지 않아요'); return; }
+        location.href = smsHref(c.phone, msg);
+      });
+      row.appendChild(b);
+    });
+    box.appendChild(row);
+    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = (c.name || '총무') + '님에게 문자로 답장이 가요.';
+    box.appendChild(fine);
+    function shut() { sheet.remove(); document.removeEventListener('keydown', esc); }
+    function esc(e) { if (e.key === 'Escape') shut(); }
+    x.addEventListener('click', shut);
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) shut(); });
+    document.addEventListener('keydown', esc);
+    sheet.appendChild(box); root.appendChild(sheet);
+    setTimeout(function () { nm.focus(); }, 50);
   }
 
   function fail(msg) {

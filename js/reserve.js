@@ -32,14 +32,16 @@
     var r = card.reserve || {};
     var menu = (r.menu || []).filter(function (m) { return m && m.n; });
     var min = r.min || 4, rate = r.rate || 0.2;
+    var label = r.label || '예약', word = r.word || '메뉴', askPeople = !r.solo && r.people !== false;
+    if (r.nodep || r.deposit === false) r = Object.assign({}, r, { account: '' });
     var shopPhone = card.contact && card.contact.phone;
     var mine = load().filter(function (x) { return x.shop === card.title && x.status !== 'canceled'; });
 
     var sheet = el('div', 'sk-sheet');
-    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '예약하기');
+    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', label);
     var box = el('div', 'sk-sheet-box');
     var head = el('div', 'sk-sheet-head');
-    head.appendChild(el('strong', '', card.title + ' 예약'));
+    head.appendChild(el('strong', '', card.title + ' · ' + label));
     var close = el('button', 'sk-x', '닫기'); close.type = 'button';
     head.appendChild(close);
     box.appendChild(head);
@@ -50,18 +52,18 @@
       mineBox.innerHTML = '';
       var list = load().filter(function (x) { return x.shop === card.title; }).reverse();
       if (!list.length) return;
-      mineBox.appendChild(el('div', 'sk-mine-t', '내 예약'));
+      mineBox.appendChild(el('div', 'sk-mine-t', '내 ' + label));
       list.slice(0, 5).forEach(function (x) {
         var row = el('div', 'sk-mine-r' + (x.status === 'canceled' ? ' off' : ''));
         var info = el('div', '');
-        info.appendChild(el('b', '', fmtDate(x.date, x.time) + ' · ' + x.people + '명'));
+        info.appendChild(el('b', '', fmtDate(x.date, x.time) + (x.people ? ' · ' + x.people + '명' : '')));
         info.appendChild(el('span', '', '예약번호 ' + x.code + (x.status === 'canceled' ? ' · 취소함' : ' · 확인 대기')));
         row.appendChild(info);
         if (x.status !== 'canceled') {
           var c = el('button', 'sk-mine-c', '예약 취소'); c.type = 'button';
           c.addEventListener('click', function () {
             if (!confirmCancel(x)) return;
-            var msg = '[싸카 예약 취소]\n' + card.title + '\n예약번호: ' + x.code + '\n' + fmtDate(x.date, x.time) + ' · ' + x.people + '명\n' + x.name + ' (' + x.phone + ')\n위 예약을 취소합니다.' +
+            var msg = '[싸카 ' + label + ' 취소]\n' + card.title + '\n예약번호: ' + x.code + '\n' + fmtDate(x.date, x.time) + (x.people ? ' · ' + x.people + '명' : '') + '\n' + x.name + ' (' + x.phone + ')\n위 예약을 취소합니다.' +
               (x.deposit ? '\n입금한 예약금 ' + won(x.deposit) + ' 환불 부탁드립니다.' : '');
             var all = load(); all.forEach(function (y) { if (y.code === x.code) y.status = 'canceled'; }); save(all);
             renderMine();
@@ -81,7 +83,7 @@
     var form = el('form', 'sk-rform'); form.noValidate = true;
     var date = input('date', { min: today(), value: today() });
     var time = input('time', { step: '1800', value: '18:00' });
-    var row1 = el('div', 'sk-f2'); row1.appendChild(field('날짜', date, true)); row1.appendChild(field('도착 시간', time, true));
+    var row1 = el('div', 'sk-f2'); row1.appendChild(field('날짜', date, true)); row1.appendChild(field(askPeople ? '도착 시간' : '희망 시간', time, true));
     form.appendChild(row1);
 
     var people = 2;
@@ -91,16 +93,16 @@
     minus.setAttribute('aria-label', '인원 줄이기'); plus.setAttribute('aria-label', '인원 늘리기');
     step.appendChild(minus); step.appendChild(pv); step.appendChild(plus);
     var pf = el('div', 'sk-f'); pf.appendChild(el('span', 'sk-f-l', '인원')); pf.appendChild(step);
-    form.appendChild(pf);
+    if (askPeople) form.appendChild(pf);
 
     var name = input('text', { maxlength: '20', autocomplete: 'name', placeholder: '홍길동' });
     var phone = input('tel', { maxlength: '20', autocomplete: 'tel', inputmode: 'tel', placeholder: '010-0000-0000' });
-    var row2 = el('div', 'sk-f2'); row2.appendChild(field('예약자', name, true)); row2.appendChild(field('연락처', phone, true));
+    var row2 = el('div', 'sk-f2'); row2.appendChild(field(askPeople ? '예약자' : '이름', name, true)); row2.appendChild(field('연락처', phone, true));
     form.appendChild(row2);
 
     var qty = menu.map(function () { return 0; });
     if (menu.length) {
-      var mw = el('div', 'sk-f'); mw.appendChild(el('span', 'sk-f-l', '메뉴 (선택)'));
+      var mw = el('div', 'sk-f'); mw.appendChild(el('span', 'sk-f-l', word + ' (선택)'));
       var ml = el('div', 'sk-menu');
       menu.forEach(function (m, i) {
         var row = el('div', 'sk-menu-r');
@@ -117,14 +119,14 @@
       mw.appendChild(ml); form.appendChild(mw);
     }
 
-    var memo = el('textarea'); memo.maxLength = 200; memo.placeholder = '예: 창가 자리, 아기 의자';
+    var memo = el('textarea'); memo.maxLength = 200; memo.placeholder = askPeople ? '예: 창가 자리, 아기 의자' : '예: 중2, 수학 내신 상담 원해요';
     form.appendChild(field('요청사항 (선택)', memo));
 
     var sum = el('div', 'sk-sum');
     form.appendChild(sum);
-    var send = el('button', 'sk-rsend', '예약 요청 문자 보내기'); send.type = 'submit';
+    var send = el('button', 'sk-rsend', label + ' 요청 문자 보내기'); send.type = 'submit';
     form.appendChild(send);
-    form.appendChild(el('p', 'sk-fine', '가게에서 확인 연락을 드리면 예약이 확정돼요. 내 예약은 이 휴대폰에 저장되어 언제든 취소할 수 있어요.'));
+    form.appendChild(el('p', 'sk-fine', '확인 연락을 받으면 ' + label + '이 확정돼요. 내 ' + label + '은 이 휴대폰에 저장되어 언제든 취소할 수 있어요.'));
     box.appendChild(form);
 
     var total = 0, deposit = 0;
@@ -151,24 +153,24 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var miss = [[date, '날짜'], [time, '도착 시간'], [name, '예약자'], [phone, '연락처']].filter(function (x) { return !x[0].value.trim(); });
+      var miss = [[date, '날짜'], [time, askPeople ? '도착 시간' : '희망 시간'], [name, askPeople ? '예약자' : '이름'], [phone, '연락처']].filter(function (x) { return !x[0].value.trim(); });
       [date, time, name, phone].forEach(function (i) { i.classList.toggle('sk-miss', !i.value.trim()); });
       if (miss.length) { h.toast('아직 비어 있어요: ' + miss.map(function (x) { return x[1]; }).join(', ')); miss[0][0].focus(); return; }
       if (!shopPhone) { h.toast('가게 전화번호가 없어 예약 문자를 보낼 수 없어요'); return; }
       var code = 'SK-' + Math.floor(1000 + Math.random() * 9000);
       var items = menu.map(function (m, i) { return qty[i] ? m.n + ' ×' + qty[i] : null; }).filter(Boolean);
-      var msg = '[싸카 예약 요청]\n' + card.title +
+      var msg = '[싸카 ' + label + ' 요청]\n' + card.title +
         '\n예약번호: ' + code +
         '\n일시: ' + fmtDate(date.value, time.value) +
-        '\n인원: ' + people + '명' +
-        '\n예약자: ' + name.value.trim() + ' (' + phone.value.trim() + ')' +
-        (items.length ? '\n메뉴: ' + items.join(', ') : '') +
+        (askPeople ? '\n인원: ' + people + '명' : '') +
+        '\n' + (askPeople ? '예약자' : '이름') + ': ' + name.value.trim() + ' (' + phone.value.trim() + ')' +
+        (items.length ? '\n' + word + ': ' + items.join(', ') : '') +
         (total ? '\n예상 금액: ' + won(total) : '') +
         (deposit ? '\n예약금: ' + won(deposit) + ' 입금 예정' : '') +
         (memo.value.trim() ? '\n요청: ' + memo.value.trim() : '') +
         '\n확인 부탁드립니다.';
       var all = load();
-      all.push({ code: code, shop: card.title, shopPhone: shopPhone, date: date.value, time: time.value, people: people,
+      all.push({ code: code, shop: card.title, shopPhone: shopPhone, date: date.value, time: time.value, people: askPeople ? people : 0,
         name: name.value.trim(), phone: phone.value.trim(), items: items, total: total, deposit: deposit, status: 'sent', at: Date.now() });
       save(all);
       renderMine();

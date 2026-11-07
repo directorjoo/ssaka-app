@@ -139,12 +139,12 @@
 .sk-f-l { font-size: 13.5px; font-weight: 700; color: var(--sub); }
 .sk-f-l b { color: #e03131; font-size: 12px; }
 .sk-f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.sk-rform input, .sk-rform textarea {
+.sk-rform input, .sk-rform textarea, .sk-sheet-box > .sk-f input {
   width: 100%; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); background: color-mix(in srgb, var(--ink) 5%, var(--paper));
   border: 1.5px solid var(--line-ink); border-radius: 12px; padding: 12px; -webkit-appearance: none; appearance: none; min-height: 48px;
 }
 .sk-rform textarea { min-height: 72px; resize: vertical; }
-.sk-rform input:focus, .sk-rform textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.sk-rform input:focus, .sk-rform textarea:focus, .sk-sheet-box > .sk-f input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .sk-rform .sk-miss { border-color: #e03131; background: #fff5f5; color: #1b1b1f; }
 .sk-step { display: inline-grid; grid-template-columns: 48px 72px 48px; align-items: center; border: 1.5px solid var(--line-ink); border-radius: 14px; overflow: hidden; width: max-content; }
 .sk-step button { height: 48px; border: 0; background: color-mix(in srgb, var(--ink) 6%, var(--paper)); color: var(--ink); font-size: 22px; font-weight: 700; cursor: pointer; }
@@ -410,3 +410,49 @@
 @media (prefers-reduced-motion: reduce) {
   .sk *, .sk-intro, .sk-sheet, .sk-sheet-box { transition: none !important; animation: none !important; }
 }
+
+/* ---------- 사진 여러 장 (배우 프로필 등) ---------- */
+.sk-gal { display: flex; gap: 8px; margin: 18px -20px 0; padding: 0 20px 4px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.sk-gal::-webkit-scrollbar { display: none; }
+.sk-gal-i { flex: none; width: 112px; aspect-ratio: 3 / 4; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--paper); scroll-snap-align: start; cursor: zoom-in; }
+.sk-gal-i img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sk-gal-i:focus-visible { outline: 3px solid var(--accent-line); outline-offset: 2px; }
+.sk-thumb .sk-gal { overflow: hidden; }
+.sk-viewer { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .92); display: grid; place-items: center; }
+.sk-viewer img { max-width: 100vw; max-height: 86vh; object-fit: contain; }
+.sk-viewer-n { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; color: #fff; font-size: 14px; font-weight: 700; }
+.sk-viewer-x { position: absolute; top: calc(8px + env(safe-area-inset-top)); right: 10px; min-width: 56px; min-height: 44px; border: 0; border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.sk-viewer-p, .sk-viewer-q { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 64px; border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 34px; line-height: 1; cursor: pointer; }
+.sk-viewer-p { left: 0; border-radius: 0 12px 12px 0; }
+.sk-viewer-q { right: 0; border-radius: 12px 0 0 12px; }
+
+/* ---------- 시즌 테마: 첫눈 · 크리스마스 · 연말 · 새해 ---------- */
+.sk-season { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.sk-season i { position: absolute; top: -12px; width: 6px; height: 6px; border-radius: 50%; background: #fff; opacity: .85; box-shadow: 0 0 6px rgba(255,255,255,.8); animation: sk-fall 9s linear infinite; }
+.sk-season i.big { width: 9px; height: 9px; opacity: .7; }
+.sk-season-newyear .sk-season i { border-radius: 2px; width: 6px; height: 10px; background: #f2c14e; box-shadow: none; }
+.sk-season-newyear .sk-season i:nth-child(3n) { background: #ff6b6b; }
+.sk-season-newyear .sk-season i:nth-child(4n) { background: #6bd3ff; }
+.sk-season-xmas .sk-season i:nth-child(5n) { background: #ffd34d; box-shadow: 0 0 8px #ffd34d; }
+.sk-wrap { position: relative; z-index: 1; }
+@keyframes sk-fall {
+  0% { transform: translate3d(0, -10px, 0) rotate(0deg); }
+  50% { transform: translate3d(14px, 50vh, 0) rotate(180deg); }
+  100% { transform: translate3d(-8px, 105vh, 0) rotate(360deg); }
+}
+.sk-thumb .sk-season i { animation: none; top: auto; }
+.sk-thumb .sk-season i:nth-child(odd) { top: 12%; } .sk-thumb .sk-season i:nth-child(even) { top: 46%; } .sk-thumb .sk-season i:nth-child(3n) { top: 78%; }
+@media (prefers-reduced-motion: reduce) {
+  .sk-season i { animation: none; }
+  .sk-season i:nth-child(odd) { top: 14%; } .sk-season i:nth-child(even) { top: 48%; } .sk-season i:nth-child(3n) { top: 80%; }
+}
+.sk-ribbon { display: inline-block; margin: 14px 0 0; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; letter-spacing: .02em; background: var(--accent); color: var(--on-accent); }
+.sk-season-xmas .sk-ribbon { background: #b3132b; color: #fff; }
+.sk-season-newyear .sk-ribbon { background: #f2c14e; color: #2a1a00; }
+.sk-season-snow .sk-ribbon { background: #e8f1fb; color: #18324f; }
+
+/* ---------- 모임 참석 답장 ---------- */
+.sk-rsvp { display: grid; gap: 10px; margin-top: 14px; }
+.sk-rsvp-b { min-height: 54px; border-radius: 14px; border: 1.5px solid var(--line-ink); background: var(--paper); color: var(--ink); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+.sk-rsvp-yes { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.sk-rsvp-b:focus-visible { outline: 3px solid var(--accent-line); outline-offset: 2px; }

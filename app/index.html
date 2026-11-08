@@ -281,7 +281,7 @@
     // 어디야? — 싸바의 얼굴. 홈 맨 위에 크게
     var eh = el('div', 'eo-hero');
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>카톡 한 번이면 친구 위치가 와요 · 친구 불러 모으기까지</p>' +
-      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>친구 위치 묻기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>내 위치 보내기</small></a><a class="play" href="../eodiya/#play">🙌 친구야 놀자!<small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
+      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>친구 위치 묻기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>내 위치 보내기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
     v.appendChild(eh);
     if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
     var mine = S.mine();

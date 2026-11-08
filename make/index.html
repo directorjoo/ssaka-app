@@ -10,6 +10,7 @@
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
   <link rel="stylesheet" href="../css/brand.css">
   <link rel="stylesheet" href="../css/sk.css">
+  <link rel="stylesheet" href="../css/sk-world.css">
   <meta property="og:title" content="10초 만에 싸카 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
@@ -71,6 +72,13 @@
     .step span { font-weight: 500; color: var(--muted); font-size: 13px; margin-left: 4px; }
     .inds { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .inds::-webkit-scrollbar { display: none; }
+    .moods { display: flex; gap: 6px; overflow-x: auto; margin: 0 0 10px; scrollbar-width: none; }
+    .moods::-webkit-scrollbar { display: none; }
+    .moods button { flex: none; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .moods button[aria-pressed="true"] { background: #1a1a1a; border-color: #1a1a1a; color: #fff; }
+    .grps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+    .grps button { min-height: 46px; padding: 4px 4px; border-radius: 12px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 13.5px; font-weight: 800; line-height: 1.25; cursor: pointer; word-break: keep-all; }
+    .grps button[aria-pressed="true"] { background: #B3132B; border-color: #B3132B; color: #fff; }
     .inds button {
       flex: 0 0 auto; border: 2px solid var(--line); background: var(--surface); border-radius: 999px;
       padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; white-space: nowrap;
@@ -497,9 +505,24 @@
   window.SsakaToast = toast;
 
   // ---------- 업종 · 디자인 고르기 ----------
+  var curGroup = null;
   function renderIndustries() {
     var box = $('inds'); box.innerHTML = '';
-    D.INDUSTRIES.forEach(function (ind) {
+    var groups = D.GROUPS || [];
+    if (!curGroup) curGroup = (D.groupOf ? D.groupOf(industry) : groups[0] || {}).id;
+    if (groups.length) {
+      var tabs = $('grps');
+      if (!tabs) { tabs = document.createElement('div'); tabs.id = 'grps'; tabs.className = 'grps'; tabs.setAttribute('role', 'group'); tabs.setAttribute('aria-label', '업종 묶음'); box.parentNode.insertBefore(tabs, box); }
+      tabs.innerHTML = '';
+      groups.forEach(function (g) {
+        var t = document.createElement('button'); t.type = 'button'; t.textContent = g.emoji + ' ' + g.label;
+        t.setAttribute('aria-pressed', g.id === curGroup ? 'true' : 'false');
+        t.addEventListener('click', function () { curGroup = g.id; renderIndustries(); var first = D.industry(g.ids[0]); if (first && g.ids.indexOf(industry) < 0) setIndustry(first.id, true); });
+        tabs.appendChild(t);
+      });
+    }
+    var cg = groups.filter(function (g) { return g.id === curGroup; })[0];
+    (cg ? cg.ids.map(function (id) { return D.industry(id); }).filter(Boolean) : D.INDUSTRIES).forEach(function (ind) {
       var b = document.createElement('button');
       b.type = 'button'; b.dataset.ind = ind.id;
       b.textContent = ind.emoji + ' ' + ind.label;
@@ -535,9 +558,28 @@
     el.addEventListener('click', function () { setDesign(d.id); });
     return el;
   }
+  var mood = '';
+  function moodList() {
+    var all = D.list(industry);
+    var hasNew = all.some(function (d) { return /-w\d+$/.test(d.id); });
+    var mb = $('moods');
+    if (!mb) { mb = document.createElement('div'); mb.id = 'moods'; mb.className = 'moods'; mb.setAttribute('role', 'group'); mb.setAttribute('aria-label', '디자인 느낌'); $('gallery').parentNode.insertBefore(mb, $('gallery')); }
+    mb.hidden = !hasNew;
+    if (hasNew) {
+      mb.innerHTML = '';
+      [{ id: '', label: '전체' }].concat(D.MOODS || []).concat([{ id: 'classic', label: '클래식' }]).forEach(function (m) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = m.label;
+        b.setAttribute('aria-pressed', mood === m.id ? 'true' : 'false');
+        b.addEventListener('click', function () { mood = m.id; renderGallery(); });
+        mb.appendChild(b);
+      });
+    }
+    return hasNew && mood ? all.filter(function (d) { return d.mood === mood; }) : all;
+  }
+  function designNo(id) { var l = D.list(industry); for (var i = 0; i < l.length; i++) if (l[i].id === id) return i + 1; return 1; }
   function renderGallery() {
     var box = $('gallery'); box.innerHTML = '';
-    var list = D.list(industry), ex = EX();
+    var list = moodList(), ex = EX();
     var shown = Object.assign({}, ex, {
       title: v('title') || ex.title, subtitle: v('subtitle') || ex.subtitle,
       body: v('body') || ex.body, name: v('name') || ex.name
@@ -546,19 +588,21 @@
     list.forEach(function (d) { box.appendChild(thumb(d, shown)); });
     box.dataset.ind = industry;
     box.scrollLeft = keep;
-    $('designInfo').textContent = list.length + '개 중 ' + design.split('-').pop() + '번';
+    $('designInfo').textContent = D.list(industry).length + '개 중 ' + designNo(design) + '번';
   }
   function setDesign(id) {
     design = id;
     document.querySelectorAll('.tcard').forEach(function (t) {
       t.setAttribute('aria-pressed', t.dataset.id === id ? 'true' : 'false');
     });
-    $('designInfo').textContent = D.list(industry).length + '개 중 ' + id.split('-').pop() + '번';
+    $('designInfo').textContent = D.list(industry).length + '개 중 ' + designNo(id) + '번';
     update();
   }
   function setIndustry(id, userPicked) {
     var ind = D.industry(id) || D.INDUSTRIES[0];
     industry = ind.id;
+    mood = '';
+    if (D.groupOf && D.groupOf(industry).id !== curGroup) { curGroup = D.groupOf(industry).id; renderIndustries(); }
     if (!D.get(design) || D.get(design).industry !== industry) design = D.list(industry)[0].id;
     document.querySelectorAll('.inds button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.ind === industry ? 'true' : 'false');

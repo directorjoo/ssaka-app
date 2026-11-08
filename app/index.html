@@ -108,6 +108,7 @@
     .eodiya:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
 
     /* 업종 바로가기 */
+    .grp { margin: 14px 22px 2px; font-size: 15.5px; font-weight: 900; letter-spacing: -0.02em; color: var(--ssaka-deep, #8E0A1C); }
     .inds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 6px; padding: 4px 12px 10px; }
     .ind { display: grid; justify-items: center; gap: 6px; padding: 10px 2px; border-radius: 14px; text-decoration: none; font-size: 15px; font-weight: 700; line-height: 1.25; color: var(--text, #1a1a1a); text-align: center; word-break: keep-all; }
     .ind:active { background: var(--bg-2); }
@@ -300,19 +301,23 @@
     v.appendChild(campaigns());
     v.appendChild(el('div', 'divider'));
     v.appendChild(secHead('업종별로 바로 만들기'));
-    var g = el('div', 'inds');
     // 업종마다 또렷이 구분되는 파스텔 바탕 (이모지가 잘 보이도록 밝게)
     var TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
       cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
       arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
       greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
-    D.INDUSTRIES.forEach(function (ind) {
-      var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
-      if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
-      var i = el('i', '', ind.emoji); a.appendChild(i); a.appendChild(document.createTextNode(ind.label));
-      g.appendChild(a);
+    (D.GROUPS || [{ label: '', emoji: '', ids: D.INDUSTRIES.map(function (x) { return x.id; }) }]).forEach(function (grp) {
+      if (grp.label) v.appendChild(el('div', 'grp', grp.emoji + ' ' + grp.label));
+      var g = el('div', 'inds');
+      grp.ids.forEach(function (id) {
+        var ind = D.industry(id); if (!ind) return;
+        var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
+        if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
+        var i = el('i', '', ind.emoji); a.appendChild(i); a.appendChild(document.createTextNode(ind.label));
+        g.appendChild(a);
+      });
+      v.appendChild(g);
     });
-    v.appendChild(g);
   }
 
   // ---------- 받은 카드 ----------

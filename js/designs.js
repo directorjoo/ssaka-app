@@ -13,7 +13,10 @@
     black:  { stack: '"Black Han Sans", "Apple SD Gothic Neo", sans-serif', family: 'Black+Han+Sans' },
     myeong: { stack: '"Nanum Myeongjo", "AppleMyungjo", serif', family: 'Nanum+Myeongjo:wght@400;800' },
     batang: { stack: '"Gowun Batang", "AppleMyungjo", serif', family: 'Gowun+Batang:wght@400;700' },
-    jua:    { stack: '"Jua", "Apple SD Gothic Neo", sans-serif', family: 'Jua' }
+    jua:    { stack: '"Jua", "Apple SD Gothic Neo", sans-serif', family: 'Jua' },
+    sanskr: { stack: '"Noto Sans KR", "Noto Sans CJK KR", "Apple SD Gothic Neo", sans-serif', family: 'Noto+Sans+KR:wght@300;500;700;900' },
+    serifkr:{ stack: '"Noto Serif KR", "Noto Serif CJK KR", "AppleMyungjo", serif', family: 'Noto+Serif+KR:wght@400;600;700;900' },
+    lora:   { stack: '"Lora", "Noto Serif KR", "Noto Serif CJK KR", serif', family: 'Lora:ital,wght@0,500;1,500;1,600' }
   };
 
   // 스타일별 제목 글꼴과 색 묶음 (bg 바탕, paper 패널, ink 글자, accent 강조, c1~c3 보조)
@@ -88,6 +91,62 @@
     ] }
   };
 
+  // ---------- 디자인 가족 v3 (은은함·모던·화려함·세계) — 가족마다 색 3벌 ----------
+  var MOODS = [
+    { id: 'calm', label: '은은하게' }, { id: 'modern', label: '모던하게' },
+    { id: 'bold', label: '화려하게' }, { id: 'world', label: '세계 여행' }
+  ];
+  var W = function (k, label, mood, title, palettes) { STYLES[k] = { label: label, title: title, mood: mood, palettes: palettes }; return k; };
+  var FAMILIES = [
+    W('minimal', '미니멀', 'calm', 'sanskr', [
+      { bg: '#ffffff', paper: '#f5f5f3', ink: '#111111', accent: '#111111' },
+      { bg: '#f4f1ec', paper: '#ffffff', ink: '#24201c', accent: '#9a6b3f' },
+      { bg: '#eef1f0', paper: '#ffffff', ink: '#18201e', accent: '#2f6b5e' }]),
+    W('pastel', '파스텔', 'calm', 'sanskr', [
+      { bg: '#fff4f6', paper: '#ffffff', ink: '#3a2030', accent: '#ef6f93', c1: '#ffd0dc', c2: '#d9ccff', c3: '#ffe3b8' },
+      { bg: '#eef8ff', paper: '#ffffff', ink: '#142a3c', accent: '#4a8fe0', c1: '#c9e6ff', c2: '#d6f5e8', c3: '#fff1b8' },
+      { bg: '#f3fbf1', paper: '#ffffff', ink: '#1d3320', accent: '#4caf6e', c1: '#d3f2c9', c2: '#fff0c2', c3: '#ffd9cf' }]),
+    W('hanji', '한지·먹', 'calm', 'serifkr', [
+      { bg: '#efe6d4', paper: '#f8f2e6', ink: '#1d1a16', accent: '#b3261e' },
+      { bg: '#e7e2d6', paper: '#f4f1ea', ink: '#1a1d22', accent: '#2c4a73' },
+      { bg: '#2a2622', paper: '#36312c', ink: '#efe6d4', accent: '#c9493b' }]),
+    W('mdark', '모던 다크', 'modern', 'sanskr', [
+      { bg: '#0c0c0e', paper: '#1b1b1f', ink: '#f2f2f2', accent: '#ff5a36' },
+      { bg: '#0e1214', paper: '#1a2125', ink: '#eef3f2', accent: '#3ddc97' },
+      { bg: '#111018', paper: '#1f1d2b', ink: '#f1effa', accent: '#8b7bff' }]),
+    W('gold', '럭셔리 골드', 'modern', 'serifkr', [
+      { bg: '#0f2a22', paper: '#16382e', ink: '#f3ead3', accent: '#d4b26a' },
+      { bg: '#0e1424', paper: '#18213a', ink: '#f1ead8', accent: '#d9b56b' },
+      { bg: '#131313', paper: '#1f1f1f', ink: '#f2ead6', accent: '#cfae6a' }]),
+    'glass',
+    W('retro', '레트로 팝', 'bold', 'black', [
+      { bg: '#fff3dc', paper: '#fffaf0', ink: '#1b1410', accent: '#e8402b', c1: '#2a9d8f' },
+      { bg: '#d9f1ee', paper: '#ffffff', ink: '#12201e', accent: '#ff6b9d', c1: '#ffc93c' },
+      { bg: '#ffe8a3', paper: '#fffbe9', ink: '#1a1300', accent: '#1f5fd6', c1: '#e8402b' }]),
+    W('neon', '네온 나이트', 'bold', 'sanskr', [
+      { bg: '#0a0714', paper: '#140f24', ink: '#ffffff', accent: '#ff2e9a', c1: '#28e7ff', c2: '#b6ff3b' },
+      { bg: '#05110f', paper: '#0c1d1a', ink: '#ffffff', accent: '#2bff9e', c1: '#ff5edb', c2: '#ffe14d' },
+      { bg: '#0b0a18', paper: '#15132b', ink: '#ffffff', accent: '#ffb22e', c1: '#7a6bff', c2: '#4df0ff' }]),
+    W('wafu', '일본 와풍', 'world', 'serifkr', [
+      { bg: '#f5f0e6', paper: '#fffaf2', ink: '#1c2236', accent: '#26387a', c1: '#c8352d' },
+      { bg: '#fbeff1', paper: '#ffffff', ink: '#3a1d26', accent: '#c2557a', c1: '#e77d95' },
+      { bg: '#eef1e4', paper: '#fafbf4', ink: '#1e2618', accent: '#5a7a3a', c1: '#c8352d' }]),
+    W('hongjin', '중국 홍금', 'world', 'serifkr', [
+      { bg: '#a8121c', paper: '#fff3dc', ink: '#5a0a10', accent: '#f2cd6b' },
+      { bg: '#7a0d14', paper: '#fff5e1', ink: '#4a070c', accent: '#e9c46a' },
+      { bg: '#101820', paper: '#fff3dc', ink: '#7a0d14', accent: '#d9b25e' }]),
+    W('paris', '유럽 빈티지', 'world', 'lora', [
+      { bg: '#f6efe2', paper: '#fffaf1', ink: '#2a1f1a', accent: '#b3261e' },
+      { bg: '#eef2ee', paper: '#ffffff', ink: '#1d2a24', accent: '#1f5a45' },
+      { bg: '#f3eef4', paper: '#ffffff', ink: '#251c2e', accent: '#2b3a7a' }]),
+    W('nordic', '북유럽', 'world', 'sanskr', [
+      { bg: '#f1ebe1', paper: '#fbf8f3', ink: '#2b2620', accent: '#7a8f6a', c1: '#d8c3a5', c2: '#a9b89a', c3: '#e3b59a' },
+      { bg: '#eaeef0', paper: '#f8fafb', ink: '#1f2a30', accent: '#4a6b7c', c1: '#c9d6dc', c2: '#e2d3bf', c3: '#9fb7c2' },
+      { bg: '#f4ece6', paper: '#fffaf6', ink: '#33241d', accent: '#b5704f', c1: '#e8c9b5', c2: '#cfd6c4', c3: '#d9a88c' }])
+  ];
+  STYLES.glass.mood = 'modern';
+  var GLASS_PICK = [0, 3, 7];
+
   var INDUSTRIES = [
     { id: 'actor', label: '배우·모델', emoji: '🎬', type: 'profile', styles: ['cinema', 'magazine', 'glass'], gallery: true,
       L: { body: '출연작 · 필모그래피 (한 줄에 하나씩)' },
@@ -112,10 +171,10 @@
       L: { body: '추천 매물 · 소식 (한 줄에 하나씩)', menu: '관심 매물 종류 (한 줄에 하나, 선택)', menuHint: '매물 종류를 적으면 상담 예약 때 손님이 고를 수 있어요.', resv: '손님이 카드에서 바로 방문 상담을 예약할 수 있게 하기' },
       res: { label: '방문 상담 예약', word: '매물', people: false, deposit: false },
       ex: { title: '싸카공인중개사', subtitle: '아파트 · 상가 · 원룸 매매·전월세', name: '싸카공인중개사', body: '이번 주 추천 매물: 역세권 30평대\n상담 예약 환영', copyLabel: '매물 목록', copyValue: 'https://example.com', place: '여수 웅천동' } },
-    { id: 'restaurant', label: '음식점', emoji: '🍲', type: 'shop', styles: ['poster', 'sticker', 'cinema'],
-      ex: { title: '싸카식당', subtitle: '11:30 – 22:00 · 월요일 휴무', name: '싸카식당', body: '오늘의 특선: 갓김치 삼겹살\n점심 백반 9,000원\n단체 예약 30명까지', copyLabel: '주소 복사', copyValue: '여수시 중앙동 (예시)', place: '여수 이순신광장', menu: '갓김치 삼겹살 15000\n돌산 갓 비빔밥 9000\n점심 백반 9000\n소주·맥주 5000', account: 'OO은행 000-0000-0000 싸카식당' } },
-    { id: 'cafe', label: '카페·베이커리', emoji: '☕', type: 'shop', styles: ['sticker', 'glass', 'magazine'],
-      ex: { title: '카페 싸카', subtitle: '매일 10:00 – 21:00', name: '카페 싸카', body: '오늘 갓 구운 소금빵\n아메리카노 2+1 (오후 3시까지)', copyLabel: '주소 복사', copyValue: '여수시 (예시)', place: '여수 낭만포차', menu: '아메리카노 4500\n카페라떼 5000\n소금빵 3500\n홀케이크 (예약) 32000', account: 'OO은행 000-0000-0000 카페 싸카' } },
+    { id: 'restaurant', label: '음식점', emoji: '🍲', type: 'shop', styles: ['poster', 'sticker', 'cinema'], world: true,
+      ex: { title: '싸바식당', subtitle: '11:30 – 22:00 · 월요일 휴무', name: '싸바식당', body: '오늘의 특선: 갓김치 삼겹살\n점심 백반 9,000원\n단체 예약 30명까지', copyLabel: '주소 복사', copyValue: '여수시 중앙동 (예시)', place: '여수 이순신광장', menu: '갓김치 삼겹살 15000\n돌산 갓 비빔밥 9000\n점심 백반 9000\n소주·맥주 5000', account: 'OO은행 000-0000-0000 싸바식당' } },
+    { id: 'cafe', label: '카페·베이커리', emoji: '☕', type: 'shop', styles: ['sticker', 'glass', 'magazine'], world: true,
+      ex: { title: '카페 싸바', subtitle: '매일 10:00 – 21:00', name: '카페 싸바', body: '오늘 갓 구운 소금빵\n아메리카노 2+1 (오후 3시까지)', copyLabel: '주소 복사', copyValue: '여수시 (예시)', place: '여수 낭만포차', menu: '아메리카노 4500\n카페라떼 5000\n소금빵 3500\n홀케이크 (예약) 32000', account: 'OO은행 000-0000-0000 카페 싸바' } },
     { id: 'beauty', label: '미용·네일', emoji: '💅', type: 'shop', styles: ['glass', 'magazine', 'cinema'],
       L: { body: '이달의 이벤트 · 시술 소식 (한 줄에 하나씩)', menu: '시술 항목과 가격 (한 줄에 하나, 선택)', menuHint: '"시술 이름 가격" 순서로 적으면 손님이 시술을 고르고 예상 금액이 계산돼요.', resv: '손님이 카드에서 바로 시술 예약할 수 있게 하기' },
       res: { label: '시술 예약', word: '시술', people: false },
@@ -214,6 +273,19 @@
   var BY_ID = {}, BY_INDUSTRY = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
+    // 새 디자인 가족 12 × 색 3 = 36장을 앞에 (기존 1~12번은 예전 카드 호환을 위해 뒤에 그대로)
+    if (ind.world) {
+      var w = 0;
+      FAMILIES.forEach(function (fk, fi) {
+        var st = STYLES[fk];
+        for (var pi = 0; pi < 3; pi++) {
+          var pal = fk === 'glass' ? st.palettes[GLASS_PICK[pi]] : st.palettes[(pi + (ind.id === 'cafe' ? 1 : 0)) % 3];
+          w++;
+          var dw = { id: ind.id + '-w' + w, industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
+          BY_ID[dw.id] = dw; list.push(dw);
+        }
+      });
+    }
     var count = ind.count || 12, styles = ind.styles, per = Math.ceil(count / styles.length);
     for (var i = 0; i < count; i++) {
       var styleKey = styles[i % styles.length];
@@ -223,7 +295,7 @@
       if (styleKey === 'safe') pal = st.palettes[(i + (ind.offset || 0)) % st.palettes.length];
       var d = {
         id: ind.id + '-' + (i + 1), industry: ind.id,
-        name: st.label + ' ' + (i + 1), style: styleKey, font: st.title,
+        name: st.label + ' ' + (i + 1), style: styleKey, font: st.title, mood: st.mood || 'classic',
         colors: colorsFor(styleKey, pal)
       };
       BY_ID[d.id] = d; list.push(d);
@@ -268,8 +340,16 @@
     return BY_ID[byTpl[card && card.template] || 'actor-2'];
   }
 
+  // 업종 4묶음 (홈·만들기 화면에서 묶어서 보여줌)
+  var GROUPS = [
+    { id: 'shop', label: '가게·매장', emoji: '🏪', ids: ['restaurant', 'cafe', 'beauty', 'fitness', 'flower', 'stay'] },
+    { id: 'edu', label: '교육·학원', emoji: '📚', ids: ['toefl', 'bigacademy', 'academy', 'entrance', 'tutor', 'arts'] },
+    { id: 'pro', label: '영업·전문직', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
+    { id: 'meet', label: '모임·행사·안부', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event', 'greeting', 'kid', 'senior'] }
+  ];
+  function groupOf(id) { return GROUPS.filter(function (g) { return g.ids.indexOf(id) >= 0; })[0] || GROUPS[0]; }
   var api = {
-    FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES,
+    FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, groupOf: groupOf, MOODS: MOODS,
     get: function (id) { return BY_ID[id] || null; },
     list: function (industryId) { return BY_INDUSTRY[industryId] || []; },
     industry: function (id) { return INDUSTRIES.filter(function (x) { return x.id === id; })[0] || null; },

@@ -103,6 +103,11 @@
     .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
     .pbig .no { border: 1.5px solid var(--line); background: #fff; }
     .pbig .row2 button { font-size: 18px; min-height: 58px; }
+    .rname { margin: 14px 0 10px; text-align: left; }
+    .rname label { display: block; font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+    .rname label span { font-weight: 600; color: var(--ink-2); font-size: 12.5px; margin-left: 4px; }
+    .cancel { min-height: 42px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-size: 15px; font-weight: 800; color: var(--ink-2); cursor: pointer; }
+    .cancel-b { min-height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 700; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 40; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -114,7 +119,7 @@
   <section id="maker">
     <div class="brand">
       <div class="logo">어디야?</div>
-      <a href="../app/">싸바 홈</a>
+      <button type="button" class="cancel" id="cancelTop">✕ 취소</button>
     </div>
     <p class="lead">"어디야?" 묻고, "여기야!" 알려 주고, "친구야 놀자!" 불러 모으세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
 
@@ -185,6 +190,7 @@
     <div class="send">
       <button type="button" class="big kakao" id="sendKakao">💬 카톡으로 보내기</button>
       <button type="button" class="big ghost" id="sendSms">📱 문자로 보내기</button>
+      <button type="button" class="cancel-b" id="cancelBottom">취소하고 나가기</button>
     </div>
   </section>
 
@@ -310,6 +316,7 @@
     });
   }
 
+  var DRAFT_ME = 'eodiya-me-v1';
   var data = new URLSearchParams(location.search).get('d');
   var card = data && window.SsakaCodec ? SsakaCodec.decode(data) : null;
 
@@ -317,21 +324,33 @@
   if (card) {
     $('maker').hidden = true;
     var who = card.from ? card.from + '님이' : '친구가';
-    function reply(text, extraUrl) {
-      var body = text + (extraUrl ? '\n' + extraUrl : '');
-      if (card.phone) { location.href = sms(card.phone, body); return; }
-      // 번호가 없으면 카톡 공유 (텍스트 메시지)
-      var K = window.SsakaKakao;
-      var url = extraUrl || BASE;
-      if (K) K().then(function (Kakao) {
-        Kakao.Share.sendDefault({ objectType: 'text', text: text, link: { mobileWebUrl: url, webUrl: url }, buttonTitle: extraUrl ? '지도 보기' : '어디야? 열기' });
-      }).catch(function () { window.SsakaShare({ title: text, description: '', url: url }); });
-      else window.SsakaShare({ title: text, description: '', url: url });
+    // 답장 보낼 사람 이름 (한 번 쓰면 기억)
+    function myName() {
+      var i = $('rName'); var n = i ? i.value.trim() : '';
+      if (n) { try { localStorage.setItem(DRAFT_ME, JSON.stringify({ from: n })); } catch (e) {} }
+      return n;
+    }
+    function nameBox(before) {
+      if (!before || $('rName')) return;
+      var w = document.createElement('div'); w.className = 'rname';
+      w.innerHTML = '<label for="rName">내 이름 <span>답장에 같이 보여요</span></label><input type="text" id="rName" maxlength="12" placeholder="예: 홍길동">';
+      before.parentNode.insertBefore(w, before);
+      try { var me = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); if (me.from) $('rName').value = me.from; } catch (e) {}
+    }
+    // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
+    function reply(o) {
+      var name = myName();
+      var title = (name ? name + ': ' : '') + o.title;
+      var url = o.url || BASE;
+      if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
+      window.SsakaShare({ title: title, description: o.desc || '', imageUrl: IMG_BASE + o.img, imageWidth: 800, imageHeight: 800, url: url,
+        buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', installUrl: BASE + '?install=1' });
     }
     if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
     if (card.m === 'play') {
       $('viewPlay').hidden = false;
+      nameBox(document.querySelector('#viewPlay .pbig'));
       document.title = '친구야 놀자! · 싸바';
       $('pWho').textContent = who + ' 불러요';
       $('pAct').textContent = card.act || '☕ 차 한잔';
@@ -357,11 +376,15 @@
         }
       }
       document.querySelectorAll('#viewPlay .pbig button').forEach(function (b) {
-        b.addEventListener('click', function () { reply('[친구야 놀자!] ' + b.dataset.r); });
+        b.addEventListener('click', function () {
+          var yes = b.classList.contains('yes');
+          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=1' : 'eodiya-reply.png?v=1', btn: yes ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
+        });
       });
       playSound(card.sound || 'play');
     } else if (card.m === 'come') {
       $('viewCome').hidden = false;
+      nameBox(document.querySelector('#viewCome .replies'));
       document.title = '여기서 만나! · 어디야?';
       var p = card.place || {};
       if (card.here) {
@@ -391,25 +414,26 @@
       }
       if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
       document.querySelectorAll('.reply').forEach(function (b) {
-        b.addEventListener('click', function () { reply('[어디야?] ' + b.dataset.r); });
+        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '어디야? 답장', img: 'eodiya-reply.png?v=1', btn: '어디야? 열기' }); });
       });
       playSound(card.sound || 'here');
     } else {
       $('viewAsk').hidden = false;
+      nameBox($('hereBtn'));
       document.title = '어디야? · 싸카';
       $('aWho').textContent = who + ' 물어봐요';
       $('hereBtn').addEventListener('click', function () {
         toast('위치를 확인하는 중…');
         getPos().then(function (pos) {
-          var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, place: { name: '', lat: pos.lat, lng: pos.lng } });
-          reply('[어디야?] 여기야! 지도에서 내 위치 보기', back);
+          var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, from: myName(), place: { name: '', lat: pos.lat, lng: pos.lng } });
+          reply({ title: '여기야!', desc: '지금 내 위치 · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=2', btn: '지도 보기', url: back });
         }, function (e) { toast(e.message + ' — 아래에 직접 써서 보낼 수 있어요'); $('hereText').focus(); });
       });
       $('hereSend').addEventListener('click', function () {
         var t = $('hereText').value.trim();
         if (!t) { toast('어디인지 적어주세요'); $('hereText').focus(); return; }
-        var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, place: { name: t } });
-        reply('[어디야?] 여기야! ' + t, back);
+        var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, from: myName(), place: { name: t } });
+        reply({ title: '여기야!', desc: '📍 ' + t + ' · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=2', btn: '지도 보기', url: back });
       });
       playSound(card.sound || 'where');
     }
@@ -523,6 +547,12 @@
   }
   $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
+  function cancelOut() {
+    var fromHere = document.referrer && document.referrer.indexOf(location.origin) === 0;
+    if (fromHere && history.length > 1) history.back(); else location.href = '../app/';
+  }
+  $('cancelTop').addEventListener('click', cancelOut);
+  $('cancelBottom').addEventListener('click', cancelOut);
   if (location.hash === '#come' || location.hash === '#play') { var cm = document.querySelector('.mode[data-mode="' + location.hash.slice(1) + '"]'); if (cm) cm.click(); }
   if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '싸바 홈 화면에 추가');
 })();

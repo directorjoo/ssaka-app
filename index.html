@@ -16,11 +16,20 @@
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="싸바">
   <link rel="stylesheet" href="css/brand.css">
+  <script>
+    // 홈 화면 아이콘으로 열었으면 바로 싸바 홈으로
+    try { if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true) location.replace('app/'); } catch (e) {}
+  </script>
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
     a { color: inherit; }
     [hidden] { display: none !important; }
+    .topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: calc(8px + env(safe-area-inset-top)) 16px 8px; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .topbar b { display: flex; align-items: center; gap: 6px; font-size: 19px; font-weight: 900; color: var(--ssaka); letter-spacing: -0.03em; }
+    .topbar b img { width: 26px; height: 26px; }
+    .topbar a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: var(--ssaka); color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; white-space: nowrap; }
+    .startbig { display: flex; align-items: center; justify-content: center; max-width: 330px; min-height: 60px; margin: 22px auto 0; border-radius: 18px; background: var(--ssaka); color: #fff; font-size: 19px; font-weight: 900; text-decoration: none; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
     .in { max-width: 560px; margin: 0 auto; padding: 0 22px; }
     .sv { color: var(--ssaka); font-weight: 900; }
 
@@ -105,6 +114,8 @@
 </head>
 <body>
 
+<div class="topbar"><b><img src="img/cherry.svg" alt="">싸바</b><a href="app/">싸바 시작하기 →</a></div>
+
 <header class="hero">
   <div class="in">
     <img src="img/cherry-dance-anim.svg" alt="한 꼭지에 달린 체리 두 알">
@@ -114,6 +125,7 @@
       <span class="bub a">싸바! 여기야!</span>
     </div>
     <p class="tag">안부 한마디로 사람을 이어 주는 회사</p>
+    <a class="startbig" href="app/">🍒 싸바 시작하기</a>
   </div>
 </header>
 

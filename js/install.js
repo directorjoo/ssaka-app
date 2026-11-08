@@ -22,7 +22,7 @@
     '.si-head span{font-size:14.5px;color:#666}' +
     '.si-steps{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:start;gap:4px;margin:6px 0 12px}' +
     '.si-step{display:grid;justify-items:center;gap:8px;text-align:center;font-size:14.5px;font-weight:800;line-height:1.3;word-break:keep-all}' +
-    '.si-step i{font-style:normal;width:62px;height:62px;border-radius:18px;background:#F2F2F4;display:grid;place-items:center;font-size:26px;font-weight:900;color:#1a1a1a}' +
+    '.si-step small{font-size:12px;color:#888;font-weight:700}.si-step i{font-style:normal;width:62px;height:62px;border-radius:18px;background:#F2F2F4;display:grid;place-items:center;font-size:26px;font-weight:900;color:#1a1a1a}' +
     '.si-step:first-child i{background:#B3132B;color:#fff}' +
     '.si-arrow{font-size:22px;color:#bbb;padding-top:18px}' +
     '.si-tip{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:#FBF3F4;font-size:13.5px;color:#7a2a35;line-height:1.5;word-break:keep-all}' +
@@ -62,11 +62,10 @@
       b.appendChild(ex);
     } else if (ios) {
       b.appendChild(el('div', 'si-steps',
-        '<div class="si-step"><i>•••</i>오른쪽 아래<br>점 세 개</div><span class="si-arrow">›</span>' +
-        '<div class="si-step"><i>⬆︎</i>공유</div><span class="si-arrow">›</span>' +
+        '<div class="si-step"><i>⬆︎</i>공유 버튼<br><small>(없으면 •••)</small></div><span class="si-arrow">›</span>' +
+        '<div class="si-step"><i>↓</i>목록을<br>위로 올리기</div><span class="si-arrow">›</span>' +
         '<div class="si-step"><i>⊞</i>홈 화면에<br>추가</div>'));
-      b.appendChild(el('p', 'si-tip', '"홈 화면에 추가"가 안 보이면 공유 창을 <b>위로 끝까지</b> 올려 보세요. 마지막에 오른쪽 위 <b>추가</b>를 누르면 끝!'));
-      b.appendChild(el('div', 'si-point', '여기 ••• <b>👇</b>'));
+      b.appendChild(el('p', 'si-tip', '<b>공유 버튼(□↑)</b>은 주소창 옆에 있어요. 위쪽이든 아래쪽이든 주소창이 있는 곳을 보세요. 마지막에 오른쪽 위 <b>추가</b>를 누르면 끝!'));
     } else {
       // 안드로이드: 크롬이 설치 창을 준비했으면 버튼 한 번, 아니면 메뉴 3칸 안내
       var samsung = /SamsungBrowser/i.test(ua);

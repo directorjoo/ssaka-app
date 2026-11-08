@@ -81,6 +81,7 @@
   }
 
   // 미리 불러두면 버튼 누를 때 빠름
+  window.SsakaKakaoKey = KAKAO_JS_KEY;
   if (KAKAO_JS_KEY) loadKakao().catch(function () {});
 
   // ---------- 문자로 보내기 ----------

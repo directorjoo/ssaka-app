@@ -166,6 +166,21 @@
     var root = SsakaRender.build(card, design, ctx);
     // 받은 카드함에 기록 (만들기 화면 미리보기는 제외)
     if (window.SsakaStore && window.self === window.top && /[?&]d=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
+    // 내가 만든 카드라면: 수정하기 · 복사해서 새로 만들기
+    try {
+      var dq = new URLSearchParams(location.search).get('d');
+      var mine = dq && window.SsakaStore && window.self === window.top && SsakaStore.mine().some(function (x) {
+        try { return new URL(x.url).searchParams.get('d') === dq; } catch (e) { return false; }
+      });
+      if (mine) {
+        var bar = document.createElement('div'); bar.className = 'sk-owner';
+        var mk = new URL('../make/', location.href).href;
+        var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq); e1.textContent = '✏️ 수정하기';
+        var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사해서 새로';
+        bar.appendChild(e1); bar.appendChild(e2);
+        document.body.appendChild(bar);
+      }
+    } catch (e) {}
     app.innerHTML = '';
     app.className = 'sk-host';
     app.appendChild(root);

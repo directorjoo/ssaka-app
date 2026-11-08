@@ -39,6 +39,11 @@
     .box h2 { margin: 0 0 10px; font-size: 15px; }
     label.l { display: block; font-size: 13px; font-weight: 700; color: var(--ink-2); margin: 12px 0 6px; }
     label.l:first-of-type { margin-top: 0; }
+    .more-opt { margin-top: 12px; }
+    .bubble { display: inline-block; padding: 14px 18px; border-radius: 20px 20px 20px 6px; background: var(--ssaka-soft, #FBE9EC); font-size: 22px; }
+    .bubble b { color: var(--ssaka-deep, #8E0A1C); }
+    #useGps { width: 100%; }
+    .more-opt summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--ink-2); min-height: 40px; display: flex; align-items: center; }
     input[type=text], input[type=tel], input[type=time] {
       width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-size: 16px;
     }
@@ -96,42 +101,42 @@
       <div class="logo">어디야?</div>
       <a href="../app/">싸카 홈</a>
     </div>
-    <p class="lead">약속 장소를 보내거나, 친구가 어디 있는지 물어보세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <p class="lead">친구에게 "어디야?"를 묻거나, "여기야!" 하고 내 위치·만날 곳을 보내세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
-      <button type="button" class="mode" data-mode="come" aria-pressed="true"><i>📍</i><b>여기로 와!</b><span>약속 장소와 시간을 보내요</span></button>
-      <button type="button" class="mode" data-mode="ask" aria-pressed="false"><i>🙋</i><b>어디야?</b><span>친구 위치를 물어봐요</span></button>
+      <button type="button" class="mode" data-mode="ask" aria-pressed="true"><i>🙋</i><b>어디야?</b><span>친구가 어디 있는지 물어봐요</span></button>
+      <button type="button" class="mode" data-mode="come" aria-pressed="false"><i>📍</i><b>여기야!</b><span>내 위치나 만날 곳을 보내요</span></button>
     </div>
 
-    <div class="box" id="comeBox">
-      <h2>어디로 올까요?</h2>
-      <div class="placebtns">
-        <button type="button" class="pbtn" id="useGps">📍 지금 내 위치</button>
-        <button type="button" class="pbtn" id="usePost">🔍 주소 찾기</button>
-      </div>
-      <input type="text" id="placeName" maxlength="60" placeholder="장소 이름 (예: 강남역 11번 출구)">
-      <div class="note" id="placeNote">이름만 적어도 받는 사람이 지도에서 찾을 수 있어요.</div>
-      <iframe class="map" id="mapPrev" title="약속 장소 지도" hidden loading="lazy"></iframe>
+    <div class="box" id="askBox">
+      <div class="bubble">🙋 <b id="askPrev">어디야?</b></div>
+      <div class="note" style="margin-top:8px">보내면 끝! 친구는 "여기야!" 한 번만 누르면 지도가 와요.</div>
+    </div>
 
-      <label class="l">몇 시까지?</label>
-      <div class="chips" id="timeChips">
-        <button type="button" class="chip" data-t="0" aria-pressed="true">지금 바로</button>
-        <button type="button" class="chip" data-t="30" aria-pressed="false">30분 뒤</button>
-        <button type="button" class="chip" data-t="60" aria-pressed="false">1시간 뒤</button>
-        <button type="button" class="chip" data-t="x" aria-pressed="false">시간 정하기</button>
-      </div>
-      <input type="time" id="timeAt" hidden style="margin-top:8px">
-      <label class="l" for="memo">한마디 (선택)</label>
-      <input type="text" id="memo" maxlength="60" placeholder="예: 2번 출구 앞 편의점!">
+    <div class="box" id="comeBox" hidden>
+      <button type="button" class="big red" id="useGps">📍 지금 내 위치 잡기</button>
+      <div class="note" id="placeNote">"어디야?" 문자를 받았으면 이것만 누르고 보내면 돼요.</div>
+      <iframe class="map" id="mapPrev" title="내 위치 지도" hidden loading="lazy"></iframe>
+      <details class="more-opt">
+        <summary>약속 장소 · 시간을 따로 정하려면</summary>
+        <button type="button" class="pbtn" id="usePost" style="margin-top:6px">🔍 주소 찾기</button>
+        <input type="text" id="placeName" maxlength="60" placeholder="장소 이름 (예: 강남역 11번 출구)" style="margin-top:8px">
+        <label class="l">만나는 시간</label>
+        <div class="chips" id="timeChips">
+          <button type="button" class="chip" data-t="0" aria-pressed="true">지금</button>
+          <button type="button" class="chip" data-t="30" aria-pressed="false">30분 뒤</button>
+          <button type="button" class="chip" data-t="60" aria-pressed="false">1시간 뒤</button>
+          <button type="button" class="chip" data-t="x" aria-pressed="false">시간 정하기</button>
+        </div>
+        <input type="time" id="timeAt" hidden style="margin-top:8px">
+        <label class="l" for="memo">한마디 (선택)</label>
+        <input type="text" id="memo" maxlength="60" placeholder="예: 2번 출구 앞 편의점!">
+      </details>
     </div>
 
     <div class="box">
-      <h2>보내는 사람</h2>
-      <div class="row2">
-        <div><label class="l" for="from">이름</label><input type="text" id="from" maxlength="12" placeholder="홍길동"></div>
-        <div><label class="l" for="myPhone">내 번호 (선택)</label><input type="tel" id="myPhone" maxlength="20" inputmode="tel" placeholder="010-0000-0000"></div>
-      </div>
-      <div class="note">번호를 적으면 친구 답장이 문자로 바로 와요. 안 적으면 카톡으로 답장해요.</div>
+      <label class="l" for="from">내 이름</label>
+      <input type="text" id="from" maxlength="12" placeholder="홍길동">
     </div>
 
     <div class="send">
@@ -255,17 +260,18 @@
 
     if (card.m === 'come') {
       $('viewCome').hidden = false;
-      document.title = '여기로 와! · 어디야?';
+      document.title = '여기서 만나! · 어디야?';
       var p = card.place || {};
       if (card.here) {
         document.querySelector('#viewCome .q').textContent = '여기야!';
         document.title = '여기야! · 어디야?';
         $('cWho').textContent = who + ' 지금 여기 있어요';
       } else {
+        document.querySelector('#viewCome .q').textContent = '여기서 만나!';
         $('cWho').textContent = who + ' 기다려요';
       }
-      $('cPlace').textContent = p.name || (hasXY(p) ? '보낸 사람의 현재 위치' : '');
-      if (card.at) {
+      $('cPlace').textContent = p.name || (hasXY(p) ? (card.here ? '지도에서 확인하세요' : '보낸 사람이 고른 곳') : '');
+      if (card.at && !card.here) {
         var left = Math.round((card.at - Date.now()) / 60000);
         $('cWhen').hidden = false;
         $('cWhen').textContent = '⏰ ' + clockText(card.at) + (left > 0 ? ' · ' + left + '분 남음' : left > -1 ? ' · 지금!' : ' · ' + (-left) + '분 지남');
@@ -309,30 +315,34 @@
   }
 
   // ================= 보내는 화면 =================
-  var mode = 'come', place = null, minutes = 0;
+  var mode = 'ask', place = null, minutes = 0;
   var DRAFT = 'eodiya-me-v1';
-  try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; if (me.phone) $('myPhone').value = me.phone; } catch (e) {}
-  function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim(), phone: $('myPhone').value.trim() })); } catch (e) {} }
+  try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; } catch (e) {}
+  function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim() })); } catch (e) {} }
+  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = (f ? f + ': ' : '') + '어디야?'; }
+  $('from').addEventListener('input', askPreview); askPreview();
 
   document.querySelectorAll('.mode').forEach(function (b) {
     b.addEventListener('click', function () {
       mode = b.dataset.mode;
       document.querySelectorAll('.mode').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
       $('comeBox').hidden = mode !== 'come';
+      $('askBox').hidden = mode !== 'ask';
+      if (mode === 'come' && !place) $('useGps').click();
     });
   });
   function setPlace(p, note) {
     place = p;
-    $('useGps').classList.toggle('on', !!(p && hasXY(p) && !p.addr));
+    $('useGps').textContent = p && hasXY(p) && !p.addr ? '📍 내 위치 잡았어요 ✓ (다시 잡기)' : '📍 지금 내 위치 잡기';
     $('usePost').classList.toggle('on', !!(p && p.addr));
     if (p && p.name) $('placeName').value = p.name;
-    $('placeNote').textContent = note || '이름만 적어도 받는 사람이 지도에서 찾을 수 있어요.';
+    $('placeNote').textContent = note || '"어디야?" 문자를 받았으면 이것만 누르고 보내면 돼요.';
     if (p && hasXY(p)) { $('mapPrev').hidden = false; $('mapPrev').src = osm(p.lat, p.lng); } else $('mapPrev').hidden = true;
   }
   $('useGps').addEventListener('click', function () {
     toast('위치를 확인하는 중…');
     getPos().then(function (pos) {
-      setPlace({ lat: pos.lat, lng: pos.lng, name: $('placeName').value.trim() }, '지금 내 위치를 보내요. 장소 이름을 적으면 더 찾기 쉬워요.');
+      setPlace({ lat: pos.lat, lng: pos.lng, name: $('placeName').value.trim() }, '이제 아래 카톡이나 문자로 보내세요.');
     }, function (e) { toast(e.message); });
   });
   $('usePost').addEventListener('click', function () {
@@ -355,15 +365,18 @@
   });
 
   function build() {
-    var from = $('from').value.trim(), phone = $('myPhone').value.trim();
+    var from = $('from').value.trim(), phone = '';
     if (!from) { toast('보내는 사람 이름을 적어주세요'); $('from').focus(); return null; }
     remember();
     var d = { m: mode, from: from, phone: phone };
+    var gpsNow = false;
     if (mode === 'come') {
       var name = $('placeName').value.trim();
       var p = place && hasXY(place) ? { name: name, lat: place.lat, lng: place.lng } : (name ? { name: name } : null);
-      if (!p) { toast('어디로 올지 정해주세요'); $('placeName').focus(); return null; }
+      if (!p) { toast('먼저 "지금 내 위치 잡기"를 눌러주세요'); $('useGps').focus(); return null; }
       d.place = p;
+      gpsNow = !!(place && hasXY(place) && !place.addr) && minutes === 0;
+      if (gpsNow) d.here = 1;
       if (minutes === null) {
         var v = $('timeAt').value;
         if (v) { var t = new Date(); var hm = v.split(':'); t.setHours(+hm[0], +hm[1], 0, 0); if (t < Date.now() - 3600000) t.setDate(t.getDate() + 1); d.at = t.getTime(); }
@@ -372,8 +385,8 @@
       d.memo = $('memo').value.trim();
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
-    var title = mode === 'come' ? from + ': 여기로 와!' : from + ': 어디야?';
-    var desc = mode === 'come' ? ((d.place.name || '내 위치') + (d.at ? ' · ' + clockText(d.at) : '')) : '눌러서 "여기야!" 답장하기';
+    var title = mode === 'come' ? (gpsNow ? from + ': 여기야!' : from + ': 여기서 만나!') : from + ': 어디야?';
+    var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '지금 내 위치' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '눌러서 "여기야!" 답장하기';
     return { url: url, title: title, desc: desc, phone: phone };
   }
   $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });

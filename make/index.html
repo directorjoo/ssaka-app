@@ -130,6 +130,16 @@
     .modal-box { background: var(--surface); width: 100%; max-width: 520px; border-radius: 18px 18px 0 0; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); }
     .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 10px; }
     #postWrap { height: 70vh; max-height: 520px; overflow: hidden; }
+    .hlinks { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 10px; scrollbar-width: none; }
+    .hlinks::-webkit-scrollbar { display: none; }
+    .hlinks b { flex: none; align-self: center; font-size: 12.5px; color: var(--muted); margin-right: 2px; }
+    .hlinks a { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--text); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    a.ghost.big { display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; }
+    .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .biz-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; max-height: 50vh; overflow: auto; }
+    .biz-list button { width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font: inherit; cursor: pointer; display: grid; gap: 2px; }
+    .biz-list b { font-size: 15px; } .biz-list span { font-size: 13px; color: var(--muted); }
+    .owner-note { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: var(--ssaka-soft); color: var(--ssaka-deep); font-size: 14px; font-weight: 700; }
     .exp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 14px; }
     .exp-grid figure { margin: 0; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
@@ -201,6 +211,7 @@
     <form id="form" autocomplete="off" onsubmit="return false">
       <div class="step">1. 업종 고르기</div>
       <div class="inds" id="inds" role="group" aria-label="업종"></div>
+      <div class="hlinks" id="hLinks" hidden></div>
 
       <div class="step">2. 디자인 고르기 <span id="designInfo"></span></div>
       <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
@@ -240,6 +251,10 @@
 
       <fieldset>
         <legend data-l="contact">연락처</legend>
+        <div class="quick" data-for="profile shop club">
+          <button type="button" class="mini" id="findBiz">🔍 상호로 찾아서 자동 채우기</button>
+          <button type="button" class="mini" id="fillMe" hidden>👤 내 정보 불러오기</button>
+        </div>
         <div class="row">
           <div>
             <label for="name" class="req" data-l="name">이름</label>
@@ -253,7 +268,7 @@
         <div data-for="profile">
           <div class="row">
             <div>
-              <label for="org">소속 (선택)</label>
+              <label for="org" data-l="org">소속 (선택)</label>
               <input id="org" maxlength="40">
             </div>
             <div>
@@ -262,6 +277,7 @@
             </div>
           </div>
         </div>
+        <p class="hint" id="bizNote" hidden>보험 상품 광고는 협회 심의 대상일 수 있어요. 카드에는 소속, 연락처, 상담 분야만 적고 상품 이름·보장 내용·수익률은 쓰지 않는 게 안전해요.</p>
         <div data-for="profile shop">
           <label for="addr1">주소 (선택 — 주소록에 함께 저장돼요)</label>
           <div class="addr">
@@ -387,6 +403,7 @@
     <button type="button" class="kakao big" id="send2">💬 카톡으로 보내기</button>
     <button type="button" class="ghost big" id="sms2">📱 문자로 보내기 (연락처에서 고르기)</button>
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
+    <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
     <button type="button" class="ghost big" id="exp2">📸 카톡 채널 · 인스타용 이미지 만들기</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
@@ -407,6 +424,15 @@
     </ol>
   </div>
 </div>
+<div class="modal" id="bizModal" hidden>
+  <div class="modal-box done-box">
+    <div class="modal-head"><b>상호로 찾기</b><button type="button" class="mini" id="bizClose">닫기</button></div>
+    <p class="done-sub">가게나 회사 이름을 적으면 카카오맵에 등록된 주소와 전화번호를 찾아 채워 드려요.</p>
+    <div class="addr"><input id="bizQ" maxlength="40" placeholder="예: 여수 온기식당, 싸카생명 여수지점" enterkeyhint="search"><button type="button" class="mini" id="bizGo">찾기</button></div>
+    <ul class="biz-list" id="bizList"></ul>
+    <p class="hint" id="bizMsg"></p>
+  </div>
+</div>
 <div id="toast" class="toast" role="status"></div>
 <div class="modal" id="postModal" hidden>
   <div class="modal-box">
@@ -423,6 +449,7 @@
 <script src="../js/store.js"></script>
 <script src="../js/share.js"></script>
 <script src="../js/export.js"></script>
+<script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
 (function () {
@@ -555,6 +582,17 @@
     });
     var res = ind.res || {};
     $('depBox').hidden = res.deposit === false;
+    $('bizNote').hidden = ind.id !== 'insurance';
+    $('castGo').hidden = ind.id !== 'actor';
+    var hl = $('hLinks'); hl.innerHTML = '';
+    if (window.SsakaLinks && (type === 'profile' || type === 'shop')) {
+      var head = document.createElement('b'); head.textContent = '쓸모 있는 곳'; hl.appendChild(head);
+      SsakaLinks.forIndustry(ind.id).forEach(function (x) {
+        var a = document.createElement('a'); a.href = x.url; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = x.icon + ' ' + x.label; hl.appendChild(a);
+      });
+      hl.hidden = false;
+    } else hl.hidden = true;
     var showGal = type === 'profile' || type === 'shop' || type === 'club';
     $('galBox').hidden = !showGal;
     $('galTitle').textContent = ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
@@ -952,6 +990,10 @@
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('글을 복사하세요', t); });
     else prompt('글을 복사하세요', t);
   });
+  $('castGo').addEventListener('click', function () {
+    var c = current(); if (!c) return;
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(c.url).then(function () { toast('내 프로필 카드 링크를 복사했어요. 공고에 지원할 때 붙여넣으세요'); });
+  });
   $('expClose').addEventListener('click', function () { $('expModal').hidden = true; });
   $('expModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 
@@ -960,7 +1002,115 @@
     window.SsakaSms({ title: c.card.title, description: c.card.subtitle || '눌러서 카드를 열어보세요', url: c.url });
   });
 
+  // ---------- 상호로 찾아 자동 채우기 (카카오맵 장소 검색) ----------
+  var mapsP = null;
+  function loadMaps() {
+    if (mapsP) return mapsP;
+    mapsP = new Promise(function (ok, no) {
+      if (window.kakao && kakao.maps && kakao.maps.services) return ok();
+      var sc = document.createElement('script');
+      sc.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + (window.SsakaKakaoKey || '') + '&libraries=services&autoload=false';
+      sc.onload = function () { try { kakao.maps.load(function () { ok(); }); } catch (e) { no(e); } };
+      sc.onerror = function () { no(new Error('load')); };
+      document.head.appendChild(sc);
+      setTimeout(function () { no(new Error('timeout')); }, 8000);
+    });
+    mapsP.catch(function () { mapsP = null; });
+    return mapsP;
+  }
+  function bizSearch() {
+    var q = $('bizQ').value.trim();
+    if (!q) { $('bizQ').focus(); return; }
+    $('bizList').innerHTML = ''; $('bizMsg').textContent = '찾는 중…';
+    loadMaps().then(function () {
+      new kakao.maps.services.Places().keywordSearch(q, function (data, status) {
+        if (status !== kakao.maps.services.Status.OK || !data.length) { $('bizMsg').textContent = '찾지 못했어요. 지역 이름을 함께 적어 보세요. (예: 여수 온기식당)'; return; }
+        $('bizMsg').textContent = '맞는 곳을 누르세요.';
+        data.slice(0, 10).forEach(function (p) {
+          var li = document.createElement('li'), b = document.createElement('button'); b.type = 'button';
+          var t = document.createElement('b'); t.textContent = p.place_name;
+          var a = document.createElement('span'); a.textContent = (p.road_address_name || p.address_name) + (p.phone ? ' · ' + p.phone : '');
+          var c = document.createElement('span'); c.textContent = (p.category_name || '').split(' > ').slice(-1)[0];
+          b.appendChild(t); b.appendChild(a); b.appendChild(c);
+          b.addEventListener('click', function () { applyBiz(p); });
+          li.appendChild(b); $('bizList').appendChild(li);
+        });
+      });
+    }).catch(function () {
+      $('bizMsg').textContent = '지금은 장소 검색을 쓸 수 없어요. (카카오디벨로퍼스에서 카카오맵 사용 설정이 필요할 수 있어요) 직접 적어 주세요.';
+    });
+  }
+  function applyBiz(p) {
+    var cat = (p.category_name || '').split(' > ').slice(-1)[0];
+    var addr = p.road_address_name || p.address_name || '';
+    if (type === 'profile') {
+      if (!$('org').value) $('org').value = p.place_name;
+    } else {
+      $('title').value = p.place_name;
+      if (!$('name').value) $('name').value = p.place_name;
+      if (cat && !$('subtitle').value) $('subtitle').value = cat;
+    }
+    if (p.phone && !$('phone').value) $('phone').value = p.phone;
+    if ($('place') && (type === 'shop' || type === 'club')) $('place').value = p.place_name + (addr ? ' (' + addr + ')' : '');
+    if (addr) { $('addr1').value = addr; }
+    $('bizModal').hidden = true;
+    ['title', 'name', 'phone'].forEach(function (f) { $(f).classList.remove('missing'); });
+    update(); refreshProgress();
+    toast('채웠어요. 틀린 곳이 있으면 고쳐 주세요');
+  }
+  $('findBiz').addEventListener('click', function () { $('bizModal').hidden = false; $('bizMsg').textContent = ''; $('bizList').innerHTML = ''; $('bizQ').value = $('title').value || ''; setTimeout(function () { $('bizQ').focus(); }, 50); loadMaps().catch(function () {}); });
+  $('bizGo').addEventListener('click', bizSearch);
+  $('bizQ').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); bizSearch(); } });
+  $('bizClose').addEventListener('click', function () { $('bizModal').hidden = true; });
+
+  // ---------- 내 정보 기억 (이 휴대폰에만) ----------
+  var ME = 'ssaka-me-v1', ME_F = ['name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2'];
+  function getMe() { try { return JSON.parse(localStorage.getItem(ME) || 'null'); } catch (e) { return null; } }
+  function saveMe() {
+    if (type !== 'profile' && type !== 'greet') return;
+    var m = {}; ME_F.forEach(function (f) { m[f] = v(f); });
+    if (m.name || m.phone) try { localStorage.setItem(ME, JSON.stringify(m)); } catch (e) {}
+  }
+  function fillMe() {
+    var m = getMe(); if (!m) return false;
+    ME_F.forEach(function (f) { if (m[f] && $(f) && !$(f).value) $(f).value = m[f]; });
+    update(); refreshProgress(); return true;
+  }
+  if (getMe()) $('fillMe').hidden = false;
+  $('fillMe').addEventListener('click', function () { if (fillMe()) toast('저장해 둔 내 정보를 넣었어요'); });
+  $('finish').addEventListener('click', function () { if (!missingFields().length) saveMe(); });
+
+  // ---------- 수정 · 복사해서 새로 만들기 (?edit=… / ?copy=…) ----------
+  function loadCard(c) {
+    FIELDS.forEach(function (f) { if ($(f) && ['resvMin', 'resvRate', 'sound', 'season'].indexOf(f) < 0) $(f).value = ''; });
+    var ci = c.contact || {};
+    var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
+    set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
+    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || '');
+    set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
+    if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
+    set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));
+    if (c.copy) { set('copyLabel', c.copy.label); set('copyValue', c.copy.value); }
+    set('sosLabel', c.sosLabel); set('locMsg', c.locationMessage);
+    if (c.sound) { set('sound', c.sound); soundTouched = true; }
+    seasonTouched = true;
+    if (c.reserve) {
+      $('resvOn').checked = true; $('resvBox').hidden = false;
+      set('menu', (c.reserve.menu || []).map(function (m) { return m.n + (m.p ? ' ' + m.p : ''); }).join('\n'));
+      set('account', c.reserve.account); set('resvMin', String(c.reserve.min || 4)); set('resvRate', String(c.reserve.rate || 0.2));
+    } else { $('resvOn').checked = false; $('resvBox').hidden = true; }
+  }
+  var qp = new URLSearchParams(location.search), qEdit = qp.get('edit') || qp.get('copy'), editCard = null;
+  if (qEdit && window.SsakaCodec) { try { editCard = SsakaCodec.decode(qEdit); } catch (e) { editCard = null; } }
+
   industry = loadDraft();
+  if (editCard) {
+    loadCard(editCard);
+    if (editCard.design && D.get(editCard.design)) { design = editCard.design; var indId = editCard.design.replace(/-\d+$/, ''); if (D.industry(indId)) industry = indId; }
+    var note = document.createElement('p'); note.className = 'owner-note';
+    note.textContent = qp.get('copy') ? '📄 지난 카드를 복사했어요. 날짜·문구만 바꿔서 새로 보내세요.' : '✏️ 카드를 고치는 중이에요. 고친 뒤 "완료 · 보내기"를 누르면 새 링크가 생겨요.';
+    var form = $('form'); form.insertBefore(note, form.firstChild);
+  } else if (!$('name').value && !$('phone').value && getMe()) { setTimeout(fillMe, 0); }
   var qInd = new URLSearchParams(location.search).get('ind');
   if (qInd && D.industry(qInd)) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
   var qSeason = new URLSearchParams(location.search).get('season');

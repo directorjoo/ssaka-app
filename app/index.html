@@ -53,6 +53,7 @@
     .row-s { font-size: 13.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-r { flex: none; display: grid; justify-items: end; gap: 6px; font-size: 12px; color: var(--ink-2); }
     .new { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--ssaka); color: #fff; font-size: 11.5px; font-weight: 800; display: grid; place-items: center; }
+    .row-r { display: flex; gap: 6px; align-items: center; }
     .row-act { width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: var(--ssaka-soft); color: var(--ssaka-deep); border-radius: 12px; cursor: pointer; }
     .tag { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 11.5px; font-weight: 700; background: var(--bg-2); color: var(--ink-2); }
     .tag.ok { background: var(--ssaka-soft); color: var(--ssaka-deep); }
@@ -192,6 +193,13 @@
     r.appendChild(t);
     var right = el('span', 'row-r');
     if (opts && opts.share) {
+      var dq = ''; try { dq = new URL(item.url).searchParams.get('d') || ''; } catch (e) {}
+      if (dq) {
+        var ed = el('button', 'row-act'); ed.type = 'button'; ed.setAttribute('aria-label', item.title + ' 수정하기');
+        ed.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+        ed.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); location.href = '../make/?edit=' + encodeURIComponent(dq); });
+        right.appendChild(ed);
+      }
       var b = el('button', 'row-act'); b.type = 'button'; b.setAttribute('aria-label', item.title + ' 링크 복사');
       b.innerHTML = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
       b.addEventListener('click', function (e) {
@@ -355,6 +363,17 @@
     });
     v.appendChild(g);
     v.appendChild(el('p', 'svc-cap', '"곧" 표시는 준비 중인 서비스예요.'));
+    v.appendChild(secHead('업무 바로가기'));
+    var LK = [['정부24 민원', '🏛️', '#E3E8F0', 'https://www.gov.kr'], ['홈택스', '🧾', '#E4F5DC', 'https://www.hometax.go.kr'], ['4대보험', '🩺', '#DDF1FF', 'https://www.4insure.or.kr'], ['소상공인24', '🏪', '#FFE8D6', 'https://www.sbiz24.kr'],
+      ['나이스 교육민원', '🏫', '#FFF3B8', 'https://www.neis.go.kr'], ['영화진흥위원회', '🎞️', '#EDE4FF', 'https://www.kofic.or.kr'], ['필름메이커스 배우모집', '🎬', '#FFE8B8', 'https://www.filmmakers.co.kr/performerCasting'], ['자동차365', '🚗', '#D5F3F5', 'https://www.car365.go.kr']];
+    var lg = el('div', 'svc');
+    LK.forEach(function (x) {
+      var a = el('a'); a.href = x[3]; a.target = '_blank'; a.rel = 'noopener'; a.style.setProperty('--tint', x[2]);
+      var i = el('i', '', x[1]); i.setAttribute('aria-hidden', 'true'); a.appendChild(i); a.appendChild(document.createTextNode(x[0]));
+      lg.appendChild(a);
+    });
+    v.appendChild(lg);
+    v.appendChild(el('p', 'svc-cap', '누르면 공식 사이트가 새 창으로 열려요.'));
     v.appendChild(el('div', 'divider'));
     var tip = el('div', 'tip');
     tip.innerHTML = '<b>싸카를 앱처럼 쓰기</b><br>아이폰: 사파리 아래 공유 버튼 → "홈 화면에 추가"<br>안드로이드: 크롬 메뉴(⋮) → "홈 화면에 추가"';

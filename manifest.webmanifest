@@ -1,6 +1,6 @@
 {
-  "name": "싸카 — 앱 없이 카톡으로 보내는 카드",
-  "short_name": "싸카",
+  "name": "싸바 — 어디야? 여기야! 앱 없이 카톡으로",
+  "short_name": "싸바",
   "start_url": "./app/",
   "scope": "./",
   "display": "standalone",

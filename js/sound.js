@@ -21,6 +21,7 @@
     { id: 'where',   group: '어디야 (친구)', label: '🤔 어디야?',      say: '어디야?',      tone: 'up', pitch: 1.4 },
     { id: 'imhere',  group: '어디야 (친구)', label: '📍 나 여기 있어!', say: '나 여기 있어!', tone: 'ding' },
     { id: 'whereru', group: '어디야 (친구)', label: '👀 어디 있니?',    say: '어디 있니?',   tone: 'up', pitch: 1.3 },
+    { id: 'play',    group: '어디야 (친구)', label: '🙌 친구야 놀자!', say: '친구야, 놀자!', tone: 'fanfare', pitch: 1.2 },
     { id: 'thatplace', group: '어디야 (친구)', label: '🤝 그때 거기?',  say: '그때, 거기?',  tone: 'double' },
     { id: 'gs-go',   group: '사투리 (친구)', label: '🌊 (경상도) 니 지금 어디가!', say: '니 지금 어디가!', tone: 'pop', pitch: 1.1, rate: 1.05 },
     { id: 'gs-dgo',  group: '사투리 (친구)', label: '🌊 (경상도) 어디고?',        say: '어디고?',        tone: 'up', pitch: 1.1 },
@@ -68,9 +69,32 @@
     speechSynthesis.onvoiceschanged = function () { koVoice(); };
   }
 
+  // 녹음 파일(sound/아이디.mp3)이 있으면 그걸 틀고, 없으면 기계 음성으로
+  var SELF = (global.document && document.currentScript && document.currentScript.src) || '';
+  var SND_BASE = SELF ? SELF.replace(/js\/sound\.js.*$/, 'sound/') : '';
+  var FILES = {}; // 녹음 파일이 올라간 소리 아이디를 여기에 적음 (예: { here: true, where: true })
+  var cache = {};
+  function fileAudio(id) {
+    if (!SND_BASE || !(FILES[id] || (global.SsakaSoundFiles && global.SsakaSoundFiles[id]))) return null;
+    if (!cache[id]) { var a = new Audio(SND_BASE + id + '.mp3'); a.preload = 'auto'; cache[id] = a; }
+    return cache[id];
+  }
+  function preload(id) { try { fileAudio(id); } catch (e) {} }
+
   function play(id) {
     var s = SOUNDS.filter(function (x) { return x.id === id; })[0];
     if (!s || !s.id) return false;
+    var fa = null; try { fa = fileAudio(id); } catch (e) {}
+    if (fa) {
+      try { if (global.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+      fa.currentTime = 0;
+      var pr = fa.play();
+      if (pr && pr.catch) pr.catch(function () { speak(s); });
+      return true;
+    }
+    return speak(s);
+  }
+  function speak(s) {
     try { if (s.tone && TONES[s.tone]) TONES[s.tone](); } catch (e) {}
     if (s.say && global.speechSynthesis && global.SpeechSynthesisUtterance) {
       try {
@@ -101,5 +125,5 @@
   // 업종별 기본 소리
   var DEFAULTS = { profile: 'hello', shop: 'hello', club: 'where', safe: '' };
 
-  global.SsakaSound = { SOUNDS: SOUNDS, play: play, tryAutoplay: tryAutoplay, DEFAULTS: DEFAULTS };
+  global.SsakaSound = { SOUNDS: SOUNDS, play: play, tryAutoplay: tryAutoplay, DEFAULTS: DEFAULTS, preload: preload };
 })(typeof window !== 'undefined' ? window : globalThis);

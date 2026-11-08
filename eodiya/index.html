@@ -14,6 +14,8 @@
   <link rel="icon" href="../img/favicon.png">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="../css/brand.css">
   <style>
     * { box-sizing: border-box; }
@@ -28,10 +30,10 @@
     .lead { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
 
     /* 모드 고르기 */
-    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-    .mode { display: grid; gap: 6px; align-content: start; text-align: left; padding: 16px 14px; min-height: 118px; border-radius: 20px; border: 2px solid var(--line); background: #fff; cursor: pointer; }
-    .mode b { font-size: 21px; letter-spacing: -0.03em; }
-    .mode span { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+    .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px; }
+    .mode { display: grid; gap: 5px; align-content: start; text-align: left; padding: 14px 11px; min-height: 118px; border-radius: 20px; border: 2px solid var(--line); background: #fff; cursor: pointer; }
+    .mode b { font-size: 19px; letter-spacing: -0.04em; white-space: nowrap; }
+    .mode span { font-size: 12.5px; word-break: keep-all; color: var(--ink-2); line-height: 1.45; }
     .mode i { font-style: normal; font-size: 26px; }
     .mode[aria-pressed="true"] { border-color: var(--ssaka); background: var(--ssaka-soft); }
 
@@ -88,6 +90,19 @@
     .tap span { color: var(--ink-2); font-size: 15px; }
     button:focus-visible, a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
 
+    /* 친구야 놀자! */
+    .acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .act { min-height: 58px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font-size: 18px; font-weight: 800; cursor: pointer; }
+    .act[aria-pressed="true"] { border-color: var(--ssaka); background: var(--ssaka); color: #fff; }
+    #playBox .chip { min-height: 50px; font-size: 16.5px; padding: 0 16px; }
+    #playBox label.l { font-size: 15px; color: var(--ink); margin: 16px 0 8px; }
+    #playBox label.l:first-of-type { margin-top: 0; }
+    .pact { font-size: 30px; font-weight: 900; letter-spacing: -0.03em; margin: 0 0 8px; }
+    .pbig { display: grid; gap: 10px; margin-top: 18px; }
+    .pbig button { min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; cursor: pointer; }
+    .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
+    .pbig .no { border: 1.5px solid var(--line); background: #fff; }
+    .pbig .row2 button { font-size: 18px; min-height: 58px; }
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 40; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -99,13 +114,14 @@
   <section id="maker">
     <div class="brand">
       <div class="logo">어디야?</div>
-      <a href="../app/">싸카 홈</a>
+      <a href="../app/">싸바 홈</a>
     </div>
-    <p class="lead">친구에게 "어디야?"를 묻거나, "여기야!" 하고 내 위치·만날 곳을 보내세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <p class="lead">"어디야?" 묻고, "여기야!" 알려 주고, "친구야 놀자!" 불러 모으세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
       <button type="button" class="mode" data-mode="ask" aria-pressed="true"><i>🙋</i><b>어디야?</b><span>친구가 어디 있는지 물어봐요</span></button>
       <button type="button" class="mode" data-mode="come" aria-pressed="false"><i>📍</i><b>여기야!</b><span>내 위치나 만날 곳을 보내요</span></button>
+      <button type="button" class="mode" data-mode="play" aria-pressed="false"><i>🙌</i><b>놀자!</b><span>친구들 불러 모아요</span></button>
     </div>
 
     <div class="box" id="askBox">
@@ -132,6 +148,33 @@
         <label class="l" for="memo">한마디 (선택)</label>
         <input type="text" id="memo" maxlength="60" placeholder="예: 2번 출구 앞 편의점!">
       </details>
+    </div>
+
+    <div class="box" id="playBox" hidden>
+      <div class="bubble">🙌 <b id="playPrev">친구야 놀자!</b></div>
+      <label class="l" style="margin-top:16px">뭐 할까?</label>
+      <div class="acts" id="acts">
+        <button type="button" class="act" aria-pressed="true">☕ 차 한잔</button>
+        <button type="button" class="act" aria-pressed="false">🍚 밥 먹자</button>
+        <button type="button" class="act" aria-pressed="false">🚶 산책</button>
+        <button type="button" class="act" aria-pressed="false">♟️ 바둑·장기</button>
+        <button type="button" class="act" aria-pressed="false">🎤 노래방</button>
+        <button type="button" class="act" aria-pressed="false">⛰️ 등산</button>
+        <button type="button" class="act" aria-pressed="false">🃏 화투 한 판</button>
+        <button type="button" class="act" aria-pressed="false">🍶 한잔하자</button>
+      </div>
+      <label class="l">언제?</label>
+      <div class="chips" id="playWhen">
+        <button type="button" class="chip" data-w="now" aria-pressed="true">지금 당장</button>
+        <button type="button" class="chip" data-w="60" aria-pressed="false">1시간 뒤</button>
+        <button type="button" class="chip" data-w="lunch" aria-pressed="false">점심 12시</button>
+        <button type="button" class="chip" data-w="3pm" aria-pressed="false">오후 3시</button>
+        <button type="button" class="chip" data-w="dinner" aria-pressed="false">저녁 6시</button>
+        <button type="button" class="chip" data-w="tmr" aria-pressed="false">내일 오전 10시</button>
+      </div>
+      <label class="l" for="playPlace">어디서?</label>
+      <input type="text" id="playPlace" maxlength="40" placeholder="예: 경로당, 시장 앞 다방, 공원 정자">
+      <button type="button" class="pbtn" id="playGps" style="width:100%;margin-top:8px">📍 내가 있는 곳으로 부르기</button>
     </div>
 
     <div class="box">
@@ -167,6 +210,28 @@
     <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
   </section>
 
+  <!-- ===== 받는 화면: 친구야 놀자! ===== -->
+  <section id="viewPlay" hidden>
+    <div class="who" id="pWho"></div>
+    <h1 class="q">친구야 놀자!</h1>
+    <p class="pact" id="pAct"></p>
+    <div class="when" id="pWhen" hidden></div>
+    <p class="place" id="pPlace" hidden style="margin-top:10px"></p>
+    <iframe class="map" id="pMap" title="모이는 곳 지도" hidden loading="lazy"></iframe>
+    <div class="nav" id="pNav" hidden>
+      <a class="big ghost" id="pKakaoMap" style="font-size:16px">카카오맵 길찾기</a>
+      <a class="big ghost" id="pNaver" style="font-size:16px">네이버 길찾기</a>
+    </div>
+    <div class="pbig">
+      <button type="button" class="yes" data-r="좋아! 갈게 🙆">🙆 좋아! 갈게</button>
+      <div class="row2">
+        <button type="button" class="no" data-r="조금 늦게 갈게 ⏰">⏰ 조금 늦게</button>
+        <button type="button" class="no" data-r="오늘은 못 가, 다음에 놀자 🙏">🙏 다음에</button>
+      </div>
+    </div>
+    <a class="mk" href="./#play">나도 <b>친구야 놀자!</b> 보내기</a>
+  </section>
+
   <!-- ===== 받는 화면: 어디야? ===== -->
   <section id="viewAsk" hidden>
     <div class="who" id="aWho"></div>
@@ -184,6 +249,7 @@
 
 <script src="../js/codec.js"></script>
 <script src="../js/share.js"></script>
+<script src="../js/install.js"></script>
 <script src="../js/sound.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -216,8 +282,9 @@
   }
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   function shareKakao(title, desc, url) {
-    var img = IMG_BASE + (/여기/.test(title) ? 'eodiya-here.png' : 'eodiya-ask.png') + '?v=1';
-    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: '싸바 여기야 설치' });
+    var play = /놀자/.test(title);
+    var img = IMG_BASE + (play ? 'eodiya-play.png' : /여기/.test(title) ? 'eodiya-here.png' : 'eodiya-ask.png') + '?v=1';
+    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
     var body = title + (desc ? '\n' + desc : '') + '\n' + url;
@@ -258,8 +325,39 @@
       }).catch(function () { window.SsakaShare({ title: text, description: '', url: url }); });
       else window.SsakaShare({ title: text, description: '', url: url });
     }
+    if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
-    if (card.m === 'come') {
+    if (card.m === 'play') {
+      $('viewPlay').hidden = false;
+      document.title = '친구야 놀자! · 싸바';
+      $('pWho').textContent = who + ' 불러요';
+      $('pAct').textContent = card.act || '☕ 차 한잔';
+      if (card.at) {
+        var lf = Math.round((card.at - Date.now()) / 60000);
+        var dd = new Date(card.at), today = new Date();
+        var dayTxt = dd.toDateString() === today.toDateString() ? '오늘 ' : '내일 ';
+        $('pWhen').hidden = false;
+        $('pWhen').textContent = '⏰ ' + (lf <= 5 && lf > -60 ? '지금 바로!' : dayTxt + clockText(card.at));
+      }
+      var pp = card.place || {};
+      if (pp.name || hasXY(pp)) {
+        $('pPlace').hidden = false; $('pPlace').textContent = '📍 ' + (pp.name || '보낸 사람이 있는 곳');
+        $('pNav').hidden = false;
+        var pn = pp.name || '모이는 곳';
+        if (hasXY(pp)) {
+          $('pMap').hidden = false; $('pMap').src = osm(pp.lat, pp.lng);
+          $('pKakaoMap').href = 'https://map.kakao.com/link/to/' + encodeURIComponent(pn) + ',' + pp.lat + ',' + pp.lng;
+          $('pNaver').href = 'https://map.naver.com/p/directions/-/' + pp.lng + ',' + pp.lat + ',' + encodeURIComponent(pn) + '/-/transit';
+        } else {
+          $('pKakaoMap').href = 'https://map.kakao.com/link/search/' + encodeURIComponent(pn);
+          $('pNaver').href = 'https://map.naver.com/p/search/' + encodeURIComponent(pn);
+        }
+      }
+      document.querySelectorAll('#viewPlay .pbig button').forEach(function (b) {
+        b.addEventListener('click', function () { reply('[친구야 놀자!] ' + b.dataset.r); });
+      });
+      playSound(card.sound || 'play');
+    } else if (card.m === 'come') {
       $('viewCome').hidden = false;
       document.title = '여기서 만나! · 어디야?';
       var p = card.place || {};
@@ -320,7 +418,7 @@
   var DRAFT = 'eodiya-me-v1';
   try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; } catch (e) {}
   function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim() })); } catch (e) {} }
-  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = (f ? f + ': ' : '') + '어디야?'; }
+  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = (f ? f + ': ' : '') + '어디야?'; $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
   $('from').addEventListener('input', askPreview); askPreview();
 
   document.querySelectorAll('.mode').forEach(function (b) {
@@ -329,6 +427,7 @@
       document.querySelectorAll('.mode').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
       $('comeBox').hidden = mode !== 'come';
       $('askBox').hidden = mode !== 'ask';
+      $('playBox').hidden = mode !== 'play';
       if (mode === 'come' && !place) $('useGps').click();
     });
   });
@@ -365,11 +464,40 @@
     });
   });
 
+  var act = '☕ 차 한잔', playW = 'now', playXY = null;
+  document.querySelectorAll('#acts .act').forEach(function (b) {
+    b.addEventListener('click', function () { act = b.textContent; document.querySelectorAll('#acts .act').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); });
+  });
+  document.querySelectorAll('#playWhen .chip').forEach(function (c) {
+    c.addEventListener('click', function () { playW = c.dataset.w; document.querySelectorAll('#playWhen .chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); }); });
+  });
+  $('playGps').addEventListener('click', function () {
+    toast('위치를 확인하는 중…');
+    getPos().then(function (pos) { playXY = pos; $('playGps').textContent = '📍 내 위치로 부를게요 ✓'; $('playGps').classList.add('on'); }, function (e) { toast(e.message); });
+  });
+  function playAt() {
+    var t = new Date();
+    if (playW === 'now') return Date.now();
+    if (playW === '60') return Date.now() + 3600000;
+    var hm = { lunch: 12, '3pm': 15, dinner: 18, tmr: 10 }[playW] || 12;
+    t.setHours(hm, 0, 0, 0);
+    if (playW === 'tmr' || t < Date.now() - 1800000) t.setDate(t.getDate() + 1);
+    return t.getTime();
+  }
+
   function build() {
     var from = $('from').value.trim(), phone = '';
     if (!from) { toast('보내는 사람 이름을 적어주세요'); $('from').focus(); return null; }
     remember();
     var d = { m: mode, from: from, phone: phone };
+    if (mode === 'play') {
+      d.act = act; d.at = playAt();
+      var pn = $('playPlace').value.trim();
+      if (pn || playXY) d.place = playXY ? { name: pn, lat: playXY.lat, lng: playXY.lng } : { name: pn };
+      var purl = BASE + '?d=' + SsakaCodec.encode(d);
+      var when = playW === 'now' ? '지금 바로' : (new Date(d.at).toDateString() === new Date().toDateString() ? '' : '내일 ') + clockText(d.at);
+      return { url: purl, title: from + ': 친구야 놀자!', desc: act + ' · ' + when + (pn ? ' · ' + pn : ''), phone: phone, play: true };
+    }
     var gpsNow = false;
     if (mode === 'come') {
       var name = $('placeName').value.trim();
@@ -392,6 +520,8 @@
   }
   $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
+  if (location.hash === '#come' || location.hash === '#play') { var cm = document.querySelector('.mode[data-mode="' + location.hash.slice(1) + '"]'); if (cm) cm.click(); }
+  if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '싸바 홈 화면에 추가');
 })();
 </script>
 </body>

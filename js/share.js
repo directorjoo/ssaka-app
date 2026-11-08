@@ -6,7 +6,7 @@
  * 3순위: 링크 복사
  */
 (function () {
-  var KAKAO_JS_KEY = '34e9c66cdbd5573434f8c38415aad6d7';
+  var KAKAO_JS_KEY = '3a133064daebee3be143bc4a1a940c47';
   var SDK_URL = 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js';
   // 싸바카드 설치하기 안내 화면 (홈 화면에 추가) — share.js 위치를 기준으로 app/ 주소를 만듦
   var SELF = (document.currentScript && document.currentScript.src) || '';

@@ -8,6 +8,9 @@
 (function () {
   var KAKAO_JS_KEY = '34e9c66cdbd5573434f8c38415aad6d7';
   var SDK_URL = 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js';
+  // 싸바카드 설치하기 안내 화면 (홈 화면에 추가) — share.js 위치를 기준으로 app/ 주소를 만듦
+  var SELF = (document.currentScript && document.currentScript.src) || '';
+  var INSTALL_URL = SELF ? SELF.replace(/js\/share\.js.*$/, 'app/?install=1') : new URL('/app/?install=1', location.href).href;
 
   function meta(prop) {
     var el = document.querySelector('meta[property="' + prop + '"]');
@@ -20,6 +23,7 @@
       title: (extra && extra.title) || meta('og:title') || document.title,
       description: ((extra && extra.description) || meta('og:description') || '').replace(/\n/g, ' '),
       imageUrl: (extra && extra.imageUrl) || meta('og:image'),
+      imageWidth: extra && extra.imageWidth, imageHeight: extra && extra.imageHeight,
       url: url
     };
   }
@@ -59,16 +63,24 @@
 
   function shareToKakao(extra) {
     var c = cardInfo(extra);
+    // 카톡 말풍선은 가운데를 정사각형에 가깝게 잘라 보여줘서, 기본 공유 그림은 정사각형으로 바꿔 보냄
+    if (/ssaka-share\.png/.test(c.imageUrl || '')) { c.imageUrl = c.imageUrl.replace(/ssaka-share\.png(\?[^#]*)?/, 'ssaka-square.png?v=1'); c.imageWidth = 800; c.imageHeight = 800; }
+    if (/eodiya-(ask|here)\.png/.test(c.imageUrl || '')) { c.imageWidth = 800; c.imageHeight = 800; }
     loadKakao().then(function (Kakao) {
+      var content = {
+        title: c.title,
+        description: c.description,
+        imageUrl: c.imageUrl,
+        link: { mobileWebUrl: c.url, webUrl: c.url }
+      };
+      if (c.imageWidth && c.imageHeight) { content.imageWidth = c.imageWidth; content.imageHeight = c.imageHeight; }
       Kakao.Share.sendDefault({
         objectType: 'feed',
-        content: {
-          title: c.title,
-          description: c.description,
-          imageUrl: c.imageUrl,
-          link: { mobileWebUrl: c.url, webUrl: c.url }
-        },
-        buttons: [{ title: '카드 열기', link: { mobileWebUrl: c.url, webUrl: c.url } }]
+        content: content,
+        buttons: [
+          { title: (extra && extra.buttonTitle) || '카드 열기', link: { mobileWebUrl: c.url, webUrl: c.url } },
+          { title: (extra && extra.installTitle) || '싸바카드 설치하기', link: { mobileWebUrl: INSTALL_URL, webUrl: INSTALL_URL } }
+        ]
       });
     }).catch(function () {
       if (navigator.share) {

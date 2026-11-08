@@ -191,7 +191,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var BASE = new URL('./', location.href).href.split('?')[0];
-  var SHARE_IMG = 'https://directorjoo.github.io/ssaka-app/img/eodiya-share.png?v=5';
+  var IMG_BASE = new URL('../img/', location.href).href;
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
   window.SsakaToast = toast;
   function sms(phone, body) {
@@ -216,7 +216,8 @@
   }
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   function shareKakao(title, desc, url) {
-    window.SsakaShare({ title: title, description: desc, imageUrl: SHARE_IMG, url: url });
+    var img = IMG_BASE + (/여기/.test(title) ? 'eodiya-here.png' : 'eodiya-ask.png') + '?v=1';
+    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: '싸바 여기야 설치' });
   }
   function shareSms(title, desc, url, phone) {
     var body = title + (desc ? '\n' + desc : '') + '\n' + url;

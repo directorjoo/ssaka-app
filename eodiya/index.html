@@ -212,7 +212,7 @@
 
   <!-- ===== 받는 화면: 친구야 놀자! ===== -->
   <section id="viewPlay" hidden style="text-align:center">
-    <img src="../img/cherry-dance-anim.svg" alt="" width="190" height="190" style="display:block;margin:-6px auto -8px">
+    <img src="../img/cherry-dance-anim.svg" alt="" width="250" height="221" style="display:block;margin:-10px auto -8px">
     <div class="who" id="pWho" style="text-align:center"></div>
     <h1 class="q" style="text-align:center">친구야 놀자!</h1>
     <p class="pact" id="pAct" style="text-align:center"></p>
@@ -224,7 +224,7 @@
       <a class="big ghost" id="pNaver" style="font-size:16px">네이버 길찾기</a>
     </div>
     <div class="pbig">
-      <button type="button" class="yes" data-r="좋아! 갈게 🙆">🙆 좋아! 갈게</button>
+      <button type="button" class="yes" data-r="좋아! 갈게 🍒">🍒 좋아! 갈게</button>
       <div class="row2">
         <button type="button" class="no" data-r="조금 늦게 갈게 ⏰">⏰ 조금 늦게</button>
         <button type="button" class="no" data-r="오늘은 못 가, 다음에 놀자 🙏">🙏 다음에</button>
@@ -284,7 +284,7 @@
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   function shareKakao(title, desc, url) {
     var play = /놀자/.test(title);
-    var img = IMG_BASE + (play ? 'eodiya-play.png' : /여기/.test(title) ? 'eodiya-here.png' : 'eodiya-ask.png') + '?v=1';
+    var img = IMG_BASE + (play ? 'eodiya-play.png?v=3' : /여기/.test(title) ? 'eodiya-here.png?v=2' : 'eodiya-ask.png?v=2');
     window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
@@ -301,7 +301,9 @@
     SsakaSound.tryAutoplay(id).then(function (ok) {
       if (ok) return;
       var t = document.createElement('div'); t.className = 'tap'; t.setAttribute('role', 'button'); t.tabIndex = 0;
-      t.innerHTML = '<div><b>' + (id === 'where' ? '어디야?' : '여기야!') + '</b><span>아무 데나 탭하세요</span></div>';
+      t.innerHTML = id === 'play'
+        ? '<div><img src="../img/cherry-dance-anim.svg" alt="" width="240" height="212" style="display:block;margin:0 auto -6px"><b>친구야 놀자!</b><span>아무 데나 탭하세요</span></div>'
+        : '<div><b>' + (id === 'where' ? '어디야?' : '여기야!') + '</b><span>아무 데나 탭하세요</span></div>';
       var go = function () { SsakaSound.play(id); t.remove(); };
       t.addEventListener('click', go); t.addEventListener('touchstart', go, { passive: true });
       document.body.appendChild(t); t.focus();

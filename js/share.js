@@ -74,6 +74,12 @@
         link: { mobileWebUrl: c.url, webUrl: c.url }
       };
       if (c.imageWidth && c.imageHeight) { content.imageWidth = c.imageWidth; content.imageHeight = c.imageHeight; }
+      if (!c.description) delete content.description;
+      // 버튼 없이: 말풍선 전체를 누르면 열림 (카톡이 기본 버튼을 붙이면 buttonTitle 이 이름이 됨)
+      if (extra && extra.noButtons) {
+        Kakao.Share.sendDefault({ objectType: 'feed', content: content, buttonTitle: extra.buttonTitle || '열어 보기' });
+        return;
+      }
       Kakao.Share.sendDefault({
         objectType: 'feed',
         content: content,

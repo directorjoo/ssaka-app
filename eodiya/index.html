@@ -299,8 +299,8 @@
   function shareKakao(title, desc, url) {
     var play = /놀자/.test(title);
     var isHere = !play && /여기/.test(title);
-    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=6');
-    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: play ? 800 : 1000, imageHeight: play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '👆 여기야! 답장', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', noButtons: !play, installUrl: BASE + '?install=1' });
+    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=7');
+    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: play ? 800 : 1000, imageHeight: play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '👆 답장 보내기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', noButtons: !play, installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
     var body = title + (desc ? '\n' + desc : '') + '\n' + url;

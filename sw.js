@@ -1,5 +1,5 @@
 /* 싸바 서비스워커 — 새 파일을 먼저 받고(network-first), 인터넷이 약하면 저장해 둔 화면을 보여줌 */
-var CACHE = 'sava-v11';
+var CACHE = 'sava-v12';
 var SHELL = ['./', './app/', './eodiya/', './lucky/', './shoot/', './fly/', './pool/', './make/', './c/', './css/brand.css', './css/sk.css', './css/sk-world.css',
   './js/codec.js', './js/store.js', './js/designs.js', './js/render.js', './js/share.js', './js/install.js', './js/sound.js',
   './img/icon-192.png?v=2', './img/cherry.svg', './img/cherry-dance-anim.svg', './manifest.webmanifest'];
@@ -12,7 +12,8 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   var r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
-  e.respondWith(fetch(r).then(function (res) {
+  // 휴대폰에 4시간 묵혀 둔 파일 대신 늘 서버에 새것이 있는지 확인 (없으면 304로 빨리 끝남)
+  e.respondWith(fetch(r, { cache: 'no-cache' }).then(function (res) {
     if (res && res.ok) { var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(r, copy); }); }
     return res;
   }).catch(function () {

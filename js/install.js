@@ -123,11 +123,15 @@
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
   // ---------- 최신 버전 업데이트 ----------
-  var VER = '2026.11.09-26'; // 올릴 때마다 version.json 과 같이 올림
+  var VER = '2026.11.09-27'; // 올릴 때마다 version.json 과 같이 올림
   function hardUpdate() {
     var jobs = [];
     try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
     try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })); } catch (e) {}
+    // 휴대폰 브라우저가 묵혀 둔 파일도 새로 받아 둠
+    var base = SELF ? SELF.replace(/js\/install\.js.*$/, '') : '/';
+    ['js/install.js', 'js/share.js', 'js/designs.js', 'js/render.js', 'js/export.js', 'js/codec.js', 'js/store.js', 'demo/js/card.js', 'css/sk.css', 'css/brand.css', 'sw.js', location.pathname]
+      .forEach(function (f) { try { jobs.push(fetch(f.charAt(0) === '/' ? f : base + f, { cache: 'reload' }).catch(function () {})); } catch (e) {} });
     Promise.all(jobs).catch(function () {}).then(function () {
       var u = new URL(location.href); u.searchParams.set('v', Date.now().toString(36)); location.replace(u.href);
     });

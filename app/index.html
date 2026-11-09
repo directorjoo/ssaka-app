@@ -464,6 +464,13 @@
     tip.appendChild(document.createElement('br')); tip.appendChild(ib);
     v.appendChild(tip);
     var m = el('div', 'more');
+    // 회원: 로그인 상태에 따라 '회원가입' 또는 '내 정보'
+    var acct = el('a', ''); acct.href = '../join/?next=' + encodeURIComponent('/app/');
+    acct.appendChild(document.createTextNode('🍒 싸바 회원가입 · 로그인')); acct.appendChild(el('span', '', '카카오로 1초'));
+    m.appendChild(acct);
+    fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.user && j.user.agreed) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님)'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; }
+    }).catch(function () {});
     [['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '회사 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
     });

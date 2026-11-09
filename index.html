@@ -19,7 +19,8 @@
   <link rel="stylesheet" href="css/brand.css">
   <script>
     // 홈 화면 아이콘으로 열었으면 바로 싸바 홈으로
-    try { if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true) location.replace('app/'); } catch (e) {}
+    // 단, 앱 안에서 '싸바 이야기'를 눌러 온 경우(?story)는 그대로 보여 줌
+    try { if (!/[?&]story/.test(location.search) && ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true)) location.replace('app/'); } catch (e) {}
   </script>
   <style>
     * { box-sizing: border-box; }

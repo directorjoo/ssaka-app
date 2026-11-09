@@ -102,6 +102,27 @@
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
+    .story { margin: 0 18px 12px; padding: 16px 16px 14px; border-radius: 22px; background: #FFF7E6; box-shadow: inset 0 0 0 1.5px #F3D9A4; }
+    .story .st-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .story .st-top img { width: 46px; height: 46px; flex: none; }
+    .story .st-top b { display: block; font-size: 20px; font-weight: 900; letter-spacing: -0.03em; color: #3a2a00; }
+    .story .st-top span { font-size: 13.5px; color: #7a6230; word-break: keep-all; }
+    .story .st-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .story .st-btns a, .story .st-btns button { display: grid; place-items: center; min-height: 54px; border: 0; border-radius: 15px; font: inherit; font-size: 16.5px; font-weight: 900; text-decoration: none; cursor: pointer; letter-spacing: -0.02em; }
+    .story .st-btns a { background: #B3132B; color: #fff; }
+    .story .st-btns button { background: #FEE500; color: #3a1d1d; }
+    .play-h { margin: 6px 22px 8px; font-size: 15.5px; font-weight: 900; letter-spacing: -0.02em; color: var(--ssaka-deep, #8E0A1C); }
+    .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 0 18px 14px; }
+    .tile { display: grid; justify-items: center; align-content: center; gap: 3px; min-height: 98px; padding: 10px 4px; border-radius: 20px; text-decoration: none; text-align: center; }
+    .tile i { font-style: normal; font-size: 30px; line-height: 1.1; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+    .tile i u { text-decoration: none; color: #E0193A; }
+    .tile b { font-size: 14.5px; font-weight: 900; letter-spacing: -0.03em; }
+    .tile span { font-size: 11.5px; font-weight: 700; opacity: .8; }
+    .tile.t1 { background: #0E0E10; color: #fff; box-shadow: inset 0 0 0 2px #FFD24A; }
+    .tile.t1 i { font-size: 24px; }
+    .tile.t2 { background: #FFD84D; color: #1A1A1A; box-shadow: inset 0 0 0 2px #1A1A1A; }
+    .tile.t4 { background: #1F5FAF; color: #fff; box-shadow: inset 0 0 0 3px #5A3420; }
+    .tile.t3 { background: #000; color: #E9C46A; box-shadow: inset 0 0 0 1px #333; }
     .eodiya { display: flex; align-items: center; gap: 14px; margin: 10px 18px 4px; padding: 16px; border-radius: 20px; background: var(--ssaka-soft); text-decoration: none; }
     .eodiya i { font-style: normal; width: 52px; height: 52px; border-radius: 18px; background: var(--ssaka); display: grid; place-items: center; font-size: 26px; flex: none; }
     .eodiya b { display: block; font-size: 19px; color: var(--ssaka-deep); letter-spacing: -0.02em; }
@@ -179,6 +200,7 @@
 <script src="../js/designs.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/install.js"></script>
+<script src="../js/share.js"></script>
 <script>
 (function () {
   var D = window.SsakaDesigns, S = window.SsakaStore;
@@ -285,6 +307,23 @@
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>카톡 한 번이면 친구 위치가 와요 · 친구 불러 모으기까지</p>' +
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>친구 위치 묻기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>내 위치 보내기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
     v.appendChild(eh);
+    // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸
+    var st = el('div', 'story');
+    st.innerHTML = '<div class="st-top"><img src="../img/cherry-dance.svg" alt=""><div><b>싸바 이야기</b><span>싸바가 뭐냐고 물으면 이걸 보여 주세요</span></div></div>' +
+      '<div class="st-btns"><a href="../?story=1">🍒 싸바가 뭐지?</a><button type="button">💬 카톡으로 보내기</button></div>';
+    st.querySelector('button').addEventListener('click', function () {
+      if (!window.SsakaShare) { location.href = '../?story=1'; return; }
+      SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 안부 한마디로 사람을 이어 주는 회사', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
+    });
+    v.appendChild(st);
+    // 싸바 놀이터 — 단톡방 미끼
+    var pg = el('div', 'play-h'); pg.textContent = '🎮 싸바 놀이터'; v.appendChild(pg);
+    var gw = el('div', 'tiles');
+    gw.innerHTML = '<a class="tile t1" href="../lucky/"><i>7.<u>777</u></i><b>럭키 잭팟</b><span>100억 체리</span></a>' +
+      '<a class="tile t4" href="../pool/"><i>🎱</i><b>당구 한판?</b><span>진짜 쓰리쿠션</span></a>' +
+      '<a class="tile t2" href="../shoot/"><i>🪜</i><b>사다리 한번?</b><span>나도! 모으기</span></a>' +
+      '<a class="tile t3" href="../fly/"><i>🪰</i><b>파리 잡기</b><span>눈 감고 도사</span></a>';
+    v.appendChild(gw);
     if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
     var mine = S.mine();
     if (mine.length) {
@@ -413,7 +452,7 @@
     tip.appendChild(document.createElement('br')); tip.appendChild(ib);
     v.appendChild(tip);
     var m = el('div', 'more');
-    [['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../', '회사 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
+    [['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '회사 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
     });
     var clear = el('button', ''); clear.type = 'button';

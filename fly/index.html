@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>눈 감고 파리 잡기 — 싸바</title>
+  <meta name="description" content="웽~ 소리만 듣고 눈 감고 파리를 잡아라. 1000분의 1초 도사 수련.">
+  <meta name="theme-color" content="#000000">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/fly/">
+  <meta property="og:title" content="🪰 눈 감고 파리 잡기 — 싸바 도사 수련">
+  <meta property="og:description" content="웽~ 소리가 뚝 그치는 순간 탁! 너는 입문이냐 신선이냐.">
+  <meta property="og:image" content="https://sava.kr/img/fly-share.png?v=1">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --gold: #E9C46A; --dim: #8b8b8b; --line: #262626; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: #0b0b0b; color: #eee; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; }
+    .top a img { width: 26px; height: 26px; }
+    .top .grade { font-size: 13px; color: var(--gold); font-weight: 800; }
+    .hero { text-align: center; margin-top: 18px; }
+    .hero .fly { font-size: 64px; line-height: 1; display: inline-block; animation: buzz 1.4s ease-in-out infinite; }
+    @keyframes buzz { 0%,100% { transform: translate(0,0) rotate(-8deg); } 25% { transform: translate(14px,-8px) rotate(10deg); } 50% { transform: translate(-6px,6px) rotate(-4deg); } 75% { transform: translate(-14px,-4px) rotate(8deg); } }
+    .hero .k { margin-top: 10px; font-size: 12px; letter-spacing: .3em; color: var(--gold); font-weight: 800; }
+    .hero h1 { margin: 6px 0 0; font-size: 36px; font-weight: 900; letter-spacing: -0.04em; }
+    .hero p { margin: 10px 0 0; font-size: 15px; color: #bbb; line-height: 1.55; word-break: keep-all; }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: #1c1708; box-shadow: inset 0 0 0 1px #4a3c12; font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
+    .chal b { color: var(--gold); }
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+    .modes button { min-height: 64px; border: 0; border-radius: 16px; background: #161616; color: #ccc; font: inherit; font-size: 15.5px; font-weight: 800; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; line-height: 1.25; }
+    .modes button small { display: block; font-size: 11.5px; color: var(--dim); font-weight: 600; margin-top: 3px; }
+    .modes button[aria-pressed="true"] { background: #1f1a0c; color: #fff; box-shadow: inset 0 0 0 2px var(--gold); }
+    .how { margin-top: 14px; padding: 14px; border-radius: 16px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; line-height: 1.65; color: #ccc; word-break: keep-all; }
+    .how b { color: #fff; }
+    .how .warn { margin-top: 8px; color: var(--gold); font-weight: 700; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 72px; margin-top: 16px; border: 0; border-radius: 22px; background: var(--gold); color: #1a1405; font: inherit; font-size: 22px; font-weight: 900; cursor: pointer; }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: #1b1b1b; color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+
+    /* 수련 중: 까만 화면 전체 */
+    .dark { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: none; }
+    .dark .msg { font-size: 22px; font-weight: 900; color: #444; text-align: center; line-height: 1.5; padding: 0 20px; word-break: keep-all; }
+    .dark .msg small { display: block; margin-top: 8px; font-size: 14px; font-weight: 700; color: #333; }
+    .dark .rd { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; font-size: 13px; color: #333; font-weight: 800; letter-spacing: .1em; }
+    .dark .half { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: calc(30px + env(safe-area-inset-bottom)); font-size: 15px; font-weight: 800; color: #2a2a2a; }
+    .dark .half.l { left: 0; border-right: 1px dashed #1a1a1a; }
+    .dark .half.r { right: 0; }
+    .dark .quit { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; z-index: 2; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #151515; color: #555; font: inherit; font-size: 14px; font-weight: 800; }
+    .splat { position: absolute; font-size: 60px; transform: translate(-50%, -50%); pointer-events: none; animation: splat .7s ease-out forwards; }
+    @keyframes splat { 0% { transform: translate(-50%,-50%) scale(1.6); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1); opacity: .9; } }
+    .rt { position: absolute; left: 0; right: 0; bottom: 22%; text-align: center; font-size: 40px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; pointer-events: none; }
+    .rt small { display: block; font-size: 16px; color: var(--gold); margin-top: 4px; }
+
+    .result { margin-top: 18px; padding: 22px 16px 16px; border-radius: 24px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 32px; font-weight: 900; color: var(--gold); letter-spacing: -0.03em; }
+    .result .avg { font-size: 18px; font-weight: 800; color: #ddd; font-variant-numeric: tabular-nums; }
+    .result .list { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 12px 0 0; }
+    .result .list span { padding: 6px 10px; border-radius: 10px; background: #1d1d1d; font-size: 13.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .result .list span.miss { color: #ff6b6b; }
+    .result .note { margin-top: 10px; font-size: 13px; color: var(--dim); word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--dim); }
+    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #0b0b0b; color: #fff; font: inherit; font-size: 15px; box-shadow: inset 0 0 0 1px var(--line); }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); }
+    .ranks h3 { margin: 0 0 6px; font-size: 13.5px; color: var(--dim); letter-spacing: .06em; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { color: var(--gold); font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: #666; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #aaa; }
+    @media (prefers-reduced-motion: reduce) { .hero .fly, .result, .splat { animation: none; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a>
+    <span class="grade" id="myGrade"></span>
+  </div>
+  <div class="hero">
+    <div class="fly" aria-hidden="true">🪰</div>
+    <div class="k">싸바 도사 수련 · 2단계</div>
+    <h1>눈 감고 파리 잡기</h1>
+    <p>웽~ 소리만 듣고, 소리가 <b>뚝</b> 그치는 순간 탁!<br>다섯 마리 잡으면 도사 등급이 나와요</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+
+  <div id="intro">
+    <div class="modes" role="group" aria-label="수련 방법">
+      <button type="button" data-m="spk" aria-pressed="true">📱 그냥 듣기<small>아무 데나 탁!</small></button>
+      <button type="button" data-m="ear" aria-pressed="false">🎧 이어폰 도사<small>앉은 쪽(왼·오)을 탁!</small></button>
+    </div>
+    <div class="how">
+      ① 시작을 누르면 화면이 까매져요. <b>눈을 감으세요.</b><br>
+      ② 파리가 웽~ 날아다니다가 어딘가 앉으면 소리가 뚝 그쳐요.<br>
+      ③ 그 순간 화면을 <b>탁!</b> 너무 일찍 치면 헛손질이에요.
+      <div class="warn" id="iosWarn" hidden>🔇 아이폰은 옆면 무음 스위치를 꺼야 소리가 나요</div>
+    </div>
+    <button type="button" class="go" id="start">🧘 수련 시작</button>
+  </div>
+
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+    <button type="button" class="ghost" id="again">🔁 다시 수련</button>
+  </div>
+
+  <div class="ranks">
+    <h3>도사 등급 (다섯 마리 평균)</h3>
+    <div><span>🧙 신선</span><span>0.230초 이하</span></div>
+    <div><span>🥋 도사</span><span>0.300초 이하</span></div>
+    <div><span>🧘 도인</span><span>0.400초 이하</span></div>
+    <div><span>🌱 입문</span><span>그 밖 · 수련하면 늘어요</span></div>
+    <div><span>🎧 이어폰 도사</span><span>방향까지 맞히면 ★</span></div>
+  </div>
+
+  <div class="more">
+    <a href="../lucky/">🎰 럭키 7.777</a>
+    <a href="../shoot/">☕ 오늘 누가 쏴?</a>
+  </div>
+  <div id="chipBox"></div>
+  <p class="foot">재미로 하는 소리 반응 놀이예요. 폰마다 소리·터치 반응이 조금씩 달라서 기록에 차이가 날 수 있어요.<br><a href="../?story=1">싸바가 뭐지?</a> · <a href="../privacy/">개인정보처리방침</a> · <a href="../terms/">이용약관</a></p>
+</div>
+
+<div class="dark" id="dark" hidden>
+  <div class="rd" id="rd">1 / 5</div>
+  <button type="button" class="quit" id="quit">그만</button>
+  <div class="half l" id="hl" hidden>◀ 왼쪽</div><div class="half r" id="hr" hidden>오른쪽 ▶</div>
+  <div class="msg" id="msg">눈을 감으세요…<small>파리가 곧 날아와요</small></div>
+</div>
+
+<script src="../js/install.js"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var ROUNDS = 5, KEY = 'sava-fly-v1';
+  var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) $('iosWarn').hidden = false;
+  var best = null; try { best = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+  function grade(ms) { return ms <= 230 ? { e: '🧙', t: '신선' } : ms <= 300 ? { e: '🥋', t: '도사' } : ms <= 400 ? { e: '🧘', t: '도인' } : { e: '🌱', t: '입문' }; }
+  function paintBest() { $('myGrade').textContent = best ? '내 최고 ' + grade(best.avg).e + ' ' + grade(best.avg).t + ' ' + (best.avg / 1000).toFixed(3) + '초' : ''; }
+  paintBest();
+  try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (me.from) $('me').value = me.from; } catch (e) {}
+  $('me').addEventListener('change', function () { try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = $('me').value.trim(); localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e) {} });
+
+  var mode = 'spk';
+  document.querySelectorAll('.modes button').forEach(function (b) { b.addEventListener('click', function () { mode = b.dataset.m; document.querySelectorAll('.modes button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); });
+
+  var q = new URLSearchParams(location.search);
+  if (q.get('r')) {
+    var cr = Math.max(50, Math.min(5000, +q.get('r') || 0)), cn = (q.get('n') || '').slice(0, 10), cg = grade(cr);
+    var c = $('chal'); c.hidden = false;
+    var b1 = document.createElement('b'); b1.textContent = (cn || '친구') + '님';
+    c.appendChild(b1); c.appendChild(document.createTextNode('의 도전장 ' + cg.e + ' ' + cg.t + ' 등급 · 평균 ' + (cr / 1000).toFixed(3) + '초' + (q.get('m') === 'ear' ? ' (🎧 이어폰 도사)' : '') + '. 이길 수 있어요?'));
+    if (q.get('m') === 'ear') { mode = 'ear'; document.querySelectorAll('.modes button').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.m === 'ear' ? 'true' : 'false'); }); }
+    window.__chal = { r: cr, n: cn };
+  }
+
+  // ---------- 파리 소리 (직접 합성) ----------
+  var AC = null, fly = null;
+  function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+  function unlock() { var a = ac(); if (!a) return; var b = a.createBuffer(1, 1, 22050), s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start(0); }
+  function startFly(side) {
+    var a = ac(); if (!a) return null;
+    var o1 = a.createOscillator(), o2 = a.createOscillator(), lfo = a.createOscillator(), lfoG = a.createGain();
+    var am = a.createOscillator(), amG = a.createGain(), body = a.createGain(), bp = a.createBiquadFilter(), out = a.createGain();
+    var pan = a.createStereoPanner ? a.createStereoPanner() : null;
+    o1.type = 'sawtooth'; o2.type = 'sawtooth';
+    var base = 190 + Math.random() * 50; o1.frequency.value = base; o2.frequency.value = base * 1.012;
+    lfo.frequency.value = 5 + Math.random() * 3; lfoG.gain.value = 18; lfo.connect(lfoG); lfoG.connect(o1.frequency); lfoG.connect(o2.frequency);
+    am.frequency.value = base / 2; amG.gain.value = 0.35; am.connect(amG); amG.connect(body.gain); body.gain.value = 0.65;
+    bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = 0.7;
+    o1.connect(body); o2.connect(body); body.connect(bp); bp.connect(out);
+    if (pan) { out.connect(pan); pan.connect(a.destination); } else out.connect(a.destination);
+    var t = a.currentTime; out.gain.setValueAtTime(0.0001, t); out.gain.exponentialRampToValueAtTime(0.22, t + 0.25);
+    [o1, o2, lfo, am].forEach(function (o) { o.start(t); });
+    // 날아다니기: 좌우·멀고 가까움을 부드럽게 바꿈, 마지막엔 앉을 쪽으로
+    var alive = true, settled = false, p = Math.random() * 2 - 1, vol = 0.2, last = performance.now();
+    (function wander() {
+      if (!alive) return;
+      var now = performance.now(), dt = (now - last) / 1000; last = now;
+      if (!settled) { var tp = Math.sin(now / 700 + base) * 0.9; p += (tp - p) * 0.1 + (Math.random() - .5) * 0.25; p = Math.max(-1, Math.min(1, p)); }
+      vol = Math.max(0.06, Math.min(0.3, vol + (Math.random() - .5) * 0.06));
+      if (pan) pan.pan.setTargetAtTime(p, a.currentTime, settled ? 0.25 : 0.08);
+      out.gain.setTargetAtTime(vol, a.currentTime, 0.1);
+      bp.frequency.setTargetAtTime(700 + vol * 1500, a.currentTime, 0.1);
+      setTimeout(wander, 60);
+    })();
+    return {
+      settle: function (s) { // 앉을 쪽으로 날아감
+        settled = true; p = s * 0.95;
+      },
+      stop: function () { // 뚝 — 바로 끊음 (이 순간부터 시간을 잼)
+        alive = false; var t2 = a.currentTime;
+        out.gain.cancelScheduledValues(t2); out.gain.setValueAtTime(out.gain.value, t2); out.gain.linearRampToValueAtTime(0, t2 + 0.008);
+        [o1, o2, lfo, am].forEach(function (o) { try { o.stop(t2 + 0.02); } catch (e) {} });
+        // 소리가 실제로 스피커에서 끊기는 시각 (출력 지연 보정)
+        var lat = (a.outputLatency || 0) + (a.baseLatency || 0);
+        return performance.now() + Math.min(lat, 0.12) * 1000;
+      },
+      kill: function () { alive = false; try { [o1, o2, lfo, am].forEach(function (o) { o.stop(); }); } catch (e) {} }
+    };
+  }
+  function slap() { var a = ac(); if (!a) return; var len = Math.floor(a.sampleRate * .12), b = a.createBuffer(1, len, a.sampleRate), d = b.getChannelData(0); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4); var s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2500; g.gain.value = .7; s.buffer = b; s.connect(f); f.connect(g); g.connect(a.destination); s.start(); }
+  function tone(f, t0, dur, vol) { var a = ac(); if (!a) return; var o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, a.currentTime + t0); g.gain.exponentialRampToValueAtTime(vol || .12, a.currentTime + t0 + .015); g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + t0 + dur); o.connect(g); g.connect(a.destination); o.start(a.currentTime + t0); o.stop(a.currentTime + t0 + dur + .05); }
+  function laugh() { [660, 590, 660, 520].forEach(function (f, i) { tone(f, i * .12, .1, .1); }); }
+  function gong() { [196, 294, 392].forEach(function (f) { tone(f, 0, 2.2, .12); }); tone(784, .05, 1.6, .05); }
+
+  // ---------- 수련 ----------
+  var round = 0, times = [], state = 'idle', stopAt = 0, side = 0, timer = 0, dirOk = 0;
+  function setMsg(h) { $('msg').innerHTML = h; }
+  function clearMarks() { document.querySelectorAll('.dark .splat, .dark .rt').forEach(function (x) { x.remove(); }); }
+  function nextRound() {
+    clearMarks();
+    if (round >= ROUNDS) return finish();
+    round++; $('rd').textContent = round + ' / ' + ROUNDS;
+    setMsg('눈을 감으세요…<small>' + (mode === 'ear' ? '파리가 앉는 쪽 화면을 탁!' : '소리가 뚝 그치면 탁!') + '</small>');
+    state = 'wait';
+    timer = setTimeout(function () {
+      side = Math.random() < .5 ? -1 : 1;
+      fly = startFly();
+      state = 'buzz'; setMsg('웽~<small>아직이에요…</small>');
+      var dur = 2500 + Math.random() * 5000;
+      if (mode === 'ear') timer = setTimeout(function () { if (fly) fly.settle(side); }, Math.max(800, dur - 900));
+      setTimeout(function () {
+        if (state !== 'buzz') return;
+        stopAt = fly.stop(); fly = null; state = 'land'; setMsg('');
+        timer = setTimeout(function () { if (state === 'land') { record(null, null); } }, 2000); // 2초 지나면 놓침
+      }, dur);
+    }, 1200 + Math.random() * 1200);
+  }
+  function record(ms, x, y, dirRight) {
+    state = 'show';
+    var d = $('dark'), el;
+    if (ms == null) { times.push(null); laugh(); setMsg('🪰 놓쳤어요!<small>파리가 도망갔어요</small>'); }
+    else {
+      slap();
+      var good = true;
+      if (mode === 'ear') { good = (dirRight ? 1 : -1) === side; if (good) dirOk++; }
+      times.push({ ms: ms, dir: mode === 'ear' ? good : null });
+      el = document.createElement('div'); el.className = 'splat'; el.textContent = good ? '💥' : '🫥'; el.style.left = x + 'px'; el.style.top = y + 'px'; d.appendChild(el);
+      var rt = document.createElement('div'); rt.className = 'rt'; rt.innerHTML = (ms / 1000).toFixed(3) + '초<small>' + (mode === 'ear' ? (good ? '방향도 정답! ★' : '반대쪽이었어요 (' + (side < 0 ? '왼쪽' : '오른쪽') + ')') : grade(ms).e + ' ' + grade(ms).t + '급') + '</small>'; d.appendChild(rt);
+      setMsg('');
+    }
+    timer = setTimeout(nextRound, 1500);
+  }
+  $('dark').addEventListener('pointerdown', function (e) {
+    if (e.target.id === 'quit') return;
+    e.preventDefault();
+    var ts = (e.timeStamp && e.timeStamp > 1e3 && e.timeStamp < performance.now() + 50) ? e.timeStamp : performance.now();
+    if (state === 'land') {
+      clearTimeout(timer);
+      var ms = Math.round(ts - stopAt);
+      if (ms < 100) { // 사람 귀는 0.1초보다 빨리 반응할 수 없음 → 찍은 것
+        state = 'show'; times.push(null); laugh(); setMsg('😏 너무 빨라요!<small>0.1초 안은 찍은 걸로 쳐요</small>');
+        timer = setTimeout(nextRound, 1500); return;
+      }
+      record(ms, e.clientX, e.clientY, e.clientX > innerWidth / 2);
+    }
+    else if (state === 'buzz' || state === 'wait') {
+      // 헛손질: 이번 판은 놓침 처리하고 다음으로
+      clearTimeout(timer); if (fly) { fly.kill(); fly = null; }
+      state = 'show'; times.push(null); laugh(); setMsg('😆 헛손질!<small>아직 날고 있었어요</small>');
+      timer = setTimeout(nextRound, 1500);
+    }
+  });
+  function shut() { clearTimeout(timer); if (fly) { fly.kill(); fly = null; } state = 'idle'; $('dark').hidden = true; clearMarks(); }
+  $('quit').addEventListener('click', shut);
+  $('start').addEventListener('click', begin);
+  $('again').addEventListener('click', begin);
+  function begin() {
+    unlock(); ac();
+    round = 0; times = []; dirOk = 0; $('out').hidden = true;
+    $('hl').hidden = $('hr').hidden = mode !== 'ear';
+    $('dark').hidden = false; nextRound();
+  }
+
+  var last = null;
+  function finish() {
+    shut();
+    var ok = times.filter(Boolean).map(function (t) { return t.ms; });
+    var miss = ROUNDS - ok.length;
+    var avg = ok.length ? Math.round(ok.reduce(function (s, v) { return s + v; }, 0) / ok.length) + miss * 150 : 0; // 놓친 마리당 0.150초 벌점
+    var g = ok.length ? grade(avg) : { e: '🪰', t: '파리 승' };
+    last = { avg: avg, g: g, miss: miss, dir: dirOk, mode: mode };
+    var r = $('result'); r.innerHTML = '';
+    r.innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + (ok.length ? ' 등급' : '') + (mode === 'ear' && dirOk === ROUNDS ? ' ★' : '') + '</h2>' +
+      '<div class="avg">' + (ok.length ? '평균 ' + (avg / 1000).toFixed(3) + '초' : '한 마리도 못 잡았어요') + '</div>' +
+      '<div class="list">' + times.map(function (t, i) { return t ? '<span>' + (i + 1) + '. ' + (t.ms / 1000).toFixed(3) + (t.dir === false ? ' ↔' : '') + '</span>' : '<span class="miss">' + (i + 1) + '. 놓침</span>'; }).join('') + '</div>' +
+      '<div class="note">' + (miss ? '놓친 ' + miss + '마리는 한 마리당 0.150초 벌점이 붙어요. ' : '') + (mode === 'ear' ? '방향 정답 ' + dirOk + '/' + ROUNDS + '. ' : '') + (window.__chal ? (ok.length && avg < window.__chal.r ? (window.__chal.n || '친구') + '님을 이겼어요! 😎' : (window.__chal.n || '친구') + '님 기록 ' + (window.__chal.r / 1000).toFixed(3) + '초') : '사람 귀는 보통 0.2~0.3초에 반응해요') + '</div>';
+    if (ok.length && (!best || avg < best.avg)) { best = { avg: avg }; try { localStorage.setItem(KEY, JSON.stringify(best)); } catch (e) {} paintBest(); }
+    $('intro').hidden = true; $('out').hidden = false;
+    if (ok.length) gong();
+    setTimeout(function () { r.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+  }
+  $('send').addEventListener('click', function () {
+    if (!last || !last.avg) return;
+    var name = $('me').value.trim(), u = new URL('https://sava.kr/fly/');
+    u.searchParams.set('r', last.avg); if (last.mode === 'ear') u.searchParams.set('m', 'ear'); if (name) u.searchParams.set('n', name);
+    var who = name ? name + ': ' : '';
+    if (window.SsakaShare) SsakaShare({ url: u.href, title: who + '🪰 눈 감고 파리 잡기 ' + last.g.e + ' ' + last.g.t + ' 등급!', description: '평균 ' + (last.avg / 1000).toFixed(3) + '초' + (last.mode === 'ear' ? ' · 이어폰 도사 방향 ' + last.dir + '/5' : '') + '. 웽~ 소리 그치면 탁! 너는 몇 초?', imageUrl: 'https://sava.kr/img/fly-share.png?v=1', imageWidth: 800, imageHeight: 800, buttonTitle: '나도 파리 잡기', installTitle: '싸바 설치하기' });
+  });
+  if (window.SsakaInstall) SsakaInstall.chip($('chipBox'), '싸바 홈 화면에 추가');
+})();
+</script>
+</body>
+</html>

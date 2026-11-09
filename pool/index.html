@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>오늘 당구 한판? — 싸바</title>
+  <meta name="description" content="폰으로 치는 진짜 쓰리쿠션. 당점·밀어치기·끌어치기·회전까지. 2~4명이 한 폰으로 번갈아.">
+  <meta name="theme-color" content="#123A6B">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/pool/">
+  <meta property="og:title" content="🎱 오늘 당구 한판? — 싸바 쓰리쿠션">
+  <meta property="og:description" content="당점 잡고 밀어치기·끌어치기·회전까지. 폰으로 치는 진짜 쓰리쿠션!">
+  <meta property="og:image" content="https://sava.kr/img/pool-share.png?v=1">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #0F1E33; --card: #16294A; --line: #24406B; --gold: #F2C14E; --dim: #9FB3D1; --red: #E0193A; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { overscroll-behavior: none; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(8px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 40px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 16px; }
+    .top a img { width: 24px; height: 24px; }
+    .top button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--card); color: var(--dim); font: inherit; font-size: 13px; font-weight: 800; }
+    h1 { margin: 12px 0 4px; text-align: center; font-size: 34px; font-weight: 900; letter-spacing: -0.04em; }
+    .sub { margin: 0; text-align: center; font-size: 14px; color: var(--dim); word-break: keep-all; }
+    .box { margin-top: 14px; padding: 14px; border-radius: 20px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+    .lab { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 900; color: var(--gold); }
+    .prow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .prow .ball { width: 26px; height: 26px; border-radius: 50%; flex: none; box-shadow: inset -4px -4px 6px rgba(0,0,0,.25); }
+    .prow input { flex: 1; min-width: 0; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #0F1E33; color: #fff; font: inherit; font-size: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+    .prow .tg { display: flex; align-items: center; gap: 4px; flex: none; font-size: 12px; color: var(--dim); }
+    .prow .tg button { width: 34px; height: 34px; border: 0; border-radius: 10px; background: #0F1E33; color: #fff; font: inherit; font-size: 18px; font-weight: 900; }
+    .prow .tg b { min-width: 26px; text-align: center; font-size: 17px; color: #fff; }
+    .prow .x { width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-size: 18px; }
+    .small { display: block; width: 100%; min-height: 44px; margin-top: 10px; border: 1.5px dashed var(--line); border-radius: 12px; background: none; color: var(--dim); font: inherit; font-size: 15px; font-weight: 800; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #0F1E33; color: var(--dim); font: inherit; font-size: 15px; font-weight: 800; box-shadow: inset 0 0 0 1px var(--line); }
+    .chip[aria-pressed="true"] { background: var(--gold); color: #1a1405; box-shadow: none; }
+    .big { display: grid; place-items: center; width: 100%; min-height: 62px; margin-top: 14px; border: 0; border-radius: 18px; background: var(--gold); color: #1a1405; font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; }
+    .big.k { background: #FEE500; color: #3a1d1d; font-size: 18px; min-height: 56px; margin-top: 8px; }
+    .big.g { background: var(--card); color: #fff; font-size: 16px; min-height: 50px; margin-top: 8px; box-shadow: inset 0 0 0 1px var(--line); }
+    .how { margin-top: 12px; font-size: 13.5px; line-height: 1.6; color: var(--dim); word-break: keep-all; }
+    .how b { color: #fff; }
+
+    /* 게임 화면 */
+    .board { display: flex; gap: 6px; margin-top: 6px; overflow-x: auto; }
+    .pl { flex: 1; min-width: 0; padding: 6px 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; line-height: 1.25; white-space: nowrap; }
+    .pl.on { background: #F2C14E; color: #1a1405; box-shadow: none; }
+    .pl .n { display: flex; align-items: center; gap: 4px; font-weight: 900; overflow: hidden; text-overflow: ellipsis; }
+    .pl .n i { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+    .pl .s { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .pl .s small { font-size: 12px; opacity: .7; font-weight: 800; }
+    .status { min-height: 22px; margin: 6px 0 4px; text-align: center; font-size: 14px; font-weight: 800; color: var(--gold); word-break: keep-all; }
+    .tablebox { display: flex; justify-content: center; }
+    canvas#t { display: block; touch-action: none; border-radius: 14px; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+    .ctrl { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: center; margin-top: 10px; }
+    .spin { position: relative; width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle at 38% 34%, #fff 0%, #f2f2f2 45%, #c9c9c9 100%); box-shadow: 0 4px 12px rgba(0,0,0,.4); touch-action: none; cursor: pointer; }
+    .spin::before, .spin::after { content: ""; position: absolute; background: rgba(0,0,0,.12); }
+    .spin::before { left: 50%; top: 8%; bottom: 8%; width: 1px; }
+    .spin::after { top: 50%; left: 8%; right: 8%; height: 1px; }
+    .spin .dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 3px rgba(224,25,58,.3); left: 50%; top: 50%; pointer-events: none; }
+    .rt { display: grid; gap: 8px; }
+    .spinlab { font-size: 13px; font-weight: 800; color: var(--dim); }
+    .spinlab b { color: #fff; }
+    .pow { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--dim); }
+    .pow input { flex: 1; height: 34px; accent-color: var(--gold); }
+    .pow b { min-width: 38px; text-align: right; color: #fff; font-variant-numeric: tabular-nums; }
+    .row3 { display: grid; grid-template-columns: 48px 1fr 48px; gap: 8px; }
+    .row3 button { min-height: 54px; border: 0; border-radius: 14px; font: inherit; font-weight: 900; cursor: pointer; }
+    .row3 .fine { background: var(--card); color: #fff; font-size: 18px; box-shadow: inset 0 0 0 1px var(--line); }
+    .row3 .shot { background: var(--gold); color: #1a1405; font-size: 20px; }
+    .row3 button:disabled { opacity: .45; }
+    .opts { display: flex; justify-content: center; gap: 14px; margin-top: 8px; font-size: 13px; color: var(--dim); }
+    .opts label { display: flex; align-items: center; gap: 6px; }
+    .opts input { width: 18px; height: 18px; accent-color: var(--gold); }
+    .over { margin-top: 12px; padding: 20px 14px; border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 2px var(--gold); text-align: center; }
+    .over .e { font-size: 50px; line-height: 1; }
+    .over h2 { margin: 8px 0 6px; font-size: 28px; font-weight: 900; color: var(--gold); word-break: keep-all; }
+    .over ol { margin: 10px auto 0; padding: 0; list-style: none; max-width: 300px; text-align: left; }
+    .over li { display: flex; justify-content: space-between; padding: 8px 4px; border-top: 1px solid var(--line); font-size: 15.5px; font-weight: 800; }
+    .over li:first-child { border-top: 0; }
+    .over .shoot { margin-top: 12px; font-size: 18px; font-weight: 900; color: #fff; }
+    .pop { position: fixed; left: 50%; top: 38%; transform: translate(-50%,-50%); z-index: 60; padding: 14px 22px; border-radius: 18px; background: rgba(0,0,0,.78); color: var(--gold); font-size: 30px; font-weight: 900; pointer-events: none; white-space: nowrap; animation: popa 1.3s ease-out forwards; }
+    @keyframes popa { 0% { transform: translate(-50%,-50%) scale(.6); opacity: 0; } 15% { transform: translate(-50%,-50%) scale(1.08); opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(-50%,-70%) scale(1); opacity: 0; } }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: #6f86a8; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--dim); }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .more a { display: grid; place-items: center; min-height: 50px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a>
+    <button type="button" id="quit" hidden>처음으로</button>
+  </div>
+
+  <!-- 준비 -->
+  <div id="setup">
+    <h1>🎱 오늘 당구 한판?</h1>
+    <p class="sub">폰으로 치는 진짜 쓰리쿠션 · 2~4명 한 폰으로 번갈아</p>
+    <div class="box">
+      <span class="lab">👥 누가 치나요? (오른쪽 숫자 = 각자 목표 점수)</span>
+      <div id="players"></div>
+      <button type="button" class="small" id="addP">+ 한 명 더 (최대 4명)</button>
+    </div>
+    <div class="box">
+      <span class="lab">🎯 지는 사람은?</span>
+      <div class="chips" id="stakes"></div>
+    </div>
+    <button type="button" class="big" id="start">🎱 시작!</button>
+    <div class="how">
+      <b>치는 법</b> ① 당구대를 손가락으로 누르면 그쪽으로 겨눠요. ◀ ▶ 로 아주 조금씩 돌려요.<br>
+      ② 왼쪽 <b>흰 공</b>에서 당점을 찍어요. 위 = <b>밀어치기</b>, 아래 = <b>끌어치기</b>, 좌우 = <b>회전</b>.<br>
+      ③ 세기를 정하고 <b>치기!</b><br>
+      <b>쓰리쿠션</b>: 내 공이 두 공을 다 맞히되, 두 번째 공을 맞히기 전에 쿠션을 <b>3번 이상</b> 맞으면 1점. 점수 나면 계속 쳐요.
+    </div>
+  </div>
+
+  <!-- 게임 -->
+  <div id="game" hidden>
+    <div class="board" id="board"></div>
+    <div class="status" id="status"></div>
+    <div class="tablebox"><canvas id="t"></canvas></div>
+    <div class="ctrl">
+      <div class="spin" id="spin" aria-label="당점"><div class="dot" id="dot"></div></div>
+      <div class="rt">
+        <div class="spinlab">당점: <b id="spinTxt">가운데</b></div>
+        <div class="pow">세기 <input type="range" id="pow" min="5" max="100" value="45"><b id="powTxt">45</b></div>
+        <div class="row3">
+          <button type="button" class="fine" id="left" aria-label="왼쪽으로 조금">◀</button>
+          <button type="button" class="shot" id="shot">치기!</button>
+          <button type="button" class="fine" id="right" aria-label="오른쪽으로 조금">▶</button>
+        </div>
+      </div>
+    </div>
+    <div class="opts">
+      <label><input type="checkbox" id="guide" checked> 가이드 선</label>
+      <label><input type="checkbox" id="snd" checked> 소리</label>
+    </div>
+    <div class="over" id="over" hidden></div>
+  </div>
+
+  <div class="more">
+    <a href="../shoot/">🪜 사다리 한번 탈까?</a>
+    <a href="../eodiya/#play">🍒 친구야 놀자</a>
+  </div>
+  <div id="chipBox"></div>
+  <p class="foot">재미로 하는 당구 놀이예요. 실제 당구와 물리가 조금 다를 수 있어요.<br><a href="../?story=1">싸바가 뭐지?</a> · <a href="../privacy/">개인정보처리방침</a> · <a href="../terms/">이용약관</a></p>
+</div>
+
+<script src="../js/install.js"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ====================== 물리 (단위: 미터, 초) ======================
+  var W = 1.422, H = 2.844, R = 0.03075;          // 대대 실측 (세로로 놓음)
+  var G = 9.81, MU_S = 0.20, MU_R = 0.014, SPIN_DECAY = 22, E_BALL = 0.94, MU_CUSH = 0.18;
+  var VMAX = 7.0;
+  var balls = [];  // {id, x,y, vx,vy, wx,wy,wz, color}
+  function ball(id, x, y, color) { return { id: id, x: x, y: y, vx: 0, vy: 0, wx: 0, wy: 0, wz: 0, color: color }; }
+  function reset() {
+    balls = [ball(0, W / 2 - 0.1524, H * 0.75, '#FFFFFF'), ball(1, W / 2, H * 0.75, '#F6C915'), ball(2, W / 2, H * 0.25, '#D9142B')];
+  }
+  function moving() { for (var i = 0; i < balls.length; i++) { var b = balls[i]; if (Math.abs(b.vx) + Math.abs(b.vy) > 0.004 || Math.abs(b.wz) > 0.5) return true; } return false; }
+  var ev = null; // 이번 샷 기록 {cue, list: [{t:'b', id} | {t:'c'}]}
+  function step(dt) {
+    for (var i = 0; i < balls.length; i++) {
+      var b = balls[i];
+      var ux = b.vx - R * b.wy, uy = b.vy + R * b.wx, us = Math.hypot(ux, uy);
+      var sp = Math.hypot(b.vx, b.vy);
+      if (us > 0.01) { // 미끄러지는 중: 천과의 마찰이 회전과 속도를 서로 맞춰 감 (밀어치기·끌어치기가 여기서 생김)
+        var f = MU_S * G * dt, nx = ux / us, ny = uy / us;
+        var dv = Math.min(f, us * 2 / 7);
+        b.vx -= dv * nx; b.vy -= dv * ny;
+        b.wx -= 2.5 * dv * ny / R; b.wy += 2.5 * dv * nx / R;
+      } else if (sp > 0) { // 구르는 중
+        var nv = Math.max(0, sp - MU_R * G * dt);
+        b.vx *= nv / sp; b.vy *= nv / sp;
+        b.wy = b.vx / R; b.wx = -b.vy / R;
+        if (nv < 0.004) { b.vx = b.vy = 0; b.wx = b.wy = 0; }
+      }
+      if (b.wz) { var d = SPIN_DECAY * dt; b.wz = Math.abs(b.wz) <= d ? 0 : b.wz - Math.sign(b.wz) * d; }
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      // 쿠션
+      cushion(b, b.x < R, 1, 0, R, null); cushion(b, b.x > W - R, -1, 0, W - R, null);
+      cushion(b, b.y < R, 0, 1, null, R); cushion(b, b.y > H - R, 0, -1, null, H - R);
+    }
+    // 공끼리
+    for (var a = 0; a < balls.length; a++) for (var c = a + 1; c < balls.length; c++) {
+      var p = balls[a], q = balls[c], dx = q.x - p.x, dy = q.y - p.y, dist = Math.hypot(dx, dy);
+      if (dist < 2 * R && dist > 0) {
+        var nx2 = dx / dist, ny2 = dy / dist, rel = (p.vx - q.vx) * nx2 + (p.vy - q.vy) * ny2;
+        var ov = (2 * R - dist) / 2; p.x -= nx2 * ov; p.y -= ny2 * ov; q.x += nx2 * ov; q.y += ny2 * ov;
+        if (rel > 0) {
+          var j = rel * (1 + E_BALL) / 2;
+          p.vx -= j * nx2; p.vy -= j * ny2; q.vx += j * nx2; q.vy += j * ny2;
+          click(rel);
+          if (ev) { if (p.id === ev.cue) ev.list.push({ t: 'b', id: q.id }); else if (q.id === ev.cue) ev.list.push({ t: 'b', id: p.id }); }
+        }
+      }
+    }
+  }
+  function cushion(b, hit, nx, ny, fx, fy) {
+    if (!hit) return;
+    var vn = b.vx * nx + b.vy * ny; // 쿠션 쪽으로 가면 음수
+    if (fx != null) b.x = fx; if (fy != null) b.y = fy;
+    if (vn >= 0) return;
+    var tx = -ny, ty = nx, vt = b.vx * tx + b.vy * ty;
+    var e = 0.82 - Math.min(0.18, Math.abs(vn) * 0.03); // 세게 칠수록 덜 튕김
+    var Jn = (1 + e) * -vn;
+    // 회전(시네루): 쿠션과 닿는 점의 미끄러짐 = vt - R*wz → 마찰이 이를 줄이며 꺾이는 각을 바꿈
+    var slip = vt - R * b.wz;
+    var Jt = -slip * 2 / 7; var lim = MU_CUSH * Jn;
+    if (Jt > lim) Jt = lim; if (Jt < -lim) Jt = -lim;
+    vn = -vn * e; vt += Jt;
+    b.wz -= 2.5 * Jt / R;
+    b.vx = vn * nx + vt * tx; b.vy = vn * ny + vt * ty;
+    // 쿠션은 공 중심보다 살짝 높게 닿아서 굴림 회전도 일부 잃음
+    b.wx *= 0.7; b.wy *= 0.7;
+    thump(Jn);
+    if (ev && b.id === ev.cue) ev.list.push({ t: 'c' });
+  }
+  function strike(b, dir, power, sx, sy) { // sx: 좌우 당점(-1~1), sy: 상하 당점(-1~1)
+    var V = 0.5 + (VMAX - 0.5) * Math.pow(power / 100, 1.35);
+    var a = sx * 0.5 * R, h = sy * 0.5 * R; // 최대 반지름의 절반까지 (실제 미스큐 한계)
+    b.vx = V * dir.x; b.vy = V * dir.y;
+    var k = 2.5 * V / (R * R);
+    // 위·아래 회전: 앞으로 구르는 방향 축
+    b.wx = -dir.y * k * h; b.wy = dir.x * k * h;
+    // 좌우 회전 (오른쪽 당점 = 시계방향)
+    b.wz = -k * a;
+  }
+  function score(e) {
+    var hits = [], c = 0, cAtSecond = -1;
+    e.list.forEach(function (x) { if (x.t === 'c') c++; else if (hits.indexOf(x.id) < 0) { hits.push(x.id); if (hits.length === 2) cAtSecond = c; } });
+    return { ok: hits.length === 2 && cAtSecond >= 3, hits: hits.length, cush: hits.length === 2 ? cAtSecond : c };
+  }
+
+  // ====================== 소리 ======================
+  var AC = null;
+  function ac() { if (!$('snd').checked) return null; if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+  var lastClick = 0;
+  function burst(freq, dur, vol) {
+    var a = ac(); if (!a) return;
+    var len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6);
+    var s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 2; g.gain.value = vol;
+    s.buffer = buf; s.connect(f); f.connect(g); g.connect(a.destination); s.start();
+  }
+  function click(v) { var n = performance.now(); if (n - lastClick < 25) return; lastClick = n; burst(3200, 0.05, Math.min(1.2, 0.15 + v * 0.25)); }
+  function thump(j) { burst(260, 0.09, Math.min(0.8, 0.08 + j * 0.12)); }
+  function cueHit(p) { burst(1800, 0.04, 0.3 + p / 200); }
+  function tone(f, t0, dur, vol) { var a = ac(); if (!a) return; var o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, a.currentTime + t0); g.gain.exponentialRampToValueAtTime(vol, a.currentTime + t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + t0 + dur); o.connect(g); g.connect(a.destination); o.start(a.currentTime + t0); o.stop(a.currentTime + t0 + dur + 0.05); }
+  function ding() { [784, 988, 1175].forEach(function (f, i) { tone(f, i * 0.09, 0.35, 0.12); }); }
+  function fanfare() { [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { tone(f, i * 0.12, i === 5 ? 1 : 0.2, 0.13); }); }
+
+  // ====================== 화면 ======================
+  var cv = $('t'), cx = cv.getContext('2d'), RAIL = 0.085, scale = 1, dpr = 1;
+  function fit() {
+    var availW = Math.min(456, document.querySelector('.wrap').clientWidth);
+    var availH = Math.max(330, innerHeight * 0.58);
+    var tw = W + RAIL * 2, th = H + RAIL * 2;
+    scale = Math.min(availW / tw, availH / th);
+    dpr = window.devicePixelRatio || 1;
+    cv.style.width = Math.round(tw * scale) + 'px'; cv.style.height = Math.round(th * scale) + 'px';
+    cv.width = Math.round(tw * scale * dpr); cv.height = Math.round(th * scale * dpr);
+    draw();
+  }
+  function X(x) { return (x + RAIL) * scale; }
+  function Y(y) { return (y + RAIL) * scale; }
+  var aim = { x: 0, y: -1 }, spinX = 0, spinY = 0;
+  function draw() {
+    if (!balls.length) return;
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var tw = (W + RAIL * 2) * scale, th = (H + RAIL * 2) * scale;
+    // 레일(나무)
+    var wood = cx.createLinearGradient(0, 0, tw, 0); wood.addColorStop(0, '#4A2A17'); wood.addColorStop(.5, '#6B3E22'); wood.addColorStop(1, '#4A2A17');
+    cx.fillStyle = wood; rr(0, 0, tw, th, 0.045 * scale); cx.fill();
+    // 쿠션 고무
+    cx.fillStyle = '#1B4E92'; cx.fillRect(X(-0.03), Y(-0.03), (W + 0.06) * scale, (H + 0.06) * scale);
+    // 천
+    var cloth = cx.createRadialGradient(tw / 2, th / 2, 10, tw / 2, th / 2, th * 0.7); cloth.addColorStop(0, '#2C72C6'); cloth.addColorStop(1, '#1F5FAF');
+    cx.fillStyle = cloth; cx.fillRect(X(0), Y(0), W * scale, H * scale);
+    // 포인트(다이아몬드)
+    cx.fillStyle = '#F4E9D0';
+    for (var i = 1; i < 8; i++) { var yy = Y(H * i / 8); dia(X(-RAIL / 2 - 0.015), yy); dia(X(W + RAIL / 2 + 0.015), yy); }
+    for (var k = 1; k < 4; k++) { var xx = X(W * k / 4); dia(xx, Y(-RAIL / 2 - 0.015)); dia(xx, Y(H + RAIL / 2 + 0.015)); }
+    // 가이드
+    if (state === 'aim' && $('guide').checked) guide();
+    // 공
+    balls.forEach(function (b) {
+      var px = X(b.x), py = Y(b.y), r = R * scale;
+      cx.fillStyle = 'rgba(0,0,0,.28)'; cx.beginPath(); cx.arc(px + r * 0.25, py + r * 0.3, r, 0, 6.283); cx.fill();
+      var g = cx.createRadialGradient(px - r * 0.35, py - r * 0.4, r * 0.1, px, py, r);
+      g.addColorStop(0, '#fff'); g.addColorStop(0.35, b.color); g.addColorStop(1, shade(b.color));
+      cx.fillStyle = g; cx.beginPath(); cx.arc(px, py, r, 0, 6.283); cx.fill();
+    });
+    // 큐
+    if (state === 'aim') {
+      var cb = balls[cur().ball], pull = (+$('pow').value) / 100 * 0.12 + 0.02;
+      var sx = X(cb.x - aim.x * (R + pull)), sy = Y(cb.y - aim.y * (R + pull));
+      var ex = X(cb.x - aim.x * (R + pull + 1.1)), ey = Y(cb.y - aim.y * (R + pull + 1.1));
+      cx.lineCap = 'round';
+      cx.strokeStyle = 'rgba(0,0,0,.3)'; cx.lineWidth = 0.022 * scale; cx.beginPath(); cx.moveTo(sx + 3, sy + 4); cx.lineTo(ex + 3, ey + 4); cx.stroke();
+      var cg = cx.createLinearGradient(sx, sy, ex, ey); cg.addColorStop(0, '#EDE3CF'); cg.addColorStop(0.03, '#EDE3CF'); cg.addColorStop(0.035, '#2B2B2B'); cg.addColorStop(0.06, '#C9A06A'); cg.addColorStop(0.7, '#8A5A2B'); cg.addColorStop(1, '#2A1A10');
+      cx.strokeStyle = cg; cx.lineWidth = 0.018 * scale; cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(ex, ey); cx.stroke();
+    }
+  }
+  function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+  function dia(x, y) { var s = 0.012 * scale; cx.beginPath(); cx.moveTo(x, y - s); cx.lineTo(x + s, y); cx.lineTo(x, y + s); cx.lineTo(x - s, y); cx.closePath(); cx.fill(); }
+  function shade(c) { return c === '#FFFFFF' ? '#B9B9B9' : c === '#F6C915' ? '#A9820A' : '#7E0A18'; }
+  // 첫 충돌까지 선 + 맞을 자리(유령 공) + 맞은 공이 갈 방향
+  function guide() {
+    var cb = balls[cur().ball], dx = aim.x, dy = aim.y, best = 9, hitB = null;
+    balls.forEach(function (b) {
+      if (b === cb) return;
+      var fx = b.x - cb.x, fy = b.y - cb.y, t = fx * dx + fy * dy; if (t <= 0) return;
+      var d2 = fx * fx + fy * fy - t * t, rr2 = 4 * R * R; if (d2 > rr2) return;
+      var tt = t - Math.sqrt(rr2 - d2); if (tt < best) { best = tt; hitB = b; }
+    });
+    var tw = dx > 0 ? (W - R - cb.x) / dx : dx < 0 ? (R - cb.x) / dx : 9, th2 = dy > 0 ? (H - R - cb.y) / dy : dy < 0 ? (R - cb.y) / dy : 9;
+    var tc = Math.min(tw, th2);
+    var t = Math.min(best, tc), gx = cb.x + dx * t, gy = cb.y + dy * t;
+    cx.setLineDash([5, 5]); cx.strokeStyle = 'rgba(255,255,255,.75)'; cx.lineWidth = 1.5;
+    cx.beginPath(); cx.moveTo(X(cb.x), Y(cb.y)); cx.lineTo(X(gx), Y(gy)); cx.stroke();
+    cx.setLineDash([]);
+    cx.strokeStyle = 'rgba(255,255,255,.8)'; cx.beginPath(); cx.arc(X(gx), Y(gy), R * scale, 0, 6.283); cx.stroke();
+    if (hitB && best <= tc) {
+      var nx = hitB.x - gx, ny = hitB.y - gy, nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;
+      cx.strokeStyle = 'rgba(255,230,120,.85)'; cx.lineWidth = 2;
+      cx.beginPath(); cx.moveTo(X(hitB.x), Y(hitB.y)); cx.lineTo(X(hitB.x + nx * 0.35), Y(hitB.y + ny * 0.35)); cx.stroke();
+      var dot = dx * nx + dy * ny, tx = dx - dot * nx, ty = dy - dot * ny, tl = Math.hypot(tx, ty);
+      if (tl > 0.05) { cx.strokeStyle = 'rgba(255,255,255,.45)'; cx.beginPath(); cx.moveTo(X(gx), Y(gy)); cx.lineTo(X(gx + tx / tl * 0.3), Y(gy + ty / tl * 0.3)); cx.stroke(); }
+    }
+  }
+
+  // ====================== 게임 진행 ======================
+  var players = [], turn = 0, state = 'setup', stake = '🙂 그냥 놀자', inning = 1;
+  var STAKES = ['🙂 그냥 놀자', '☕ 커피', '🍚 밥', '🍻 한잔', '🎱 게임비'];
+  var BCOL = ['#FFFFFF', '#F6C915'];
+  function cur() { return players[turn]; }
+  var saved = {}; try { saved = JSON.parse(localStorage.getItem('sava-pool-v1') || '{}'); } catch (e) {}
+  var setupList = saved.players && saved.players.length >= 2 ? saved.players : [{ n: '', g: 10 }, { n: '', g: 10 }];
+  if (saved.stake) stake = saved.stake;
+  try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (me.from && !setupList[0].n) setupList[0].n = me.from.slice(0, 8); } catch (e) {}
+  function paintSetup() {
+    var box = $('players'); box.innerHTML = '';
+    setupList.forEach(function (p, i) {
+      var row = document.createElement('div'); row.className = 'prow';
+      row.innerHTML = '<span class="ball" style="background:' + BCOL[i % 2] + '"></span><input maxlength="8" placeholder="' + (i + 1) + '번 선수 이름"><span class="tg"><button type="button">−</button><b>' + p.g + '</b><button type="button">+</button></span>' + (setupList.length > 2 ? '<button type="button" class="x" aria-label="빼기">×</button>' : '');
+      var inp = row.querySelector('input'); inp.value = p.n; inp.addEventListener('input', function () { p.n = inp.value.trim(); });
+      var bs = row.querySelectorAll('.tg button');
+      bs[0].addEventListener('click', function () { p.g = Math.max(1, p.g - 1); paintSetup(); });
+      bs[1].addEventListener('click', function () { p.g = Math.min(50, p.g + 1); paintSetup(); });
+      var x = row.querySelector('.x'); if (x) x.addEventListener('click', function () { setupList.splice(i, 1); paintSetup(); });
+      box.appendChild(row);
+    });
+    $('addP').hidden = setupList.length >= 4;
+    var sb = $('stakes'); sb.innerHTML = '';
+    STAKES.forEach(function (s) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s; b.setAttribute('aria-pressed', s === stake ? 'true' : 'false'); b.addEventListener('click', function () { stake = s; paintSetup(); }); sb.appendChild(b); });
+  }
+  $('addP').addEventListener('click', function () { if (setupList.length < 4) { setupList.push({ n: '', g: 10 }); paintSetup(); } });
+  paintSetup();
+
+  $('start').addEventListener('click', function () {
+    ac();
+    players = setupList.map(function (p, i) { return { n: p.n || (i + 1) + '번', g: p.g, s: 0, ball: i % 2, hi: 0, run: 0 }; });
+    try { localStorage.setItem('sava-pool-v1', JSON.stringify({ players: setupList, stake: stake })); } catch (e) {}
+    turn = 0; inning = 1; reset();
+    $('setup').hidden = true; $('game').hidden = false; $('quit').hidden = false; $('over').hidden = true;
+    state = 'aim'; aimAt(balls[2]); fit(); paintBoard(); say(cur().n + ' 차례예요 · 빨간 공을 겨눠 보세요');
+    scrollTo({ top: 0 });
+  });
+  $('quit').addEventListener('click', function () { state = 'setup'; $('game').hidden = true; $('setup').hidden = false; $('quit').hidden = true; });
+  function aimAt(b) { var cb = balls[cur().ball], dx = b.x - cb.x, dy = b.y - cb.y, l = Math.hypot(dx, dy) || 1; aim = { x: dx / l, y: dy / l }; }
+  function paintBoard() {
+    var bd = $('board'); bd.innerHTML = '';
+    players.forEach(function (p, i) {
+      var d = document.createElement('div'); d.className = 'pl' + (i === turn && state !== 'over' ? ' on' : '');
+      d.innerHTML = '<div class="n"><i style="background:' + BCOL[p.ball] + '"></i></div><div class="s">' + p.s + '<small> / ' + p.g + '</small></div>';
+      d.querySelector('.n').appendChild(document.createTextNode(p.n));
+      bd.appendChild(d);
+    });
+  }
+  function say(t) { $('status').textContent = t; }
+  function popMsg(t) { var d = document.createElement('div'); d.className = 'pop'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1400); }
+
+  // 겨누기: 당구대를 누르거나 끌면 그쪽으로
+  function tablePt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / scale - RAIL, y: (e.clientY - r.top) / scale - RAIL }; }
+  var aiming = false;
+  function aimTo(e) { var p = tablePt(e), cb = balls[cur().ball], dx = p.x - cb.x, dy = p.y - cb.y, l = Math.hypot(dx, dy); if (l < R * 1.5) return; aim = { x: dx / l, y: dy / l }; draw(); }
+  cv.addEventListener('pointerdown', function (e) { if (state !== 'aim') return; aiming = true; cv.setPointerCapture(e.pointerId); aimTo(e); });
+  cv.addEventListener('pointermove', function (e) { if (aiming && state === 'aim') aimTo(e); });
+  cv.addEventListener('pointerup', function () { aiming = false; });
+  function rot(deg) { var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); aim = { x: aim.x * c - aim.y * s, y: aim.x * s + aim.y * c }; draw(); }
+  function hold(btn, deg) {
+    var t = 0, iv = 0;
+    btn.addEventListener('pointerdown', function (e) { e.preventDefault(); if (state !== 'aim') return; rot(deg); t = setTimeout(function () { iv = setInterval(function () { rot(deg * 2); }, 50); }, 350); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (k) { btn.addEventListener(k, function () { clearTimeout(t); clearInterval(iv); }); });
+  }
+  hold($('left'), -0.25); hold($('right'), 0.25);
+
+  // 당점
+  function spinSet(e) {
+    var r = $('spin').getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1;
+    var l = Math.hypot(x, y); if (l > 0.82) { x *= 0.82 / l; y *= 0.82 / l; }
+    if (Math.hypot(x, y) < 0.08) { x = 0; y = 0; }
+    spinX = x / 0.82; spinY = -y / 0.82; paintSpin();
+  }
+  function paintSpin() {
+    $('dot').style.left = (50 + spinX * 41) + '%'; $('dot').style.top = (50 - spinY * 41) + '%';
+    var t = [];
+    if (spinY > 0.25) t.push('위 · 밀어치기'); else if (spinY < -0.25) t.push('아래 · 끌어치기');
+    if (spinX > 0.25) t.push('오른쪽 회전'); else if (spinX < -0.25) t.push('왼쪽 회전');
+        $('spinTxt').textContent = t.length ? t.join(' + ') + ' (' + Math.max(1, Math.round(Math.hypot(spinX, spinY) * 5)) + '팁)' : '가운데';
+  }
+  var spinning = false;
+  $('spin').addEventListener('pointerdown', function (e) { spinning = true; $('spin').setPointerCapture(e.pointerId); spinSet(e); });
+  $('spin').addEventListener('pointermove', function (e) { if (spinning) spinSet(e); });
+  $('spin').addEventListener('pointerup', function () { spinning = false; });
+  $('spin').addEventListener('dblclick', function () { spinX = spinY = 0; paintSpin(); });
+  $('pow').addEventListener('input', function () { $('powTxt').textContent = $('pow').value; draw(); });
+
+  // 치기
+  var raf = 0, lastT = 0;
+  $('shot').addEventListener('click', function () {
+    if (state !== 'aim') return;
+    ac();
+    var cb = balls[cur().ball];
+    ev = { cue: cb.id, list: [] };
+    strike(cb, aim, +$('pow').value, spinX, spinY); cueHit(+$('pow').value);
+    state = 'move'; $('shot').disabled = true; say('…');
+    lastT = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  });
+  function loop(now) {
+    var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+    var n = Math.ceil(dt / 0.001); for (var i = 0; i < n; i++) step(dt / n);
+    draw();
+    if (moving()) raf = requestAnimationFrame(loop); else settle();
+  }
+  function settle() {
+    balls.forEach(function (b) { b.vx = b.vy = b.wx = b.wy = b.wz = 0; });
+    var r = score(ev), p = cur(); ev = null;
+    if (r.ok) {
+      p.s++; p.run++; p.hi = Math.max(p.hi, p.run); ding();
+      popMsg(p.run >= 3 ? '🔥 ' + p.run + '연속 득점!' : '🎯 쓰리쿠션!');
+      if (p.s >= p.g) return finish(p);
+      say(p.n + ' 득점! 계속 치세요 (' + p.s + '/' + p.g + ')');
+    } else {
+      var why = r.hits === 0 ? '공을 하나도 못 맞혔어요' : r.hits === 1 ? '한 공만 맞혔어요' : '쿠션이 ' + r.cush + '번이라 아쉽게 실패';
+      p.run = 0; turn = (turn + 1) % players.length; if (turn === 0) inning++;
+      say(why + ' · 다음은 ' + cur().n + ' (' + inning + '이닝)');
+    }
+    spinX = spinY = 0; paintSpin();
+    state = 'aim'; $('shot').disabled = false;
+    var others = balls.filter(function (b) { return b.id !== cur().ball; });
+    aimAt(others[0].id === 2 ? others[0] : others[1]);
+    paintBoard(); draw();
+  }
+  var result = null;
+  function finish(w) {
+    state = 'over'; $('shot').disabled = true; fanfare(); paintBoard(); draw();
+    var rank = players.slice().sort(function (a, b) { return (b.s / b.g) - (a.s / a.g); });
+    var last = rank[rank.length - 1], fun = /^🙂/.test(stake);
+    result = { w: w, last: last, rank: rank };
+    var o = $('over'); o.hidden = false; o.innerHTML = '';
+    o.innerHTML = '<div class="e">🏆</div><h2></h2><ol></ol><div class="shoot"></div><button type="button" class="big k" id="tell">💬 결과 단톡방에 알리기</button><button type="button" class="big" id="again">🔁 한 판 더</button>';
+    o.querySelector('h2').textContent = w.n + ' 승리! (' + inning + '이닝)';
+    var ol = o.querySelector('ol');
+    rank.forEach(function (p, i) { var li = document.createElement('li'); li.innerHTML = '<span></span><span>' + p.s + ' / ' + p.g + ' · 하이런 ' + p.hi + '</span>'; li.firstChild.textContent = (i + 1) + '. ' + p.n; ol.appendChild(li); });
+    o.querySelector('.shoot').textContent = fun ? '수고했어요! 🎱' : stake.split(' ')[0] + ' ' + last.n + (iga(last.n)) + ' 쏜다!';
+    o.querySelector('#tell').addEventListener('click', tell);
+    o.querySelector('#again').addEventListener('click', function () { $('start').click(); });
+    setTimeout(function () { o.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200);
+  }
+  function iga(w) { var c = w.charCodeAt(w.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 ? '이' : '가'; }
+  function tell() {
+    if (!result) return;
+    var fun = /^🙂/.test(stake), w = result.w, l = result.last;
+    var title = '🎱 쓰리쿠션 ' + w.n + ' 승리! ' + result.rank.map(function (p) { return p.n + ' ' + p.s; }).join(' · ');
+    var desc = fun ? inning + '이닝 · 하이런 ' + w.hi + ' · 다음엔 너도 붙자!' : stake.split(' ')[0] + ' ' + l.n + iga(l.n) + ' 쏜다! (' + inning + '이닝)';
+    if (window.SsakaShare) SsakaShare({ url: 'https://sava.kr/pool/', title: title, description: desc, imageUrl: 'https://sava.kr/img/pool-share.png?v=1', imageWidth: 800, imageHeight: 800, buttonTitle: '나도 당구 치기', installTitle: '싸바 설치하기' });
+  }
+
+  addEventListener('resize', function () { if (state !== 'setup') fit(); });
+  if (window.SsakaInstall) SsakaInstall.chip($('chipBox'), '싸바 홈 화면에 추가');
+  paintSpin();
+  // 테스트용 연결 (화면에는 영향 없음)
+  window.__pool = { balls: function () { return balls; }, strike: strike, step: step, score: score, R: R, W: W, H: H, setAim: function (x, y) { var l = Math.hypot(x, y); aim = { x: x / l, y: y / l }; draw(); }, setSpin: function (x, y) { spinX = x; spinY = y; paintSpin(); }, state: function () { return state; }, players: function () { return players; } };
+})();
+</script>
+</body>
+</html>

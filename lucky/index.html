@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>럭키 7.777 — 싸바</title>
+  <meta name="description" content="정확히 7.777초에 누르면 잭팟 100억 체리! 1000분의 1초 승부. 너도 해 봐.">
+  <meta name="theme-color" content="#0E0E10">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/lucky/">
+  <meta property="og:title" content="🍒 럭키 7.777 — 잭팟 100억 체리">
+  <meta property="og:description" content="정확히 7.777초에 누르면 잭팟! 1000분의 1초 승부. 너도 해 봐.">
+  <meta property="og:image" content="https://sava.kr/img/lucky-share.png?v=1">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --red: #E0193A; --gold: #FFD24A; --bg: #0E0E10; --card: #18181C; --line: #2A2A30; --dim: #8A8A93; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; overscroll-behavior: none; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; letter-spacing: -0.02em; }
+    .top a img { width: 26px; height: 26px; }
+    .top .bank { font-size: 13px; color: var(--gold); font-weight: 800; text-align: right; line-height: 1.25; }
+    .top .bank small { display: block; color: var(--dim); font-weight: 600; font-size: 10.5px; }
+
+    .title { text-align: center; margin: 14px 0 6px; }
+    .title .k { font-size: 12px; letter-spacing: .3em; color: var(--dim); font-weight: 800; }
+    .title h1 { margin: 6px 0 0; font-size: 40px; line-height: 1; font-weight: 900; letter-spacing: -0.04em; }
+    .title h1 em { font-style: normal; color: var(--red); }
+    .title p { margin: 10px 0 0; font-size: 14.5px; color: #cfcfd6; word-break: keep-all; }
+
+    .chal { margin: 14px 0 0; padding: 12px 14px; border-radius: 16px; background: linear-gradient(135deg, #3a0a14, #1f0a10); box-shadow: inset 0 0 0 1px #5a1424; font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
+    .chal b { color: var(--gold); }
+
+    .tabs, .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .tabs button, .modes button { min-height: 50px; border: 0; border-radius: 14px; background: var(--card); color: #cfcfd6; font: inherit; font-size: 15px; font-weight: 800; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; line-height: 1.2; }
+    .tabs button small, .modes button small { display: block; font-size: 11.5px; font-weight: 600; color: var(--dim); margin-top: 2px; }
+    .tabs button[aria-pressed="true"] { background: #2a0d14; color: #fff; box-shadow: inset 0 0 0 2px var(--red); }
+    .modes button[aria-pressed="true"] { background: #2a2410; color: #fff; box-shadow: inset 0 0 0 2px var(--gold); }
+    .modes { margin-top: 8px; }
+
+    .stage { position: relative; margin-top: 16px; border-radius: 28px; background: radial-gradient(120% 90% at 50% 0%, #26262c 0%, #121215 70%); box-shadow: inset 0 0 0 1px var(--line); padding: 22px 16px 18px; text-align: center; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    .target { font-size: 13px; color: var(--dim); font-weight: 800; letter-spacing: .08em; }
+    .target b { color: var(--gold); font-size: 15px; letter-spacing: 0; }
+    .clock { margin: 10px 0 6px; font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; font-size: 76px; line-height: 1; font-weight: 900; letter-spacing: -0.03em; }
+    .clock .ms { color: var(--red); }
+    .clock.hide { color: #2b2b31; }
+    .clock.hide .ms { color: #2b2b31; }
+    .hint { min-height: 22px; font-size: 14px; color: #cfcfd6; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 96px; margin-top: 14px; border: 0; border-radius: 24px; background: var(--red); color: #fff; font: inherit; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; cursor: pointer; box-shadow: 0 16px 34px -16px rgba(224,25,58,.9), inset 0 -4px 0 rgba(0,0,0,.2); }
+    .go.run { background: #fff; color: #0E0E10; box-shadow: 0 16px 34px -16px rgba(255,255,255,.6), inset 0 -4px 0 rgba(0,0,0,.12); }
+    .go:active { transform: translateY(2px); }
+
+    .result { display: none; margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
+    .result.show { display: block; animation: pop .35s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .badge { font-size: 46px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 30px; font-weight: 900; letter-spacing: -0.03em; }
+    .result.jack h2 { color: var(--gold); text-shadow: 0 0 24px rgba(255,210,74,.6); }
+    .result .num { font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 800; color: #cfcfd6; }
+    .result .num b { color: #fff; }
+    .result .win { margin: 10px auto 0; display: inline-block; padding: 8px 14px; border-radius: 999px; background: #2a2410; color: var(--gold); font-weight: 900; font-size: 18px; font-variant-numeric: tabular-nums; }
+    .result .best { margin-top: 8px; font-size: 13px; color: var(--dim); }
+    .acts { display: grid; gap: 8px; margin-top: 16px; }
+    .acts button { min-height: 58px; border: 0; border-radius: 16px; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .acts .kakao { background: #FEE500; color: #3a1d1d; }
+    .acts .again { background: #2A2A30; color: #fff; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--dim); }
+    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #0E0E10; color: #fff; font: inherit; font-size: 15px; box-shadow: inset 0 0 0 1px var(--line); }
+
+    .table { margin-top: 18px; padding: 14px 14px 10px; border-radius: 20px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+    .table h3 { margin: 0 0 8px; font-size: 14px; color: var(--dim); letter-spacing: .06em; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+    .row:first-of-type { border-top: 0; }
+    .row span:last-child { color: var(--gold); font-weight: 800; }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: #6b6b73; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #cfcfd6; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
+    #fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+    .flash { position: fixed; inset: 0; pointer-events: none; z-index: 49; background: radial-gradient(circle at 50% 40%, rgba(255,210,74,.55), rgba(255,210,74,0) 60%); opacity: 0; }
+    .flash.on { animation: flash 1.6s ease-out; }
+    @keyframes flash { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+    .shake { animation: shake .5s; }
+    @keyframes shake { 0%,100% { transform: none; } 20% { transform: translate(-6px, 2px); } 40% { transform: translate(6px, -2px); } 60% { transform: translate(-4px, 1px); } 80% { transform: translate(4px, 0); } }
+    @media (prefers-reduced-motion: reduce) { .result.show, .flash.on, .shake { animation: none; } }
+  </style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="flash" id="flash"></div>
+<div class="wrap" id="wrap">
+  <div class="top">
+    <a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a>
+    <div class="bank" id="bank"><small>내 체리 (재미용)</small>0</div>
+  </div>
+
+  <div class="title">
+    <div class="k">1/1000초 승부</div>
+    <h1>럭키 <em id="tgtBig">7.777</em></h1>
+    <p>정확히 맞추면 <b style="color:var(--gold)">잭팟 100억 체리</b>가 쏟아져요</p>
+  </div>
+
+  <div class="chal" id="chal" hidden></div>
+
+  <div class="tabs" role="group" aria-label="목표 숫자">
+    <button type="button" data-tab="777" aria-pressed="true">🍒 럭키 7.777<small>언제나 이 숫자</small></button>
+    <button type="button" data-tab="day" aria-pressed="false" id="dayBtn">📅 오늘의 숫자<small id="dayNum">-</small></button>
+  </div>
+  <div class="modes" role="group" aria-label="난이도">
+    <button type="button" data-mode="see" aria-pressed="true">👀 보통<small>숫자가 계속 보여요</small></button>
+    <button type="button" data-mode="blind" aria-pressed="false">🙈 눈 감고<small>3초 뒤 숫자가 사라져요</small></button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="target">목표 <b id="tgt">7.777</b> 초</div>
+    <div class="clock" id="clock">0.<span class="ms">000</span></div>
+    <div class="hint" id="hint">시작을 누르고, 목표 숫자에 멈춰!</div>
+    <button type="button" class="go" id="go">시작</button>
+  </div>
+
+  <div class="result" id="result" aria-live="polite">
+    <div class="badge" id="rBadge">🎉</div>
+    <h2 id="rTitle">대박!</h2>
+    <div class="num" id="rNum"></div>
+    <div class="win" id="rWin"></div>
+    <div class="best" id="rBest"></div>
+    <div class="acts">
+      <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+      <button type="button" class="again" id="again">🔁 한 번 더</button>
+    </div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+  </div>
+
+  <div class="table">
+    <h3>상금표</h3>
+    <div class="row"><span>💰 정확히 0.000초 차이</span><span>잭팟 100억</span></div>
+    <div class="row"><span>🎉 0.010초 안</span><span>1억</span></div>
+    <div class="row"><span>👏 0.050초 안</span><span>100만</span></div>
+    <div class="row"><span>🙂 0.200초 안</span><span>1만</span></div>
+    <div class="row"><span>🙈 눈 감고 잭팟</span><span>전설의 잭팟 1000억</span></div>
+  </div>
+
+  <div class="more">
+    <a href="../app/">🍒 싸바 홈</a>
+    <a href="../?story=1">🍒 싸바가 뭐지?</a>
+  </div>
+  <div id="chipBox"></div>
+  <p class="foot">체리는 재미로 쌓는 점수예요. 돈이나 상품으로 바꿀 수 없어요.<br>폰마다 터치 반응 속도가 조금씩 달라요. 친구끼리 즐겨 주세요.<br><a href="../privacy/">개인정보처리방침</a> · <a href="../terms/">이용약관</a></p>
+</div>
+
+<script src="../js/install.js"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'sava-lucky-v1';
+  var st = { bank: 0, plays: 0, best: {} };
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv) st = Object.assign(st, sv); } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (me.from) $('me').value = me.from; } catch (e) {}
+  $('me').addEventListener('change', function () {
+    try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = $('me').value.trim(); localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e) {}
+  });
+
+  // ---------- 오늘의 숫자 (한국 날짜 기준, 전국 같은 숫자 · 일요일은 7.777) ----------
+  var POOL = [3141, 5555, 8282, 1004, 2580, 9999, 3333, 5252, 7070, 1234, 8888, 2026, 6060, 4321, 1111, 2222, 9090, 5678, 3690, 1357];
+  function kstDay() { var d = new Date(Date.now() + 9 * 3600000); return { n: Math.floor(d.getTime() / 86400000), w: d.getUTCDay(), m: d.getUTCMonth() + 1, d: d.getUTCDate() }; }
+  var K = kstDay();
+  var DAY = K.w === 0 ? 7777 : POOL[((K.n * 7) % POOL.length + POOL.length) % POOL.length];
+  function fmt(ms) { return (ms / 1000).toFixed(3); }
+  $('dayNum').textContent = K.m + '월 ' + K.d + '일 · ' + fmt(DAY) + '초';
+
+  var tab = '777', mode = 'see';
+  function target() { return tab === '777' ? 7777 : DAY; }
+  function bestKey() { return (tab === '777' ? '777' : 'd' + K.n) + '-' + mode; }
+  function paintTarget() { $('tgt').textContent = fmt(target()); $('tgtBig').textContent = fmt(target()); }
+
+  // ---------- 도전장으로 들어온 경우 ----------
+  var q = new URLSearchParams(location.search);
+  var chal = null;
+  if (q.get('r')) {
+    chal = { r: +q.get('r'), t: +(q.get('t') || 7777), m: q.get('m') === 'blind' ? 'blind' : 'see', n: (q.get('n') || '').slice(0, 10) };
+    if (chal.t !== 7777) { if (chal.t === DAY) tab = 'day'; else chal.t = 7777; }
+    mode = chal.m;
+    var diff = Math.abs(chal.r - chal.t);
+    var c = $('chal'); c.hidden = false;
+    c.innerHTML = '';
+    var b1 = document.createElement('b'); b1.textContent = (chal.n || '친구') + '님';
+    c.appendChild(b1);
+    c.appendChild(document.createTextNode('의 도전장 🍒 ' + (chal.m === 'blind' ? '눈 감고 ' : '') + fmt(chal.t) + '초 목표에 ' + fmt(chal.r) + '초 (' + (diff === 0 ? '잭팟!' : fmt(diff) + '초 차이') + '). 이 기록 깰 수 있어요?'));
+  }
+
+  function press(group, attr, val) { document.querySelectorAll(group + ' button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset[attr] === val ? 'true' : 'false'); }); }
+  function syncButtons() { press('.tabs', 'tab', tab); press('.modes', 'mode', mode); paintTarget(); }
+  document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { if (running) return; tab = b.dataset.tab; syncButtons(); reset(); }); });
+  document.querySelectorAll('.modes button').forEach(function (b) { b.addEventListener('click', function () { if (running) return; mode = b.dataset.mode; syncButtons(); reset(); }); });
+  syncButtons();
+
+  function bank() { $('bank').innerHTML = '<small>내 체리 (재미용)</small>' + won(st.bank); }
+  function won(n) {
+    if (n >= 1e12) return (n / 1e12).toFixed(n % 1e12 ? 1 : 0) + '조';
+    if (n >= 1e8) return Math.floor(n / 1e8).toLocaleString() + '억' + (n % 1e8 >= 1e4 ? ' ' + Math.floor((n % 1e8) / 1e4).toLocaleString() + '만' : '');
+    if (n >= 1e4) return Math.floor(n / 1e4).toLocaleString() + '만';
+    return n.toLocaleString();
+  }
+  bank();
+
+  // ---------- 소리 (직접 합성 · 저작권 걱정 없음) ----------
+  var AC = null;
+  function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+  function tone(f, t0, dur, type, vol, slideTo) {
+    var a = ac(); if (!a) return;
+    var o = a.createOscillator(), g = a.createGain(), lp = a.createBiquadFilter();
+    o.type = type || 'sawtooth'; o.frequency.setValueAtTime(f, a.currentTime + t0);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, a.currentTime + t0 + dur);
+    lp.type = 'lowpass'; lp.frequency.value = 2600;
+    g.gain.setValueAtTime(0.0001, a.currentTime + t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.18, a.currentTime + t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + t0 + dur);
+    o.connect(lp); lp.connect(g); g.connect(a.destination); o.start(a.currentTime + t0); o.stop(a.currentTime + t0 + dur + 0.05);
+  }
+  function noise(t0, dur, vol, hp) {
+    var a = ac(); if (!a) return;
+    var len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    var s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+    f.type = 'highpass'; f.frequency.value = hp || 1200; g.gain.value = vol || 0.3;
+    s.buffer = buf; s.connect(f); f.connect(g); g.connect(a.destination); s.start(a.currentTime + t0);
+  }
+  var SND = {
+    tick: function () { tone(1400, 0, 0.05, 'square', 0.06); },
+    stop: function () { tone(880, 0, 0.08, 'square', 0.08); },
+    fanfare: function () { // 빰빠바밤~ 빠바밤!
+      var N = [523, 523, 523, 659, 784, 659, 784, 1047];
+      var T = [0, .12, .24, .36, .62, .86, .98, 1.12];
+      N.forEach(function (f, i) { tone(f, T[i], i === 7 ? 1.3 : .2, 'sawtooth', .16); tone(f / 2, T[i], i === 7 ? 1.3 : .2, 'square', .06); });
+      [1047, 1319, 1568].forEach(function (f) { tone(f, 1.12, 1.3, 'triangle', .1); });
+      for (var i = 0; i < 26; i++) tone(1800 + Math.random() * 1800, 1.2 + i * 0.07, .12, 'triangle', .07); // 금화 짤랑짤랑
+      noise(1.12, 1.4, .18, 3000);
+    },
+    big: function () { [659, 784, 1047, 1319].forEach(function (f, i) { tone(f, i * .1, .35, 'sawtooth', .14); }); for (var i = 0; i < 8; i++) tone(2000 + Math.random() * 1500, .4 + i * .06, .1, 'triangle', .07); },
+    clap: function () { for (var i = 0; i < 9; i++) noise(i * 0.09 + Math.random() * 0.03, 0.08, 0.35, 1500); },
+    ok: function () { tone(660, 0, .12, 'triangle', .14); tone(880, .12, .2, 'triangle', .14); },
+    wah: function () { tone(392, 0, .3, 'sawtooth', .13, 370); tone(370, .32, .3, 'sawtooth', .13, 349); tone(349, .64, .7, 'sawtooth', .13, 260); } // 뿌뿌뿌~
+  };
+
+  // ---------- 체리 비 ----------
+  var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = 0;
+  var cherry = new Image(); cherry.src = '../img/cherry.svg';
+  function fit() { var r = window.devicePixelRatio || 1; cv.width = innerWidth * r; cv.height = innerHeight * r; cx.setTransform(r, 0, 0, r, 0, 0); }
+  fit(); addEventListener('resize', fit);
+  function rain(n, gold) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    for (var i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -40 - Math.random() * innerHeight * .8, vy: 2 + Math.random() * 4, vx: (Math.random() - .5) * 2, r: Math.random() * 6.28, vr: (Math.random() - .5) * .2, s: 22 + Math.random() * 22, coin: gold && Math.random() < .45 });
+    if (!raf) loop();
+  }
+  function loop() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(function (p) { return p.y < innerHeight + 60; });
+    parts.forEach(function (p) {
+      p.y += p.vy; p.x += p.vx; p.vy += .06; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r);
+      if (p.coin) { cx.fillStyle = '#FFD24A'; cx.beginPath(); cx.ellipse(0, 0, p.s * .42, p.s * .42 * Math.abs(Math.cos(p.r * 2)) + 2, 0, 0, 6.28); cx.fill(); cx.strokeStyle = '#B8860B'; cx.lineWidth = 2; cx.stroke(); }
+      else if (cherry.complete) cx.drawImage(cherry, -p.s / 2, -p.s / 2, p.s, p.s);
+      cx.restore();
+    });
+    raf = parts.length ? requestAnimationFrame(loop) : 0;
+    if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  // ---------- 게임 ----------
+  var running = false, t0 = 0, frame = 0, lastSec = -1, armedAt = 0, last = null;
+  function show(ms) {
+    var s = Math.floor(ms / 1000), r = Math.floor(ms % 1000);
+    $('clock').innerHTML = s + '.<span class="ms">' + String(r).padStart(3, '0') + '</span>';
+  }
+  function tickLoop() {
+    var e = performance.now() - t0;
+    if (mode === 'blind' && e > 3000) { $('clock').classList.add('hide'); $('clock').innerHTML = '?.<span class="ms">???</span>'; $('hint').textContent = '🙈 속으로 세어 보세요…'; }
+    else show(e);
+    var sec = Math.floor(e / 1000); if (sec !== lastSec && sec > 0 && (mode !== 'blind' || e <= 3000)) SND.tick(); lastSec = sec;
+    if (e > 30000) { stopAt(performance.now()); return; }
+    frame = requestAnimationFrame(tickLoop);
+  }
+  function reset() {
+    running = false; cancelAnimationFrame(frame);
+    $('clock').classList.remove('hide'); show(0);
+    $('go').textContent = '시작'; $('go').classList.remove('run');
+    $('hint').textContent = mode === 'blind' ? '3초 뒤엔 숫자가 사라져요. 몸속 시계를 믿으세요!' : '시작을 누르고, 목표 숫자에 멈춰!';
+  }
+  function start() {
+    ac();
+    $('result').classList.remove('show', 'jack');
+    running = true; lastSec = 0; t0 = performance.now(); armedAt = t0 + 400;
+    $('go').textContent = '멈춰!'; $('go').classList.add('run');
+    $('hint').textContent = '목표 ' + fmt(target()) + '초에 누르세요';
+    frame = requestAnimationFrame(tickLoop);
+  }
+  function stopAt(ts) {
+    running = false; cancelAnimationFrame(frame);
+    var ms = Math.max(0, Math.round(ts - t0));
+    $('clock').classList.remove('hide'); show(ms); SND.stop();
+    $('go').textContent = '다시 시작'; $('go').classList.remove('run');
+    judge(ms);
+  }
+  // 손가락이 닿은 그 순간의 시각(event.timeStamp)으로 잼 — 화면 그리는 시간과 무관
+  $('go').addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    var ts = (e.timeStamp && e.timeStamp > 1e3 && e.timeStamp < performance.now() + 50) ? e.timeStamp : performance.now();
+    if (running) { if (ts < armedAt) return; stopAt(ts); }
+    else start();
+  });
+  $('go').addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); var ts = performance.now(); if (running) { if (ts >= armedAt) stopAt(ts); } else start(); } });
+
+  function judge(ms) {
+    var tgt = target(), d = Math.abs(ms - tgt), blind = mode === 'blind';
+    var tier;
+    if (d === 0) tier = blind ? { b: '👑', t: '전설의 잭팟!!', w: 1e11, s: 'fanfare', n: 400 } : { b: '💰', t: '잭팟!!!', w: 1e10, s: 'fanfare', n: 300 };
+    else if (d <= 10) tier = { b: '🎉', t: blind ? '눈 감고 대박!' : '대박!', w: blind ? 1e9 : 1e8, s: 'big', n: 90 };
+    else if (d <= 50) tier = { b: '👏', t: '아깝다!', w: blind ? 1e7 : 1e6, s: 'clap', n: 24 };
+    else if (d <= 200) tier = { b: '🙂', t: '괜찮네!', w: blind ? 1e5 : 1e4, s: 'ok', n: 6 };
+    else tier = { b: '😅', t: ms > tgt ? '몸속 시계 고장?' : '너무 급했어요!', w: 0, s: 'wah', n: 0 };
+    st.plays++; st.bank += tier.w;
+    var k = bestKey(), prev = st.best[k], newBest = prev == null || d < Math.abs(prev - tgt);
+    if (newBest) st.best[k] = ms;
+    save(); bank();
+    last = { ms: ms, d: d, t: tgt, m: mode, tier: tier };
+
+    var r = $('result');
+    $('rBadge').textContent = tier.b; $('rTitle').textContent = tier.t;
+    $('rNum').innerHTML = '<b>' + fmt(ms) + '초</b> · ' + (d === 0 ? '오차 0.000초!' : fmt(d) + '초 차이');
+    $('rWin').textContent = tier.w ? '+' + won(tier.w) + ' 체리' : '체리 0개 · 다시 도전!';
+    var bk = st.best[k];
+    $('rBest').textContent = newBest && prev != null ? '🏆 내 최고 기록 경신!' : '내 최고 기록 ' + fmt(bk) + '초 (' + fmt(Math.abs(bk - tgt)) + '초 차이)';
+    if (chal && chal.t === tgt && chal.m === mode) {
+      var cd = Math.abs(chal.r - chal.t);
+      $('rBest').textContent += d < cd ? ' · ' + (chal.n || '친구') + '님 기록 격파! 😎' : d === cd ? ' · ' + (chal.n || '친구') + '님과 동점!' : ' · ' + (chal.n || '친구') + '님한테 아직 졌어요';
+    }
+    r.classList.toggle('jack', d <= 10);
+    r.classList.add('show');
+    SND[tier.s]();
+    if (tier.n) rain(tier.n, d === 0);
+    if (d === 0) { $('flash').classList.remove('on'); void $('flash').offsetWidth; $('flash').classList.add('on'); $('wrap').classList.add('shake'); setTimeout(function () { $('wrap').classList.remove('shake'); }, 600); if (navigator.vibrate) navigator.vibrate([80, 60, 80, 60, 300]); }
+    setTimeout(function () { r.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
+  }
+
+  $('again').addEventListener('click', function () { $('result').classList.remove('show'); reset(); $('stage').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+
+  $('send').addEventListener('click', function () {
+    if (!last) return;
+    var name = $('me').value.trim();
+    var u = new URL('https://sava.kr/lucky/');
+    u.searchParams.set('r', last.ms); if (last.t !== 7777) u.searchParams.set('t', last.t);
+    if (last.m === 'blind') u.searchParams.set('m', 'blind'); if (name) u.searchParams.set('n', name);
+    var who = name ? name + ': ' : '';
+    var title = last.d === 0 ? who + '💰 ' + (last.m === 'blind' ? '눈 감고 ' : '') + '잭팟 터졌다! ' + fmt(last.ms) + '초' : who + '🍒 ' + fmt(last.ms) + '초! ' + fmt(last.d) + '초 차이로 잭팟 놓침';
+    var desc = (last.m === 'blind' ? '[눈 감고] ' : '') + '목표 ' + fmt(last.t) + '초에 딱 맞추면 잭팟 100억 체리. 너는 몇 초?';
+    if (window.SsakaShare) SsakaShare({ url: u.href, title: title, description: desc, imageUrl: 'https://sava.kr/img/lucky-share.png?v=1', imageWidth: 800, imageHeight: 800, buttonTitle: '내가 잭팟 터뜨리기', installTitle: '싸바 설치하기' });
+  });
+
+  if (window.SsakaInstall) SsakaInstall.chip($('chipBox'), '싸바 홈 화면에 추가');
+  reset();
+})();
+</script>
+</body>
+</html>

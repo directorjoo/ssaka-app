@@ -476,7 +476,7 @@
   var DRAFT = 'eodiya-me-v1';
   try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; } catch (e) {}
   function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim() })); } catch (e) {} }
-  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = (f ? f + ': ' : '') + '어디야?'; $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
+  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = '어디야?'; $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
   $('from').addEventListener('input', askPreview); askPreview();
 
   document.querySelectorAll('.mode').forEach(function (b) {

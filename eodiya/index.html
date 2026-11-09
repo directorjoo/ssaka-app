@@ -359,7 +359,7 @@
       var title = o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       var url = o.url || BASE;
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
-      var wide = /eodiya-(ask|here)\.png/.test(o.img);
+      var wide = /eodiya-(ask|here|reply2)\.png/.test(o.img);
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: IMG_BASE + o.img, imageWidth: wide ? 1000 : 800, imageHeight: wide ? 600 : 800, url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide, installUrl: BASE + '?install=1' });
     }
@@ -442,7 +442,7 @@
       }
       if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
       document.querySelectorAll('.reply').forEach(function (b) {
-        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '어디야? 답장', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' }); });
+        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
       });
       playSound(card.sound || 'here');
     } else {
@@ -460,11 +460,11 @@
       $('hereSend').addEventListener('click', function () {
         var t = $('hereText').value.trim();
         if (!t) { toast('보낼 말을 적어주세요'); $('hereText').focus(); return; }
-        reply({ title: t, desc: '', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' });
+        reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' });
       });
       $('hereText').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('hereSend').click(); });
       document.querySelectorAll('#viewAsk .reply').forEach(function (b) {
-        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' }); });
+        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
       });
       playSound(card.sound || 'where');
     }

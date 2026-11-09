@@ -65,7 +65,7 @@
     var c = cardInfo(extra);
     // 카톡 말풍선은 가운데를 정사각형에 가깝게 잘라 보여줘서, 기본 공유 그림은 정사각형으로 바꿔 보냄
     if (/ssaka-share\.png/.test(c.imageUrl || '')) { c.imageUrl = c.imageUrl.replace(/ssaka-share\.png(\?[^#]*)?/, 'ssaka-square.png?v=1'); c.imageWidth = 800; c.imageHeight = 800; }
-    if (/eodiya-(ask|here)\.png/.test(c.imageUrl || '')) { c.imageWidth = 1000; c.imageHeight = 600; }
+    if (/eodiya-(ask|here|reply2)\.png/.test(c.imageUrl || '')) { c.imageWidth = 1000; c.imageHeight = 600; }
     loadKakao().then(function (Kakao) {
       var content = {
         title: c.title,

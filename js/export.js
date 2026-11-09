@@ -74,7 +74,8 @@
 
   function drawCover(card, col, img, w, h) {
     var c = canvas(w, h), ctx = c.getContext('2d');
-    var photoH = Math.round(h * (h > 1500 ? 0.56 : 0.6));
+    var sq = h <= 1100;
+    var photoH = Math.round(h * (h > 1500 ? 0.56 : sq ? 0.55 : 0.6));
     ctx.fillStyle = col.paper; ctx.fillRect(0, 0, w, h);
     if (img) cover(ctx, img, 0, 0, w, photoH);
     else {
@@ -91,8 +92,17 @@
       ctx.fillStyle = col.onAccent; ctx.textBaseline = 'middle'; ctx.fillText(SEASON[card.season], x + 22, y + 29);
       y += 84;
     }
-    y = text(ctx, card.title, x, y, 76, col.ink, 800, max, 2, 1.2) + 18;
-    if (card.subtitle) y = text(ctx, card.subtitle, x, y, 38, col.sub, 600, max, 2) + 10;
+    y = text(ctx, card.title, x, y, sq ? 68 : h > 1500 ? 92 : 76, col.ink, 800, max, sq ? 1 : 2, 1.2) + 18;
+    if (card.subtitle) y = text(ctx, card.subtitle, x, y, 38, col.sub, 600, max, sq ? 1 : 2) + 10;
+    if (!sq) {
+      var big = h > 1500, bs = big ? 44 : 36, room = h - 130;
+      y += big ? 30 : 16;
+      (card.body || []).slice(0, big ? 4 : 2).forEach(function (l) {
+        if (y + bs * 1.4 > room) return;
+        ctx.fillStyle = col.accent; ctx.beginPath(); ctx.arc(x + 9, y + bs * 0.55, 8, 0, Math.PI * 2); ctx.fill();
+        y = text(ctx, l, x + 36, y, bs, col.ink, 600, max - 36, 1) + 14;
+      });
+    }
     ctx.fillStyle = col.accent; ctx.fillRect(x, h - 86, 120, 10);
     brand(ctx, w, h, col.sub);
     return c;
@@ -161,10 +171,11 @@
       imgs = imgs.map(function (im) { return usable(im) ? im : null; });
       var main = card.image ? imgs[0] : null;
       var rest = imgs.filter(function (im, i) { return im && !(card.image && i === 0); }).slice(0, 7);
-      var list = [{ name: '01-표지', label: '표지', c: drawCover(card, col, main || rest[0] || null, 1080, 1350) }];
+      var list = [{ name: '01-표지', label: '표지 4:5 (인스타 피드)', c: drawCover(card, col, main || rest[0] || null, 1080, 1350) }];
       rest.forEach(function (im, i) { list.push({ name: '0' + (i + 2) + '-사진', label: '사진 ' + (i + 1), c: drawPhoto(card, col, im, i, rest.length) }); });
       list.push({ name: (list.length + 1 < 10 ? '0' : '') + (list.length + 1) + '-안내', label: '안내', c: drawInfo(card, col) });
-      list.push({ name: '스토리', label: '스토리 (세로)', c: drawCover(card, col, main || rest[0] || null, 1080, 1920) });
+      list.push({ name: '정사각', label: '정사각 1:1 (플레이스·당근·카톡)', c: drawCover(card, col, main || rest[0] || null, 1080, 1080) });
+      list.push({ name: '스토리', label: '스토리·릴스 9:16', c: drawCover(card, col, main || rest[0] || null, 1080, 1920) });
       var skipped = uniq.length - imgs.filter(Boolean).length;
       return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
         var out = list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, blob: blobs[i], w: x.c.width, h: x.c.height }; });

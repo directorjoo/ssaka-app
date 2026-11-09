@@ -123,7 +123,7 @@
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
   // ---------- 최신 버전 업데이트 ----------
-  var VER = '2026.11.09-24'; // 올릴 때마다 version.json 과 같이 올림
+  var VER = '2026.11.09-25'; // 올릴 때마다 version.json 과 같이 올림
   function hardUpdate() {
     var jobs = [];
     try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}

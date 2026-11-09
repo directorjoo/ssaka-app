@@ -4,8 +4,10 @@
  * 주소에 ?install=1 이 있으면 자동으로 안내 창이 열림
  */
 (function () {
+  // 예전 주소(ssaka-app.pages.dev)로 들어오면 정식 주소 sava.kr 로 옮김 (카톡 공유는 sava.kr 에서만 됨)
+  if (location.hostname === 'ssaka-app.pages.dev') { location.replace('https://sava.kr' + location.pathname + location.search + location.hash); return; }
   var SELF = (document.currentScript && document.currentScript.src) || '';
-  var ICON = SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png') : '/img/icon-192.png';
+  var ICON = SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png?v=2') : '/img/icon-192.png?v=2';
   var ua = navigator.userAgent;
   var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var inKakao = /KAKAOTALK/i.test(ua);
@@ -38,6 +40,8 @@
     '.si-chip img{width:40px;height:40px;border-radius:11px;flex:none}' +
     '.si-chip b{display:block;font-size:16px}' +
     '.si-chip span{font-size:13px;color:#777}' +
+    '.si-upd{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:95;display:grid;gap:2px;width:min(92vw,420px);padding:14px 18px;border:0;border-radius:18px;background:#B3132B;color:#fff;font:inherit;text-align:center;box-shadow:0 14px 30px rgba(0,0,0,.3);cursor:pointer}' +
+    '.si-upd b{font-size:17px}.si-upd span{font-size:13.5px;opacity:.9}' +
     '.si-chip em{margin-left:auto;font-style:normal;font-size:14px;font-weight:800;color:#B3132B;white-space:nowrap}';
   function addCss() {
     if (document.getElementById('si-css')) return;
@@ -118,7 +122,34 @@
   if ('serviceWorker' in navigator && location.protocol === 'https:' && SELF) {
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
-  window.SsakaInstall = { open: open, chip: chip, standalone: standalone };
+  // ---------- 최신 버전 업데이트 ----------
+  var VER = '2026.11.09-22'; // 올릴 때마다 version.json 과 같이 올림
+  function hardUpdate() {
+    var jobs = [];
+    try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
+    try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })); } catch (e) {}
+    Promise.all(jobs).catch(function () {}).then(function () {
+      var u = new URL(location.href); u.searchParams.set('v', Date.now().toString(36)); location.replace(u.href);
+    });
+  }
+  function banner(newV) {
+    if (document.getElementById('si-upd')) return;
+    addCss();
+    var b = el('button', 'si-upd', '<b>🍒 새 버전이 나왔어요</b><span>눌러서 바로 업데이트</span>');
+    b.id = 'si-upd'; b.type = 'button'; b.addEventListener('click', hardUpdate);
+    document.body.appendChild(b);
+  }
+  function checkUpdate() {
+    if (!SELF || location.protocol !== 'https:') return;
+    fetch(SELF.replace(/js\/install\.js.*$/, 'version.json') + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.v && j.v !== VER) banner(j.v); })
+      .catch(function () {});
+  }
+  // 홈 화면 앱은 며칠씩 켜져 있어서, 다시 열 때마다 확인
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) checkUpdate(); });
+  setTimeout(checkUpdate, 1500);
+  window.SsakaInstall = { open: open, chip: chip, standalone: standalone, update: hardUpdate, version: VER };
   if (/[?&]install=1/.test(location.search)) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', open); else open();
   }

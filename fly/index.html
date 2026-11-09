@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <title>눈 감고 파리 잡기 — 싸바</title>
   <meta name="description" content="웽~ 소리만 듣고 눈 감고 파리를 잡아라. 1000분의 1초 도사 수련.">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#B3132B">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sava.kr/fly/">
@@ -13,72 +13,74 @@
   <meta property="og:description" content="웽~ 소리가 뚝 그치는 순간 탁! 너는 입문이냐 신선이냐.">
   <meta property="og:image" content="https://sava.kr/img/fly-share.png?v=1">
   <link rel="manifest" href="../manifest.webmanifest">
-  <link rel="icon" href="../img/favicon.png">
-  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <meta name="apple-mobile-web-app-title" content="싸바">
   <style>
-    :root { --gold: #E9C46A; --dim: #8b8b8b; --line: #262626; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    :root { --gold: #B3132B; --acc: rgba(255,255,255,.78); --dim: rgba(255,255,255,.78); --line: rgba(255,255,255,.2); --ink: #1E1E1E; --card: #FFFFFF; --bg: #B3132B; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
     [hidden] { display: none !important; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; background: #0b0b0b; color: #eee; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg, #C2172F 0%, #B3132B 40%, #A0101F 100%); background-attachment: fixed; }
     .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
     .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
     .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; }
     .top a img { width: 26px; height: 26px; }
-    .top .grade { font-size: 13px; color: var(--gold); font-weight: 800; }
+    .top .grade { font-size: 13px; color: #fff; font-weight: 800; }
     .hero { text-align: center; margin-top: 18px; }
     .hero .fly { font-size: 64px; line-height: 1; display: inline-block; animation: buzz 1.4s ease-in-out infinite; }
     @keyframes buzz { 0%,100% { transform: translate(0,0) rotate(-8deg); } 25% { transform: translate(14px,-8px) rotate(10deg); } 50% { transform: translate(-6px,6px) rotate(-4deg); } 75% { transform: translate(-14px,-4px) rotate(8deg); } }
-    .hero .k { margin-top: 10px; font-size: 12px; letter-spacing: .3em; color: var(--gold); font-weight: 800; }
-    .hero h1 { margin: 6px 0 0; font-size: 36px; font-weight: 900; letter-spacing: -0.04em; }
-    .hero p { margin: 10px 0 0; font-size: 15px; color: #bbb; line-height: 1.55; word-break: keep-all; }
-    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: #1c1708; box-shadow: inset 0 0 0 1px #4a3c12; font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
-    .chal b { color: var(--gold); }
+    .hero .k { margin-top: 10px; font-size: 11px; letter-spacing: .32em; color: var(--dim); font-weight: 700; }
+    .hero h1 { margin: 6px 0 0; font-size: 34px; font-weight: 800; letter-spacing: -0.04em; }
+    .hero p { margin: 10px 0 0; font-size: 15px; color: var(--dim); line-height: 1.55; word-break: keep-all; }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.12); font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
+    .chal b { color: #fff; }
     .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
-    .modes button { min-height: 64px; border: 0; border-radius: 16px; background: #161616; color: #ccc; font: inherit; font-size: 15.5px; font-weight: 800; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; line-height: 1.25; }
+    .modes button { min-height: 64px; border: 0; border-radius: 16px; background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 15.5px; font-weight: 700; cursor: pointer; line-height: 1.25; }
     .modes button small { display: block; font-size: 11.5px; color: var(--dim); font-weight: 600; margin-top: 3px; }
-    .modes button[aria-pressed="true"] { background: #1f1a0c; color: #fff; box-shadow: inset 0 0 0 2px var(--gold); }
-    .how { margin-top: 14px; padding: 14px; border-radius: 16px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; line-height: 1.65; color: #ccc; word-break: keep-all; }
+    .modes button[aria-pressed="true"] { background: #fff; color: var(--gold); }
+    .modes button[aria-pressed="true"] small { color: #B97A84; }
+    .how { margin-top: 14px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.1); font-size: 14px; line-height: 1.65; color: var(--dim); word-break: keep-all; }
     .how b { color: #fff; }
-    .how .warn { margin-top: 8px; color: var(--gold); font-weight: 700; }
-    .go { display: grid; place-items: center; width: 100%; min-height: 72px; margin-top: 16px; border: 0; border-radius: 22px; background: var(--gold); color: #1a1405; font: inherit; font-size: 22px; font-weight: 900; cursor: pointer; }
-    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: #1b1b1b; color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .how .warn { margin-top: 8px; color: #fff; font-weight: 700; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 72px; margin-top: 16px; border: 0; border-radius: 20px; background: #fff; color: var(--gold); font: inherit; font-size: 21px; font-weight: 800; cursor: pointer; box-shadow: 0 20px 40px -24px rgba(60,0,10,.7); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.14); color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); }
     .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
 
-    /* 수련 중: 까만 화면 전체 */
-    .dark { position: fixed; inset: 0; z-index: 40; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: none; }
-    .dark .msg { font-size: 22px; font-weight: 900; color: #444; text-align: center; line-height: 1.5; padding: 0 20px; word-break: keep-all; }
-    .dark .msg small { display: block; margin-top: 8px; font-size: 14px; font-weight: 700; color: #333; }
-    .dark .rd { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; font-size: 13px; color: #333; font-weight: 800; letter-spacing: .1em; }
-    .dark .half { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: calc(30px + env(safe-area-inset-bottom)); font-size: 15px; font-weight: 800; color: #2a2a2a; }
-    .dark .half.l { left: 0; border-right: 1px dashed #1a1a1a; }
+    /* 수련 중: 눈을 감는 화면이라 어둡게 둠 (먹색) */
+    .dark { position: fixed; inset: 0; z-index: 40; background: #141414; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: none; color: #fff; }
+    .dark .msg { font-size: 22px; font-weight: 900; color: #4B5C54; text-align: center; line-height: 1.5; padding: 0 20px; word-break: keep-all; }
+    .dark .msg small { display: block; margin-top: 8px; font-size: 14px; font-weight: 700; color: #34433C; }
+    .dark .rd { position: absolute; top: calc(18px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; font-size: 13px; color: #34433C; font-weight: 800; letter-spacing: .1em; }
+    .dark .half { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: calc(30px + env(safe-area-inset-bottom)); font-size: 15px; font-weight: 800; color: #2C3833; }
+    .dark .half.l { left: 0; border-right: 1px dashed #1F2A25; }
     .dark .half.r { right: 0; }
-    .dark .quit { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; z-index: 2; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #151515; color: #555; font: inherit; font-size: 14px; font-weight: 800; }
+    .dark .quit { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; z-index: 2; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: #1A2420; color: #5E6F67; font: inherit; font-size: 14px; font-weight: 800; }
     .splat { position: absolute; font-size: 60px; transform: translate(-50%, -50%); pointer-events: none; animation: splat .7s ease-out forwards; }
     @keyframes splat { 0% { transform: translate(-50%,-50%) scale(1.6); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1); opacity: .9; } }
     .rt { position: absolute; left: 0; right: 0; bottom: 22%; text-align: center; font-size: 40px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; pointer-events: none; }
-    .rt small { display: block; font-size: 16px; color: var(--gold); margin-top: 4px; }
+    .rt small { display: block; font-size: 16px; color: #E9C46A; margin-top: 4px; }
 
-    .result { margin-top: 18px; padding: 22px 16px 16px; border-radius: 24px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    .result { margin-top: 18px; padding: 22px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); box-shadow: 0 24px 50px -28px rgba(60,0,10,.6); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
     @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
     .result .e { font-size: 54px; line-height: 1; }
-    .result h2 { margin: 8px 0 2px; font-size: 32px; font-weight: 900; color: var(--gold); letter-spacing: -0.03em; }
-    .result .avg { font-size: 18px; font-weight: 800; color: #ddd; font-variant-numeric: tabular-nums; }
+    .result h2 { margin: 8px 0 2px; font-size: 30px; font-weight: 800; color: var(--gold); letter-spacing: -0.03em; }
+    .result .avg { font-size: 18px; font-weight: 700; color: #9A8F8F; font-variant-numeric: tabular-nums; }
     .result .list { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin: 12px 0 0; }
-    .result .list span { padding: 6px 10px; border-radius: 10px; background: #1d1d1d; font-size: 13.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .result .list span.miss { color: #ff6b6b; }
-    .result .note { margin-top: 10px; font-size: 13px; color: var(--dim); word-break: keep-all; }
+    .result .list span { padding: 6px 10px; border-radius: 10px; background: #F7F3F3; font-size: 13.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .result .list span.miss { color: #C8162F; }
+    .result .note { margin-top: 10px; font-size: 13px; color: #9A8F8F; word-break: keep-all; }
     .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--dim); }
-    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #0b0b0b; color: #fff; font: inherit; font-size: 15px; box-shadow: inset 0 0 0 1px var(--line); }
-    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); }
-    .ranks h3 { margin: 0 0 6px; font-size: 13.5px; color: var(--dim); letter-spacing: .06em; }
-    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,.1); }
+    .ranks h3 { margin: 0 0 6px; font-size: 12px; color: var(--dim); letter-spacing: .2em; font-weight: 700; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.14); font-size: 14.5px; }
     .ranks div:first-of-type { border-top: 0; }
-    .ranks div span:last-child { color: var(--gold); font-weight: 800; }
+    .ranks div span:last-child { color: #fff; font-weight: 800; }
     .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
-    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
-    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: #666; line-height: 1.6; word-break: keep-all; }
-    .foot a { color: #aaa; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.12); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #fff; }
     @media (prefers-reduced-motion: reduce) { .hero .fly, .result, .splat { animation: none; } }
   </style>
 </head>
@@ -127,7 +129,7 @@
   </div>
 
   <div class="more">
-    <a href="../lucky/">🎰 럭키 7.777</a>
+    <a href="../lucky/">🎰 럭키 7초</a>
     <a href="../shoot/">☕ 오늘 누가 쏴?</a>
   </div>
   <div id="chipBox"></div>

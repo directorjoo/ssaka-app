@@ -13,8 +13,8 @@
   <meta property="og:description" content="친구들 이름으로 진짜 사다리 한판! 단톡방에서 다 같이 결과 보기.">
   <meta property="og:image" content="https://sava.kr/img/shoot-share.png?v=2">
   <link rel="manifest" href="../manifest.webmanifest">
-  <link rel="icon" href="../img/favicon.png">
-  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <meta name="apple-mobile-web-app-title" content="싸바">
   <style>
     :root { --red: #D3122F; --deep: #8E0A1C; --yel: #FFD84D; --ink: #1A1A1A; --dim: #6B6B6B; --line: #ECE6D6; --bg: #FFFBEF; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
@@ -38,7 +38,7 @@
     .chip.nm b { font-weight: 900; color: #a07a00; font-size: 17px; line-height: 1; }
     .add { display: flex; gap: 8px; margin-top: 10px; }
     .add input, .stake input { flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; border: 0; border-radius: 14px; background: #F7F4EA; color: var(--ink); font: inherit; font-size: 16px; box-shadow: inset 0 0 0 1px var(--line); }
-    .add button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--ink); color: #fff; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .add button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--red); color: #fff; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; }
     .stake { margin-top: 10px; }
     .stake input { width: 100%; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -58,7 +58,7 @@
 
     #play { display: none; }
     #play.on { display: block; }
-    .banner { margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: var(--ink); color: #fff; text-align: center; font-size: 15.5px; font-weight: 800; word-break: keep-all; }
+    .banner { margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: var(--deep); color: #fff; text-align: center; font-size: 15.5px; font-weight: 800; word-break: keep-all; }
     .banner b { color: var(--yel); }
     .stage { position: relative; margin-top: 14px; padding: 14px 10px; border-radius: 24px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
     /* 돌림판 */
@@ -95,10 +95,15 @@
     .bung .myname { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--dim); }
     .bung .myname input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #F7F4EA; font: inherit; font-size: 15px; box-shadow: inset 0 0 0 1px var(--line); }
     .ok { margin-top: 14px; padding: 14px; border-radius: 18px; background: #13A35A; color: #fff; text-align: center; font-size: 17px; font-weight: 900; word-break: keep-all; }
-    .big.collect { background: #1A1A1A; color: #fff; }
+    .big.collect { background: linear-gradient(135deg, #D3122F 0%, #8E0A1C 100%); color: #fff; min-height: 76px; box-shadow: 0 14px 30px -14px rgba(211,18,47,.9); }
+    .cnote { margin: 8px 4px 4px; font-size: 12px; line-height: 1.5; color: #8a8a8a; text-align: center; word-break: keep-all; }
+    .cnote a { color: var(--deep); }
+    .more-opt summary { cursor: pointer; font-size: 15px; font-weight: 900; color: var(--deep); list-style: none; }
+    .more-opt summary::-webkit-details-marker { display: none; }
+    .more-opt[open] summary { margin-bottom: 4px; }
     #room { display: none; }
     #room.on { display: block; }
-    .rhead { margin-top: 14px; padding: 18px 16px; border-radius: 22px; background: var(--ink); color: #fff; text-align: center; }
+    .rhead { margin-top: 14px; padding: 18px 16px; border-radius: 22px; background: linear-gradient(135deg, #D3122F 0%, #8E0A1C 100%); color: #fff; text-align: center; }
     .rhead .t { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; }
     .rhead .w { margin-top: 6px; font-size: 14.5px; color: var(--yel); font-weight: 800; word-break: keep-all; }
     .rcount { margin: 14px 0 8px; text-align: center; font-size: 15px; font-weight: 900; color: var(--deep); }
@@ -122,7 +127,7 @@
 <div class="wrap">
   <div class="top">
     <a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a>
-    <a class="lk" href="../lucky/">🎰 럭키 7.777 ›</a>
+    <a class="lk" href="../lucky/">🎰 럭키 7초 ›</a>
   </div>
   <h1>오늘 <em>사다리</em><br>한번 탈까?</h1>
   <p class="sub">친구들 이름으로 진짜 사다리 한판 · 돌림판도 있어요</p>
@@ -130,35 +135,39 @@
   <!-- 준비 -->
   <div id="setup">
     <div class="box">
-      <span class="lab">👥 누구누구? <small style="color:var(--dim);font-weight:700">(2~12명 · 이름을 누르면 빠져요)</small></span>
-      <div class="chips" id="names"></div>
-      <form class="add" id="addForm"><input id="nameIn" maxlength="120" placeholder="이름 입력 (쉼표로 여러 명)" enterkeyhint="done"><button type="submit">추가</button></form>
+      <span class="lab">🙋 내 이름</span>
+      <input id="myself" class="full" maxlength="8" placeholder="친구들이 알아볼 이름">
     </div>
-    <div class="box">
-      <span class="lab">🎯 걸리면?</span>
+    <button type="button" class="big collect" id="collect" style="width:100%;margin-top:14px">💬 친구 불러서 사다리 타기<small>카톡으로 보내면 친구가 "나도!" 눌러 들어와요 · 1명도 OK</small></button>
+    <p class="cnote">누르면 모인 이름을 놀이하는 동안만 쓰고 <b>출발하면 바로 지우는 데</b> 동의하는 거예요 (위치는 저장 안 해요 · <a href="../privacy/" target="_blank">개인정보처리방침</a>)</p>
+    <button type="button" class="big ghost" id="hereBtn" style="width:100%">👥 여기 모인 사람끼리 바로 타기</button>
+    <div id="hereBox" hidden>
+      <div class="box">
+        <span class="lab">👥 같이 할 사람 <small style="color:var(--dim);font-weight:700">(이름을 누르면 빠져요)</small></span>
+        <div class="chips" id="names"></div>
+        <form class="add" id="addForm"><input id="nameIn" maxlength="120" placeholder="이름 (쉼표로 여러 명)" enterkeyhint="done"><button type="submit">추가</button></form>
+      </div>
+      <div class="acts">
+        <button type="button" class="big" id="goNow">🎲 바로 타기</button>
+        <button type="button" class="big kakao" id="toRoom">💬 이 이름들로 카톡에 보내기<small>받은 사람도 똑같은 결과를 봐요</small></button>
+      </div>
+    </div>
+    <p class="err" id="err"></p>
+    <details class="box more-opt">
+      <summary>⚙️ 더 정하기 · 내기 / 장소 / 돌림판</summary>
+      <span class="lab" style="margin-top:12px">🎯 걸리면?</span>
       <div class="chips" id="stakes"></div>
       <div class="stake"><input id="stakeIn" maxlength="14" placeholder="직접 쓰기 (예: 노래방비)"></div>
       <div class="count"><span>걸리는 사람</span><div class="st"><button type="button" id="minus" aria-label="줄이기">−</button><b id="cnt">1</b><button type="button" id="plus" aria-label="늘리기">+</button></div></div>
-    </div>
-    <div class="box">
-      <span class="lab">📍 진짜 벙개로? <small style="color:var(--dim);font-weight:700">(선택 · 다 같이 모일 곳)</small></span>
+      <span class="lab" style="margin-top:14px">📍 모일 곳 (선택)</span>
       <input id="placeIn" class="full" maxlength="24" placeholder="장소 (예: 압구정 순천만)">
       <div class="chips" id="whens" style="margin-top:10px"></div>
-    </div>
-    <div class="box">
-      <span class="lab">🎲 어떻게 뽑을까?</span>
+      <span class="lab" style="margin-top:14px">🎲 어떻게 뽑을까?</span>
       <div class="row2">
-        <button type="button" class="seg" data-g="ladder" aria-pressed="true">🪜 사다리<small>하나씩 내려가며 공개</small></button>
-        <button type="button" class="seg" data-g="wheel" aria-pressed="false">🎡 돌림판<small>한 방에 빙글빙글</small></button>
+        <button type="button" class="seg" data-g="ladder" aria-pressed="true">🪜 사다리<small>하나씩 공개</small></button>
+        <button type="button" class="seg" data-g="wheel" aria-pressed="false">🎡 돌림판<small>빙글빙글</small></button>
       </div>
-    </div>
-    <label class="consent" id="hostConsent"><input type="checkbox" id="agreeHost"><span>"나도!" 모으기를 쓰면 <b>참가 이름(닉네임)</b>을 놀이하는 동안만 서버에 두고, <b>출발하면 바로 지워요</b>. (출발 안 하면 24시간 뒤 자동 삭제 · 위치는 저장 안 해요) <a href="../privacy/" target="_blank">개인정보처리방침</a>에 동의해요.</span></label>
-    <p class="err" id="err"></p>
-    <div class="acts">
-      <button type="button" class="big collect" id="collect">🙋 "나도!" 모으기 초대장 보내기<small>단톡방에서 누르는 사람 이름이 자동으로 모여요</small></button>
-      <button type="button" class="big kakao" id="toRoom">💬 지금 이름으로 단톡방에 보내기<small>결과는 누른 사람마다 똑같이 나와요</small></button>
-      <button type="button" class="big" id="goNow">🎲 여기서 바로 뽑기</button>
-    </div>
+    </details>
   </div>
 
   <!-- 나도! 모으기 방 -->
@@ -168,8 +177,8 @@
     <div class="rnames" id="rNames"></div>
     <div class="box" id="joinBox">
       <span class="lab">🙋 나도 할래!</span>
-      <form class="add" id="joinForm"><input id="joinName" maxlength="8" placeholder="내 이름" enterkeyhint="done"><button type="submit">나도!</button></form>
-      <label class="consent"><input type="checkbox" id="agreeJoin"><span>내 <b>이름(닉네임)</b>을 이 놀이에만 쓰고, <b>출발하면 바로 지우는</b> 것에 동의해요. (위치는 저장 안 해요 · <a href="../privacy/" target="_blank">개인정보처리방침</a>)</span></label>
+      <form class="add" id="joinForm"><input id="joinName" maxlength="8" placeholder="내 이름" enterkeyhint="done"><button type="submit">동의하고 나도!</button></form>
+      <p class="cnote" style="text-align:left">내 이름을 이 놀이에만 쓰고 <b>출발하면 바로 지워요</b> (위치는 저장 안 해요 · <a href="../privacy/" target="_blank">개인정보처리방침</a>)</p>
       <button type="button" class="big ghost" id="leave" hidden style="margin-top:10px">빠질래요</button>
     </div>
     <div class="acts" id="hostBox" hidden>
@@ -220,7 +229,7 @@
   var KEY = 'sava-shoot-v1';
   var saved = {}; try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
   var names = saved.names && saved.names.length ? saved.names : [];
-  var stake = saved.stake || '🙂 그냥 놀자', game = saved.game || 'ladder', payers = 1, when = '';
+  var stake = '🙂 그냥 놀자', game = saved.game || 'ladder', payers = 1, when = '';
   var WHENS = ['⚡ 지금 바로', '⏱️ 30분 뒤', '🍚 오늘 점심', '🌙 오늘 저녁 7시', '📅 내일 저녁'];
   if (saved.place) document.getElementById('placeIn').value = saved.place;
   function save() { try { localStorage.setItem(KEY, JSON.stringify({ names: names, stake: stake, game: game, place: (document.getElementById('placeIn').value || '').trim() })); } catch (e) {} }
@@ -497,6 +506,15 @@
     document.getElementById('all').addEventListener('click', function () { ac(); this.disabled = true; this.style.opacity = .5; for (var i = 0; i < n; i++) trace(i); });
   }
 
+  function rememberMe(n) { try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e) {} }
+  try { var meS = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (meS.from) $('myself').value = meS.from.slice(0, 8); } catch (e) {}
+  $('hereBtn').addEventListener('click', function () {
+    var box = $('hereBox'); box.hidden = !box.hidden;
+    var me = $('myself').value.trim().slice(0, 8);
+    if (!box.hidden && me && names.indexOf(me) < 0) { names.unshift(me); if (names.length > 12) names.length = 12; paintNames(); payersFit(); save(); }
+    if (!box.hidden) setTimeout(function () { $('nameIn').focus(); }, 100);
+  });
+
   // ---------- "나도!" 모으기 (서버) ----------
   var API = '/api/room/';
   var ROOMS = 'sava-rooms-v1';
@@ -506,7 +524,6 @@
     return fetch(API + path, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' })
       .then(function (r) { return r.json().then(function (j) { j._s = r.status; return j; }, function () { return { _s: r.status, error: 'server' }; }); });
   }
-  try { if (localStorage.getItem('sava-agree-v1')) { $('agreeHost').checked = true; $('agreeJoin').checked = true; } } catch (e) {}
   function agreed() { try { localStorage.setItem('sava-agree-v1', String(Date.now())); } catch (e) {} }
   function roomTitle(info) { return fun(info) ? '🪜 사다리 탈 사람, 나도! 손!' : stakeEmoji(info.k) + ' ' + stakeWord(info.k) + ' 걸고 사다리 탈 사람!'; }
   function roomWhere(info) { return info.w ? '📍 ' + info.w + (info.t ? ' · ' + info.t : '') : (info.t || ''); }
@@ -514,16 +531,18 @@
     if (window.SsakaShare) SsakaShare({ url: 'https://sava.kr/shoot/?room=' + id, title: roomTitle(info), description: (roomWhere(info) ? roomWhere(info) + ' — ' : '') + '눌러서 "나도!" 하면 이름이 바로 들어가요', imageUrl: 'https://sava.kr/img/shoot-share.png?v=2', imageWidth: 800, imageHeight: 800, buttonTitle: '🙋 나도!', installTitle: '싸바 설치하기' });
   }
   $('collect').addEventListener('click', function () {
-    if (!$('agreeHost').checked) { $('err').textContent = '아래 동의 칸에 체크해 주세요'; $('hostConsent').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if ($('nameIn').value.trim()) $('addForm').requestSubmit ? $('addForm').requestSubmit() : $('addForm').dispatchEvent(new Event('submit'));
+    var me = $('myself').value.trim().slice(0, 8);
+    if (!me) { $('err').textContent = '내 이름을 먼저 써 주세요'; $('myself').focus(); return; }
+    rememberMe(me);
     agreed();
+    var start = [me];
     var info = { k: stake, g: game, p: payers };
     var pl = $('placeIn').value.trim().slice(0, 24); if (pl) { info.w = pl; if (when) info.t = whenWord(when); }
     $('collect').disabled = true; $('err').textContent = '';
-    api('', { info: info, names: names }).then(function (j) {
+    api('', { info: info, names: start }).then(function (j) {
       $('collect').disabled = false;
       if (!j.id) { $('err').textContent = j.error === 'no-db' ? '"나도!" 모으기는 서버 연결 준비 중이에요. 지금은 이름을 직접 넣어 주세요.' : '잠깐 문제가 있어요. 다시 눌러 주세요.'; return; }
-      setHost(j.id, j.hk); invite(j.id, info); openRoom(j.id);
+      setHost(j.id, j.hk); invite(j.id, info); openRoom(j.id); setJoin(me);
     }, function () { $('collect').disabled = false; $('err').textContent = '인터넷 연결을 확인해 주세요'; });
   });
   var roomId = null, poll = 0, roomInfo = null;
@@ -537,8 +556,8 @@
     j.names.forEach(function (n, i) { var sp = document.createElement('span'); sp.textContent = n; sp.style.background = COLORS[i % 12]; if (i < old) sp.style.animation = 'none'; box.appendChild(sp); });
     var mine = myJoin(), inRoom = mine && j.names.indexOf(mine) >= 0;
     $('leave').hidden = !inRoom; $('joinForm').hidden = !!inRoom;
-    if (inRoom) $('rMsg').textContent = '✅ ' + mine + ' 들어왔어요! 출발하면 결과가 단톡방에 와요';
     var hk = hosts()[roomId];
+    if (inRoom) $('rMsg').textContent = hk ? (j.names.length < 2 ? '카톡 보낸 친구가 "나도!" 누르면 여기 이름이 떠요' : '모였으면 출발! 결과를 카톡으로 알려 주세요') : '✅ ' + mine + ' 들어왔어요! 출발하면 결과가 카톡으로 와요';
     $('hostBox').hidden = !hk;
     if (hk) $('goRoom').textContent = j.names.length < 2 ? '두 명 이상 모이면 출발할 수 있어요' : '🚀 출발! ' + j.names.length + '명으로 사다리 타기';
     $('goRoom').disabled = !hk || j.names.length < 2; $('goRoom').style.opacity = $('goRoom').disabled ? .5 : 1;
@@ -567,7 +586,6 @@
     e.preventDefault();
     var n = $('joinName').value.trim().slice(0, 8);
     if (!n) { $('joinName').focus(); return; }
-    if (!$('agreeJoin').checked) { $('rMsg').textContent = '동의 칸에 체크하면 들어갈 수 있어요'; return; }
     agreed();
     try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e2) {}
     api(roomId, { a: 'join', name: n }).then(function (j) {

@@ -3,87 +3,88 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <title>럭키 7.777 — 싸바</title>
-  <meta name="description" content="정확히 7.777초에 누르면 잭팟 100억 체리! 1000분의 1초 승부. 너도 해 봐.">
-  <meta name="theme-color" content="#0E0E10">
+  <title>럭키 7초 — 싸바</title>
+  <meta name="description" content="정확히 7.00초에 누르면 잭팟 100억 체리! 100분의 1초 승부. 너도 해 봐.">
+  <meta name="theme-color" content="#B3132B">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sava.kr/lucky/">
-  <meta property="og:title" content="🍒 럭키 7.777 — 잭팟 100억 체리">
-  <meta property="og:description" content="정확히 7.777초에 누르면 잭팟! 1000분의 1초 승부. 너도 해 봐.">
-  <meta property="og:image" content="https://sava.kr/img/lucky-share.png?v=1">
+  <meta property="og:title" content="🍒 럭키 7초 — 잭팟 100억 체리">
+  <meta property="og:description" content="정확히 7.00초에 누르면 잭팟! 100분의 1초 승부. 너도 해 봐.">
+  <meta property="og:image" content="https://sava.kr/img/lucky-share.png?v=2">
   <link rel="manifest" href="../manifest.webmanifest">
-  <link rel="icon" href="../img/favicon.png">
-  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <meta name="apple-mobile-web-app-title" content="싸바">
   <style>
-    :root { --red: #E0193A; --gold: #FFD24A; --bg: #0E0E10; --card: #18181C; --line: #2A2A30; --dim: #8A8A93; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    :root { --red: #B3132B; --deep: #8E0A1C; --gold: #FFE3A3; --gold2: #FFE3A3; --bg: #B3132B; --card: #FFFFFF; --line: rgba(255,255,255,.22); --ink: #1E1E1E; --dim: rgba(255,255,255,.78); --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
-    body { min-height: 100svh; overscroll-behavior: none; }
+    body { min-height: 100svh; overscroll-behavior: none; background: linear-gradient(180deg, #C2172F 0%, #B3132B 40%, #A0101F 100%); background-attachment: fixed; }
     .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
     .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
-    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; letter-spacing: -0.02em; }
-    .top a img { width: 26px; height: 26px; }
-    .top .bank { font-size: 13px; color: var(--gold); font-weight: 800; text-align: right; line-height: 1.25; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 800; font-size: 17px; }
+    .top a img { width: 26px; height: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+    .top .bank { font-size: 14px; color: #fff; font-weight: 800; text-align: right; line-height: 1.25; }
     .top .bank small { display: block; color: var(--dim); font-weight: 600; font-size: 10.5px; }
 
-    .title { text-align: center; margin: 14px 0 6px; }
-    .title .k { font-size: 12px; letter-spacing: .3em; color: var(--dim); font-weight: 800; }
-    .title h1 { margin: 6px 0 0; font-size: 40px; line-height: 1; font-weight: 900; letter-spacing: -0.04em; }
-    .title h1 em { font-style: normal; color: var(--red); }
-    .title p { margin: 10px 0 0; font-size: 14.5px; color: #cfcfd6; word-break: keep-all; }
+    .title { text-align: center; margin: 16px 0 6px; }
+    .title .k { font-size: 11px; letter-spacing: .34em; color: var(--dim); font-weight: 700; }
+    .title h1 { margin: 8px 0 0; font-size: 42px; line-height: 1; font-weight: 800; letter-spacing: -0.04em; color: #fff; }
+    .title h1 em { font-style: normal; color: #fff; }
+    .title p { margin: 10px 0 0; font-size: 14.5px; color: var(--dim); word-break: keep-all; }
+    .title p b { color: #fff !important; }
 
-    .chal { margin: 14px 0 0; padding: 12px 14px; border-radius: 16px; background: linear-gradient(135deg, #3a0a14, #1f0a10); box-shadow: inset 0 0 0 1px #5a1424; font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
-    .chal b { color: var(--gold); }
+    .chal { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.12); font-size: 14.5px; line-height: 1.5; word-break: keep-all; }
+    .chal b { color: #fff; }
 
     .tabs, .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .tabs button, .modes button { min-height: 50px; border: 0; border-radius: 14px; background: var(--card); color: #cfcfd6; font: inherit; font-size: 15px; font-weight: 800; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; line-height: 1.2; }
+    .tabs button, .modes button { min-height: 50px; border: 0; border-radius: 14px; background: rgba(255,255,255,.12); color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; line-height: 1.2; }
     .tabs button small, .modes button small { display: block; font-size: 11.5px; font-weight: 600; color: var(--dim); margin-top: 2px; }
-    .tabs button[aria-pressed="true"] { background: #2a0d14; color: #fff; box-shadow: inset 0 0 0 2px var(--red); }
-    .modes button[aria-pressed="true"] { background: #2a2410; color: #fff; box-shadow: inset 0 0 0 2px var(--gold); }
+    .tabs button[aria-pressed="true"], .modes button[aria-pressed="true"] { background: #fff; color: var(--red); }
+    .tabs button[aria-pressed="true"] small, .modes button[aria-pressed="true"] small { color: #B97A84; }
     .modes { margin-top: 8px; }
 
-    .stage { position: relative; margin-top: 16px; border-radius: 28px; background: radial-gradient(120% 90% at 50% 0%, #26262c 0%, #121215 70%); box-shadow: inset 0 0 0 1px var(--line); padding: 22px 16px 18px; text-align: center; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-    .target { font-size: 13px; color: var(--dim); font-weight: 800; letter-spacing: .08em; }
-    .target b { color: var(--gold); font-size: 15px; letter-spacing: 0; }
-    .clock { margin: 10px 0 6px; font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; font-size: 76px; line-height: 1; font-weight: 900; letter-spacing: -0.03em; }
+    .stage { position: relative; margin-top: 16px; border-radius: 28px; background: #fff; color: var(--ink); box-shadow: 0 24px 50px -28px rgba(60,0,10,.6); padding: 22px 16px 18px; text-align: center; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    .target { font-size: 13px; color: #9A8F8F; font-weight: 700; letter-spacing: .08em; }
+    .target b { color: var(--red); font-size: 15px; letter-spacing: 0; }
+    .clock { margin: 10px 0 6px; font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; font-size: 84px; line-height: 1; font-weight: 700; letter-spacing: -0.03em; color: var(--ink); }
     .clock .ms { color: var(--red); }
-    .clock.hide { color: #2b2b31; }
-    .clock.hide .ms { color: #2b2b31; }
-    .hint { min-height: 22px; font-size: 14px; color: #cfcfd6; word-break: keep-all; }
-    .go { display: grid; place-items: center; width: 100%; min-height: 96px; margin-top: 14px; border: 0; border-radius: 24px; background: var(--red); color: #fff; font: inherit; font-size: 28px; font-weight: 900; letter-spacing: -0.02em; cursor: pointer; box-shadow: 0 16px 34px -16px rgba(224,25,58,.9), inset 0 -4px 0 rgba(0,0,0,.2); }
-    .go.run { background: #fff; color: #0E0E10; box-shadow: 0 16px 34px -16px rgba(255,255,255,.6), inset 0 -4px 0 rgba(0,0,0,.12); }
+    .clock.hide, .clock.hide .ms { color: #EFE6E7; }
+    .hint { min-height: 22px; font-size: 14px; color: #9A8F8F; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 92px; margin-top: 14px; border: 0; border-radius: 20px; background: var(--red); color: #fff; font: inherit; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; cursor: pointer; }
+    .go.run { background: #fff; color: var(--red); box-shadow: inset 0 0 0 2.5px var(--red); }
     .go:active { transform: translateY(2px); }
 
-    .result { display: none; margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
+    .result { display: none; margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); box-shadow: 0 24px 50px -28px rgba(60,0,10,.6); text-align: center; }
     .result.show { display: block; animation: pop .35s cubic-bezier(.2,1.4,.4,1); }
     @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
     .result .badge { font-size: 46px; line-height: 1; }
-    .result h2 { margin: 8px 0 2px; font-size: 30px; font-weight: 900; letter-spacing: -0.03em; }
-    .result.jack h2 { color: var(--gold); text-shadow: 0 0 24px rgba(255,210,74,.6); }
-    .result .num { font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 800; color: #cfcfd6; }
-    .result .num b { color: #fff; }
-    .result .win { margin: 10px auto 0; display: inline-block; padding: 8px 14px; border-radius: 999px; background: #2a2410; color: var(--gold); font-weight: 900; font-size: 18px; font-variant-numeric: tabular-nums; }
-    .result .best { margin-top: 8px; font-size: 13px; color: var(--dim); }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+    .result.jack h2 { color: var(--red); }
+    .result .num { font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 700; color: #9A8F8F; }
+    .result .num b { color: var(--ink); }
+    .result .win { margin: 10px auto 0; display: inline-block; padding: 8px 14px; border-radius: 999px; background: #FBEDEF; color: var(--red); font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; }
+    .result .best { margin-top: 8px; font-size: 13px; color: #9A8F8F; }
     .acts { display: grid; gap: 8px; margin-top: 16px; }
-    .acts button { min-height: 58px; border: 0; border-radius: 16px; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .acts button { min-height: 58px; border: 0; border-radius: 16px; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer; }
     .acts .kakao { background: #FEE500; color: #3a1d1d; }
-    .acts .again { background: #2A2A30; color: #fff; }
-    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--dim); }
-    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #0E0E10; color: #fff; font: inherit; font-size: 15px; box-shadow: inset 0 0 0 1px var(--line); }
+    .acts .again { background: #fff; color: var(--red); box-shadow: inset 0 0 0 1.5px #EBCBD0; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 13px; color: #9A8F8F; }
+    .name input { flex: 1; min-height: 42px; padding: 0 12px; border: 0; border-radius: 12px; background: #F7F3F3; color: var(--ink); font: inherit; font-size: 15px; }
 
-    .table { margin-top: 18px; padding: 14px 14px 10px; border-radius: 20px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
-    .table h3 { margin: 0 0 8px; font-size: 14px; color: var(--dim); letter-spacing: .06em; }
-    .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+    .table { margin-top: 18px; padding: 14px 14px 10px; border-radius: 20px; background: rgba(255,255,255,.1); }
+    .table h3 { margin: 0 0 6px; font-size: 11px; color: var(--dim); letter-spacing: .3em; font-weight: 700; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.14); font-size: 14.5px; color: #fff; }
     .row:first-of-type { border-top: 0; }
-    .row span:last-child { color: var(--gold); font-weight: 800; }
-    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: #6b6b73; line-height: 1.6; word-break: keep-all; }
-    .foot a { color: #cfcfd6; }
+    .row span:last-child { color: #fff; font-weight: 800; }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #fff; }
     .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
-    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: #fff; text-decoration: none; font-weight: 800; font-size: 15px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.12); color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; }
     #fx { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
-    .flash { position: fixed; inset: 0; pointer-events: none; z-index: 49; background: radial-gradient(circle at 50% 40%, rgba(255,210,74,.55), rgba(255,210,74,0) 60%); opacity: 0; }
+    .flash { position: fixed; inset: 0; pointer-events: none; z-index: 49; background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.6), rgba(255,255,255,0) 60%); opacity: 0; }
     .flash.on { animation: flash 1.6s ease-out; }
     @keyframes flash { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
     .shake { animation: shake .5s; }
@@ -101,15 +102,15 @@
   </div>
 
   <div class="title">
-    <div class="k">1/1000초 승부</div>
-    <h1>럭키 <em id="tgtBig">7.777</em></h1>
+    <div class="k">1/100초 승부</div>
+    <h1>럭키 <em id="tgtBig">7.00</em></h1>
     <p>정확히 맞추면 <b style="color:var(--gold)">잭팟 100억 체리</b>가 쏟아져요</p>
   </div>
 
   <div class="chal" id="chal" hidden></div>
 
   <div class="tabs" role="group" aria-label="목표 숫자">
-    <button type="button" data-tab="777" aria-pressed="true">🍒 럭키 7.777<small>언제나 이 숫자</small></button>
+    <button type="button" data-tab="777" aria-pressed="true">🍒 럭키 7초<small>언제나 7.00초</small></button>
     <button type="button" data-tab="day" aria-pressed="false" id="dayBtn">📅 오늘의 숫자<small id="dayNum">-</small></button>
   </div>
   <div class="modes" role="group" aria-label="난이도">
@@ -118,8 +119,8 @@
   </div>
 
   <div class="stage" id="stage">
-    <div class="target">목표 <b id="tgt">7.777</b> 초</div>
-    <div class="clock" id="clock">0.<span class="ms">000</span></div>
+    <div class="target">목표 <b id="tgt">7.00</b> 초</div>
+    <div class="clock" id="clock">0.<span class="ms">00</span></div>
     <div class="hint" id="hint">시작을 누르고, 목표 숫자에 멈춰!</div>
     <button type="button" class="go" id="go">시작</button>
   </div>
@@ -139,10 +140,10 @@
 
   <div class="table">
     <h3>상금표</h3>
-    <div class="row"><span>💰 정확히 0.000초 차이</span><span>잭팟 100억</span></div>
-    <div class="row"><span>🎉 0.010초 안</span><span>1억</span></div>
-    <div class="row"><span>👏 0.050초 안</span><span>100만</span></div>
-    <div class="row"><span>🙂 0.200초 안</span><span>1만</span></div>
+    <div class="row"><span>💰 정확히 0.00초</span><span>잭팟 100억</span></div>
+    <div class="row"><span>🎉 0.01초 차이</span><span>1억</span></div>
+    <div class="row"><span>👏 0.05초 안</span><span>100만</span></div>
+    <div class="row"><span>🙂 0.20초 안</span><span>1만</span></div>
     <div class="row"><span>🙈 눈 감고 잭팟</span><span>전설의 잭팟 1000억</span></div>
   </div>
 
@@ -168,16 +169,16 @@
     try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = $('me').value.trim(); localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e) {}
   });
 
-  // ---------- 오늘의 숫자 (한국 날짜 기준, 전국 같은 숫자 · 일요일은 7.777) ----------
-  var POOL = [3141, 5555, 8282, 1004, 2580, 9999, 3333, 5252, 7070, 1234, 8888, 2026, 6060, 4321, 1111, 2222, 9090, 5678, 3690, 1357];
+  // ---------- 오늘의 숫자 (한국 날짜 기준, 전국 같은 숫자 · 일요일은 7.77) ----------
+  var POOL = [3140, 5550, 8280, 1000, 2580, 9990, 3330, 5250, 7070, 1230, 8880, 2020, 6060, 4320, 1110, 2220, 9090, 5670, 3690, 1350];
   function kstDay() { var d = new Date(Date.now() + 9 * 3600000); return { n: Math.floor(d.getTime() / 86400000), w: d.getUTCDay(), m: d.getUTCMonth() + 1, d: d.getUTCDate() }; }
   var K = kstDay();
-  var DAY = K.w === 0 ? 7777 : POOL[((K.n * 7) % POOL.length + POOL.length) % POOL.length];
-  function fmt(ms) { return (ms / 1000).toFixed(3); }
+  var DAY = K.w === 0 ? 7770 : POOL[((K.n * 7) % POOL.length + POOL.length) % POOL.length];
+  function fmt(ms) { return (ms / 1000).toFixed(2); }
   $('dayNum').textContent = K.m + '월 ' + K.d + '일 · ' + fmt(DAY) + '초';
 
   var tab = '777', mode = 'see';
-  function target() { return tab === '777' ? 7777 : DAY; }
+  function target() { return tab === '777' ? 7000 : DAY; }
   function bestKey() { return (tab === '777' ? '777' : 'd' + K.n) + '-' + mode; }
   function paintTarget() { $('tgt').textContent = fmt(target()); $('tgtBig').textContent = fmt(target()); }
 
@@ -185,8 +186,8 @@
   var q = new URLSearchParams(location.search);
   var chal = null;
   if (q.get('r')) {
-    chal = { r: +q.get('r'), t: +(q.get('t') || 7777), m: q.get('m') === 'blind' ? 'blind' : 'see', n: (q.get('n') || '').slice(0, 10) };
-    if (chal.t !== 7777) { if (chal.t === DAY) tab = 'day'; else chal.t = 7777; }
+    chal = { r: +q.get('r'), t: +(q.get('t') || 7000), m: q.get('m') === 'blind' ? 'blind' : 'see', n: (q.get('n') || '').slice(0, 10) };
+    if (chal.t !== 7000) { if (chal.t === DAY) tab = 'day'; else chal.t = 7000; }
     mode = chal.m;
     var diff = Math.abs(chal.r - chal.t);
     var c = $('chal'); c.hidden = false;
@@ -277,12 +278,12 @@
   // ---------- 게임 ----------
   var running = false, t0 = 0, frame = 0, lastSec = -1, armedAt = 0, last = null;
   function show(ms) {
-    var s = Math.floor(ms / 1000), r = Math.floor(ms % 1000);
-    $('clock').innerHTML = s + '.<span class="ms">' + String(r).padStart(3, '0') + '</span>';
+    var s = Math.floor(ms / 1000), r = Math.floor((ms % 1000) / 10);
+    $('clock').innerHTML = s + '.<span class="ms">' + String(r).padStart(2, '0') + '</span>';
   }
   function tickLoop() {
     var e = performance.now() - t0;
-    if (mode === 'blind' && e > 3000) { $('clock').classList.add('hide'); $('clock').innerHTML = '?.<span class="ms">???</span>'; $('hint').textContent = '🙈 속으로 세어 보세요…'; }
+    if (mode === 'blind' && e > 3000) { $('clock').classList.add('hide'); $('clock').innerHTML = '?.<span class="ms">??</span>'; $('hint').textContent = '🙈 속으로 세어 보세요…'; }
     else show(e);
     var sec = Math.floor(e / 1000); if (sec !== lastSec && sec > 0 && (mode !== 'blind' || e <= 3000)) SND.tick(); lastSec = sec;
     if (e > 30000) { stopAt(performance.now()); return; }
@@ -304,7 +305,7 @@
   }
   function stopAt(ts) {
     running = false; cancelAnimationFrame(frame);
-    var ms = Math.max(0, Math.round(ts - t0));
+    var ms = Math.max(0, Math.floor((ts - t0) / 10) * 10); // 100분의 1초 단위 (초시계처럼 버림)
     $('clock').classList.remove('hide'); show(ms); SND.stop();
     $('go').textContent = '다시 시작'; $('go').classList.remove('run');
     judge(ms);
@@ -334,7 +335,7 @@
 
     var r = $('result');
     $('rBadge').textContent = tier.b; $('rTitle').textContent = tier.t;
-    $('rNum').innerHTML = '<b>' + fmt(ms) + '초</b> · ' + (d === 0 ? '오차 0.000초!' : fmt(d) + '초 차이');
+    $('rNum').innerHTML = '<b>' + fmt(ms) + '초</b> · ' + (d === 0 ? '오차 0.00초!' : fmt(d) + '초 차이');
     $('rWin').textContent = tier.w ? '+' + won(tier.w) + ' 체리' : '체리 0개 · 다시 도전!';
     var bk = st.best[k];
     $('rBest').textContent = newBest && prev != null ? '🏆 내 최고 기록 경신!' : '내 최고 기록 ' + fmt(bk) + '초 (' + fmt(Math.abs(bk - tgt)) + '초 차이)';
@@ -356,12 +357,12 @@
     if (!last) return;
     var name = $('me').value.trim();
     var u = new URL('https://sava.kr/lucky/');
-    u.searchParams.set('r', last.ms); if (last.t !== 7777) u.searchParams.set('t', last.t);
+    u.searchParams.set('r', last.ms); if (last.t !== 7000) u.searchParams.set('t', last.t);
     if (last.m === 'blind') u.searchParams.set('m', 'blind'); if (name) u.searchParams.set('n', name);
     var who = name ? name + ': ' : '';
     var title = last.d === 0 ? who + '💰 ' + (last.m === 'blind' ? '눈 감고 ' : '') + '잭팟 터졌다! ' + fmt(last.ms) + '초' : who + '🍒 ' + fmt(last.ms) + '초! ' + fmt(last.d) + '초 차이로 잭팟 놓침';
     var desc = (last.m === 'blind' ? '[눈 감고] ' : '') + '목표 ' + fmt(last.t) + '초에 딱 맞추면 잭팟 100억 체리. 너는 몇 초?';
-    if (window.SsakaShare) SsakaShare({ url: u.href, title: title, description: desc, imageUrl: 'https://sava.kr/img/lucky-share.png?v=1', imageWidth: 800, imageHeight: 800, buttonTitle: '내가 잭팟 터뜨리기', installTitle: '싸바 설치하기' });
+    if (window.SsakaShare) SsakaShare({ url: u.href, title: title, description: desc, imageUrl: 'https://sava.kr/img/lucky-share.png?v=2', imageWidth: 800, imageHeight: 800, buttonTitle: '내가 잭팟 터뜨리기', installTitle: '싸바 설치하기' });
   });
 
   if (window.SsakaInstall) SsakaInstall.chip($('chipBox'), '싸바 홈 화면에 추가');

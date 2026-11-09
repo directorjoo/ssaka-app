@@ -573,7 +573,7 @@
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
     var nim = from ? from + '님이 ' : '';
-    var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : (from ? nim + '어디냐고 물어요' : '어디야?');
+    var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : '어디야?';
     var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '';
     return { url: url, title: title, desc: desc, phone: phone };
   }

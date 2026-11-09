@@ -9,6 +9,8 @@
   var ua = navigator.userAgent;
   var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var inKakao = /KAKAOTALK/i.test(ua);
+  // 구글·네이버·다음·인스타·페북·라인·밴드 앱 안의 브라우저 (홈 화면 추가가 안 됨)
+  var inApp = !inKakao && /GSA\/|NAVER\(inapp|NAVER|DaumApps|Instagram|FBAN|FBAV|FB_IAB|Line\/|BAND\/|Whale\/.*inapp|; wv\)/i.test(ua);
   function standalone() { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
   var deferred = null;
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; });
@@ -55,6 +57,15 @@
       (done ? '홈 화면의 🍒 아이콘으로 열면 돼요' : '앱스토어 없이 홈 화면에 쏙 · 3초면 끝') + '</span></div>'));
     if (done) {
       // 안내만
+    } else if (inApp) {
+      b.appendChild(el('p', 'si-tip', '지금은 다른 앱 안에서 열려 있어서 설치가 안 돼요. ' + (ios ? '<b>사파리</b>' : '<b>크롬</b>') + '로 열어 주세요.'));
+      var url = new URL(location.href); url.searchParams.set('install', '1');
+      var op = el('a', 'si-go', (ios ? '사파리' : '크롬') + '로 열기');
+      op.href = ios ? url.href.replace(/^https:/, 'x-safari-https:') : 'intent://' + url.href.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+      b.appendChild(op);
+      var cp = el('button', 'si-later', '🔗 주소 복사하기 (안 열리면 사파리에 붙여넣기)'); cp.type = 'button'; cp.style.fontWeight = '800'; cp.style.color = '#B3132B';
+      cp.addEventListener('click', function () { var t = url.href; if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { cp.textContent = '✅ 복사했어요! 사파리 주소창에 붙여넣으세요'; }); else prompt('주소를 복사하세요', t); });
+      b.appendChild(cp);
     } else if (inKakao) {
       b.appendChild(el('p', 'si-tip', '카톡 안에서는 설치가 안 돼요. 아래 버튼을 누르면 ' + (ios ? '사파리' : '크롬') + '로 열려요.'));
       var u = new URL(location.href); u.searchParams.set('install', '1');

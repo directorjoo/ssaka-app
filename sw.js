@@ -1,7 +1,23 @@
-/* 싸바 — 설치용 서비스워커 (저장하지 않고 그대로 통과: 새로 올린 파일이 바로 보임) */
-self.addEventListener('install', function () { self.skipWaiting(); });
-self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
+/* 싸바 서비스워커 — 새 파일을 먼저 받고(network-first), 인터넷이 약하면 저장해 둔 화면을 보여줌 */
+var CACHE = 'sava-v1';
+var SHELL = ['./', './app/', './eodiya/', './make/', './c/', './css/brand.css', './css/sk.css', './css/sk-world.css',
+  './js/codec.js', './js/store.js', './js/designs.js', './js/render.js', './js/share.js', './js/install.js', './js/sound.js',
+  './img/icon-192.png', './img/cherry.svg', './img/cherry-dance-anim.svg', './manifest.webmanifest'];
+self.addEventListener('install', function (e) {
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL).catch(function () {}); }).then(function () { return self.skipWaiting(); }));
+});
+self.addEventListener('activate', function (e) {
+  e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); }));
+});
 self.addEventListener('fetch', function (e) {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(fetch(e.request).catch(function () { return new Response('<meta charset=utf-8><p style="font:16px sans-serif;padding:24px">인터넷 연결을 확인해 주세요 🍒</p>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } }); }));
+  var r = e.request;
+  if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
+  e.respondWith(fetch(r).then(function (res) {
+    if (res && res.ok) { var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(r, copy); }); }
+    return res;
+  }).catch(function () {
+    return caches.match(r, { ignoreSearch: true }).then(function (hit) {
+      return hit || new Response('<meta charset=utf-8><meta name=viewport content="width=device-width"><p style="font:17px sans-serif;padding:28px">인터넷 연결을 확인해 주세요 🍒</p>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    });
+  }));
 });

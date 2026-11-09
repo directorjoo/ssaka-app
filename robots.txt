@@ -1,0 +1,8 @@
+# 싸바 — 개인 카드·위치 링크는 검색에 나오지 않게
+User-agent: *
+Disallow: /c/
+Disallow: /eodiya/
+Disallow: /demo/
+Disallow: /make/
+Disallow: /joo/
+Allow: /

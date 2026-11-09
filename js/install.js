@@ -123,31 +123,37 @@
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
   // ---------- 최신 버전 업데이트 ----------
-  var VER = '2026.11.09-28'; // 올릴 때마다 version.json 과 같이 올림
-  function hardUpdate() {
-    var jobs = [];
+  var VER = '2026.11.09-29'; // 올릴 때마다 version.json 과 같이 올림
+  var BASE_DIR = SELF ? SELF.replace(/js\/install\.js.*$/, '') : '/';
+  var CORE = ['js/install.js', 'js/share.js', 'js/designs.js', 'js/render.js', 'js/export.js', 'js/codec.js', 'js/store.js', 'demo/js/card.js', 'css/sk.css', 'css/brand.css', 'sw.js', 'app/', 'make/', 'eodiya/', 'c/'];
+  // 휴대폰 브라우저가 묵혀 둔 파일을 서버의 새 파일로 바꿔 둠 (화면은 그대로)
+  function refreshFiles() {
+    var jobs = CORE.concat([location.pathname]).map(function (f) {
+      try { return fetch(f.charAt(0) === '/' ? f : BASE_DIR + f, { cache: 'reload' }).catch(function () {}); } catch (e) { return Promise.resolve(); }
+    });
     try { if (window.caches) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) {}
-    try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })); } catch (e) {}
-    // 휴대폰 브라우저가 묵혀 둔 파일도 새로 받아 둠
-    var base = SELF ? SELF.replace(/js\/install\.js.*$/, '') : '/';
-    ['js/install.js', 'js/share.js', 'js/designs.js', 'js/render.js', 'js/export.js', 'js/codec.js', 'js/store.js', 'demo/js/card.js', 'css/sk.css', 'css/brand.css', 'sw.js', location.pathname]
-      .forEach(function (f) { try { jobs.push(fetch(f.charAt(0) === '/' ? f : base + f, { cache: 'reload' }).catch(function () {})); } catch (e) {} });
-    Promise.all(jobs).catch(function () {}).then(function () {
+    try { if (navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.update(); })); })); } catch (e) {}
+    return Promise.all(jobs).catch(function () {});
+  }
+  // 더보기의 "최신 버전으로 업데이트" 버튼
+  function hardUpdate() {
+    refreshFiles().then(function () {
       var u = new URL(location.href); u.searchParams.set('v', Date.now().toString(36)); location.replace(u.href);
     });
   }
-  function banner(newV) {
-    if (document.getElementById('si-upd')) return;
-    addCss();
-    var b = el('button', 'si-upd', '<b>🍒 새 버전이 나왔어요</b><span>눌러서 바로 업데이트</span>');
-    b.id = 'si-upd'; b.type = 'button'; b.addEventListener('click', hardUpdate);
-    document.body.appendChild(b);
-  }
+  // 새 버전이 있으면 알림창 없이 조용히 새 파일을 받아 둠 → 다음에 열 때 새 버전
+  // (같은 버전은 한 번만 시도해서, 알림이 계속 튀어나오지 않게)
   function checkUpdate() {
     if (!SELF || location.protocol !== 'https:') return;
-    fetch(SELF.replace(/js\/install\.js.*$/, 'version.json') + '?t=' + Date.now(), { cache: 'no-store' })
+    fetch(BASE_DIR + 'version.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (j && j.v && j.v !== VER) banner(j.v); })
+      .then(function (j) {
+        if (!j || !j.v || j.v === VER) return;
+        var tried = ''; try { tried = localStorage.getItem('sava-upd') || ''; } catch (e) {}
+        if (tried === j.v) return;
+        try { localStorage.setItem('sava-upd', j.v); } catch (e) {}
+        refreshFiles();
+      })
       .catch(function () {});
   }
   // 홈 화면 앱은 며칠씩 켜져 있어서, 다시 열 때마다 확인

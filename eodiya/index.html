@@ -298,8 +298,9 @@
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   function shareKakao(title, desc, url) {
     var play = /놀자/.test(title);
-    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : /여기/.test(title) ? 'eodiya-here.png?v=4' : 'eodiya-ask.png?v=4');
-    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', installUrl: BASE + '?install=1' });
+    var isHere = !play && /여기/.test(title);
+    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=5' : 'eodiya-ask.png?v=5');
+    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: play ? 800 : 1000, imageHeight: play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
     var body = title + (desc ? '\n' + desc : '') + '\n' + url;
@@ -348,10 +349,11 @@
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
     function reply(o) {
       var name = myName();
-      var title = (name ? name + ': ' : '') + o.title;
+      var title = o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       var url = o.url || BASE;
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
-      window.SsakaShare({ title: title, description: o.desc || '', imageUrl: IMG_BASE + o.img, imageWidth: 800, imageHeight: 800, url: url,
+      var wide = /eodiya-(ask|here)\.png/.test(o.img);
+      window.SsakaShare({ title: title, description: o.desc || '', imageUrl: IMG_BASE + o.img, imageWidth: wide ? 1000 : 800, imageHeight: wide ? 600 : 800, url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', installUrl: BASE + '?install=1' });
     }
     if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
@@ -445,14 +447,14 @@
         toast('위치를 확인하는 중…');
         getPos().then(function (pos) {
           var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: '', lat: pos.lat, lng: pos.lng } });
-          reply({ title: '여기야!', desc: '지금 내 위치 · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=4', btn: '지도 보기', url: back });
+          reply({ title: '여기야!', desc: '사진을 누르면 지도가 열려요', img: 'eodiya-here.png?v=5', btn: '지도 보기', url: back });
         }, function (e) { toast(e.message + ' — 아래에 직접 써서 보낼 수 있어요'); $('hereText').focus(); });
       });
       $('hereSend').addEventListener('click', function () {
         var t = $('hereText').value.trim();
         if (!t) { toast('어디인지 적어주세요'); $('hereText').focus(); return; }
         var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: t } });
-        reply({ title: '여기야!', desc: '📍 ' + t + ' · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=4', btn: '지도 보기', url: back });
+        reply({ title: '여기야!', desc: '📍 ' + t + ' · 사진을 누르면 지도가 열려요', img: 'eodiya-here.png?v=5', btn: '지도 보기', url: back });
       });
       playSound(card.sound || 'where');
     }
@@ -560,8 +562,9 @@
       d.memo = $('memo').value.trim();
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
-    var title = mode === 'come' ? (gpsNow ? from + ': 여기야!' : from + ': 여기서 만나!') : from + ': 어디야?';
-    var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '지금 내 위치' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '눌러서 "여기야!" 답장하기';
+    var nim = from ? from + '님이 ' : '';
+    var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : (from ? nim + '어디냐고 물어요' : '어디야?');
+    var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '사진을 누르면 지도가 열려요' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '사진을 누르면 바로 답장돼요';
     return { url: url, title: title, desc: desc, phone: phone };
   }
   $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });

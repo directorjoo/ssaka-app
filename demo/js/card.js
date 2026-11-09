@@ -147,13 +147,17 @@
       },
       onLocation: function () { sendMyLocation(card); },
       onShare: function () {
-        if (window.SsakaShare) window.SsakaShare({
-          title: card.title, description: card.subtitle || '',
-          imageUrl: card.image || undefined, url: location.href
+        shortHere().then(function (u) {
+          if (window.SsakaShare) window.SsakaShare({
+            title: card.title, description: card.subtitle || '',
+            imageUrl: /^https:/.test(card.image || '') ? card.image : undefined, url: u
+          });
         });
       },
       onSms: function () {
-        if (window.SsakaSms) window.SsakaSms({ title: card.title, description: card.subtitle || '', url: location.href });
+        shortHere().then(function (u) {
+          if (window.SsakaSms) window.SsakaSms({ title: card.title, description: card.subtitle || '', url: u });
+        });
       },
       onReserve: function () {
         if (window.self !== window.top) { toast('미리보기에선 예약 창만 보여드려요'); }
@@ -165,10 +169,10 @@
 
     var root = SsakaRender.build(card, design, ctx);
     // 받은 카드함에 기록 (만들기 화면 미리보기는 제외)
-    if (window.SsakaStore && window.self === window.top && /[?&]d=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
+    if (window.SsakaStore && window.self === window.top && /[?&][ds]=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
     // 내가 만든 카드라면: 수정하기 · 복사해서 새로 만들기
     try {
-      var dq = new URLSearchParams(location.search).get('d');
+      var dq = new URLSearchParams(location.search).get('d') || window.__ssakaD;
       var mine = dq && window.SsakaStore && window.self === window.top && SsakaStore.mine().some(function (x) {
         try { return new URL(x.url).searchParams.get('d') === dq; } catch (e) { return false; }
       });
@@ -277,6 +281,17 @@
     setTimeout(function () { nm.focus(); }, 50);
   }
 
+  // 긴 링크(?d=)로 열린 카드는 보낼 때 짧은 링크로 바꿔서 보냄 (카톡이 긴 링크를 거절함)
+  var shortP = null;
+  function shortHere() {
+    var d = new URLSearchParams(location.search).get('d');
+    if (!d) return Promise.resolve(location.href);
+    if (!shortP) shortP = fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { return j && j.id ? new URL('?s=' + j.id, location.href).href : location.href; })
+      .catch(function () { return location.href; });
+    return shortP;
+  }
   function fail(msg) {
     app.innerHTML = '';
     app.appendChild(h('p', { class: 'error', text: msg }));
@@ -285,6 +300,18 @@
   function load() {
     var params = new URLSearchParams(location.search);
     var data = params.get('d');
+    var sid = params.get('s');
+    if (!data && sid) {
+      fetch(new URL('../api/card/' + encodeURIComponent(sid), location.href).href)
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (j) {
+          var card = j && j.d && window.SsakaCodec && SsakaCodec.decode(j.d);
+          window.__ssakaD = j && j.d;
+          if (card) render(card); else fail('카드를 찾을 수 없어요');
+        })
+        .catch(function () { fail('카드를 불러오지 못했어요. 잠시 뒤 다시 열어주세요'); });
+      return;
+    }
     if (data) {
       var card = window.SsakaCodec && SsakaCodec.decode(data);
       if (card) render(card); else fail('카드 링크가 잘렸거나 잘못됐어요');

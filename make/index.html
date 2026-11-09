@@ -151,6 +151,8 @@
     .biz-list button { width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font: inherit; cursor: pointer; display: grid; gap: 2px; }
     .biz-list b { font-size: 15px; } .biz-list span { font-size: 13px; color: var(--muted); }
     .owner-note { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: var(--ssaka-soft); color: var(--ssaka-deep); font-size: 14px; font-weight: 700; }
+    .blog-prev { text-align: left; max-height: 38vh; overflow: auto; background: var(--bg, #f6f6f6); border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+    .blog-prev b { display: block; font-size: 16px; margin-bottom: 8px; }
     .exp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 14px; }
     .exp-grid figure { margin: 0; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
@@ -419,9 +421,29 @@
     <button type="button" class="ghost big" id="sms2">📱 문자로 보내기 (연락처에서 고르기)</button>
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
     <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
+    <button type="button" class="ghost big" id="blog2">📝 네이버 블로그 글 만들기 (AI가 써줘요)</button>
     <button type="button" class="ghost big" id="exp2">📸 인스타·카톡 채널·플레이스용 이미지 (3가지 사이즈)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
+  </div>
+</div>
+<div class="modal" id="blogModal" hidden>
+  <div class="modal-box done-box">
+    <div class="modal-head"><b>네이버 블로그 글</b><button type="button" class="mini" id="blogClose">닫기</button></div>
+    <p class="done-sub" id="blogStatus">카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)</p>
+    <div class="blog-prev" id="blogPrev" hidden></div>
+    <button type="button" class="kakao big" id="blogT" disabled>① 제목 복사</button>
+    <button type="button" class="kakao big" id="blogB" disabled>② 본문 복사 (태그·카드 링크 포함)</button>
+    <button type="button" class="ghost big" id="blogP" disabled>③ 사진 저장</button>
+    <a class="ghost big" id="blogOpen" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">④ 네이버 블로그 글쓰기 열기</a>
+    <button type="button" class="textbtn" id="blogAgain" hidden>🔄 다시 쓰기</button>
+    <ol class="exp-how">
+      <li>네이버 블로그 앱(또는 웹)에서 <b>글쓰기</b>를 누르세요.</li>
+      <li>제목 칸에 ①, 본문에 ②를 붙여넣으세요.</li>
+      <li>본문의 <b>[사진 1]</b> 자리마다 ③에서 저장한 사진을 순서대로 넣고 그 표시는 지우세요.</li>
+      <li>마지막 줄 #태그는 발행할 때 태그 칸에 넣어도 좋아요. 확인하고 <b>발행</b>!</li>
+    </ol>
+    <p class="done-sub" style="font-size:12px">AI가 카드 내용만 보고 쓴 초안이에요. 사실과 다른 곳이 없는지 꼭 읽어보고 올려주세요.</p>
   </div>
 </div>
 <div class="modal" id="expModal" hidden>
@@ -789,8 +811,21 @@
     if (!was && !miss.length) { btn.style.animation = 'none'; void btn.offsetWidth; btn.style.animation = ''; }
     REQUIRED.forEach(function (f) { if (v(f)) $(f).classList.remove('missing'); });
   }
+  // 짧은 링크 (카톡은 긴 링크를 거절함) — 완료 화면이 열릴 때 미리 받아 둠
+  var SHORT = {};
+  function dOf(u) { try { return new URL(u).searchParams.get('d') || ''; } catch (e) { return ''; } }
+  function link(c) { return SHORT[dOf(c.url)] || c.url; }
+  function ensureShort(c) {
+    var d = dOf(c.url);
+    if (!d || SHORT[d]) return Promise.resolve(link(c));
+    return fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.id) SHORT[d] = viewer + '?s=' + j.id; return link(c); })
+      .catch(function () { return c.url; });
+  }
   function openDone() {
     var c = current(); if (!c) return;
+    ensureShort(c).then(function (u) { $('open2').href = u; });
     $('open2').href = c.url;
     if (window.SsakaStore) SsakaStore.saveMine(c.card, c.url);
     $('toast').classList.remove('show');
@@ -819,18 +854,21 @@
 
   $('send').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    window.SsakaShare({
-      title: c.card.title,
-      description: c.card.subtitle || '눌러서 카드를 열어보세요',
-      imageUrl: c.card.image || undefined,
-      url: c.url
+    ensureShort(c).then(function (u) {
+      window.SsakaShare({
+        title: c.card.title,
+        description: c.card.subtitle || '눌러서 카드를 열어보세요',
+        imageUrl: /^https:/.test(c.card.image || '') ? c.card.image : undefined,
+        url: u
+      });
     });
   });
   $('copy').addEventListener('click', function () {
     var c = current(); if (!c) return;
     var done = function () { toast('링크를 복사했어요'); };
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(c.url).then(done, function () { prompt('링크를 복사하세요', c.url); });
-    else prompt('링크를 복사하세요', c.url);
+    var u = link(c);
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(u).then(done, function () { prompt('링크를 복사하세요', u); });
+    else prompt('링크를 복사하세요', u);
   });
   $('open').addEventListener('click', function (e) {
     if (!current()) e.preventDefault();
@@ -1024,11 +1062,92 @@
     if (!SsakaSound.play($('sound').value)) toast('소리를 먼저 골라주세요');
   });
   $('resvOn').addEventListener('change', function () { $('resvBox').hidden = !this.checked; update(); });
+  // ---------- 네이버 블로그 글 (AI) ----------
+  var blogPost = null, blogCard = null, blogUrl = '', blogImgs = [];
+  function devId() {
+    try { var d = localStorage.getItem('sava-dev'); if (!d) { d = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sava-dev', d); } return d; }
+    catch (e) { return 'x'; }
+  }
+  function blogText(p, withTags) {
+    var out = [], n = 0;
+    p.blocks.forEach(function (b) {
+      if (b.t === 'img') { n++; out.push('[사진 ' + n + ']'); }
+      else out.push(b.text);
+      out.push('');
+    });
+    out.push('👉 예약 · 길찾기 · 전화: ' + blogUrl);
+    if (withTags && p.tags && p.tags.length) { out.push(''); out.push(p.tags.join(' ')); }
+    return out.join('\n');
+  }
+  function copyText(t, msg) {
+    var done = function () { toast(msg); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('복사하세요', t); });
+    else prompt('복사하세요', t);
+  }
+  function blogRun() {
+    $('blogStatus').textContent = '카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)';
+    $('blogPrev').hidden = true; $('blogAgain').hidden = true;
+    ['blogT', 'blogB', 'blogP'].forEach(function (id) { $(id).disabled = true; });
+    var ind = D.industry(industry) || {};
+    // 사진은 미리 만들어 둠 (정사각 표지 → 올린 사진 → 안내)
+    var imgsP = window.SsakaExport.build(blogCard, D.get(design), { pics: localPics }).then(function (list) {
+      var sq = list.filter(function (x) { return /정사각/.test(x.name); });
+      var photos = list.filter(function (x) { return /사진/.test(x.name); });
+      var info = list.filter(function (x) { return /안내/.test(x.name); });
+      return sq.concat(photos, info).slice(0, 6);
+    }).catch(function () { return []; });
+    imgsP.then(function (imgs) {
+      blogImgs = imgs;
+      return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ card: blogCard, industry: ind.label || '', images: Math.max(1, imgs.length), dev: devId() }) });
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok) {
+          var e = x.j && x.j.error;
+          $('blogStatus').textContent = e === 'limit' ? '오늘은 블로그 글을 다 만들었어요. 내일 다시 써드릴게요.'
+            : e === 'busy' ? '오늘 요청이 많아 잠시 쉬고 있어요. 내일 다시 눌러주세요.'
+            : e === 'no-key' ? '블로그 글 기능을 준비 중이에요. 곧 열려요!'
+            : '글을 쓰지 못했어요. 잠시 뒤 다시 눌러주세요.';
+          $('blogAgain').hidden = e === 'limit' || e === 'no-key';
+          return;
+        }
+        blogPost = x.j;
+        $('blogPrev').innerHTML = '';
+        var b = document.createElement('b'); b.textContent = blogPost.title; $('blogPrev').appendChild(b);
+        $('blogPrev').appendChild(document.createTextNode(blogText(blogPost, true)));
+        $('blogPrev').hidden = false;
+        $('blogStatus').textContent = '다 썼어요! ①②③ 순서대로 눌러 네이버 블로그에 붙여넣으세요.';
+        ['blogT', 'blogB'].forEach(function (id) { $(id).disabled = false; });
+        $('blogP').disabled = !blogImgs.length;
+        $('blogP').textContent = '③ 사진 ' + blogImgs.length + '장 저장';
+        $('blogAgain').hidden = false;
+      }).catch(function () { $('blogStatus').textContent = '인터넷 연결을 확인하고 다시 눌러주세요.'; $('blogAgain').hidden = false; });
+  }
+  $('blog2').addEventListener('click', function () {
+    var c = current(); if (!c) return;
+    blogCard = c.card; blogUrl = link(c); blogPost = null;
+    $('doneModal').hidden = true; $('blogModal').hidden = false;
+    blogRun();
+  });
+  $('blogAgain').addEventListener('click', blogRun);
+  $('blogT').addEventListener('click', function () { if (blogPost) copyText(blogPost.title, '제목을 복사했어요'); });
+  $('blogB').addEventListener('click', function () { if (blogPost) copyText(blogText(blogPost, true), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
+  $('blogP').addEventListener('click', function () {
+    if (!blogImgs.length) return;
+    var files = blogImgs.map(function (x, i) { return new File([x.blob], '사진' + (i + 1) + '.jpg', { type: 'image/jpeg' }); });
+    if (navigator.canShare && navigator.canShare({ files: files })) { navigator.share({ files: files }).catch(function () {}); return; }
+    files.forEach(function (f, i) {
+      setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 350);
+    });
+    toast('사진을 내려받았어요');
+  });
+  $('blogClose').addEventListener('click', function () { $('blogModal').hidden = true; });
+  $('blogModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   // ---------- 카톡 채널 · 인스타용 이미지 ----------
   var expFiles = [], expCard = null, expUrl = '';
   $('exp2').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    expCard = c.card; expUrl = c.url; expFiles = [];
+    expCard = c.card; expUrl = link(c); expFiles = [];
     $('doneModal').hidden = true;
     $('expModal').hidden = false;
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
@@ -1074,14 +1193,14 @@
   });
   $('castGo').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(c.url).then(function () { toast('내 프로필 카드 링크를 복사했어요. 공고에 지원할 때 붙여넣으세요'); });
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link(c)).then(function () { toast('내 프로필 카드 링크를 복사했어요. 공고에 지원할 때 붙여넣으세요'); });
   });
   $('expClose').addEventListener('click', function () { $('expModal').hidden = true; });
   $('expModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 
   $('sms2').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    window.SsakaSms({ title: c.card.title, description: c.card.subtitle || '눌러서 카드를 열어보세요', url: c.url });
+    window.SsakaSms({ title: c.card.title, description: c.card.subtitle || '눌러서 카드를 열어보세요', url: link(c) });
   });
 
   // ---------- 상호로 찾아 자동 채우기 (카카오맵 장소 검색) ----------

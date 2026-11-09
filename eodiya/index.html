@@ -272,7 +272,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var BASE = new URL('./', location.href).href.split('?')[0];
-  var IMG_BASE = new URL('../img/', location.href).href;
+  var IMG_BASE = /(^|\.)sava\.kr$|pages\.dev$/.test(location.hostname) ? 'https://sava.kr/img/' : new URL('../img/', location.href).href; // 카톡이 그림을 잘 가져가도록 정식 주소로
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
   window.SsakaToast = toast;
   function sms(phone, body) {
@@ -298,7 +298,7 @@
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   function shareKakao(title, desc, url) {
     var play = /놀자/.test(title);
-    var img = IMG_BASE + (play ? 'eodiya-play.png?v=3' : /여기/.test(title) ? 'eodiya-here.png?v=2' : 'eodiya-ask.png?v=2');
+    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : /여기/.test(title) ? 'eodiya-here.png?v=4' : 'eodiya-ask.png?v=4');
     window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '나의 위치 알리기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
@@ -387,7 +387,7 @@
       document.querySelectorAll('#viewPlay .pbig button').forEach(function (b) {
         b.addEventListener('click', function () {
           var yes = b.classList.contains('yes');
-          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=1' : 'eodiya-reply.png?v=1', btn: yes ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
+          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
         });
       });
       playSound(card.sound || 'play');
@@ -433,7 +433,7 @@
       }
       if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
       document.querySelectorAll('.reply').forEach(function (b) {
-        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '어디야? 답장', img: 'eodiya-reply.png?v=1', btn: '어디야? 열기' }); });
+        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '어디야? 답장', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' }); });
       });
       playSound(card.sound || 'here');
     } else {
@@ -445,14 +445,14 @@
         toast('위치를 확인하는 중…');
         getPos().then(function (pos) {
           var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: '', lat: pos.lat, lng: pos.lng } });
-          reply({ title: '여기야!', desc: '지금 내 위치 · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=2', btn: '지도 보기', url: back });
+          reply({ title: '여기야!', desc: '지금 내 위치 · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=4', btn: '지도 보기', url: back });
         }, function (e) { toast(e.message + ' — 아래에 직접 써서 보낼 수 있어요'); $('hereText').focus(); });
       });
       $('hereSend').addEventListener('click', function () {
         var t = $('hereText').value.trim();
         if (!t) { toast('어디인지 적어주세요'); $('hereText').focus(); return; }
         var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: t } });
-        reply({ title: '여기야!', desc: '📍 ' + t + ' · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=2', btn: '지도 보기', url: back });
+        reply({ title: '여기야!', desc: '📍 ' + t + ' · 눌러서 지도·길찾기', img: 'eodiya-here.png?v=4', btn: '지도 보기', url: back });
       });
       playSound(card.sound || 'where');
     }

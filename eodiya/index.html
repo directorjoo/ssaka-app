@@ -251,11 +251,18 @@
   <section id="viewAsk" hidden>
     <div class="who" id="aWho"></div>
     <h1 class="q">어디야?</h1>
-    <button type="button" class="here" id="hereBtn">여기야!<small>버튼 누르면 지금 내 위치를 보내요</small></button>
-    <div class="sec-t">또는 직접 쓰기</div>
+    <button type="button" class="here" id="hereBtn">📍 위치 찍어주기<small>누르면 지금 내 위치를 지도로 보내요</small></button>
+    <div class="sec-t">✍️ 문자로 답하기</div>
     <div class="or">
-      <input type="text" id="hereText" maxlength="60" placeholder="예: 강남역 2번 출구 앞">
+      <input type="text" id="hereText" maxlength="80" placeholder="예: 회의 중, 30분 뒤 연락할게">
       <button type="button" id="hereSend">보내기</button>
+    </div>
+    <div class="sec-t">한 번에 답장하기</div>
+    <div class="replies">
+      <button type="button" class="reply" data-r="지금 가는 중! 🏃">🏃 가는 중!</button>
+      <button type="button" class="reply" data-r="10분 뒤 도착해요">⏱ 10분 뒤</button>
+      <button type="button" class="reply" data-r="도착했어! 어디 있어?">✅ 도착!</button>
+      <button type="button" class="reply" data-r="조금 늦어요, 미안해요 🙏">🙏 조금 늦어</button>
     </div>
     <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
   </section>
@@ -448,13 +455,16 @@
         getPos().then(function (pos) {
           var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: '', lat: pos.lat, lng: pos.lng } });
           reply({ title: '여기야!', desc: '', img: 'eodiya-here.png?v=6', btn: '지도 보기', url: back });
-        }, function (e) { toast(e.message + ' — 아래에 직접 써서 보낼 수 있어요'); $('hereText').focus(); });
+        }, function (e) { toast(e.message + ' — 아래에 문자로 답할 수 있어요'); $('hereText').focus(); });
       });
       $('hereSend').addEventListener('click', function () {
         var t = $('hereText').value.trim();
-        if (!t) { toast('어디인지 적어주세요'); $('hereText').focus(); return; }
-        var back = BASE + '?d=' + SsakaCodec.encode({ m: 'come', here: 1, t: Date.now(), from: myName(), place: { name: t } });
-        reply({ title: '여기야!', desc: '📍 ' + t, img: 'eodiya-here.png?v=6', btn: '지도 보기', url: back });
+        if (!t) { toast('보낼 말을 적어주세요'); $('hereText').focus(); return; }
+        reply({ title: t, desc: '', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' });
+      });
+      $('hereText').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('hereSend').click(); });
+      document.querySelectorAll('#viewAsk .reply').forEach(function (b) {
+        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply.png?v=4', btn: '어디야? 열기' }); });
       });
       playSound(card.sound || 'where');
     }

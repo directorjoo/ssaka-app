@@ -304,11 +304,11 @@
         <div class="row">
           <div>
             <label for="name" class="req" data-l="name">이름</label>
-            <input id="name" maxlength="30">
+            <input id="name" maxlength="30" autocomplete="name">
           </div>
           <div>
             <label for="phone" class="req" data-l="phone">전화번호</label>
-            <input id="phone" type="tel" inputmode="tel" placeholder="010-0000-0000" maxlength="20">
+            <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" maxlength="20">
           </div>
         </div>
         <div data-for="profile">
@@ -1364,13 +1364,13 @@
   var ME = 'ssaka-me-v1', ME_F = ['name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2'];
   function getMe() { try { return JSON.parse(localStorage.getItem(ME) || 'null'); } catch (e) { return null; } }
   function saveMe() {
-    if (type !== 'profile' && type !== 'greet') return;
-    var m = {}; ME_F.forEach(function (f) { m[f] = v(f); });
+    if (type !== 'profile' && type !== 'greet' && type !== 'club') return;
+    var m = getMe() || {}; ME_F.forEach(function (f) { var x = v(f); if (x) m[f] = x; });
     if (m.name || m.phone) try { localStorage.setItem(ME, JSON.stringify(m)); } catch (e) {}
   }
   function fillMe() {
-    var m = getMe(); if (!m) return false;
-    ME_F.forEach(function (f) { if (m[f] && $(f) && !$(f).value) $(f).value = m[f]; });
+    var m = getMe(); if (!m || (type !== 'profile' && type !== 'greet' && type !== 'club')) return false;
+    (type === 'profile' || type === 'greet' ? ME_F : ['name', 'phone']).forEach(function (f) { if (m[f] && $(f) && !$(f).value) $(f).value = m[f]; });
     update(); refreshProgress(); return true;
   }
   if (getMe()) $('fillMe').hidden = false;
@@ -1408,7 +1408,13 @@
     var note = document.createElement('p'); note.className = 'owner-note';
     note.textContent = qp.get('copy') ? '📄 지난 카드를 복사했어요. 날짜·문구만 바꿔서 새로 보내세요.' : '✏️ 카드를 고치는 중이에요. 고친 뒤 "완료 · 보내기"를 누르면 새 링크가 생겨요.';
     var form = $('form'); form.insertBefore(note, form.firstChild);
-  } else if (!$('name').value && !$('phone').value && getMe()) { setTimeout(fillMe, 0); }
+  } else if (!$('name').value && !$('phone').value) {
+    // 지난번에 쓴 내 이름·번호를 자동으로 (없으면 어디야에서 쓴 이름이라도)
+    if (getMe()) setTimeout(function () { if (fillMe()) toast('지난번 내 이름·번호를 넣었어요'); }, 0);
+    else { try { var eo = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (eo.from) $('name').value = eo.from; } catch (e) {} }
+  }
+  // 이름·번호를 적으면 바로 기억 (다음 카드부터 자동으로 들어감)
+  ['name', 'phone'].forEach(function (f) { $(f).addEventListener('change', function () { if ($('name').value.trim() && $('phone').value.trim()) saveMe(); }); });
   var qInd = new URLSearchParams(location.search).get('ind');
   if (qInd && D.industry(qInd)) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
   var qSeason = new URLSearchParams(location.search).get('season');

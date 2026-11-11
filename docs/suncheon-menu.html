@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #ddd; }
+  .pg { width: 1080px; height: 1350px; background: #FBF6EC; position: relative; overflow: hidden; font-family: "Noto Sans CJK KR", sans-serif; color: #2A211B; padding: 64px 70px 0; }
+  .pg::before { content: ""; position: absolute; inset: 22px; border: 2px solid #CDB89A; border-radius: 6px; pointer-events: none; }
+  .pg::after { content: ""; position: absolute; inset: 30px; border: 1px solid #E3D4BC; border-radius: 4px; pointer-events: none; }
+  .hd { text-align: center; margin-bottom: 26px; }
+  .tag { display: inline-block; padding: 5px 14px; border-radius: 4px; background: #B3132B; color: #fff; font-size: 22px; font-weight: 700; letter-spacing: .08em; }
+  .name { font-family: "Noto Serif CJK KR", "Noto Serif CJK JP", serif; font-weight: 900; font-size: 92px; letter-spacing: .06em; line-height: 1.15; margin-top: 6px; }
+  .sub { font-size: 26px; color: #7A6650; letter-spacing: .04em; }
+  .sub b { color: #2A211B; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+  .sec { margin-top: 26px; break-inside: avoid; }
+  .sec h3 { display: flex; align-items: baseline; gap: 10px; font-size: 32px; font-weight: 900; color: #B3132B; border-bottom: 2px solid #2A211B; padding-bottom: 6px; margin-bottom: 8px; }
+  .sec h3 small { font-size: 20px; font-weight: 700; color: #8A7660; }
+  .it { display: flex; align-items: baseline; gap: 8px; font-size: 27px; line-height: 1.62; }
+  .it .n { white-space: nowrap; font-weight: 700; }
+  .it .n small { font-size: 19px; color: #8A7660; font-weight: 500; }
+  .it .d { flex: 1; border-bottom: 2px dotted #CDB89A; transform: translateY(-7px); }
+  .it .p { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .hot .n::after { content: "인기"; display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 4px; background: #B3132B; color: #fff; font-size: 16px; font-weight: 700; transform: translateY(-4px); }
+  .winter { margin-top: 26px; padding: 16px 20px 12px; border-radius: 10px; background: #1F3B5A; color: #fff; }
+  .winter h3 { color: #F4E7C8; border-color: #F4E7C8; }
+  .winter .it .d { border-color: rgba(244,231,200,.5); }
+  .season { margin-top: 18px; font-size: 22px; color: #6B5A47; line-height: 1.6; }
+  .season b { color: #2A211B; }
+  .ft { position: absolute; left: 70px; right: 70px; bottom: 58px; text-align: center; font-size: 23px; color: #6B5A47; line-height: 1.6; border-top: 1px solid #CDB89A; padding-top: 14px; }
+  .ft b { color: #2A211B; }
+  .cherry { position: absolute; right: 60px; top: 52px; font-size: 40px; }
+</style></head><body>
+
+<div class="pg" id="p1">
+  <div class="hd">
+    <span class="tag">남도 맛집</span>
+    <div class="name">순천만</div>
+    <div class="sub">압구정 본점 · <b>식사 메뉴</b></div>
+  </div>
+  <div class="cols">
+    <div>
+      <div class="sec"><h3>생선구이</h3>
+        <div class="it"><span class="n">고등어 구이</span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">삼치 구이</span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">갈치 구이</span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">임연수 구이</span><span class="d"></span><span class="p">14,000</span></div>
+        <div class="it"><span class="n">서대 구이</span><span class="d"></span><span class="p">14,000</span></div>
+        <div class="it"><span class="n">능성어 구이</span><span class="d"></span><span class="p">14,000</span></div>
+        <div class="it"><span class="n">양태 구이</span><span class="d"></span><span class="p">15,000</span></div>
+      </div>
+      <div class="sec"><h3>찌개 · 국밥</h3>
+        <div class="it"><span class="n">김치찌개</span><span class="d"></span><span class="p">10,000</span></div>
+        <div class="it"><span class="n">청국장</span><span class="d"></span><span class="p">10,000</span></div>
+        <div class="it"><span class="n">순두부</span><span class="d"></span><span class="p">10,000</span></div>
+        <div class="it"><span class="n">콩나물국밥</span><span class="d"></span><span class="p">10,000</span></div>
+        <div class="it"><span class="n">굴국밥</span><span class="d"></span><span class="p">12,000</span></div>
+        <div class="it"><span class="n">매생이 굴떡국</span><span class="d"></span><span class="p">12,000</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec"><h3>특선 탕</h3>
+        <div class="it hot"><span class="n">짱뚱어탕</span><span class="d"></span><span class="p">15,000</span></div>
+        <div class="it"><span class="n">민어탕·지리 <small>2인</small></span><span class="d"></span><span class="p">17,000</span></div>
+        <div class="it"><span class="n">동태탕·지리 <small>2인</small></span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">조기매운탕 <small>2인</small></span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">매생이 굴탕</span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">홍어 김치탕</span><span class="d"></span><span class="p">13,000</span></div>
+      </div>
+      <div class="sec"><h3>비빔밥 · 덮밥</h3>
+        <div class="it"><span class="n">돌솥 비빔밥</span><span class="d"></span><span class="p">12,000</span></div>
+        <div class="it"><span class="n">꼬막 비빔밥</span><span class="d"></span><span class="p">12,000</span></div>
+        <div class="it"><span class="n">양푼 비빔밥</span><span class="d"></span><span class="p">10,000</span></div>
+        <div class="it"><span class="n">알밥</span><span class="d"></span><span class="p">12,000</span></div>
+        <div class="it"><span class="n">낙지덮밥</span><span class="d"></span><span class="p">12,000</span></div>
+        <div class="it"><span class="n">제육덮밥</span><span class="d"></span><span class="p">13,000</span></div>
+        <div class="it"><span class="n">오삼불고기 <small>2인</small></span><span class="d"></span><span class="p">15,000</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><b>11:30 – 22:00</b> (15–17시 쉬는 시간) · <b>일요일·공휴일 휴무</b><br>서울 강남구 신사동 609-1 지하1층 · <b>02-541-2125</b> · 배달은 하지 않아요</div>
+</div>
+
+<div class="pg" id="p2">
+  <div class="hd">
+    <span class="tag">남도 맛집</span>
+    <div class="name">순천만</div>
+    <div class="sub">압구정 본점 · <b>요리 · 안주</b></div>
+  </div>
+  <div class="cols">
+    <div>
+      <div class="sec"><h3>요리</h3>
+        <div class="it hot"><span class="n">홍어삼합</span><span class="d"></span><span class="p">60,000</span></div>
+        <div class="it hot"><span class="n">갑오징어 <small>초무침·숙회</small></span><span class="d"></span><span class="p">40,000</span></div>
+        <div class="it hot"><span class="n">서대회 무침</span><span class="d"></span><span class="p">40,000</span></div>
+        <div class="it"><span class="n">낙지볶음</span><span class="d"></span><span class="p">40,000</span></div>
+        <div class="it"><span class="n">연포탕</span><span class="d"></span><span class="p">40,000</span></div>
+        <div class="it"><span class="n">홍어찜</span><span class="d"></span><span class="p">35,000</span></div>
+        <div class="it"><span class="n">통돼지 두루치기 <small>중</small></span><span class="d"></span><span class="p">39,000</span></div>
+        <div class="it"><span class="n">통돼지 두루치기 <small>소</small></span><span class="d"></span><span class="p">29,000</span></div>
+      </div>
+      <div class="sec"><h3>전 · 곁들이</h3>
+        <div class="it"><span class="n">굴전</span><span class="d"></span><span class="p">29,000</span></div>
+        <div class="it"><span class="n">동태전</span><span class="d"></span><span class="p">25,000</span></div>
+        <div class="it"><span class="n">해물부추전</span><span class="d"></span><span class="p">20,000</span></div>
+        <div class="it"><span class="n">매생이전</span><span class="d"></span><span class="p">20,000</span></div>
+        <div class="it"><span class="n">두부김치</span><span class="d"></span><span class="p">20,000</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec"><h3>조림 <small>2인</small></h3>
+        <div class="it"><span class="n">갈치조림</span><span class="d"></span><span class="p">40,000</span></div>
+        <div class="it"><span class="n">삼치조림</span><span class="d"></span><span class="p">35,000</span></div>
+        <div class="it hot"><span class="n">고등어조림</span><span class="d"></span><span class="p">35,000</span></div>
+      </div>
+      <div class="sec"><h3>모둠구이 · 생선찜</h3>
+        <div class="it"><span class="n">모둠구이 <small>서대·양태·능성어</small></span><span class="d"></span><span class="p">45,000</span></div>
+        <div class="it hot"><span class="n">생선찜 <small>서대·양태·민어</small></span><span class="d"></span><span class="p">50,000</span></div>
+        <div class="it"><span class="n">민어찜</span><span class="d"></span><span class="p">60,000</span></div>
+        <div class="it"><span class="n">보리굴비</span><span class="d"></span><span class="p">25,000</span></div>
+        <div class="it"><span class="n">꽁치김치전골</span><span class="d"></span><span class="p">29,000</span></div>
+      </div>
+      <div class="winter"><h3>❄ 겨울 한정</h3>
+        <div class="it"><span class="n">벌교꼬막</span><span class="d"></span><span class="p">30,000</span></div>
+        <div class="it"><span class="n">생굴무침</span><span class="d"></span><span class="p">30,000</span></div>
+      </div>
+      <div class="season"><b>계절 메뉴</b> · 봄 도다리쑥국 · 여름 민어탕 · 가을 전어구이·무침 <b>(시세)</b></div>
+    </div>
+  </div>
+  <div class="ft"><b>11:30 – 22:00</b> (15–17시 쉬는 시간) · <b>일요일·공휴일 휴무</b><br>서울 강남구 신사동 609-1 지하1층 · <b>02-541-2125</b> · 배달은 하지 않아요</div>
+</div>
+</body></html>

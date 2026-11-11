@@ -204,6 +204,16 @@
     .bar-done { background: #adb5bd; color: #fff; }
     .bar-done.ready { background: #8E0A1C; animation: pop .35s ease; }
     @keyframes pop { 50% { transform: scale(1.06); } }
+    /* 폰: 진행 막대는 위에 한 줄, 단추 3개는 아래에 나란히 (글자 겹침 방지) */
+    @media (max-width: 560px) {
+      .bar { padding-top: 8px; }
+      body { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+      .bar-in { grid-template-columns: auto 1fr 1.25fr; row-gap: 6px; }
+      .prog { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
+      .prog b { margin: 0; font-size: 12.5px; }
+      .prog .track { flex: 1; }
+      .bar button { min-height: 50px; padding: 0 12px; font-size: 15.5px; }
+    }
     @media (min-width: 860px) { .bar-pv { display: none; } }
     .done-box { text-align: center; display: grid; gap: 10px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
     .done-head { font-size: 22px; font-weight: 800; }
@@ -288,7 +298,7 @@
       <fieldset>
         <legend data-l="contact">연락처</legend>
         <div class="quick" data-for="profile shop club">
-          <button type="button" class="mini" id="findBiz">🔍 상호로 찾아서 자동 채우기</button>
+          <button type="button" class="mini" id="findBiz">🔍 가게 이름으로 찾아서 자동 채우기</button>
           <button type="button" class="mini" id="fillMe" hidden>👤 내 정보 불러오기</button>
         </div>
         <div class="row">
@@ -665,6 +675,7 @@
     });
     setType(ind.type);
     applyIndustry(ind);
+    bizBtn(ind);
     if (!seasonTouched) $('season').value = ind.season || '';
     renderGallery();
     if (userPicked) {
@@ -1279,6 +1290,16 @@
   });
 
   // ---------- 상호로 찾아 자동 채우기 (카카오맵 장소 검색) ----------
+  // 업종에 맞는 이름으로, 모임·개인 프로필(배우·감독 등)에서는 숨김
+  function bizBtn(ind) {
+    var b = $('findBiz'); if (!b) return;
+    var id = ind.id, t = ind.type, w = null;
+    if (t === 'shop') w = /toefl|academy|entrance|tutor|arts|edu/.test(id) ? '학원' : id === 'fitness' ? '센터' : id === 'stay' ? '숙소' : id === 'flower' ? '꽃집' : id === 'cafe' ? '카페' : id === 'beauty' ? '매장' : '가게';
+    else if (t === 'profile' && /insurance|newcar|usedcar|sales|realty|pro/.test(id)) w = '회사·사무실';
+    b.hidden = !w;
+    if (w) b.textContent = '🔍 ' + w + ' 이름으로 찾아서 자동 채우기';
+    if ($('bizQ')) $('bizQ').placeholder = w ? w + ' 이름 (예: 여수 ' + (w === '회사·사무실' ? '○○보험' : '온기식당') + ')' : '';
+  }
   var mapsP = null;
   function loadMaps() {
     if (mapsP) return mapsP;

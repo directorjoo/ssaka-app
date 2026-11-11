@@ -1,6 +1,20 @@
 // 싸바 온라인 당구 — 각자 자기 폰으로 치는 쓰리쿠션 방 + 대화
 // 저장: 방 상태(별명, 점수, 공 위치), 대화. 게임이 끝나고 30분 뒤, 또는 24시간 뒤 자동 삭제.
 // 참가자 확인은 기기마다 무작위 열쇠(pk)로 하고, 서버에는 그 해시만 둠.
+// ---- 남용 막기 (스팸·도박·불법 대출 등) — 여러 파일에 같은 코드 ----
+const BAD = [/카지노/, /바카라/, /슬롯\s*머신/, /온라인\s*슬롯/, /토토\s*사이트/, /먹튀/, /사설\s*토토/, /도박/, /베팅|배팅/, /급전/, /작업\s*대출/, /무직자\s*대출/, /당일\s*대출/, /신불자\s*대출/, /조건\s*만남/, /출장\s*(안마|마사지)/, /오피\s*(걸|방)/, /비아그라|시알리스/, /필로폰|대마초|마약\s*판매/, /리딩\s*방/, /(수익|원금)\s*보장/, /불법\s*(자금|환전)/, /t\.me\//i, /bit\.ly|tinyurl|han\.gl|me2\.kr|url\.kr|t\.ly\//i];
+function textOf(o, out) { out = out || []; if (typeof o === 'string') out.push(o); else if (Array.isArray(o)) o.forEach(x => textOf(x, out)); else if (o && typeof o === 'object') Object.keys(o).forEach(k => textOf(o[k], out)); return out; }
+function isBad(obj) { const t = textOf(obj).join(' ').replace(/\s+/g, ' '); return BAD.some(r => r.test(t)); }
+async function tooMany(db, key, limit, perSec) {
+  await db.prepare('CREATE TABLE IF NOT EXISTS rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, until INTEGER NOT NULL)').run();
+  const now = Date.now(), r = await db.prepare('SELECT n, until FROM rate WHERE k = ?').bind(key).first();
+  if (!r || r.until < now) { await db.prepare('INSERT OR REPLACE INTO rate (k, n, until) VALUES (?, 1, ?)').bind(key, now + perSec * 1000).run(); if (Math.random() < 0.02) await db.prepare('DELETE FROM rate WHERE until < ?').bind(now).run(); return false; }
+  if (r.n >= limit) return true;
+  await db.prepare('UPDATE rate SET n = n + 1 WHERE k = ?').bind(key).run(); return false;
+}
+async function ipKey(request, tag) { const ip = request.headers.get('cf-connecting-ip') || 'x'; const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip + '|' + tag))); return tag + ':' + [...h].slice(0, 10).map(b => b.toString(16).padStart(2, '0')).join(''); }
+async function isBlocked(db, cid) { try { await db.prepare('CREATE TABLE IF NOT EXISTS blocked (cid TEXT PRIMARY KEY, why TEXT, at INTEGER)').run(); return !!(await db.prepare('SELECT 1 AS x FROM blocked WHERE cid = ?').bind(cid).first()); } catch (e) { return false; } }
+// ---- 여기까지 ----
 const MAXP = 4, CHAT_MAX = 100, SKIP_AFTER = 120e3;
 
 function json(o, status) { return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
@@ -65,6 +79,7 @@ export async function onRequest({ request, env, params }) {
 
   // 방 만들기
   if (!id) {
+    if (await tooMany(db, await ipKey(request, 'pool'), 40, 86400)) return json({ error: 'slow' }, 429);
     if (!b.ok) return json({ error: 'consent' }, 400);
     const nick = nickOf(b.nick); if (!nick) return json({ error: 'nick' }, 400);
     const nid = rid(), pk = rkey();
@@ -94,6 +109,8 @@ export async function onRequest({ request, env, params }) {
   if (a === 'chat') {
     if (me < 0) return json({ error: 'who' }, 403);
     const t = String(b.t || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, CHAT_MAX); if (!t) return json({ error: 'empty' }, 400);
+    if (isBad(t)) return json({ error: 'bad-content' }, 422);
+    if (await tooMany(db, await ipKey(request, 'chat'), 20, 60)) return json({ error: 'slow' }, 429);
     await say(db, id, st.players[me].nick, t);
     return json({ ok: true });
   }

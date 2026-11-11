@@ -819,9 +819,9 @@
     var d = dOf(c.url);
     if (!d || SHORT[d]) return Promise.resolve(link(c));
     return fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
-      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (r) { if (r.status === 422 || r.status === 451) { toast('이용 규칙에 맞지 않는 내용(도박·불법 대출 등)이 있어 보낼 수 없어요'); throw new Error('bad'); } return r.ok ? r.json() : null; })
       .then(function (j) { if (j && j.id) SHORT[d] = viewer + '?s=' + j.id; return link(c); })
-      .catch(function () { return c.url; });
+      .catch(function (e) { return e && e.message === 'bad' ? null : c.url; });
   }
   function openDone() {
     var c = current(); if (!c) return;
@@ -855,6 +855,7 @@
   $('send').addEventListener('click', function () {
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) {
+      if (!u) return;
       window.SsakaShare({
         title: c.card.title,
         description: c.card.subtitle || '눌러서 카드를 열어보세요',

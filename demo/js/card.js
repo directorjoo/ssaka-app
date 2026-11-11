@@ -180,6 +180,17 @@
       try { fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: body, keepalive: true }); } catch (e) {}
     }
     hit('view');
+    // 이상한 카드 신고 (만든 사람 화면엔 안 보임)
+    if (statKey && window.self === window.top && !isMine()) {
+      var rp = document.createElement('button'); rp.type = 'button'; rp.className = 'sk-report'; rp.textContent = '🚩 이상한 카드 신고';
+      rp.addEventListener('click', function () {
+        var why = prompt('어떤 문제인가요? (예: 도박·대출 광고, 사기, 욕설)');
+        if (why === null) return;
+        fetch(new URL('../api/report', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ why: why }, statKey)) })
+          .then(function () { toast('신고했어요. 확인할게요 🙏'); rp.disabled = true; }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+      });
+      setTimeout(function () { (root.querySelector('.sk-make') || root).insertAdjacentElement('afterend', rp); }, 0);
+    }
     root.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-sos-call');
       if (!t) return;

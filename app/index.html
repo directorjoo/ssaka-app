@@ -98,7 +98,7 @@
     .eo-hero .eo-btns a small { display: block; font-size: 12px; font-weight: 700; color: #9a5a63; letter-spacing: 0; }
     .eo-hero .eo-btns a.alt { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
     .eo-hero .eo-btns a.alt small { color: rgba(255,255,255,.85); }
-    .eo-hero .eo-btns a.play { grid-column: 1 / -1; min-height: 62px; background: #FFE27A; color: #5a3b00; font-size: 20px; }
+    .eo-hero .eo-btns a.play { grid-column: 1 / -1; min-height: 62px; padding: 10px 8px 12px; background: #FFE27A; color: #5a3b00; font-size: 20px; }
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
@@ -327,7 +327,7 @@
     // 어디야? — 싸바의 얼굴. 홈 맨 위에 크게
     var eh = el('div', 'eo-hero');
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요 · 친구 불러 모으기까지</p>' +
-      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>여기서 만나자</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
+      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>여기서 만나자</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>보고 싶은 친구에게 "놀자!" 한마디<br>차 한잔 · 소주 한잔 · 식사 · 산책 · 당구 · 수다</small></a></div>';
     v.appendChild(eh);
     // 싸바카드 만들기 — 보틀 그린+골드로 어디야(체리)와 구분, 상자 어디를 눌러도 만들기로
     var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '우리 가게 홍보하기 — 싸바카드 만들기');

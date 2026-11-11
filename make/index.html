@@ -1416,6 +1416,14 @@
   var qp = new URLSearchParams(location.search), qEdit = qp.get('edit') || qp.get('copy'), editCard = null;
   if (qEdit && window.SsakaCodec) { try { editCard = SsakaCodec.decode(qEdit); } catch (e) { editCard = null; } }
 
+  // 시험할 때 적은 "아주조아 / 0000000"은 한 번만 지움
+  try {
+    var junk = function (o) { if (!o || typeof o !== 'object') return; ['name', 'phone'].forEach(function (k) { if (o[k] === '아주조아' || /^0+$/.test(String(o[k] || '').replace(/\D/g, '') || 'x')) delete o[k]; }); };
+    var dj = JSON.parse(localStorage.getItem(DRAFT) || 'null');
+    if (dj) { junk(dj); if (dj.byType) Object.keys(dj.byType).forEach(function (k) { junk(dj.byType[k]); }); localStorage.setItem(DRAFT, JSON.stringify(dj)); }
+    var mj = JSON.parse(localStorage.getItem('ssaka-me-v1') || 'null');
+    if (mj) { junk(mj); localStorage.setItem('ssaka-me-v1', JSON.stringify(mj)); }
+  } catch (e) {}
   industry = loadDraft();
   if (editCard) {
     loadCard(editCard); type = null;

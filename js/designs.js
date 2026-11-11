@@ -149,9 +149,9 @@
 
   // 압구정 순천만 계절 메뉴 (예시) — 3~5월 봄, 6~8월 여름, 9~10월 가을, 11~2월 겨울
   var SC_M = new Date().getMonth() + 1;
-  var SC = SC_M >= 3 && SC_M <= 5 ? { line: '봄 한정: 도다리쑥국', menu: '' }
+  var SC = SC_M >= 3 && SC_M <= 5 ? { line: '봄 한정: 도다리쑥국 (시세)', menu: '\n도다리쑥국 (시세)' }
     : SC_M >= 6 && SC_M <= 8 ? { line: '여름 한정: 민어탕', menu: '\n민어탕·지리 (2인) 17000' }
-    : SC_M >= 9 && SC_M <= 10 ? { line: '가을 한정: 전어구이 · 전어무침', menu: '' }
+    : SC_M >= 9 && SC_M <= 10 ? { line: '가을 한정: 전어구이 · 전어무침 (시세)', menu: '\n전어구이 (시세)\n전어무침 (시세)' }
     : { line: '겨울 한정: 벌교꼬막 · 생굴무침', menu: '\n벌교꼬막 (겨울 한정) 30000\n생굴무침 (겨울 한정) 30000' };
   var INDUSTRIES = [
     { id: 'actor', label: '배우·모델', emoji: '🎬', type: 'profile', styles: ['cinema', 'magazine', 'glass'], gallery: true,

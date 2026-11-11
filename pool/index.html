@@ -284,10 +284,18 @@
     b.wx = -dir.y * k * h; b.wy = dir.x * k * h; b.wz = -k * a;
   }
   function score(e) {
-    var hits = [], c = 0, cAt = -1;
-    e.list.forEach(function (x) { if (x.t === 'c') c++; else if (hits.indexOf(x.id) < 0) { hits.push(x.id); if (hits.length === 2) cAt = c; } });
+    var hits = [], firstHit = false, cushionsAfterFirst = 0, cAt = -1;
+    e.list.forEach(function (x) {
+      if (x.t === 'c') {
+        if (firstHit) cushionsAfterFirst++;
+      } else if (hits.indexOf(x.id) < 0) {
+        hits.push(x.id);
+        if (hits.length === 1) { firstHit = true; cushionsAfterFirst = 0; }
+        else if (hits.length === 2) cAt = cushionsAfterFirst;
+      }
+    });
     var ok = hits.length === 2 && cAt >= 3;
-    var why = ok ? '쓰리쿠션!' : hits.length === 0 ? '공을 하나도 못 맞혔어요' : hits.length === 1 ? '한 공만 맞혔어요' : '쿠션이 ' + cAt + '번이라 아쉽게 실패';
+    var why = ok ? '쓰리쿠션!' : hits.length === 0 ? '공을 하나도 못 맞혔어요' : hits.length === 1 ? '한 공만 맞혔어요' : '첫 공 이후 쿠션이 ' + cAt + '번이라 아쉽게 실패';
     return { ok: ok, why: why };
   }
 

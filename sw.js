@@ -1,5 +1,5 @@
 /* 싸바 서비스워커 — 새 파일을 먼저 받고(network-first), 인터넷이 약하면 저장해 둔 화면을 보여줌 */
-var CACHE = 'sava-v68';
+var CACHE = 'sava-v69';
 var SHELL = ['./', './app/', './eodiya/', './lucky/', './shoot/', './fly/', './pool/', './emo/', './make/', './c/', './css/brand.css', './css/sk.css', './css/sk-world.css',
   './js/codec.js', './js/store.js', './js/designs.js', './js/render.js', './js/share.js', './js/msgimg.js', './js/install.js', './js/sound.js',
   './img/icon-192.png?v=2', './img/cherry.svg', './img/cherry-dance-anim.svg', './manifest.webmanifest'];

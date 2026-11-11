@@ -790,7 +790,7 @@
     if (card.image && v('image') && (IP.z !== 100 || IP.x !== 50 || IP.y !== 50 || IP.f)) card.ip = [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0];
     if (g('place')) card.place = { name: g('place') };
     // 당근·네이버·카톡 채널·인스타 (https 주소만)
-    var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = v(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
+    var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = g(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
     if (Object.keys(lk).length) card.links = lk;
     if (galList().length) card.gallery = galList();
     if (v('season')) card.season = v('season');

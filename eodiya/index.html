@@ -81,6 +81,12 @@
     #gChips .chip { min-height: 42px; font-size: 15px; }
     #gChips .chip[aria-pressed="true"] { background: var(--ssaka); border-color: var(--ssaka); }
     .gcount { font-weight: 800; color: var(--ssaka); }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .tile { min-height: 104px; border-radius: 20px; border: 0; color: #fff; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+    .tile i { font-style: normal; font-size: 30px; line-height: 1; }
+    .tile b { font-size: 16px; font-weight: 900; line-height: 1.25; }
+    .t-msg { background: #B3142B; } .t-loc { background: #1d6fd1; } .t-pic { background: #12924a; }
+    .tnote { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-2); text-align: center; }
     .photo-btn { display: block; width: 100%; min-height: 64px; margin-top: 12px; border: 0; border-radius: 18px; background: #12924a; color: #fff; font-size: 19px; font-weight: 900; cursor: pointer; }
     .photo-btn small { display: block; font-size: 12.5px; font-weight: 700; opacity: .9; }
     .replies { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
@@ -134,13 +140,13 @@
     <p class="lead">"어디야?" 묻고, "여기야!" 알려 주고, "친구야 놀자!" 불러 모으세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
-      <button type="button" class="mode" data-mode="ask" aria-pressed="true"><i>🙋</i><b>어디야?</b><span>친구가 어디 있는지 물어봐요</span></button>
+      <button type="button" class="mode" data-mode="ask" aria-pressed="true"><i>💬</i><b>싸바?</b><span>안부 묻고 답장 받아요</span></button>
       <button type="button" class="mode" data-mode="come" aria-pressed="false"><i>📍</i><b>여기야!</b><span>내 위치나 만날 곳을 보내요</span></button>
       <button type="button" class="mode" data-mode="play" aria-pressed="false"><i><img src="../img/cherry-dance.svg" alt="" width="34" height="34" style="display:block;margin:-4px 0"></i><b>놀자!</b><span>친구들 불러 모아요</span></button>
     </div>
 
     <div class="box" id="askBox">
-      <div class="bubble">💬 <b id="askPrev">어디야?</b></div>
+      <div class="bubble">💬 <b id="askPrev">싸바?</b></div>
       <label class="l" style="margin-top:14px">첫마디 고르기 <span class="gcount" id="gCount">(최대 3개, 누른 순서대로)</span></label>
       <div class="gtabs" id="gTabs"></div>
       <div class="chips" id="gChips"></div>
@@ -264,8 +270,12 @@
   <section id="viewAsk" hidden>
     <div class="who" id="aWho"></div>
     <h1 class="q">어디야?</h1>
-    <button type="button" class="here" id="hereBtn">📍 위치 찍어주기<small>누르면 지금 내 위치를 지도로 보내요</small></button>
-    <button type="button" class="photo-btn" id="photoBtn">📷 사진 보내기<small>사진을 고르면 카톡 큰 그림으로 가요</small></button>
+    <div class="tiles">
+      <button type="button" class="tile t-msg" id="msgBtn"><i>💬</i><b>문자로<br>답하기</b></button>
+      <button type="button" class="tile t-loc" id="hereBtn"><i>📍</i><b>위치<br>보내기</b></button>
+      <button type="button" class="tile t-pic" id="photoBtn"><i>📷</i><b>사진<br>보내기</b></button>
+    </div>
+    <p class="tnote">📍 위치는 누를 때만 확인하고, 싸바는 저장하지 않아요.</p>
     <input type="file" id="photoIn" accept="image/*" hidden>
     <div class="sec-t">💬 답장 고르기 <span class="gcount" id="rCount">(마음대로, 최대 3개 이어 보내기)</span></div>
     <div class="bubble" id="rPrev" style="margin-bottom:10px">💬 <b>답장을 골라 보세요</b></div>
@@ -273,7 +283,7 @@
     <div class="chips" id="rChips"></div>
     <input type="text" id="hereText" maxlength="80" placeholder="직접 쓰기 (예: 회의 중, 30분 뒤 연락할게)" style="margin-top:10px">
     <button type="button" class="big red" id="rSend" style="margin-top:12px;width:100%;display:block">💬 답장 보내기</button>
-    <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
+    <a class="mk" href="./">나도 <b>싸바?</b> 보내기</a>
   </section>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -469,7 +479,7 @@
       playSound(card.sound || 'here');
     } else {
       $('viewAsk').hidden = false;
-      nameBox($('hereBtn'));
+      nameBox(document.querySelector('#viewAsk .tiles'));
       document.title = '어디야? · 싸카';
       $('aWho').textContent = who + ' 물어봐요';
       var qs = Array.isArray(card.q) && card.q.length ? card.q.slice(0, 4).map(function (x) { return String(x).slice(0, 40); }) : ['어디야?'];
@@ -509,9 +519,8 @@
         var t = rText(); if (!t) { toast('답장을 고르거나 적어주세요'); return; }
         reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' });
       });
-      // 위치를 묻지 않았으면 위치 버튼은 조금 작게, '보여줘'면 사진 버튼을 먼저
-      if (!hasLoc) { var hb = $('hereBtn'); hb.innerHTML = '📍 내 위치 보내기'; hb.style.minHeight = '58px'; hb.style.fontSize = '17px'; }
-      if (ks.indexOf('pic') >= 0) $('hereBtn').parentNode.insertBefore($('photoBtn'), $('hereBtn'));
+      // 💬 문자 · 📍 위치 · 📷 사진은 같은 크기로 나란히 — 무엇으로 답할지는 받는 사람 마음
+      $('msgBtn').addEventListener('click', function () { var t = document.querySelector('#viewAsk .sec-t'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       $('photoBtn').addEventListener('click', function () { $('photoIn').click(); });
       $('photoIn').addEventListener('change', function () {
         var inp = this, f = inp.files && inp.files[0]; if (!f) return;
@@ -621,7 +630,7 @@
     { k: 'world', t: '🌏 세계 인사', items: ['Hello! (헬로 · 안녕!)', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va? (싸바 · 잘 지내?)', 'Ciao! (차오 · 안녕!)', 'Guten Tag! (구텐 탁 · 안녕하세요)', 'Olá! (올라 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Sawasdee (사와디 · 안녕하세요)', 'Namaste (나마스떼 · 안녕하세요)', 'Merhaba (메르하바 · 안녕!)', 'Привет (프리벳 · 안녕!)', 'Salam (살람 · 안녕!)', 'Aloha! (알로하 · 안녕!)'] },
     { k: 'hi', t: '✨ 더', items: ['오늘 뭐 해?', '주말에 뭐 해?', '퇴근했어?', '보고 싶다', '고마워', '힘내!', '아프지 마', '비 온다, 우산 챙겨!', '날씨 좋다, 나와!', '생일 축하해 🎂'] }
   ];
-  var picked = [{ t: '어디야?', k: 'loc' }], gTab = 0;
+  var picked = [{ t: '싸바?', k: 'hi' }], gTab = 2;
   function paintGreet() {
     var tb = $('gTabs'); tb.innerHTML = '';
     GREET.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; paintGreet(); }); tb.appendChild(b); });
@@ -636,7 +645,7 @@
       });
       cb.appendChild(b);
     });
-    $('askPrev').textContent = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '어디야?';
+    $('askPrev').textContent = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '싸바?';
     $('gCount').textContent = picked.length ? '(' + picked.length + '/3 · 누른 순서대로)' : '(최대 3개, 누른 순서대로)';
   }
   $('gOwn').addEventListener('change', function () {
@@ -659,6 +668,7 @@
       var when = playW === 'now' ? '지금 바로' : (new Date(d.at).toDateString() === new Date().toDateString() ? '' : '내일 ') + clockText(d.at);
       return { url: purl, title: from + ': 친구야 놀자!', desc: act + ' · ' + when + (pn ? ' · ' + pn : ''), phone: phone, play: true };
     }
+    if (mode === 'ask' && !picked.length) { picked = [{ t: '싸바?', k: 'hi' }]; paintGreet(); }
     if (mode === 'ask' && picked.length) { d.q = picked.map(function (x) { return x.t; }); d.k = picked.map(function (x) { return x.k; }).filter(function (k, i, a) { return a.indexOf(k) === i; }).join(','); }
     var gpsNow = false;
     if (mode === 'come') {
@@ -677,7 +687,7 @@
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
     var nim = from ? from + '님이 ' : '';
-    var askT = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '어디야?';
+    var askT = picked.map(function (x) { return x.t; }).join(' ');
     var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : askT;
     var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '';
     var onlyWhere = !picked.length || (picked.length === 1 && picked[0].t === '어디야?');

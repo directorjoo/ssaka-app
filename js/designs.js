@@ -215,7 +215,7 @@
       res: { label: '객실 예약', word: '객실' },
       ex: { title: '오션뷰 펜션 싸바', subtitle: '체크인 15:00 · 체크아웃 11:00', name: '펜션 싸바', body: '전 객실 바다 전망\n바비큐 · 개별 스파', copyLabel: '예약 링크', copyValue: 'https://example.com', place: '여수 돌산', menu: '오션 스탠다드 (1박) 120000\n오션 스위트 (1박) 180000\n바비큐 세트 30000', account: 'OO은행 000-0000-0000 펜션 싸바' } },
     { id: 'club', label: '산악회·동호회', emoji: '⛰️', type: 'club', styles: ['ticket', 'poster', 'sticker'],
-      ex: { title: '11월 정기산행 북한산', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 싸바산악회', place: '북한산 우이역 2번 출구' } },
+      ex: { title: '순천중고 산악회 11월 정기산행', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고산악회', place: '북한산 우이역 2번 출구' } },
     { id: 'alumni', label: '동문회·향우회', emoji: '🎓', type: 'club', styles: ['ticket', 'magazine', 'cinema'],
       ex: { title: '순천중고 동창회 송년회', subtitle: '12월 20일(토) 저녁 7시', name: '이정민', body: '회비 3만원 (현장 납부 가능)\n2차 노래방 예정', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고동창회', place: '압구정 순천만', phone: '02-541-2125' } },
     { id: 'party', label: '송년회·신년회', emoji: '🥂', type: 'club', styles: ['ticket', 'glass', 'cinema'], season: 'yearend',

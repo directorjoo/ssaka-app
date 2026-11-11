@@ -126,6 +126,7 @@
     }
 
     var ctx = {
+      preview: window.self !== window.top,
       tel: telHref,
       mapUrls: function (p) {
         return {

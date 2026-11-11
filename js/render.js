@@ -68,7 +68,10 @@
     var wrap = el('div', 'sk-wrap');
     var main = el('div', 'sk-main');
     var hero = el('header', 'sk-hero');
-    var photo = el('div', 'sk-photo' + (card.image ? '' : ' sk-nophoto'));
+    // 만들기 화면 미리보기에서 대표 사진이 아직 없으면: 결과와 똑같은 정사각형 자리를 보여 줌 (실제 카드에는 안 나옴)
+    var phHold = !card.image && !card.sos && (!ctx || ctx.preview);
+    var photo = el('div', 'sk-photo' + (card.image || phHold ? '' : ' sk-nophoto') + (phHold ? ' sk-phhold' : ''));
+    if (phHold) photo.appendChild(el('span', 'sk-phhold-t', '📷 대표 사진 자리\n정사각형(1:1)으로 들어가요'));
     if (card.image && !card.sos) {
       var img = el('img');
       img.src = card.image; img.alt = card.title || ''; img.decoding = 'async';

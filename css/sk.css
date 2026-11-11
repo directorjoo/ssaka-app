@@ -517,3 +517,11 @@
 .sk-cb-v { font-size: 17px; font-weight: 900; line-height: 1.3; word-break: keep-all; overflow-wrap: anywhere; }
 .sk-cb-go { flex: none; padding: 10px 12px; border-radius: 12px; background: #1A1A1A; color: #fff; font-size: 14.5px; font-weight: 900; white-space: nowrap; }
 .sk-copybox.done .sk-cb-go { background: #13A35A; }
+
+/* 대표 사진은 모든 디자인에서 정사각형 (만들기 화면의 자르기와 똑같이) */
+.sk[data-style="cinema"] .sk-photo:not(.sk-nophoto) { aspect-ratio: 1 / 1 !important; }
+/* 미리보기 전용: 사진 넣기 전 정사각형 자리 */
+.sk-photo.sk-phhold { aspect-ratio: 1 / 1 !important; height: auto; display: grid; place-items: center; background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--accent, #B3132B) 10%, #fff) 0 14px, color-mix(in srgb, var(--accent, #B3132B) 18%, #fff) 14px 28px); border: 2px dashed color-mix(in srgb, var(--accent, #B3132B) 55%, transparent); }
+.sk-phhold-t { white-space: pre-line; text-align: center; font-size: 17px; font-weight: 900; line-height: 1.5; color: #333; background: rgba(255,255,255,.85); padding: 10px 16px; border-radius: 14px; }
+.sk-photo.sk-phhold::after { display: none; }
+.sk-photo.sk-phhold .sk-mono { display: none !important; }

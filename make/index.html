@@ -900,7 +900,7 @@
       .then(function (j) { if (j && j.id) SHORT[d] = viewer + '?s=' + j.id; return link(c); })
       .catch(function (e) { return e && e.message === 'bad' ? null : c.url; });
   }
-  function openDone() {
+  function openDone() { try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) { $('open2').href = u; });
     $('open2').href = c.url;
@@ -931,16 +931,63 @@
 
   $('send').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    ensureShort(c).then(function (u) {
+    var btn = this; btn.disabled = true; setTimeout(function () { btn.disabled = false; }, 4000);
+    Promise.all([ensureShort(c), shareImage(c.card)]).then(function (r) {
+      var u = r[0], im = r[1]; btn.disabled = false;
       if (!u) return;
-      window.SsakaShare({
-        title: c.card.title,
-        description: c.card.subtitle || '눌러서 카드를 열어보세요',
-        imageUrl: /^https:/.test(c.card.image || '') ? c.card.image : undefined,
-        url: u
-      });
+      var o = { title: c.card.title, description: c.card.subtitle || '눌러서 카드를 열어보세요', url: u };
+      if (im) { o.imageUrl = im.url; o.imageWidth = im.w; o.imageHeight = im.h; }
+      else if (/^https:/.test(c.card.image || '')) o.imageUrl = c.card.image;
+      window.SsakaShare(o);
     });
   });
+
+  // ---------- 카톡 말풍선 그림: 사진이 여러 장이면 대표 사진 + 작은 사진 3장 모음 (카톡엔 그림 1장만 뜨니까) ----------
+  var shareImgCache = {};
+  function loadImg(u) {
+    return new Promise(function (ok, no) {
+      var blob = localPics[u], im = new Image();
+      im.onload = function () { ok(im); }; im.onerror = no;
+      if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = u; }
+      setTimeout(function () { no(new Error('t')); }, 5000);
+    });
+  }
+  function coverDraw(cx, im, x, y, w, h) {
+    var r = Math.max(w / im.naturalWidth, h / im.naturalHeight), sw = w / r, sh = h / r;
+    cx.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 3, sw, sh, x, y, w, h);
+  }
+  function shareImage(card) {
+    var gal = (card.gallery || []).filter(Boolean), main = card.image || gal[0];
+    if (!main || gal.length < 1 || !window.SsakaKakao) return Promise.resolve(null);
+    var small = gal.filter(function (u) { return u !== main; }).slice(0, 3), key = main + '|' + small.join('|') + '|' + gal.length;
+    if (shareImgCache[key]) return Promise.resolve(shareImgCache[key]);
+    var work = Promise.all([main].concat(small).map(function (u) { return loadImg(u).catch(function () { return null; }); })).then(function (ims) {
+      if (!ims[0]) return null;
+      var W = 1000, H = 1000, TOP = 667, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H);
+      coverDraw(cx, ims[0], 0, 0, W, TOP);
+      var th = ims.slice(1).filter(Boolean), n = Math.max(1, th.length), tw = (W - (n - 1) * 6) / n;
+      th.forEach(function (im, i) { coverDraw(cx, im, i * (tw + 6), TOP + 6, tw, H - TOP - 6); });
+      var more = gal.length - th.length;
+      if (th.length && more > 0) { var lx = (th.length - 1) * (tw + 6); cx.fillStyle = 'rgba(0,0,0,.5)'; cx.fillRect(lx, TOP + 6, tw, H - TOP - 6); cx.fillStyle = '#fff'; cx.font = '900 64px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText('+' + more, lx + tw / 2, TOP + 6 + (H - TOP - 6) / 2); }
+      cx.fillStyle = 'rgba(0,0,0,.6)'; var label = '📷 사진 ' + (gal.length + (card.image && gal.indexOf(card.image) < 0 ? 1 : 0)) + '장';
+      cx.font = '800 38px sans-serif'; var lw = cx.measureText(label).width + 40;
+      cx.beginPath(); cx.roundRect ? cx.roundRect(24, 24, lw, 64, 32) : cx.rect(24, 24, lw, 64); cx.fill();
+      cx.fillStyle = '#fff'; cx.textAlign = 'left'; cx.textBaseline = 'middle'; cx.fillText(label, 44, 57);
+      return new Promise(function (ok) { cv.toBlob(ok, 'image/jpeg', 0.86); });
+    }).then(function (blob) {
+      if (!blob) return null;
+      var f = new File([blob], 'sava-share.jpg', { type: 'image/jpeg' }), list = [f];
+      try { var dt = new DataTransfer(); dt.items.add(f); list = dt.files; } catch (e) {}
+      return window.SsakaKakao().then(function (Kakao) { return Kakao.Share.uploadImage({ file: list }); }).then(function (res) {
+        var info = (res && (res.infos || res)) || {}, url = info.original && info.original.url;
+        if (!url) return null;
+        return (shareImgCache[key] = { url: url.replace(/^http:/, 'https:'), w: 1000, h: 1000 });
+      });
+    }).catch(function () { return null; });
+    // 늦으면 대표 사진 한 장으로 그냥 보냄
+    return Promise.race([work, new Promise(function (ok) { setTimeout(function () { ok(null); }, 6000); })]);
+  }
   $('copy').addEventListener('click', function () {
     var c = current(); if (!c) return;
     var done = function () { toast('링크를 복사했어요'); };

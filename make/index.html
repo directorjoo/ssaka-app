@@ -64,6 +64,8 @@
     .ptile.has .ptile-in { position: absolute; left: 10px; bottom: 10px; display: block; padding: 7px 12px; border-radius: 999px; background: rgba(20,20,24,.72); color: #fff; }
     .ptile.has .ptile-in small, .ptile.has .ptile-ico { display: none; }
     .ptile.has .ptile-in b { font-size: 13px; }
+    .fixlab { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 700; cursor: pointer; min-height: 40px; }
+    .fixlab input { width: 20px; height: 20px; accent-color: #B3132B; }
     .ptile-in { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 16px; }
     .ptile-ico { font-size: 34px; }
     .ptile-in b { font-size: 17px; }
@@ -277,6 +279,9 @@
           <div class="photo-row">
             <span class="hint" id="photoStatus">사진은 크기를 줄여서 카카오 서버에 올려요.</span>
             <button type="button" class="mini" id="photoRemove" hidden>사진 빼기</button>
+          </div>
+          <div class="photo-row">
+            <label class="fixlab"><input type="checkbox" id="autoFix" checked> ✨ 사진 자동 보정 (밝기·색감)</label>
           </div>
           <input id="image" type="hidden">
         </div>
@@ -960,7 +965,32 @@
   }
   var PHOTO_LABEL = { profile: '대표 사진 올리기', shop: '간판·매장 사진 올리기', club: '모임 사진 올리기', greet: '사진 올리기', safe: '사진 올리기' };
   var PHOTO_HELP = { profile: '본인 프로필 사진을 고르면 카드 맨 위에 크게 들어가요', shop: '간판이나 매장, 대표 메뉴 사진이 좋아요', club: '모임 단체 사진이나 장소 사진이 좋아요', greet: '함께 찍은 사진이나 겨울 풍경 사진이 좋아요', safe: '' };
-  function resize(file, max) {
+  // ✨ 사진 자동 보정: 어둡거나 뿌연 사진을 밝기·대비·색감 맞춰 또렷하게 (과하지 않게)
+  function enhance(cv) {
+    try {
+      var x = cv.getContext('2d'), W = cv.width, H = cv.height, im = x.getImageData(0, 0, W, H), d = im.data, n = W * H;
+      var hist = new Uint32Array(256), step = Math.max(1, Math.floor(n / 60000)) * 4, cnt = 0, sat = 0;
+      for (var i = 0; i < d.length; i += step) { var l = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0; hist[l]++; cnt++; var mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]); sat += mx ? (mx - mn) / mx : 0; }
+      function pct(p) { var t = cnt * p, a = 0; for (var k = 0; k < 256; k++) { a += hist[k]; if (a >= t) return k; } return 255; }
+      var lo = pct(0.01), hi = pct(0.99), mid = pct(0.5); sat /= cnt;
+      lo = Math.min(lo, 60); hi = Math.max(hi, 150);
+      var span = Math.max(1, hi - lo);
+      var midN = (mid - lo) / span, gamma = midN > 0.02 && midN < 0.98 ? Math.log(0.5) / Math.log(midN) : 1;
+      gamma = Math.min(1.45, Math.max(0.75, gamma)); gamma = 1 + (gamma - 1) * 0.8;
+      var sBoost = sat < 0.18 ? 1.18 : sat < 0.3 ? 1.1 : 1.03;
+      if (lo < 6 && hi > 248 && Math.abs(gamma - 1) < 0.04 && sBoost < 1.05) return false;
+      var lut = new Uint8ClampedArray(256);
+      for (var v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.min(1, Math.max(0, (v - lo) / span)), 1 / gamma);
+      for (i = 0; i < d.length; i += 4) {
+        var r = lut[d[i]], g = lut[d[i + 1]], b = lut[d[i + 2]], L = 0.299 * r + 0.587 * g + 0.114 * b;
+        d[i] = L + (r - L) * sBoost; d[i + 1] = L + (g - L) * sBoost; d[i + 2] = L + (b - L) * sBoost;
+      }
+      x.putImageData(im, 0, 0); return true;
+    } catch (e) { return false; }
+  }
+  var autoFix = true;
+  try { autoFix = localStorage.getItem('sava-autofix') !== '0'; } catch (e) {}
+  function resize(file, max, fix) {
     return new Promise(function (resolve) {
       var img = new Image(), u = URL.createObjectURL(file);
       img.onload = function () {
@@ -968,6 +998,7 @@
         var cv = document.createElement('canvas');
         cv.width = Math.round(img.width * r); cv.height = Math.round(img.height * r);
         cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        if (fix) enhance(cv);
         URL.revokeObjectURL(u);
         cv.toBlob(function (b) { resolve(b ? new File([b], 'ssaka.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.85);
       };
@@ -1026,17 +1057,27 @@
     function end() { if (drag && moved) ipChanged(); drag = null; }
     tile.addEventListener('pointerup', end); tile.addEventListener('pointercancel', end);
   })();
+  var origMain = null;
   $('photoFile').addEventListener('change', function () {
     var input = this, file = input.files && input.files[0];
     if (!file) return;
     if (!/^image\//.test(file.type)) { toast('사진 파일만 올릴 수 있어요'); return; }
-    $('photoStatus').textContent = '사진 올리는 중…';
     IP = { z: 100, x: 50, y: 50, f: 0 }; autoFit = true;
-    showThumb(URL.createObjectURL(file));
+    origMain = file; uploadMain(file);
+    input.value = '';
+  });
+  $('autoFix').checked = autoFix;
+  $('autoFix').addEventListener('change', function () {
+    autoFix = this.checked; try { localStorage.setItem('sava-autofix', autoFix ? '1' : '0'); } catch (e) {}
+    if (origMain) uploadMain(origMain);
+  });
+  function uploadMain(file) {
+    $('photoStatus').textContent = autoFix ? '✨ 사진을 보정해서 올리는 중…' : '사진 올리는 중…';
     var lastSmall = null;
-    resize(file, 1080).then(function (small) {
+    resize(file, 1080, autoFix).then(function (small) {
       lastSmall = small;
-      var list = input.files;
+      showThumb(URL.createObjectURL(small));
+      var list = [small];
       try { var dt = new DataTransfer(); dt.items.add(small); list = dt.files; } catch (e) {}
       if (!window.SsakaKakao) throw new Error('kakao');
       return window.SsakaKakao().then(function (Kakao) { return Kakao.Share.uploadImage({ file: list }); });
@@ -1046,14 +1087,13 @@
       if (!url) throw new Error('no url');
       $('image').value = url.replace(/^http:/, 'https:');
       if (lastSmall) localPics[$('image').value] = lastSmall;
-      $('photoStatus').textContent = '사진이 올라갔어요 ✓';
+      $('photoStatus').textContent = autoFix ? '✨ 보정한 사진이 올라갔어요 ✓' : '사진이 올라갔어요 ✓';
       update(); renderGallery();
     }).catch(function () {
       $('photoStatus').textContent = '사진을 올리지 못했어요. 잠시 뒤 다시 골라주세요.';
       showThumb($('image').value);
     });
-    input.value = '';
-  });
+  }
   // ---------- 사진 여러 장 (최대 10장) ----------
   function renderGal() {
     var grid = $('galGrid'), add = $('galAdd');

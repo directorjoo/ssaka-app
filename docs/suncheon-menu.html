@@ -38,6 +38,14 @@
   .c4 { --bg: #E2F0E3; --hc: #2E7D4F; --dc: #B8D8BC; }
   .sec { margin-top: 18px !important; }
   .it { line-height: 1.55 !important; }
+  /* 나무 액자 */
+  .pg { padding: 80px 86px 0 !important; }
+  .pg::before { inset: 0 !important; border-radius: 0 !important; border: 34px solid transparent !important;
+    border-image: repeating-linear-gradient(90deg, #6B4226 0 7px, #7E5130 7px 13px, #5E3820 13px 16px, #8A5A36 16px 27px, #6F4528 27px 33px) 34 !important; z-index: 2; }
+  .pg::after { inset: 34px !important; border: 0 !important; border-radius: 0 !important; box-shadow: inset 0 0 0 3px #3E2513, inset 0 0 0 7px #C9A877, inset 0 6px 22px rgba(0,0,0,.28) !important; z-index: 2; }
+  .ft { left: 86px !important; right: 86px !important; bottom: 62px !important; }
+  .hd { margin-bottom: 14px !important; }
+  .name { font-size: 84px !important; }
 </style></head><body>
 
 <div class="pg" id="p1">

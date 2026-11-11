@@ -173,7 +173,7 @@
     if (live && ctx.onSms) on(sms, ctx.onSms); else sms.tabIndex = -1;
     wrap.appendChild(sms);
 
-    var make = el(live ? 'a' : 'div', 'sk-make', '나도 10초 만에 싸카 만들기');
+    var make = el(live ? 'a' : 'div', 'sk-make', '나도 10초 만에 싸바카드 만들기');
     if (live) make.href = ctx.makeHref;
     wrap.appendChild(make);
 

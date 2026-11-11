@@ -168,6 +168,29 @@
     };
 
     var root = SsakaRender.build(card, design, ctx);
+    // ---------- 손님 반응 숫자: 열람·버튼 '횟수'만 보냄 (만든 사람 본인 화면은 빼고) ----------
+    var statKey = (function () { var q = new URLSearchParams(location.search); return q.get('s') ? { s: q.get('s') } : (q.get('d') || window.__ssakaD) ? { d: q.get('d') || window.__ssakaD } : null; })();
+    function isMine() {
+      try { var dq = new URLSearchParams(location.search).get('d') || window.__ssakaD; return !!(dq && window.SsakaStore && SsakaStore.mine().some(function (x) { try { return new URL(x.url).searchParams.get('d') === dq || x.url.indexOf(dq) >= 0; } catch (e) { return false; } })); } catch (e) { return false; }
+    }
+    function hit(ev) {
+      if (!statKey || window.self !== window.top || isMine()) return;
+      var body = JSON.stringify(Object.assign({ ev: ev }, statKey)), u = new URL('../api/stats', location.href).href;
+      try { if (navigator.sendBeacon && navigator.sendBeacon(u, new Blob([body], { type: 'application/json' }))) return; } catch (e) {}
+      try { fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: body, keepalive: true }); } catch (e) {}
+    }
+    hit('view');
+    root.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-sos-call');
+      if (!t) return;
+      var c = t.className || '', ev = '';
+      if (/sk-mapbtn/.test(c)) ev = /네이버/.test(t.textContent) ? 'navermap' : 'kakaomap';
+      else if (/sk-share/.test(c)) ev = 'share';
+      else if (/sk-sms/.test(c)) ev = 'sms';
+      else if (/sk-sos-call|sk-call/.test(c)) ev = 'call';
+      else { var m = c.match(/sk-(map|reserve|rsvp|save|copy)\b/); if (m) ev = m[1]; }
+      if (ev) hit(ev);
+    }, true);
     // 받은 카드함에 기록 (만들기 화면 미리보기는 제외)
     if (window.SsakaStore && window.self === window.top && /[?&][ds]=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
     // 내가 만든 카드라면: 수정하기 · 복사해서 새로 만들기
@@ -178,11 +201,22 @@
       });
       if (mine) {
         var bar = document.createElement('div'); bar.className = 'sk-owner';
+        var st = document.createElement('div'); st.className = 'sk-stats'; st.textContent = '📊 손님 반응 불러오는 중…';
+        fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {
+          var w = j.week || {}, t = j.total || {};
+          var mp = (w.map || 0) + (w.kakaomap || 0) + (w.navermap || 0);
+          st.innerHTML = '';
+          var h = document.createElement('b'); h.textContent = '📊 이번 주 손님 반응'; st.appendChild(h);
+          [['👀 열어 봄', w.view || 0], ['📍 길찾기', mp], ['📞 전화', w.call || 0], ['📅 예약', (w.reserve || 0) + (w.rsvp || 0)], ['💬 다시 보냄', (w.share || 0) + (w.sms || 0)]].forEach(function (x) {
+            var c = document.createElement('span'); c.innerHTML = '<i></i><em></em>'; c.firstChild.textContent = x[0]; c.lastChild.textContent = x[1]; st.appendChild(c);
+          });
+          var tot = document.createElement('small'); tot.textContent = '처음부터 지금까지 열어 본 횟수 ' + (t.view || 0) + '번 · 같은 사람은 하루 한 번만 세요'; st.appendChild(tot);
+        }).catch(function () { st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
         var mk = new URL('../make/', location.href).href;
         var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq); e1.textContent = '✏️ 수정하기';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사해서 새로';
         bar.appendChild(e1); bar.appendChild(e2);
-        document.body.appendChild(bar);
+        document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
       }
     } catch (e) {}
     app.innerHTML = '';

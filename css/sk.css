@@ -452,7 +452,7 @@
 .sk-season-snow .sk-ribbon { background: #e8f1fb; color: #18324f; }
 
 /* ---------- 모임 참석 답장 ---------- */
-.sk-rsvp { display: grid; gap: 10px; margin-top: 14px; }
+.sk-rsvp:not(.sk-act) { display: grid; gap: 10px; margin-top: 14px; }
 .sk-rsvp-b { min-height: 54px; border-radius: 14px; border: 1.5px solid var(--line-ink); background: var(--paper); color: var(--ink); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
 .sk-rsvp-yes { background: var(--accent); color: var(--on-accent); border-color: transparent; }
 .sk-rsvp-b:focus-visible { outline: 3px solid var(--accent-line); outline-offset: 2px; }
@@ -482,3 +482,16 @@
 .sk[data-style="pastel"] .sk-photo:not(.sk-nophoto), .sk[data-style="hongjin"] .sk-photo:not(.sk-nophoto), .sk[data-style="gold"] .sk-photo:not(.sk-nophoto) { width: 84% !important; }
 .sk-photo .sk-photo-blur { position: absolute; inset: -10%; width: 120% !important; height: 120% !important; object-fit: cover; filter: blur(22px) saturate(1.1); opacity: .85; }
 .sk-photo.sk-fit > img:not(.sk-photo-blur) { position: relative; z-index: 1; }
+
+/* 단추 3개 → 한 줄로 나란히, 높이 같게 */
+.sk-actions.sk-n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: stretch; }
+.sk-actions.sk-n3 .sk-act { flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 8px; padding: 14px 4px; min-height: 104px; }
+.sk-actions.sk-n3 .sk-lab { font-size: 15px; white-space: nowrap; letter-spacing: -.03em; }
+.sk-actions.sk-n3 .sk-meta { display: none; }
+/* 동그라미 단추 색을 기능마다 다르게 (유리·파스텔) */
+.sk[data-style="glass"] .sk-actions .sk-act.sk-call .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-call .sk-ico { background: #2FA866; color: #fff; box-shadow: 0 8px 18px -8px #2FA866; }
+.sk[data-style="glass"] .sk-actions .sk-act.sk-rsvp .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-rsvp .sk-ico { background: #E0457B; color: #fff; box-shadow: 0 8px 18px -8px #E0457B; }
+.sk[data-style="glass"] .sk-actions .sk-act.sk-map .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-map .sk-ico { background: #3A86E0; color: #fff; box-shadow: 0 8px 18px -8px #3A86E0; }
+.sk[data-style="glass"] .sk-actions .sk-act.sk-save .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-save .sk-ico { background: #8A5CD6; color: #fff; box-shadow: 0 8px 18px -8px #8A5CD6; }
+.sk[data-style="glass"] .sk-actions .sk-act.sk-reserve .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-reserve .sk-ico { background: #F08A24; color: #fff; box-shadow: 0 8px 18px -8px #F08A24; }
+.sk[data-style="glass"] .sk-actions .sk-act.sk-copy .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-copy .sk-ico { background: #6B7A8F; color: #fff; box-shadow: 0 8px 18px -8px #6B7A8F; }

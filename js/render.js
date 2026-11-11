@@ -169,7 +169,10 @@
       }
       if (b === 'copy' && card.copy && card.copy.value) acts.appendChild(action('copy', card.copy.label || '복사', null, null, live && ctx.onCopy, live));
     });
-    if (acts.children.length % 2 === 1) acts.lastChild.classList.add('sk-wide');
+    // 단추가 3개면 한 줄에 나란히 (목록형 디자인은 제외), 아니면 홀수일 때 마지막을 넓게
+    var listy = { cinema: 1, magazine: 1, minimal: 1 }[design && design.style];
+    if (acts.children.length === 3 && !listy) acts.classList.add('sk-n3');
+    else if (acts.children.length % 2 === 1) acts.lastChild.classList.add('sk-wide');
     if (acts.children.length) wrap.appendChild(acts);
     if (mapc) wrap.appendChild(mapc);
 

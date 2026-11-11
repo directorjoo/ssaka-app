@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>의견 관리 · 싸바</title>
+  <link rel="stylesheet" href="../../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #f6f6f8; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 640px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 14px 40px; }
+    h1 { font-size: 22px; margin: 4px 0 12px; }
+    .key { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    input { min-height: 48px; border-radius: 12px; border: 1.5px solid #ddd; padding: 0 12px; font: inherit; font-size: 16px; }
+    button { min-height: 44px; border-radius: 12px; border: 0; padding: 0 14px; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .tabs { display: flex; gap: 6px; margin: 14px 0 10px; }
+    .tabs button { background: #fff; border: 1.5px solid #ddd; }
+    .tabs button[aria-pressed="true"] { background: #191919; color: #fff; border-color: #191919; }
+    .it { background: #fff; border-radius: 16px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 0 rgba(0,0,0,.04); }
+    .it .meta { font-size: 12.5px; color: var(--ink-2); margin-bottom: 6px; }
+    .it p { margin: 0 0 10px; font-size: 16px; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; }
+    .it .acts { display: flex; gap: 8px; }
+    .ok { background: #155040; color: #fff; } .no { background: #eee; } .re { background: #fff; border: 1.5px solid #ddd !important; }
+    .st { font-weight: 900; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <h1>💡 의견 관리</h1>
+  <div class="key"><input id="k" type="password" placeholder="관리 비밀번호 (ADMIN_KEY)" autocomplete="current-password"><button id="go" class="ok">열기</button></div>
+  <div class="tabs" id="tabs" hidden>
+    <button data-f="new" aria-pressed="true">읽을 것</button><button data-f="ok" aria-pressed="false">쿠폰 준 것</button><button data-f="no" aria-pressed="false">넘긴 것</button><button data-f="" aria-pressed="false">전체</button>
+  </div>
+  <div id="list"></div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, items = [], f = 'new';
+  try { $('k').value = sessionStorage.getItem('sava-adm') || ''; } catch (e) {}
+  var KIND = { better: '🔧 고칠 점', idea: '💡 새 아이디어', bug: '😣 불편했던 점' };
+  function call(extra) {
+    var key = $('k').value.trim(); if (!key) return;
+    try { sessionStorage.setItem('sava-adm', key); } catch (e) {}
+    return fetch('../../api/idea', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ admin: key }, extra || {})) })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        if (j.error) { $('list').textContent = j.error === 'key' ? '비밀번호가 달라요' : j.error === 'setup' ? 'Cloudflare에 ADMIN_KEY를 먼저 넣어 주세요' : '잠시 뒤 다시'; return; }
+        items = j.items || []; $('tabs').hidden = false; paint();
+      });
+  }
+  function paint() {
+    var L = $('list'); L.innerHTML = '';
+    var list = items.filter(function (x) { return !f || x.st === f; });
+    if (!list.length) { L.textContent = '없어요'; return; }
+    list.forEach(function (x) {
+      var d = document.createElement('div'); d.className = 'it';
+      var m = document.createElement('div'); m.className = 'meta'; m.textContent = (KIND[x.kind] || '') + ' · ' + new Date(x.at).toLocaleString('ko-KR') + (x.code ? ' · 쿠폰 ' + x.code : '') + (x.used ? ' · ✔ 사용함' : '');
+      var p = document.createElement('p'); p.textContent = x.text;
+      var a = document.createElement('div'); a.className = 'acts';
+      [['ok', '🎁 쿠폰 주기'], ['no', '🙏 넘기기'], ['new', '되돌리기']].forEach(function (o) {
+        if (x.st === o[0]) return;
+        if (x.used && o[0] !== 'ok') return;
+        var b = document.createElement('button'); b.className = o[0] === 'ok' ? 'ok' : o[0] === 'no' ? 'no' : 're'; b.textContent = o[1];
+        b.addEventListener('click', function () { call({ id: x.id, st: o[0] }); });
+        a.appendChild(b);
+      });
+      d.appendChild(m); d.appendChild(p); d.appendChild(a); L.appendChild(d);
+    });
+  }
+  document.querySelectorAll('#tabs button').forEach(function (b) { b.addEventListener('click', function () { f = b.dataset.f; document.querySelectorAll('#tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); paint(); }); });
+  $('go').addEventListener('click', function () { call(); });
+  $('k').addEventListener('keydown', function (e) { if (e.key === 'Enter') call(); });
+  if ($('k').value) call();
+})();
+</script>
+</body>
+</html>

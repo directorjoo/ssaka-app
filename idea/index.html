@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B3132B">
+  <title>의견 보내고 쿠폰 받기 · 싸바</title>
+  <meta property="og:title" content="💡 싸바에 의견 보내고 7,000원 쿠폰 받기">
+  <meta property="og:description" content="고칠 점, 새 아이디어를 보내 주세요. 좋은 의견엔 압구정 순천만 7,000원 할인 쿠폰을 드려요.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 520px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom)); }
+    a.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-decoration: none; font-weight: 700; }
+    h1 { margin: 6px 0 6px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; line-height: 1.25; word-break: keep-all; }
+    h1 em { font-style: normal; color: var(--ssaka); }
+    .sub { margin: 0 0 16px; color: var(--ink-2); font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+    .kinds button { min-height: 48px; border-radius: 14px; border: 1.5px solid #ddd; background: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .kinds button[aria-pressed="true"] { background: #FBE9EC; border-color: var(--ssaka); color: var(--ssaka); }
+    textarea { display: block; width: 100%; min-height: 150px; padding: 14px; border: 2px solid #E9B3BD; border-radius: 16px; background: #FFF7F8; font: inherit; font-size: 17px; line-height: 1.5; resize: vertical; }
+    textarea:focus { outline: none; border-color: var(--ssaka); background: #fff; }
+    .cnt { text-align: right; font-size: 12.5px; color: var(--ink-2); margin: 4px 2px 0; }
+    .go { display: block; width: 100%; min-height: 58px; margin-top: 12px; border: 0; border-radius: 16px; background: var(--ssaka); color: #fff; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .go:disabled { opacity: .5; }
+    .note { margin-top: 10px; font-size: 13px; color: var(--ink-2); line-height: 1.6; word-break: keep-all; }
+    h2 { font-size: 19px; margin: 28px 0 10px; }
+    .item { padding: 12px 14px; border-radius: 14px; background: #f6f6f8; margin-bottom: 8px; font-size: 14.5px; line-height: 1.5; }
+    .item b { display: block; margin-bottom: 2px; }
+    .cp { position: relative; margin: 8px 0 14px; padding: 18px 18px 16px; border-radius: 20px; background: linear-gradient(135deg, #2F7A62, #155040); color: #fff; overflow: hidden; }
+    .cp::before, .cp::after { content: ""; position: absolute; top: 50%; width: 26px; height: 26px; margin-top: -13px; border-radius: 50%; background: #fff; }
+    .cp::before { left: -13px; } .cp::after { right: -13px; }
+    .cp .shop { font-size: 14px; font-weight: 800; opacity: .9; }
+    .cp .amt { font-size: 40px; font-weight: 900; letter-spacing: -.03em; color: #F4E7C8; margin: 2px 0; }
+    .cp .code { display: inline-block; margin: 6px 0 8px; padding: 6px 12px; border-radius: 10px; background: rgba(255,255,255,.14); font-size: 20px; font-weight: 900; letter-spacing: .08em; }
+    .cp .cond { font-size: 12.5px; line-height: 1.55; opacity: .9; }
+    .cp button { margin-top: 12px; width: 100%; min-height: 50px; border: 0; border-radius: 14px; background: #EBD9B0; color: #123F33; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .cp.used { filter: grayscale(1); opacity: .7; }
+    .pin { margin-top: 10px; display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .pin input { min-height: 50px; border-radius: 12px; border: 0; padding: 0 12px; font: inherit; font-size: 20px; letter-spacing: .3em; }
+    .pin button { margin: 0; width: auto; padding: 0 16px; }
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.88); color: #fff; font-size: 14px; font-weight: 700; max-width: 90%; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <a class="back" href="../app/">← 싸바</a>
+  <h1>💡 의견 보내고<br><em>7,000원 쿠폰</em> 받기</h1>
+  <p class="sub">싸바를 써 보고 고칠 점이나 새 아이디어를 보내 주세요. 대표가 직접 읽고, 도움 되는 의견에는 <b>압구정 순천만 7,000원 할인 쿠폰</b>을 드려요.</p>
+
+  <div class="kinds" role="group" aria-label="의견 종류">
+    <button type="button" data-k="better" aria-pressed="true">🔧 고칠 점</button>
+    <button type="button" data-k="idea" aria-pressed="false">💡 새 아이디어</button>
+    <button type="button" data-k="bug" aria-pressed="false">😣 불편했던 점</button>
+  </div>
+  <textarea id="txt" maxlength="1000" placeholder="예: 어디야 답장 화면에서 글씨가 작아요. 이렇게 바꾸면 좋겠어요…"></textarea>
+  <div class="cnt"><span id="n">0</span> / 1000</div>
+  <button type="button" class="go" id="send">💌 의견 보내기</button>
+  <p class="note">이름·전화번호는 받지 않아요. 보낸 폰에서만 이 화면 아래에 쿠폰이 열려요. (다른 폰이나 다른 브라우저에서는 안 보여요)</p>
+
+  <div id="mine" hidden>
+    <h2>내가 보낸 의견 · 쿠폰</h2>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'sava-ideas-v1', kind = 'better';
+  function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2600); }
+  function mine() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+  function keep(list) { try { localStorage.setItem(KEY, JSON.stringify(list.slice(-10))); } catch (e) {} }
+  document.querySelectorAll('.kinds button').forEach(function (b) { b.addEventListener('click', function () { kind = b.dataset.k; document.querySelectorAll('.kinds button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); });
+  $('txt').addEventListener('input', function () { $('n').textContent = this.value.length; });
+  $('send').addEventListener('click', function () {
+    var text = $('txt').value.trim();
+    if (text.length < 10) { toast('10자 이상 적어 주세요'); $('txt').focus(); return; }
+    var btn = this; btn.disabled = true;
+    fetch('../api/idea', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: kind, text: text }) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (x) {
+        btn.disabled = false;
+        if (x.j.ok && x.j.t) { var l = mine(); l.push({ t: x.j.t, text: text.slice(0, 60), at: Date.now() }); keep(l); $('txt').value = ''; $('n').textContent = 0; toast('고마워요! 읽어 보고 쿠폰을 열어 드릴게요 🍒'); load(); return; }
+        toast(x.s === 429 ? '오늘은 더 보낼 수 없어요. 내일 다시 보내 주세요' : x.s === 422 ? '보낼 수 없는 내용이 들어 있어요' : '잠시 뒤 다시 보내 주세요');
+      }).catch(function () { btn.disabled = false; toast('잠시 뒤 다시 보내 주세요'); });
+  });
+  function fmt(ms) { var d = new Date(ms); return (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
+  function won(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function load() {
+    var l = mine(); if (!l.length) return;
+    fetch('../api/idea?t=' + l.map(function (x) { return x.t; }).join(',')).then(function (r) { return r.json(); }).then(function (j) {
+      var box = $('list'); box.innerHTML = ''; $('mine').hidden = false;
+      (j.items || []).slice().reverse().forEach(function (it) {
+        var my = l.filter(function (x) { return x.t === it.t; })[0] || {};
+        if (it.st === 'ok') {
+          var c = it.coupon, d = document.createElement('div'); d.className = 'cp' + (it.used ? ' used' : '');
+          d.innerHTML = '<div class="shop"></div><div class="amt"></div><div class="code"></div><div class="cond"></div>';
+          d.querySelector('.shop').textContent = '🍽 ' + c.shop + ' 할인 쿠폰';
+          d.querySelector('.amt').textContent = won(c.amount) + '원';
+          d.querySelector('.code').textContent = it.code;
+          d.querySelector('.cond').textContent = won(c.min) + '원 이상 식사 시 · ' + c.until.replace(/-/g, '.') + '까지 · 1회 사용 · 다른 할인과 함께 쓸 수 없어요';
+          var ad = document.createElement('div'); ad.className = 'cond'; ad.style.marginTop = '4px'; ad.textContent = '📍 ' + (c.addr || '') + ' · 📞 ' + (c.tel || ''); d.appendChild(ad);
+          if (it.used) { var u = document.createElement('div'); u.className = 'cond'; u.style.marginTop = '8px'; u.style.fontWeight = '900'; u.textContent = '✔ ' + fmt(it.used) + ' 사용했어요'; d.appendChild(u); }
+          else if (it.expired) { var e = document.createElement('div'); e.className = 'cond'; e.style.marginTop = '8px'; e.textContent = '기간이 지났어요'; d.appendChild(e); }
+          else {
+            var b = document.createElement('button'); b.type = 'button'; b.textContent = '👩‍🍳 계산할 때 직원에게 보여 주세요';
+            b.addEventListener('click', function () {
+              if (d.querySelector('.pin')) return;
+              var p = document.createElement('div'); p.className = 'pin';
+              p.innerHTML = '<input type="password" inputmode="numeric" maxlength="8" placeholder="직원 번호" aria-label="직원 확인 번호"><button type="button">사용 처리</button>';
+              p.querySelector('button').addEventListener('click', function () {
+                var pin = p.querySelector('input').value.trim(); if (!pin) return;
+                fetch('../api/idea', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ use: it.t, pin: pin }) })
+                  .then(function (r) { return r.json(); }).then(function (x) {
+                    if (x.ok) { toast('쿠폰을 사용했어요. 맛있게 드세요!'); load(); }
+                    else toast(x.error === 'pin' ? '직원 번호가 달라요' : x.error === 'used' ? '이미 사용한 쿠폰이에요' : x.error === 'expired' ? '기간이 지난 쿠폰이에요' : '잠시 뒤 다시 해 주세요');
+                  });
+              });
+              d.appendChild(p); p.querySelector('input').focus();
+            });
+            d.appendChild(b);
+          }
+          box.appendChild(d);
+        }
+        var i = document.createElement('div'); i.className = 'item';
+        var st = it.st === 'ok' ? '🎁 쿠폰을 드렸어요' : it.st === 'no' ? '🙏 고마워요! 이번 의견은 쿠폰 대상이 아니에요' : it.st === 'gone' ? '지워진 의견이에요' : '⏳ 대표가 읽고 있어요';
+        i.innerHTML = '<b></b><span></span>'; i.firstChild.textContent = st; i.lastChild.textContent = (my.at ? fmt(my.at) + ' · ' : '') + (my.text || '');
+        box.appendChild(i);
+      });
+    }).catch(function () {});
+  }
+  load();
+})();
+</script>
+</body>
+</html>

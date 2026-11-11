@@ -504,3 +504,8 @@
 .sk-more button { min-height: 44px; border-radius: 14px; border: 1.5px solid var(--line-ink, rgba(0,0,0,.15)); background: transparent; color: inherit; font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; opacity: .9; }
 .sk-more .sk-band::before { content: "🟢 "; }
 .sk-more .sk-link::before { content: "🔗 "; }
+
+/* 가게의 다른 곳 링크 */
+.sk-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.sk-lk { flex: 1 1 calc(50% - 8px); display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 14px; background: var(--paper, #fff); color: var(--ink, #222); border: 1.5px solid var(--line-ink, rgba(0,0,0,.12)); font-size: 15px; font-weight: 800; text-decoration: none; }
+.sk-lk-dg { color: #E8610B; } .sk-lk-nv { color: #03A94D; }

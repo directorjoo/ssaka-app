@@ -63,7 +63,7 @@
           var c = el('button', 'sk-mine-c', '예약 취소'); c.type = 'button';
           c.addEventListener('click', function () {
             if (!confirmCancel(x)) return;
-            var msg = '[싸카 ' + label + ' 취소]\n' + card.title + '\n예약번호: ' + x.code + '\n' + fmtDate(x.date, x.time) + (x.people ? ' · ' + x.people + '명' : '') + '\n' + x.name + ' (' + x.phone + ')\n위 예약을 취소합니다.' +
+            var msg = '[싸바 ' + label + ' 취소]\n' + card.title + '\n예약번호: ' + x.code + '\n' + fmtDate(x.date, x.time) + (x.people ? ' · ' + x.people + '명' : '') + '\n' + x.name + ' (' + x.phone + ')\n위 예약을 취소합니다.' +
               (x.deposit ? '\n입금한 예약금 ' + won(x.deposit) + ' 환불 부탁드립니다.' : '');
             var all = load(); all.forEach(function (y) { if (y.code === x.code) y.status = 'canceled'; }); save(all);
             renderMine();
@@ -159,7 +159,7 @@
       if (!shopPhone) { h.toast('가게 전화번호가 없어 예약 문자를 보낼 수 없어요'); return; }
       var code = 'SK-' + Math.floor(1000 + Math.random() * 9000);
       var items = menu.map(function (m, i) { return qty[i] ? m.n + ' ×' + qty[i] : null; }).filter(Boolean);
-      var msg = '[싸카 ' + label + ' 요청]\n' + card.title +
+      var msg = '[싸바 ' + label + ' 요청]\n' + card.title +
         '\n예약번호: ' + code +
         '\n일시: ' + fmtDate(date.value, time.value) +
         (askPeople ? '\n인원: ' + people + '명' : '') +

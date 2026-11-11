@@ -106,7 +106,7 @@
     card.gallery = (Array.isArray(card.gallery) ? card.gallery : []).map(safeUrl).filter(Boolean).slice(0, 10);
     if (c.url) c.url = safeUrl(c.url);
     if (c.address && c.address.street) card.body = (card.body || []).concat(['📍 ' + c.address.street]);
-    document.title = card.title ? card.title + ' · 싸카' : '싸카';
+    document.title = card.title ? card.title + ' · 싸바' : '싸바';
 
     var D = window.SsakaDesigns;
     var design = D ? (D.get(card.design) || D.fallback(card)) : null;
@@ -202,11 +202,12 @@
       setTimeout(function () { (root.querySelector('.sk-make') || root).insertAdjacentElement('afterend', rp); }, 0);
     }
     root.addEventListener('click', function (e) {
-      var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-band, .sk-link, .sk-sos-call');
+      var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-band, .sk-link, .sk-lk, .sk-sos-call');
       if (!t) return;
       var c = t.className || '', ev = '';
       if (/sk-mapbtn/.test(c)) ev = /네이버/.test(t.textContent) ? 'navermap' : /구글/.test(t.textContent) ? 'googlemap' : 'kakaomap';
-      else if (/sk-band|sk-link/.test(c)) ev = 'share';
+      else if (/sk-band|sk-link\b/.test(c) && !/sk-lk/.test(c)) ev = 'share';
+      else if (/sk-lk/.test(c)) ev = 'outlink';
       else if (/sk-share/.test(c)) ev = 'share';
       else if (/sk-sms/.test(c)) ev = 'sms';
       else if (/sk-sos-call|sk-call/.test(c)) ev = 'call';
@@ -262,7 +263,7 @@
         intro.setAttribute('role', 'button');
         intro.tabIndex = 0;
         intro.setAttribute('aria-label', '탭해서 카드 열기');
-        intro.innerHTML = '<div class="sk-intro-in"><div class="sk-ring"><div class="sk-envelope"></div></div><div class="sk-intro-b">띠링! 싸카 도착</div><div class="sk-intro-t"></div><div class="sk-intro-s">아무 데나 탭하세요</div></div>';
+        intro.innerHTML = '<div class="sk-intro-in"><div class="sk-ring"><div class="sk-envelope"></div></div><div class="sk-intro-b">띠링! 싸바 도착</div><div class="sk-intro-t"></div><div class="sk-intro-s">아무 데나 탭하세요</div></div>';
         intro.querySelector('.sk-intro-t').textContent = (card.contact && card.contact.name ? card.contact.name + '님의 ' : '') + '카드가 도착했어요';
         var opened = false;
         var openCard = function () {

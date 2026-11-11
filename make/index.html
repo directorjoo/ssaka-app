@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>싸카 만들기</title>
+  <title>싸바 만들기</title>
   <meta name="theme-color" content="#FFFFFF">
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png?v=2">
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="../css/brand.css">
   <link rel="stylesheet" href="../css/sk.css">
   <link rel="stylesheet" href="../css/sk-world.css">
-  <meta property="og:title" content="10초 만에 싸카 만들기">
+  <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
   <meta property="og:type" content="website">
@@ -353,7 +353,20 @@
           <input id="place" maxlength="60" placeholder="예: 북한산 우이역 2번 출구">
           <button type="button" class="mini" data-postcode="place">🔍 주소 찾기</button>
         </div>
-        <div class="hint">받는 사람이 누르면 카카오맵·네이버지도에서 이 이름으로 찾아줘요.</div>
+        <div class="hint">받는 사람이 누르면 카카오맵·네이버지도·구글지도에서 이 이름으로 찾아줘요.</div>
+      </fieldset>
+
+      <fieldset data-for="shop profile">
+        <legend>우리 가게 다른 곳 (선택)</legend>
+        <div class="hint" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
+        <label for="lkDg">🥕 당근 비즈프로필</label>
+        <input id="lkDg" type="url" inputmode="url" placeholder="https://www.daangn.com/…">
+        <label for="lkNv">🟢 네이버 플레이스·예약</label>
+        <input id="lkNv" type="url" inputmode="url" placeholder="https://naver.me/…">
+        <label for="lkKc">💬 카카오톡 채널</label>
+        <input id="lkKc" type="url" inputmode="url" placeholder="https://pf.kakao.com/…">
+        <label for="lkIg">📷 인스타그램</label>
+        <input id="lkIg" type="url" inputmode="url" placeholder="https://instagram.com/…">
       </fieldset>
 
       <fieldset>
@@ -500,7 +513,7 @@
   <div class="modal-box done-box">
     <div class="modal-head"><b>상호로 찾기</b><button type="button" class="mini" id="bizClose">닫기</button></div>
     <p class="done-sub">가게나 회사 이름을 적으면 카카오맵에 등록된 주소와 전화번호를 찾아 채워 드려요.</p>
-    <div class="addr"><input id="bizQ" maxlength="40" placeholder="예: 여수 온기식당, 싸카생명 여수지점" enterkeyhint="search"><button type="button" class="mini" id="bizGo">찾기</button></div>
+    <div class="addr"><input id="bizQ" maxlength="40" placeholder="예: 여수 온기식당, 싸바생명 여수지점" enterkeyhint="search"><button type="button" class="mini" id="bizGo">찾기</button></div>
     <ul class="biz-list" id="bizList"></ul>
     <p class="hint" id="bizMsg"></p>
   </div>
@@ -529,12 +542,12 @@
     profile: {
       theme: 'dark', buttons: ['call', 'save', 'copy'],
       labels: { title: '이름 · 직함', subtitle: '한 줄 소개', contact: '연락처', name: '저장될 이름', phone: '전화번호', body: '경력·필모그래피 (한 줄에 하나씩)' },
-      ex: { title: '배우 김싸카', subtitle: '신인 배우 · 178cm · 서울', name: '김싸카', body: '단편 「바다의 문」 주연 (2026)\n웹드라마 「식탁」 조연 (2025)', copyLabel: '인스타 링크', copyValue: 'https://instagram.com/' }
+      ex: { title: '배우 김싸바', subtitle: '신인 배우 · 178cm · 서울', name: '김싸바', body: '단편 「바다의 문」 주연 (2026)\n웹드라마 「식탁」 조연 (2025)', copyLabel: '인스타 링크', copyValue: 'https://instagram.com/' }
     },
     club: {
       theme: 'light', buttons: ['call', 'rsvp', 'map', 'save', 'copy'],
       labels: { title: '모임 제목', subtitle: '날짜 · 시간', contact: '보내는 사람', name: '보내는 사람 이름', phone: '답장 받을 전화번호', body: '코스 · 준비물 · 회비 (한 줄에 하나씩)' },
-      ex: { title: '순천중고 산악회 11월 정기산행', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 싸카산악회', place: '북한산 우이역 2번 출구' }
+      ex: { title: '순천중고 산악회 11월 정기산행', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 싸바산악회', place: '북한산 우이역 2번 출구' }
     },
     shop: {
       theme: 'light', buttons: ['call', 'map', 'save', 'copy'],
@@ -544,7 +557,7 @@
     greet: {
       theme: 'light', buttons: ['call', 'copy'],
       labels: { title: '인사 제목', subtitle: '보내는 사람 · 날짜', contact: '보내는 사람', name: '이름', phone: '전화번호 (선택)', body: '전하고 싶은 말 (한 줄에 하나씩)' },
-      ex: { title: '올 한 해 고마웠어요', subtitle: '2026년 겨울, 김싸카 드림', name: '김싸카', body: '함께여서 든든한 한 해였어요\n새해에도 웃는 일만 가득하길' }
+      ex: { title: '올 한 해 고마웠어요', subtitle: '2026년 겨울, 김싸바 드림', name: '김싸바', body: '함께여서 든든한 한 해였어요\n새해에도 웃는 일만 가득하길' }
     },
     safe: {
       theme: 'contrast', buttons: [], sos: true,
@@ -552,7 +565,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'account', 'resvMin', 'resvRate', 'sound'];
+  var FIELDS = ['title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -776,6 +789,9 @@
     };
     if (card.image && v('image') && (IP.z !== 100 || IP.x !== 50 || IP.y !== 50 || IP.f)) card.ip = [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0];
     if (g('place')) card.place = { name: g('place') };
+    // 당근·네이버·카톡 채널·인스타 (https 주소만)
+    var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = v(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
+    if (Object.keys(lk).length) card.links = lk;
     if (galList().length) card.gallery = galList();
     if (v('season')) card.season = v('season');
     if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
@@ -1443,6 +1459,7 @@
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));
+    var lk = c.links || {}; set('lkDg', lk.dg); set('lkNv', lk.nv); set('lkKc', lk.kc); set('lkIg', lk.ig);
     if (c.copy) { set('copyLabel', c.copy.label); set('copyValue', c.copy.value); }
     set('sosLabel', c.sosLabel); set('locMsg', c.locationMessage);
     if (c.sound) { set('sound', c.sound); soundTouched = true; }

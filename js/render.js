@@ -176,6 +176,16 @@
     else if (acts.children.length % 2 === 1) acts.lastChild.classList.add('sk-wide');
     if (acts.children.length) wrap.appendChild(acts);
     if (mapc) wrap.appendChild(mapc);
+    // 가게의 다른 곳: 당근 · 네이버 · 카톡 채널 · 인스타 (넣은 것만)
+    var LK = [['dg', '🥕 당근'], ['nv', '🟢 네이버'], ['kc', '💬 카톡 채널'], ['ig', '📷 인스타']], lks = card.links || {};
+    var lrow = el('div', 'sk-links');
+    LK.forEach(function (x) {
+      var u = lks[x[0]]; if (!u || !/^https:\/\//.test(u)) return;
+      var a = el(live ? 'a' : 'span', 'sk-lk sk-lk-' + x[0], x[1]);
+      if (live) { a.href = u; a.target = '_blank'; a.rel = 'noopener nofollow'; }
+      lrow.appendChild(a);
+    });
+    if (lrow.children.length) wrap.appendChild(lrow);
 
     var share = el('button', 'sk-share');
     share.type = 'button';

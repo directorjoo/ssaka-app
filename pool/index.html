@@ -121,20 +121,68 @@
     html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
     button, canvas, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
     input, textarea { -webkit-user-select: text; user-select: text; }
+
+    /* 게임 화면: 한 화면에 고정 (스크롤 없음) */
+    body.game { overflow: hidden; height: 100%; }
+    body.game .wrap { height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+    body.game .foot { display: none; }
+    body.game .top { min-height: 34px; }
+    body.game #vGame { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    body.game.over { overflow: auto; } body.game.over .wrap { height: auto; }
+    #vGame .pls { position: relative; }
+    .turn { margin: 5px 0; padding: 6px 10px; font-size: 13.5px; }
+    .bar1 { display: flex; gap: 5px; margin-bottom: 5px; }
+    .bar1 .ch { flex: 1; margin: 0; }
+    .ch button { min-height: 40px; font-size: 14px; }
+    .sideb { flex: none; width: 64px; min-height: 40px; border: 0; border-radius: 9px; background: #fff; box-shadow: inset 0 0 0 1.5px #dbe3ee; font-size: 14px; font-weight: 800; }
+    .sideb[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: none; }
+    .tablebox { flex: 1; min-height: 200px; position: relative; display: flex; justify-content: center; align-items: center; }
+    .tgt { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); padding: 3px 10px; border-radius: 20px; background: rgba(20,28,40,.6); color: #fff; font-size: 12px; font-weight: 800; white-space: nowrap; pointer-events: none; }
+    .tgt:empty { display: none; }
+    .bar2 { display: flex; gap: 6px; align-items: stretch; margin-top: 6px; }
+    .bar2 .f { width: 50px; flex: none; min-height: 64px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1.5px #dbe3ee; font-size: 20px; font-weight: 900; }
+    .bar2 .f:disabled { opacity: .35; }
+    .mini { flex: none; width: 64px; min-height: 64px; padding: 4px 0 2px; border: 0; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1.5px #dbe3ee; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+    .mini canvas { width: 44px; height: 44px; }
+    .mini span { font-size: 11px; font-weight: 900; color: #5b6b82; }
+    .pull { position: relative; flex: 1; min-width: 0; min-height: 64px; border-radius: 16px; background: linear-gradient(90deg, #ffe3e7, #ffb3bd); box-shadow: inset 0 0 0 2px #e8a2ac; overflow: hidden; touch-action: none; }
+    .pull .pf { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #E0455D, var(--cherry)); }
+    .pull .pf.ghost { background: transparent; border-right: 3px dashed rgba(179,20,43,.55); }
+    .pull .pt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: var(--cherry); pointer-events: none; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
+    .pull.on .pt { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35); font-size: 20px; }
+    .pull.off { opacity: .4; }
+    .sheet { position: fixed; inset: 0; z-index: 50; background: rgba(10,16,28,.45); display: flex; align-items: flex-end; justify-content: center; }
+    .sheet .sh { width: 100%; max-width: 480px; padding: 16px 16px calc(14px + env(safe-area-inset-bottom)); border-radius: 22px 22px 0 0; background: #fff; }
+    .sheet .tipw { width: 200px; margin: 0 auto 6px; }
+    .sheet #tip { width: 200px; height: 200px; }
+    .sheet .l { font-size: 13px; font-weight: 900; color: #5b6b82; margin: 8px 0 5px; }
+    .sheet .ch { display: flex; gap: 5px; }
+    .sheet .guide { margin: 0; justify-content: stretch; }
+    .sheet .guide button { flex: 1; min-height: 40px; border-radius: 9px; font-size: 14px; }
+    .sndl { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 14px; font-weight: 800; color: #5b6b82; }
+    .sndl input { width: 20px; height: 20px; accent-color: var(--blue); }
+    .top .chatB { position: relative; background: #FFF1F3; color: var(--cherry); }
+    .chatB.new::after { content: ""; position: absolute; right: 4px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--cherry); }
+    body.game .chat { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 55; margin: 0; border-radius: 20px 20px 0 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(0,0,0,.25); }
+    body.game .chat:not(.open) { display: none; }
+    .big.solo { display: flex; flex-direction: column; gap: 2px; min-height: 84px; margin-top: 18px; background: linear-gradient(135deg, #1d6fd1, #134d93); box-shadow: 0 5px 0 #0d3a70; font-size: 26px; }
+    .big.solo small { font-size: 14px; font-weight: 800; opacity: .85; }
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
     <a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a>
-    <button type="button" id="quit" hidden>나가기</button>
+    <span style="display:flex;gap:6px"><button type="button" class="chatB" id="chatB" hidden>💬 대화</button><button type="button" id="quit" hidden>나가기</button></span>
   </div>
 
   <!-- 처음 -->
   <section id="vHome">
     <h1>🎱 오늘 당구 한판?</h1>
     <p class="sub">집에서 <b>각자 자기 폰으로</b> 친구들과 치는 쓰리쿠션<br>당점 25칸 · 두께 · 밀어·끌어·끊어치기 · 대화창</p>
+    <button type="button" class="big solo" id="practice">🎯 혼자 연습하기<small>가입·초대 없이 바로 쳐요</small></button>
     <div class="box">
+      <span class="lab" style="font-size:16px;margin-bottom:12px">👫 친구랑 치기</span>
       <span class="lab">내 별명 <small>게임·대화에서 보여요</small></span>
       <input class="tx" id="nick" maxlength="10" placeholder="예: 큐대장">
       <span class="lab" style="margin-top:14px">방식</span>
@@ -145,11 +193,10 @@
       <button type="button" class="big" id="make">🎱 방 만들고 친구 부르기</button>
       <div class="err" id="err1"></div>
     </div>
-    <button type="button" class="big g" id="practice">🎯 혼자 연습하기</button>
     <div class="how">
-      <b>치는 법</b> ① 맞힐 공을 톡 누르고 <b>두께</b>를 고르거나, 당구대를 끌어서 직접 겨눠요. ◀ ▶ 로 아주 조금씩.<br>
-      ② 내 공 색의 당점 공에서 <b>상하좌우·대각선 1~3팁</b>을 찍어요.<br>
-      ③ <b>밀어 길게 / 보통 / 툭 끊어</b> 중 스트로크, 세기를 정하고 <b>치기!</b><br>
+      <b>치는 법</b> ① <b>큐를 손가락으로 잡고 돌려서</b> 방향을 잡아요. 맞힐 공을 누르고 <b>두께</b>를 골라도 돼요. ◀ ▶ 로 아주 조금씩.<br>
+      ② 아래 작은 공을 눌러 <b>당점</b>(상하좌우·대각선 1~3팁)과 스트로크를 골라요.<br>
+      ③ 아래 <b>힘 막대를 오른쪽으로 끌었다 놓으면</b> 쳐요. 많이 끌수록 세게! 처음 자리로 돌아와 놓으면 안 쳐요.<br>
       <b>쓰리쿠션</b>: 내 공이 두 공을 다 맞히되, 두 번째 공 전에 쿠션 <b>3번 이상</b>이면 1점. 점수 나면 계속 쳐요. 빨간 공은 절대 내 공이 아니고, 차례가 넘어가면 <b>흰 공 ↔ 노란 공</b>이 바뀌어요.
     </div>
   </section>
@@ -183,22 +230,28 @@
     <div class="pls" id="pls"></div>
     <div class="teamsc" id="teamsc" hidden></div>
     <div class="turn" id="turn"></div>
-    <div class="tablebox"><canvas id="t"></canvas></div>
-    <div class="guide">가이드 <button type="button" data-g="0">실전</button><button type="button" data-g="1">보통</button><button type="button" data-g="2">연습</button>
-      <label style="margin-left:8px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="snd" checked style="accent-color:var(--blue)">소리</label></div>
-    <div class="ctrl" id="ctrl">
-      <div class="tipw"><canvas id="tip" width="264" height="264"></canvas><small id="tipTxt">당점: 가운데</small></div>
-      <div class="rt">
-        <div class="l" id="tgtTxt">① 맞힐 공: 빨간 공 (공을 눌러 바꿔요)</div>
-        <div class="l">② 두께</div>
-        <div class="ch" id="thick"><button type="button" data-t="0.125">1/8</button><button type="button" data-t="0.25">1/4</button><button type="button" data-t="0.5">1/2</button><button type="button" data-t="0.75">3/4</button><button type="button" data-t="1">정면</button></div>
-        <div class="ch" id="side"><button type="button" data-s="-1">◀ 왼쪽</button><button type="button" data-s="1">오른쪽 ▶</button></div>
-        <div class="l">③ 스트로크</div>
+    <div class="bar1" id="ctrl">
+      <div class="ch" id="thick"><button type="button" data-t="0.125">1/8</button><button type="button" data-t="0.25">1/4</button><button type="button" data-t="0.5">1/2</button><button type="button" data-t="0.75">3/4</button><button type="button" data-t="1">정면</button></div>
+      <button type="button" class="sideb" id="sideB">왼 ◀</button>
+    </div>
+    <div class="tablebox" id="tbox"><canvas id="t"></canvas><div class="tgt" id="tgtTxt"></div></div>
+    <div class="bar2">
+      <button type="button" class="f" id="left" aria-label="왼쪽으로 조금">◀</button>
+      <button type="button" class="mini" id="miniB" aria-label="당점·스트로크 고르기"><canvas id="mini" width="104" height="104"></canvas><span>당점</span></button>
+      <div class="pull" id="pull"><div class="pf" id="pf"></div><div class="pt" id="pt">👉 끌었다 놓으면 쳐요</div></div>
+      <button type="button" class="f" id="right" aria-label="오른쪽으로 조금">▶</button>
+    </div>
+    <div class="sheet" id="tipSheet" hidden>
+      <div class="sh">
+        <div class="tipw"><canvas id="tip" width="400" height="400"></canvas><small id="tipTxt">당점: 가운데</small></div>
+        <div class="l">스트로크</div>
         <div class="ch" id="stroke"><button type="button" data-k="0">밀어 길게</button><button type="button" data-k="1">보통</button><button type="button" data-k="2">툭 끊어</button></div>
-        <div class="pw">세기 <input type="range" id="pow" min="5" max="100" value="45"><b id="powTxt">45</b></div>
+        <div class="l">가이드 선</div>
+        <div class="ch guide"><button type="button" data-g="0">실전</button><button type="button" data-g="1">보통</button><button type="button" data-g="2">연습</button></div>
+        <label class="sndl"><input type="checkbox" id="snd" checked> 소리</label>
+        <button type="button" class="big b" id="tipOk">확인</button>
       </div>
     </div>
-    <div class="shot"><button type="button" class="f" id="left" aria-label="왼쪽으로 조금">◀</button><button type="button" class="go" id="shotGo">치기!</button><button type="button" class="f" id="right" aria-label="오른쪽으로 조금">▶</button></div>
     <button type="button" class="skip" id="skip" hidden>⏭ 2분 넘게 안 쳐요 · 다음 사람으로</button>
     <div class="over" id="over" hidden></div>
   </section>
@@ -318,8 +371,8 @@
   var cv = $('t'), cx = cv.getContext('2d'), FR = 0.075, CU = 0.035, scale = 1, dpr = 1;
   var M = FR + CU; // 천 바깥 여백 (프레임 + 쿠션)
   function fit() {
-    var availW = Math.min(456, document.querySelector('.wrap').clientWidth);
-    var availH = Math.max(330, innerHeight * 0.6);
+    var bx = $('tbox'), availW = Math.min(456, bx.clientWidth || document.querySelector('.wrap').clientWidth);
+    var availH = Math.max(200, bx.clientHeight || innerHeight * 0.6);
     var tw = W + M * 2, th = H + M * 2;
     scale = Math.min(availW / tw, availH / th);
     dpr = window.devicePixelRatio || 1;
@@ -377,10 +430,11 @@
     if (canShoot()) drawCue();
   }
   function drawCue() {
-    var cb = balls[curBall()], pull = (+$('pow').value) / 100 * 0.12 + 0.02;
+    var cb = balls[curBall()], pull = pullPow / 100 * 0.16 + 0.02;
     var sx = X(cb.x - aim.x * (R + pull)), sy = Y(cb.y - aim.y * (R + pull));
     var ex = X(cb.x - aim.x * (R + pull + 1.1)), ey = Y(cb.y - aim.y * (R + pull + 1.1));
     cx.lineCap = 'round';
+    if (cueGlow) { cx.strokeStyle = 'rgba(255,236,120,.55)'; cx.lineWidth = 0.06 * scale; cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(ex, ey); cx.stroke(); }
     cx.strokeStyle = 'rgba(0,0,0,.25)'; cx.lineWidth = 0.022 * scale; cx.beginPath(); cx.moveTo(sx + 3, sy + 4); cx.lineTo(ex + 3, ey + 4); cx.stroke();
     var g = cx.createLinearGradient(sx, sy, ex, ey);
     g.addColorStop(0, '#5b8fd6'); g.addColorStop(.015, '#5b8fd6'); g.addColorStop(.02, '#f2ead8'); g.addColorStop(.05, '#f2ead8'); g.addColorStop(.055, '#222'); g.addColorStop(.08, '#d8b07a'); g.addColorStop(.7, '#8a5a2b'); g.addColorStop(1, '#2a1a10');
@@ -427,7 +481,7 @@
   var TR = 58, TO = 66, TMAX = TR * 3 / 3.6;
   function drawTip() {
     var c = tx2, col = BCOL[curBall()] || '#fff', sh = BSH[curBall()] || '#B9B9B9';
-    c.setTransform(2, 0, 0, 2, 0, 0); c.clearRect(0, 0, 132, 132);
+    var ks = tip.width / 132; c.setTransform(ks, 0, 0, ks, 0, 0); c.clearRect(0, 0, 132, 132);
     var g = c.createRadialGradient(TO - 20, TO - 24, 6, TO, TO, TR); g.addColorStop(0, '#fff'); g.addColorStop(.45, col); g.addColorStop(1, sh);
     c.fillStyle = g; c.beginPath(); c.arc(TO, TO, TR, 0, 6.283); c.fill();
     var dark = curBall() === 0 ? 'rgba(40,50,70,.4)' : 'rgba(80,50,0,.45)';
@@ -440,6 +494,7 @@
     var px = TO + spinX * TMAX, py = TO - spinY * TMAX;
     c.fillStyle = '#E0193A'; c.beginPath(); c.arc(px, py, 7, 0, 6.283); c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 2; c.stroke();
     $('tipTxt').textContent = tipName();
+    var mc = $('mini').getContext('2d'); mc.setTransform(1, 0, 0, 1, 0, 0); mc.clearRect(0, 0, 104, 104); mc.drawImage(tip, 0, 0, 104, 104);
   }
   function tipName() {
     var l = Math.hypot(spinX, spinY); if (l < 0.12) return '당점: 가운데';
@@ -480,28 +535,42 @@
   }
   function paintChoices() {
     document.querySelectorAll('#thick button').forEach(function (b) { b.setAttribute('aria-pressed', thick != null && Math.abs(+b.dataset.t - thick) < 1e-6 ? 'true' : 'false'); });
-    document.querySelectorAll('#side button').forEach(function (b) { b.setAttribute('aria-pressed', thick != null && thick < 1 && +b.dataset.s === side ? 'true' : 'false'); });
+    $('sideB').textContent = side < 0 ? '왼 ◀' : '▶ 오른'; $('sideB').setAttribute('aria-pressed', thick != null && thick < 1 ? 'true' : 'false');
     document.querySelectorAll('#stroke button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.k === strokeK ? 'true' : 'false'); });
     document.querySelectorAll('.guide button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.g === guideMode ? 'true' : 'false'); });
-    $('tgtTxt').textContent = target != null ? '① 맞힐 공: ' + BNAME[target] + ' (공을 눌러 바꿔요)' : '① 직접 겨누는 중 (공을 누르면 두께로)';
+    $('tgtTxt').textContent = !canShoot() ? '' : target != null ? '맞힐 공: ' + BNAME[target] + ' · 두께 ' + (thick === 1 ? '정면' : ($('thick').querySelector('[aria-pressed=true]') || {}).textContent || '') : '✋ 큐를 잡고 돌려 겨누는 중';
   }
   document.querySelectorAll('#thick button').forEach(function (b) { b.addEventListener('click', function () { if (!canShoot()) return; thick = +b.dataset.t; if (target == null) target = others().indexOf(2) >= 0 ? 2 : others()[0]; aimByThick(); paintChoices(); draw(); }); });
-  document.querySelectorAll('#side button').forEach(function (b) { b.addEventListener('click', function () { if (!canShoot()) return; side = +b.dataset.s; if (thick == null) thick = 0.5; if (target == null) target = 2; aimByThick(); paintChoices(); draw(); }); });
+  $('sideB').addEventListener('click', function () { if (!canShoot()) return; side = thick == null ? side : -side; if (thick == null) thick = 0.5; if (target == null) target = others().indexOf(2) >= 0 ? 2 : others()[0]; aimByThick(); paintChoices(); draw(); });
   document.querySelectorAll('#stroke button').forEach(function (b) { b.addEventListener('click', function () { strokeK = +b.dataset.k; paintChoices(); }); });
   document.querySelectorAll('.guide button').forEach(function (b) { b.addEventListener('click', function () { guideMode = +b.dataset.g; ls('sava-pool-guide', String(guideMode)); paintChoices(); draw(); }); });
 
   function tablePt(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / scale - M, y: (e.clientY - r.top) / scale - M }; }
-  var dragging = false, downAt = null;
+  // 큐 잡기: 큐대(또는 내 공 둘레)를 손가락으로 잡고 돌리면 내 공을 중심으로 방향이 돌아요.
+  // 빈 당구대를 만지는 건 방향을 바꾸지 않아요 (실수로 움직이지 않게).
+  var grab = null, cueGlow = false;
+  function segDist(px, py, ax, ay, bx, by) { var vx = bx - ax, vy = by - ay, t = ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy); t = Math.max(0, Math.min(1, t)); return Math.hypot(px - ax - vx * t, py - ay - vy * t); }
   cv.addEventListener('pointerdown', function (e) {
     if (!canShoot()) return; ac();
-    var p = tablePt(e), hit = null;
-    others().forEach(function (i) { if (Math.hypot(balls[i].x - p.x, balls[i].y - p.y) < R * 3) hit = i; });
+    var p = tablePt(e), hit = null, cb = balls[curBall()];
+    others().forEach(function (i) { if (Math.hypot(balls[i].x - p.x, balls[i].y - p.y) < R * 2.6) hit = i; });
     if (hit != null) { target = hit; if (thick == null) thick = 0.5; aimByThick(); paintChoices(); draw(); return; }
-    dragging = true; cv.setPointerCapture(e.pointerId); aimTo(p);
+    var nearCue = segDist(p.x, p.y, cb.x, cb.y, cb.x - aim.x * 1.25, cb.y - aim.y * 1.25) < 0.1 || Math.hypot(p.x - cb.x, p.y - cb.y) < R * 5;
+    if (!nearCue) { hintCue(); return; }
+    grab = { a0: Math.atan2(p.y - cb.y, p.x - cb.x), aim0: Math.atan2(aim.y, aim.x), id: e.pointerId };
+    cueGlow = true; cv.setPointerCapture(e.pointerId); draw();
   });
-  cv.addEventListener('pointermove', function (e) { if (dragging && canShoot()) aimTo(tablePt(e)); });
-  cv.addEventListener('pointerup', function () { dragging = false; });
-  function aimTo(p) { var cb = balls[curBall()], dx = p.x - cb.x, dy = p.y - cb.y, l = Math.hypot(dx, dy); if (l < R * 1.5) return; aim = { x: dx / l, y: dy / l }; target = null; thick = null; paintChoices(); draw(); }
+  cv.addEventListener('pointermove', function (e) {
+    if (!grab || !canShoot()) return;
+    var p = tablePt(e), cb = balls[curBall()], d = Math.hypot(p.x - cb.x, p.y - cb.y);
+    if (d < R * 2) return; // 공 바로 위는 각도가 튀니까 무시
+    var a = grab.aim0 + (Math.atan2(p.y - cb.y, p.x - cb.x) - grab.a0);
+    aim = { x: Math.cos(a), y: Math.sin(a) }; target = null; thick = null; paintChoices(); draw();
+  });
+  function endGrab() { if (grab) { grab = null; cueGlow = false; draw(); } }
+  cv.addEventListener('pointerup', endGrab); cv.addEventListener('pointercancel', endGrab);
+  var hintT = 0;
+  function hintCue() { clearTimeout(hintT); cueGlow = true; draw(); toast('✋ 큐대를 손가락으로 잡고 돌려 보세요'); hintT = setTimeout(function () { cueGlow = false; draw(); }, 900); }
   function rot(deg) { var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); aim = { x: aim.x * c - aim.y * s, y: aim.x * s + aim.y * c }; thick = null; paintChoices(); draw(); }
   // 꾹 누르면 계속 돌기. 손을 뗀 신호를 폰이 놓쳐도 멈추도록: 어디서 떼든·화면 바뀌든·4초 지나면 무조건 멈춤
   document.addEventListener('contextmenu', function (e) { if (!/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) e.preventDefault(); });
@@ -520,7 +589,31 @@
     ['pointerleave', 'pointerout'].forEach(function (k) { btn.addEventListener(k, stopHold); });
   }
   hold($('left'), -0.2); hold($('right'), 0.2);
-  $('pow').addEventListener('input', function () { $('powTxt').textContent = $('pow').value; draw(); });
+
+  // ====================== 힘 막대: 오른쪽으로 끌었다 놓으면 치기 ======================
+  var pullPow = 0, lastPow = 45, pulling = null;
+  function paintPull() {
+    var pb = $('pull'), on = !!pulling;
+    pb.classList.toggle('on', on && pullPow >= 5); pb.classList.toggle('off', !canShoot());
+    $('pf').className = 'pf' + (on ? '' : ' ghost'); $('pf').style.width = (on ? pullPow : lastPow) + '%';
+    $('pt').textContent = on ? (pullPow < 5 ? '놓으면 안 쳐요' : '세기 ' + pullPow + (pullPow > 85 ? ' 💥' : '')) : '👉 끌었다 놓으면 쳐요';
+  }
+  $('pull').addEventListener('pointerdown', function (e) {
+    if (!canShoot()) return; ac(); e.preventDefault();
+    var r = this.getBoundingClientRect(); pulling = { x0: e.clientX, w: r.width * 0.8 }; pullPow = 0;
+    this.setPointerCapture(e.pointerId); paintPull(); draw();
+  });
+  $('pull').addEventListener('pointermove', function (e) {
+    if (!pulling) return;
+    pullPow = Math.round(Math.max(0, Math.min(100, (e.clientX - pulling.x0) / pulling.w * 100))); paintPull(); draw();
+  });
+  $('pull').addEventListener('pointerup', function () { if (!pulling) return; var pw = pullPow; pulling = null; pullPow = 0; if (pw >= 5 && canShoot()) { lastPow = pw; shoot(pw); } paintPull(); draw(); });
+  $('pull').addEventListener('pointercancel', function () { pulling = null; pullPow = 0; paintPull(); draw(); });
+
+  // 당점 창
+  $('miniB').addEventListener('click', function () { $('tipSheet').hidden = false; drawTip(); });
+  $('tipOk').addEventListener('click', function () { $('tipSheet').hidden = true; });
+  $('tipSheet').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 
   // ====================== 게임 상태 ======================
   // S = 서버(또는 연습)의 방 상태. phase: 'aim' 내 차례 | 'wait' 남의 차례 | 'move' 공 굴러가는 중 | 'over'
@@ -529,7 +622,7 @@
   function canShoot() { return phase === 'aim'; }
   function myTurn() { return S && S.status === 'play' && S.turn === ME; }
 
-  function show(v) { ['vHome', 'vJoin', 'vLobby', 'vGame'].forEach(function (x) { $(x).hidden = x !== v; }); $('quit').hidden = v === 'vHome' || v === 'vJoin'; $('chat').hidden = practice || !(v === 'vLobby' || v === 'vGame'); }
+  function show(v) { ['vHome', 'vJoin', 'vLobby', 'vGame'].forEach(function (x) { $(x).hidden = x !== v; }); $('quit').hidden = v === 'vHome' || v === 'vJoin'; $('chat').hidden = practice || !(v === 'vLobby' || v === 'vGame'); document.body.classList.toggle('game', v === 'vGame'); if (v !== 'vGame') document.body.classList.remove('over'); $('chatB').hidden = practice || v !== 'vGame'; $('chat').classList.remove('open'); window.scrollTo(0, 0); }
 
   function paintPlayers() {
     var box = $('pls'); box.innerHTML = '';
@@ -562,7 +655,7 @@
     else if (S.status !== 'play') phase = 'none';
     else if (myTurn()) { if (phase !== 'aim') { phase = 'aim'; readyAim(); if (!practice) { popMsg('🎱 내 차례!'); try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} } } }
     else phase = 'wait';
-    $('shotGo').disabled = !canShoot(); $('left').disabled = $('right').disabled = !canShoot();
+    $('left').disabled = $('right').disabled = !canShoot(); paintPull(); paintChoices();
     $('ctrl').style.opacity = canShoot() ? '1' : '.45';
     $('skip').hidden = practice || !(S.status === 'play' && !myTurn() && Date.now() - S.turnAt > 120e3);
     paintPlayers(); paintTurn(); drawTip(); draw();
@@ -584,11 +677,11 @@
     if (moving()) raf = requestAnimationFrame(loop);
     else { balls.forEach(function (b) { b.vx = b.vy = b.wx = b.wy = b.wz = 0; }); var r = score(ev); ev = null; var f = onSettle; onSettle = null; f && f(r); }
   }
-  $('shotGo').addEventListener('click', function () {
+  function shoot(pw) {
     if (!canShoot()) return; ac();
-    var p = { ax: aim.x, ay: aim.y, pow: +$('pow').value, sx: spinX, sy: spinY, st: strokeK };
+    var p = { ax: aim.x, ay: aim.y, pow: pw, sx: spinX, sy: spinY, st: strokeK };
     var seq0 = S.seq, cb = balls[S.ball];
-    phase = 'move'; $('shotGo').disabled = true; $('ctrl').style.opacity = '.45';
+    phase = 'move'; $('ctrl').style.opacity = '.45'; paintPull(); paintChoices();
     run(cb, p, function (r) {
       var to = balls.map(function (b) { return [b.x, b.y]; });
       if (r.ok) { ding(); popMsg(S.run + 1 >= 3 ? '🔥 ' + (S.run + 1) + '연속 득점!' : '🎯 쓰리쿠션!'); } else toast(r.why);
@@ -598,7 +691,7 @@
         phase = 'none'; poll(true);
       });
     });
-  });
+  }
 
   // 남이 친 샷을 내 폰에서 그대로 재생
   function replay(s) {
@@ -617,7 +710,7 @@
     S = s;
     if (fresh) { setBalls(s.balls); localSeq = s.seq; }
     if (s.status === 'lobby') { phase = 'none'; showLobby(); return; }
-    if ($('vGame').hidden) { show('vGame'); fit(); }
+    if ($('vGame').hidden) { show('vGame'); fit(); requestAnimationFrame(fit); }
     enterPhase();
   }
 
@@ -656,7 +749,9 @@
     });
     while (box.children.length > 60) box.firstChild.remove();
     if (near) box.scrollTop = box.scrollHeight;
+    if (document.body.classList.contains('game') && !$('chat').classList.contains('open')) { $('chatB').classList.add('new'); var last = list[list.length - 1]; if (last && last.nick && last.n === chatN) toast('💬 ' + last.nick + ': ' + String(last.t).slice(0, 30)); }
   }
+  $('chatB').addEventListener('click', function () { var c = $('chat'); c.classList.toggle('open'); this.classList.remove('new'); if (c.classList.contains('open')) { var m = $('msgs'); m.scrollTop = m.scrollHeight; } });
   function sendChat(t) { t = String(t || '').trim(); if (!t || !RID) return; $('chatIn').value = ''; post({ a: 'chat', t: t }).then(function () { poll(true); }); }
   $('chatGo').addEventListener('click', function () { sendChat($('chatIn').value); });
   $('chatIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); sendChat($('chatIn').value); } });
@@ -741,15 +836,15 @@
   // 끝
   function showOver() {
     var o = $('over'); if (!o.hidden && o.dataset.seq == S.seq) return;
-    o.dataset.seq = S.seq; o.hidden = false; fanfare();
+    o.dataset.seq = S.seq; o.hidden = false; document.body.classList.add('over'); fanfare();
     var win = S.mode === 'team' ? (S.winner === 'team1' ? 'B팀' : 'A팀') : (S.players[S.winner] || {}).nick || '';
     o.innerHTML = '<div class="e">🏆</div><h2></h2><ol></ol>' + (ME === 0 && !practice ? '<button type="button" class="big" id="again">🔁 한 판 더 (같은 멤버)</button>' : '') + (!practice ? '<button type="button" class="big k" id="tell">💬 결과 단톡방에 알리기</button>' : '<button type="button" class="big" id="again2">🔁 다시 연습</button>');
     o.querySelector('h2').textContent = win + ' 승리! (' + S.inning + '이닝)';
     var rank = S.players.map(function (p, i) { return { n: p.nick, s: S.pts[i], hi: S.hi[i] }; }).sort(function (a, b) { return b.s - a.s; });
     var ol = o.querySelector('ol');
     rank.forEach(function (p, i) { var li = document.createElement('li'); li.innerHTML = '<span></span><span>' + p.s + '점 · 하이런 ' + p.hi + '</span>'; li.firstChild.textContent = (i + 1) + '. ' + p.n; ol.appendChild(li); });
-    var ag = o.querySelector('#again'); if (ag) ag.addEventListener('click', function () { post({ a: 'again' }).then(function () { o.hidden = true; poll(true); }); });
-    var ag2 = o.querySelector('#again2'); if (ag2) ag2.addEventListener('click', function () { o.hidden = true; startPractice(); });
+    var ag = o.querySelector('#again'); if (ag) ag.addEventListener('click', function () { post({ a: 'again' }).then(function () { o.hidden = true; document.body.classList.remove('over'); poll(true); }); });
+    var ag2 = o.querySelector('#again2'); if (ag2) ag2.addEventListener('click', function () { o.hidden = true; document.body.classList.remove('over'); startPractice(); });
     var tl = o.querySelector('#tell'); if (tl) tl.addEventListener('click', function () {
       if (window.SsakaShare) SsakaShare({ url: 'https://sava.kr/pool/', title: '🎱 쓰리쿠션 ' + win + ' 승리! ' + rank.map(function (p) { return p.n + ' ' + p.s; }).join(' · '), description: S.inning + '이닝 · 다음엔 너도 붙자!', imageUrl: 'https://sava.kr/img/pool-share.png?v=1', imageWidth: 800, imageHeight: 800, buttonTitle: '나도 당구 치기', installTitle: '싸바 설치하기' });
     });
@@ -761,7 +856,7 @@
     practice = true; RID = ''; ME = 0; localSeq = 0;
     var nick = $('nick').value.trim() || '나';
     S = { mode: 'solo', goal: 999, status: 'play', players: [{ nick: nick, team: 0 }], turn: 0, ball: +(ls('sava-pool-pball') || 0), inning: 1, run: 0, pts: [0], team: [0, 0], hi: [0], balls: startPos(), seq: 0, turnAt: Date.now() };
-    setBalls(S.balls); $('over').hidden = true; show('vGame'); phase = 'none'; fit(); enterPhase();
+    setBalls(S.balls); $('over').hidden = true; show('vGame'); phase = 'none'; fit(); enterPhase(); requestAnimationFrame(fit);
   }
   function applyPractice(p, to, r) {
     S.balls = to; S.seq++;

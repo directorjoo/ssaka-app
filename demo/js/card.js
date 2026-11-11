@@ -284,7 +284,7 @@
     }
   }
 
-  // 모임 참석 답장: 총무에게 정리된 문자를 보냄 (서버 없음)
+  // 모임 참석 답장: 보낸 사람에게 정리된 문자를 보냄 (서버 없음)
   function openRsvp(card, root) {
     var c = card.contact || {};
     var sheet = document.createElement('div');
@@ -322,7 +322,7 @@
       row.appendChild(b);
     });
     box.appendChild(row);
-    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = (c.name || '총무') + '님에게 문자로 답장이 가요.';
+    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = (c.name ? c.name + '님' : '보낸 사람') + '에게 문자로 답장이 가요.';
     box.appendChild(fine);
     function shut() { sheet.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') shut(); }

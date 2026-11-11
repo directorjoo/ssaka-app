@@ -82,8 +82,9 @@
     #gChips .chip[aria-pressed="true"] { background: var(--ssaka); border-color: var(--ssaka); }
     .gcount { font-weight: 800; color: var(--ssaka); }
     .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .tiles .t-pic { grid-column: 1 / -1; min-height: 58px; flex-direction: row; gap: 8px; }
-    .tiles .t-pic i { font-size: 24px; } .tiles .t-pic b br { display: none; }
+    .mini3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .mini { min-height: 62px; border-radius: 18px; border: 2px solid #e2e2e6; background: #fff; font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--ink); }
+    .mini { gap: 4px; padding: 0 4px; } .mini i { font-style: normal; font-size: 21px; } .mini b { font-size: 16px; font-weight: 900; white-space: nowrap; letter-spacing: -.03em; }
     .tile small { font-size: 12.5px; font-weight: 700; opacity: .92; }
     .tile { min-height: 116px; }
     .rbox { margin-top: 18px; padding: 14px 12px 14px; border: 2.5px solid var(--ssaka); border-radius: 22px; background: #fff; scroll-margin-top: 12px; }
@@ -282,7 +283,11 @@
     <div class="tiles">
       <button type="button" class="tile t-msg" id="msgBtn"><i>💬</i><b>문자로 답하기</b><small>골라서 바로 보내요</small></button>
       <button type="button" class="tile t-loc" id="hereBtn"><i>📍</i><b>위치 보내기</b><small>지도로 바로 찾아와요</small></button>
-      <button type="button" class="tile t-pic" id="photoBtn"><i>📷</i><b>사진 보내기</b></button>
+    </div>
+    <div class="mini3">
+      <button type="button" class="mini" id="callBtn"><i>📞</i><b>통화하기</b></button>
+      <button type="button" class="mini" id="photoBtn"><i>📷</i><b>사진</b></button>
+      <button type="button" class="mini" id="playBtn"><i>🍻</i><b>놀자</b></button>
     </div>
     <p class="tnote">📍 위치는 누를 때만 확인하고, 싸바는 저장하지 않아요.</p>
     <input type="file" id="photoIn" accept="image/*" hidden>
@@ -547,6 +552,17 @@
       // 💬 문자 · 📍 위치 · 📷 사진은 같은 크기로 나란히 — 무엇으로 답할지는 받는 사람 마음
       $('msgBtn').addEventListener('click', function () { var t = $('rBox'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       $('photoBtn').addEventListener('click', function () { $('photoIn').click(); });
+      // 📞 통화하기: 보낸 사람 번호가 있으면 바로 전화 (사업자 등록 뒤 번호 인증 회원), 없으면 "통화 돼! 전화해" 답장
+      $('callBtn').addEventListener('click', function () {
+        var tel = String(card.tel || card.phone || '').replace(/[^\d+]/g, '');
+        if (tel.length >= 9) { location.href = 'tel:' + tel; return; }
+        var t = '지금 통화 돼! 전화해 📞';
+        if (card.phone) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); return; }
+        withMsgImg(t, { kind: 'reply' }, function (mi) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
+      });
+      if (window.SavaMsgImg) SavaMsgImg.soon('지금 통화 돼! 전화해 📞', { kind: 'reply' });
+      // 🍻 놀자: 나도 "친구야 놀자!" 보내기 화면으로
+      $('playBtn').addEventListener('click', function () { location.href = BASE + '#play'; });
       $('photoIn').addEventListener('change', function () {
         var inp = this, f = inp.files && inp.files[0]; if (!f) return;
         if (!/^image\//.test(f.type)) { toast('사진 파일만 보낼 수 있어요'); return; }

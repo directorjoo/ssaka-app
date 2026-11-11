@@ -104,6 +104,7 @@
     .si-pad { padding: 0 18px; }
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2B3D6B 0%, #16213F 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(22,33,63,.9); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
+    .mk p small { display: block; margin-top: 4px; font-size: 13px; opacity: .8; }
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { margin: 2px 0 0; font-size: 28px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
     .mk p { margin: 8px 0 14px; font-size: 14.5px; line-height: 1.5; opacity: .95; word-break: keep-all; padding-right: 84px; }
@@ -325,9 +326,9 @@
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>친구 위치 묻기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>내 위치 보내기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
     v.appendChild(eh);
     // 싸바카드 만들기 — 남색으로 어디야(체리)와 구분, 상자 어디를 눌러도 만들기로
-    var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '싸바카드 만들기');
-    mk.innerHTML = '<div class="mini" aria-hidden="true"><i></i><i></i><i></i></div><h2>싸바카드 만들기</h2><p>프로필 · 홍보물 · 가게 홍보<br>모임 공지 · 초대장 · 스마트 명함</p>' +
-      '<span class="go">✏️ 지금 만들기 ›</span>';
+    var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '우리 가게 홍보하기 — 싸바카드 만들기');
+    mk.innerHTML = '<div class="mini" aria-hidden="true"><i></i><i></i><i></i></div><h2>우리 가게 홍보하기</h2><p>카드 한 장 만들어 단골손님 카톡에 보내세요<br><small>모임 공지 · 초대장 · 명함도 OK</small></p>' +
+      '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
     // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸
     var st = el('div', 'story');

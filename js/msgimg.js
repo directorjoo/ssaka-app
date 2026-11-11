@@ -31,7 +31,7 @@
     opt = opt || {};
     var th = TH[opt.kind] || TH.ask;
     var head = opt.head || (opt.kind === 'reply' ? '답장 왔어!' : '싸바?');
-    var W = 1000, PAD = 70, FS = 56, LH = Math.round(FS * 1.45);
+    var W = 1000, PAD = 70, FS = 66, LH = Math.round(FS * 1.45);
     var mx = document.createElement('canvas').getContext('2d');
     mx.font = '700 ' + FS + 'px ' + FONT;
     var lines = text ? wrap(mx, text, W - PAD * 2 - 80) : [];

@@ -499,10 +499,19 @@
   cv.addEventListener('pointerup', function () { dragging = false; });
   function aimTo(p) { var cb = balls[curBall()], dx = p.x - cb.x, dy = p.y - cb.y, l = Math.hypot(dx, dy); if (l < R * 1.5) return; aim = { x: dx / l, y: dy / l }; target = null; thick = null; paintChoices(); draw(); }
   function rot(deg) { var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); aim = { x: aim.x * c - aim.y * s, y: aim.x * s + aim.y * c }; thick = null; paintChoices(); draw(); }
+  // 꾹 누르면 계속 돌기. 손을 뗀 신호를 폰이 놓쳐도 멈추도록: 어디서 떼든·화면 바뀌든·4초 지나면 무조건 멈춤
+  var holdT = 0, holdIv = 0, holdEnd = 0;
+  function stopHold() { clearTimeout(holdT); clearInterval(holdIv); holdT = holdIv = 0; }
+  ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup', 'blur'].forEach(function (k) { window.addEventListener(k, stopHold, true); });
+  document.addEventListener('visibilitychange', stopHold);
   function hold(btn, deg) {
-    var t = 0, iv = 0;
-    btn.addEventListener('pointerdown', function (e) { e.preventDefault(); if (!canShoot()) return; rot(deg); t = setTimeout(function () { iv = setInterval(function () { rot(deg * 2); }, 50); }, 350); });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (k) { btn.addEventListener(k, function () { clearTimeout(t); clearInterval(iv); }); });
+    btn.style.webkitUserSelect = btn.style.userSelect = 'none'; btn.style.webkitTouchCallout = 'none';
+    btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    btn.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); stopHold(); if (!canShoot()) return; rot(deg); holdEnd = Date.now() + 4000;
+      holdT = setTimeout(function () { holdIv = setInterval(function () { if (!canShoot() || Date.now() > holdEnd) return stopHold(); rot(deg * 2); }, 50); }, 350);
+    });
+    ['pointerleave', 'pointerout'].forEach(function (k) { btn.addEventListener(k, stopHold); });
   }
   hold($('left'), -0.2); hold($('right'), 0.2);
   $('pow').addEventListener('input', function () { $('powTxt').textContent = $('pow').value; draw(); });

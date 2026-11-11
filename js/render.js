@@ -158,7 +158,8 @@
           mapc = el('div', 'sk-mapc');
           var k = el('a', 'sk-mapbtn', '카카오맵'); k.href = u.kakao;
           var n = el('a', 'sk-mapbtn', '네이버지도'); n.href = u.naver; on(n, u.onNaver);
-          mapc.appendChild(k); mapc.appendChild(n);
+          var gg = el('a', 'sk-mapbtn', '구글지도'); gg.href = u.google; gg.target = '_blank'; gg.rel = 'noopener';
+          mapc.appendChild(k); mapc.appendChild(n); mapc.appendChild(gg);
         }
         acts.appendChild(action('map', '길찾기', card.place.name, null, function () { mapc.classList.toggle('open'); }, live));
       }
@@ -188,6 +189,13 @@
     sms.appendChild(el('span', '', '문자로 보내기'));
     if (live && ctx.onSms) on(sms, ctx.onSms); else sms.tabIndex = -1;
     wrap.appendChild(sms);
+    // 밴드 · 링크 복사 (카톡이 아니어도 보낼 수 있게)
+    var more = el('div', 'sk-more');
+    var band = el('button', 'sk-band', '밴드로 보내기'); band.type = 'button';
+    var cp = el('button', 'sk-link', '링크 복사'); cp.type = 'button';
+    if (live) { on(band, ctx.onBand); on(cp, ctx.onLink); } else { band.tabIndex = -1; cp.tabIndex = -1; }
+    more.appendChild(band); more.appendChild(cp);
+    wrap.appendChild(more);
 
     var make = el(live ? 'a' : 'div', 'sk-make', '나도 10초 만에 싸바카드 만들기');
     if (live) make.href = ctx.makeHref;

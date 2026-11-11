@@ -132,6 +132,7 @@
         return {
           kakao: kakaoMapUrl(p),
           naver: naverMapUrl(p),
+          google: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.lat && p.lng ? p.lat + ',' + p.lng : (p.name || '')),
           onNaver: function () {
             // 네이버지도 앱이 없으면 1.5초 뒤 웹으로
             var t = setTimeout(function () { location.href = naverWebUrl(p); }, 1500);
@@ -153,6 +154,15 @@
             imageUrl: /^https:/.test(card.image || '') ? card.image : undefined, url: u
           });
         });
+      },
+      onBand: function () {
+        shortHere().then(function (u) {
+          var body = (card.title || '') + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + u;
+          location.href = 'https://band.us/plugin/share?body=' + encodeURIComponent(body) + '&route=' + encodeURIComponent(u);
+        });
+      },
+      onLink: function () {
+        shortHere().then(function (u) { copyText(u).then(function () { toast('링크를 복사했어요. 원하는 곳에 붙여 넣으세요'); }).catch(function () { toast('복사하지 못했어요'); }); });
       },
       onSms: function () {
         shortHere().then(function (u) {
@@ -192,10 +202,11 @@
       setTimeout(function () { (root.querySelector('.sk-make') || root).insertAdjacentElement('afterend', rp); }, 0);
     }
     root.addEventListener('click', function (e) {
-      var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-sos-call');
+      var t = e.target.closest && e.target.closest('.sk-act, .sk-mapbtn, .sk-share, .sk-sms, .sk-band, .sk-link, .sk-sos-call');
       if (!t) return;
       var c = t.className || '', ev = '';
-      if (/sk-mapbtn/.test(c)) ev = /네이버/.test(t.textContent) ? 'navermap' : 'kakaomap';
+      if (/sk-mapbtn/.test(c)) ev = /네이버/.test(t.textContent) ? 'navermap' : /구글/.test(t.textContent) ? 'googlemap' : 'kakaomap';
+      else if (/sk-band|sk-link/.test(c)) ev = 'share';
       else if (/sk-share/.test(c)) ev = 'share';
       else if (/sk-sms/.test(c)) ev = 'sms';
       else if (/sk-sos-call|sk-call/.test(c)) ev = 'call';
@@ -215,7 +226,7 @@
         var st = document.createElement('div'); st.className = 'sk-stats'; st.textContent = '📊 손님 반응 불러오는 중…';
         fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {
           var w = j.week || {}, t = j.total || {};
-          var mp = (w.map || 0) + (w.kakaomap || 0) + (w.navermap || 0);
+          var mp = (w.map || 0) + (w.kakaomap || 0) + (w.navermap || 0) + (w.googlemap || 0);
           st.innerHTML = '';
           var h = document.createElement('b'); h.textContent = '📊 이번 주 손님 반응'; st.appendChild(h);
           [['👀 열어 봄', w.view || 0], ['📍 길찾기', mp], ['📞 전화', w.call || 0], ['📅 예약', (w.reserve || 0) + (w.rsvp || 0)], ['💬 다시 보냄', (w.share || 0) + (w.sms || 0)]].forEach(function (x) {

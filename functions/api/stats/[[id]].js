@@ -1,6 +1,6 @@
 // 싸바카드 손님 반응 숫자 — 카드 열람·버튼 누름 '횟수'만 셉니다 (누가 눌렀는지는 저장하지 않음)
 // 같은 사람이 하루에 여러 번 눌러도 한 번으로: IP+카드+종류의 해시를 그날 하루만 보관
-const EVS = ['view', 'call', 'map', 'kakaomap', 'navermap', 'reserve', 'rsvp', 'save', 'copy', 'share', 'sms', 'coupon'];
+const EVS = ['view', 'call', 'map', 'kakaomap', 'navermap', 'googlemap', 'reserve', 'rsvp', 'save', 'copy', 'share', 'sms', 'coupon'];
 const ABC = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
 function json(o, s) { return new Response(JSON.stringify(o), { status: s || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
 async function digest(s) { return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))); }

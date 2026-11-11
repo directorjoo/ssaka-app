@@ -25,10 +25,19 @@
     return lines;
   }
 
+  function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
+  // 위: 싸바 상징(말풍선 + 어디야?/싸바?/답장 왔어!) 크게 · 가운데: 보낸 말은 카톡 글씨 크기로 흰 말풍선 안에 · 아래: 🍒 싸바
   function draw(text, opt) {
     opt = opt || {};
     var th = TH[opt.kind] || TH.ask;
-    var W = 1000, H = String(text).length <= 8 ? 600 : 800;
+    var head = opt.head || (opt.kind === 'reply' ? '답장 왔어!' : '싸바?');
+    var W = 1000, PAD = 70, FS = 56, LH = Math.round(FS * 1.45);
+    var mx = document.createElement('canvas').getContext('2d');
+    mx.font = '700 ' + FS + 'px ' + FONT;
+    var lines = text ? wrap(mx, text, W - PAD * 2 - 80) : [];
+    var maxL = 11; if (lines.length > maxL) { lines = lines.slice(0, maxL); lines[maxL - 1] = lines[maxL - 1].replace(/.$/, '…'); }
+    var headH = 250, bubH = lines.length ? lines.length * LH + 70 : 0, footH = 90;
+    var H = Math.max(600, headH + bubH + (lines.length ? 30 : 0) + footH);
     var c = document.createElement('canvas'); c.width = W; c.height = H;
     var x = c.getContext('2d');
     x.fillStyle = th.bg; x.fillRect(0, 0, W, H);
@@ -36,38 +45,35 @@
     for (var g = 40; g < W; g += 40) { x.beginPath(); x.moveTo(g, 0); x.lineTo(g, H); x.stroke(); }
     for (g = 40; g < H; g += 40) { x.beginPath(); x.moveTo(0, g); x.lineTo(W, g); x.stroke(); }
 
-    // 위: 누가 보냈는지 (작게)
-    var top = 56;
-    if (opt.who) {
-      x.font = '800 46px ' + FONT; x.fillStyle = th.sub; x.textAlign = 'center'; x.textBaseline = 'top';
-      x.fillText('💬 ' + String(opt.who).slice(0, 16), W / 2, 44);
-      top = 120;
+    // 상징: 말풍선 아이콘 + 큰 글씨
+    var oy = lines.length ? Math.max(0, (H - footH - headH - bubH - 20) / 2) : 0;
+    var hy = lines.length ? 135 + oy : H / 2 - 30;
+    x.font = '900 136px ' + FONT; x.textBaseline = 'middle'; x.textAlign = 'left';
+    var hw = x.measureText(head).width, iw = 130, gap = 26, sx = (W - (iw + gap + hw)) / 2;
+    x.fillStyle = th.ink; rr(x, sx, hy - 52, iw, 88, 18); x.fill();
+    x.beginPath(); x.moveTo(sx + 22, hy + 30); x.lineTo(sx + 22, hy + 66); x.lineTo(sx + 56, hy + 30); x.closePath(); x.fill();
+    x.fillStyle = '#fff'; [0, 1, 2].forEach(function (i) { x.beginPath(); x.arc(sx + 37 + i * 28, hy - 8, 10, 0, Math.PI * 2); x.fill(); });
+    x.fillStyle = th.ink; x.fillText(head, sx + iw + gap, hy + 4);
+
+    // 보낸 말: 흰 말풍선, 카톡 글씨 크기
+    if (lines.length) {
+      var by = headH + oy;
+      x.save(); x.shadowColor = 'rgba(0,0,0,.08)'; x.shadowBlur = 18; x.shadowOffsetY = 4;
+      x.fillStyle = '#fff'; rr(x, PAD, by, W - PAD * 2, bubH, 34); x.fill(); x.restore();
+      x.fillStyle = '#222'; x.font = '700 ' + FS + 'px ' + FONT; x.textAlign = 'left'; x.textBaseline = 'middle';
+      lines.forEach(function (ln, i) { x.fillText(ln, PAD + 40, by + 35 + LH / 2 + i * LH); });
     }
-    // 아래: 체리 싸바 (작게)
-    var bottom = H - 70;
     x.font = '900 40px ' + FONT; x.fillStyle = th.ink; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
     x.fillText('🍒 싸바', W / 2, H - 34);
-
-    // 가운데: 보내는 말 — 칸에 꽉 차게 가장 큰 글씨를 고름
-    var boxW = W - 110, boxH = bottom - top - 20, size = 170, lines, lh;
-    for (; size >= 54; size -= 6) {
-      x.font = '900 ' + size + 'px ' + FONT;
-      lines = wrap(x, text, boxW); lh = size * 1.22;
-      if (lines.length * lh <= boxH && lines.length <= 5) break;
-    }
-    if (lines.length * lh > boxH) { var keep = Math.max(1, Math.floor(boxH / lh)); lines = lines.slice(0, keep); lines[keep - 1] = lines[keep - 1].replace(/.{0,1}$/, '…'); }
-    x.fillStyle = th.ink; x.textAlign = 'center'; x.textBaseline = 'middle';
-    var y0 = top + 10 + (boxH - lines.length * lh) / 2 + lh / 2;
-    lines.forEach(function (ln, i) { x.fillText(ln, W / 2, y0 + i * lh); });
     return c;
   }
 
   var cache = {};
-  function key(text, opt) { return (opt && opt.kind || 'ask') + '|' + (opt && opt.who || '') + '|' + text; }
+  function key(text, opt) { return (opt && opt.kind || 'ask') + '|' + (opt && opt.head || '') + '|' + text; }
 
   // 미리 그려서 카카오에 올려 둠 → Promise<{url,w,h}>
   function prepare(text, opt) {
-    text = String(text || '').trim(); if (!text) return Promise.reject(new Error('empty'));
+    text = String(text || '').trim();
     var k = key(text, opt);
     if (cache[k]) return cache[k].p;
     var ent = { done: null };

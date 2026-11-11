@@ -337,13 +337,13 @@
   }
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
   // 보내는 말을 크게 그린 그림 (미리 올려 둔 게 있으면 바로, 없으면 잠깐 기다렸다가, 안 되면 기본 그림)
-  function withMsgImg(text, kind, go) {
+  function withMsgImg(text, opt, go) {
     var M = window.SavaMsgImg; if (!M || !text) return go(null);
-    var r = M.ready(text, { kind: kind }); if (r) return go(r);
+    var r = M.ready(text, opt); if (r) return go(r);
     var done = false, fin = function (v) { if (done) return; done = true; clearTimeout(tm); go(v); };
     var tm = setTimeout(function () { fin(null); }, 2500);
     toast('말풍선 그림 만드는 중…');
-    M.prepare(text, { kind: kind }).then(fin, function () { fin(null); });
+    M.prepare(text, opt).then(fin, function () { fin(null); });
   }
   function shareKakao(title, desc, url, forceImg, mi) {
     var play = /놀자/.test(title) && !forceImg;
@@ -530,7 +530,7 @@
       $('rSend').addEventListener('click', function () {
         var t = rText(); if (!t) { toast('답장을 고르거나 적어주세요'); return; }
         if (card.phone) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); return; }
-        withMsgImg(t.slice(0, 100), 'reply', function (mi) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
+        withMsgImg(t.slice(0, 100), { kind: 'reply' }, function (mi) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
       });
       // 💬 문자 · 📍 위치 · 📷 사진은 같은 크기로 나란히 — 무엇으로 답할지는 받는 사람 마음
       $('msgBtn').addEventListener('click', function () { var t = document.querySelector('#viewAsk .sec-t'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
@@ -659,7 +659,7 @@
       cb.appendChild(b);
     });
     $('askPrev').textContent = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '싸바?';
-    if (window.SavaMsgImg && mode === 'ask') SavaMsgImg.soon($('askPrev').textContent, { kind: 'ask' });
+    if (window.SavaMsgImg && mode === 'ask') { var at = $('askPrev').textContent, ah = /어디야\?/.test(at) ? '어디야?' : '싸바?', ab = at.indexOf(ah) === 0 ? at.slice(ah.length).trim() : at; if (ab) SavaMsgImg.soon(ab, { kind: 'ask', head: ah }); }
     $('gCount').textContent = picked.length ? '(' + picked.length + '/3 · 누른 순서대로)' : '(최대 3개, 누른 순서대로)';
   }
   $('gOwn').addEventListener('change', function () {
@@ -712,7 +712,10 @@
     if (mode !== 'ask') { shareKakao(b.title, b.desc, b.url, b.img); return; }
     // 묻는 말은 그림에 크게, 카톡 제목은 누가 보냈는지만
     var from = $('from').value.trim();
-    withMsgImg(b.title, 'ask', function (mi) { shareKakao(mi ? (from ? from + '님이 보냈어요' : '싸바가 왔어요') : b.title, b.desc, b.url, b.img, mi); });
+    var head = /어디야\?/.test(b.title) ? '어디야?' : '싸바?';
+    var body = b.title.indexOf(head) === 0 ? b.title.slice(head.length).trim() : b.title;
+    if (!body) { shareKakao(b.title, b.desc, b.url, b.img); return; }
+    withMsgImg(body, { kind: 'ask', head: head }, function (mi) { shareKakao(mi ? (from ? from + '님이 보냈어요' : '싸바가 왔어요') : b.title, b.desc, b.url, b.img, mi); });
   });
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
   function cancelOut() {

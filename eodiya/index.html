@@ -92,6 +92,13 @@
     .rtitle .gcount { display: block; font-size: 13px; margin-top: 2px; }
     #rChips .chip { border-color: #c9c9cf; color: var(--ink); font-weight: 800; }
     #rChips .chip[aria-pressed="true"] { color: #fff; }
+    #rChips .chip.pop { animation: chipPop .35s ease; }
+    @keyframes chipPop { 50% { transform: scale(1.08); background: #FBE9EC; } }
+    .rta { position: relative; margin-bottom: 10px; }
+    .rta textarea { display: block; width: 100%; min-height: 96px; padding: 14px 14px 14px; border: 2px solid #E9B3BD; border-radius: 16px; background: #FFF7F8; font: inherit; font-size: 18px; font-weight: 700; line-height: 1.45; resize: none; color: var(--ink); }
+    .rta textarea:focus { outline: none; border-color: var(--ssaka); background: #fff; }
+    .rta textarea::placeholder { color: #a99; font-weight: 600; font-size: 16px; }
+    .rta button { position: absolute; right: 8px; bottom: 8px; min-height: 34px; padding: 0 12px; border-radius: 10px; border: 0; background: rgba(0,0,0,.07); font: inherit; font-size: 13.5px; font-weight: 800; color: var(--ink-2); cursor: pointer; }
     .tile { min-height: 104px; border-radius: 20px; border: 0; color: #fff; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
     .tile i { font-style: normal; font-size: 30px; line-height: 1; }
     .tile b { font-size: 16px; font-weight: 900; line-height: 1.25; }
@@ -292,11 +299,11 @@
     <p class="tnote">📍 위치는 누를 때만 확인하고, 싸바는 저장하지 않아요.</p>
     <input type="file" id="photoIn" accept="image/*" multiple hidden>
     <div class="rbox" id="rBox">
-    <div class="rtitle">💬 문자·안부 고르기 <span class="gcount" id="rCount">(마음대로, 최대 3개 이어 보내기)</span></div>
-    <div class="bubble" id="rPrev" style="margin-bottom:10px">💬 <b>답장을 골라 보세요</b></div>
+    <div class="rtitle">💬 문자·안부 고르기 <span class="gcount" id="rCount">(직접 쓰거나, 아래 말을 누르면 글칸에 들어가요)</span></div>
+    <div class="rta"><textarea id="hereText" maxlength="100" rows="3" placeholder="여기에 답장을 쓰세요&#10;(예: 회의 중, 30분 뒤 연락할게)"></textarea><button type="button" id="rClear" hidden>지우기</button></div>
+    <div class="bubble" id="rPrev" hidden></div>
     <div class="gtabs" id="rTabs"></div>
     <div class="chips" id="rChips"></div>
-    <input type="text" id="hereText" maxlength="80" placeholder="직접 쓰기 (예: 회의 중, 30분 뒤 연락할게)" style="margin-top:10px">
     <button type="button" class="big red" id="rSend" style="margin-top:12px;width:100%;display:block">💬 답장 보내기</button>
     </div>
     <a class="mk" href="./">나도 <b>싸바?</b> 보내기</a>
@@ -525,27 +532,35 @@
         { t: '📷 사진', items: ['잠깐만, 사진 찾아볼게 📷', '많이 컸어! 보고 싶지? 😍', '사진 보내줄게, 기다려!'] },
         { t: '🌏 세계 인사', items: ['Hi! (하이 · 안녕!) 👋', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va! (싸바 · 잘 지내!)', 'Ciao! (차오 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Merci! (메르시 · 고마워!)', 'Thank you! (땡큐 · 고마워!)'] }
       ];
-      var rTab = ks.indexOf('call') >= 0 ? 2 : hasLoc ? 1 : ks.indexOf('pic') >= 0 ? 4 : ks.indexOf('world') >= 0 ? 5 : 0, rPick = [];
-      function rText() { var own = $('hereText').value.trim(); return rPick.concat(own ? [own] : []).join(' '); }
+      var rTab = ks.indexOf('call') >= 0 ? 2 : hasLoc ? 1 : ks.indexOf('pic') >= 0 ? 4 : ks.indexOf('world') >= 0 ? 5 : 0;
+      function rText() { return $('hereText').value.replace(/\s+/g, ' ').trim(); }
+      // 예시 말을 누르면 글칸 끝에 이어 붙임 → 그대로 보내도 되고 고쳐 써도 됨
+      function addText(t) {
+        var ta = $('hereText'), cur = ta.value.replace(/\s+$/, '');
+        var next = (cur ? cur + ' ' : '') + t;
+        if (next.length > 100) { toast('글이 너무 길어요. 조금 지우고 넣어 주세요'); return false; }
+        ta.value = next; changed(); return true;
+      }
+      function changed() {
+        var tx = rText();
+        $('rClear').hidden = !tx;
+        if (tx && window.SavaMsgImg && !card.phone) SavaMsgImg.soon(tx.slice(0, 100), { kind: 'reply' });
+      }
       function paintR() {
         var tb = $('rTabs'); tb.innerHTML = '';
         RT.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === rTab ? 'true' : 'false'); b.addEventListener('click', function () { rTab = i; paintR(); }); tb.appendChild(b); });
         var cb = $('rChips'); cb.innerHTML = '';
         RT[rTab].items.forEach(function (t) {
-          var idx = rPick.indexOf(t);
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = (idx >= 0 ? (idx + 1) + '. ' : '') + t; b.setAttribute('aria-pressed', idx >= 0 ? 'true' : 'false');
-          b.addEventListener('click', function () { if (idx >= 0) rPick.splice(idx, 1); else { if (rPick.length >= 3) { toast('최대 3개까지 이어 보내요'); return; } rPick.push(t); } paintR(); });
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t;
+          b.addEventListener('click', function () { if (addText(t)) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
           cb.appendChild(b);
         });
-        var tx = rText();
-        $('rPrev').innerHTML = '💬 <b></b>'; $('rPrev').lastChild.textContent = tx || '답장을 골라 보세요';
-        if (tx && window.SavaMsgImg && !card.phone) SavaMsgImg.soon(tx.slice(0, 100), { kind: 'reply' });
-        $('rCount').textContent = rPick.length ? '(' + rPick.length + '/3 · 누른 순서대로)' : '(마음대로, 최대 3개 이어 보내기)';
       }
-      $('hereText').addEventListener('input', paintR);
+      $('hereText').addEventListener('input', changed);
+      $('rClear').addEventListener('click', function () { $('hereText').value = ''; changed(); });
       paintR();
       $('rSend').addEventListener('click', function () {
-        var t = rText(); if (!t) { toast('답장을 고르거나 적어주세요'); return; }
+        var t = rText(); if (!t) { toast('답장을 쓰거나 아래 말을 눌러 주세요'); $('hereText').focus(); return; }
         if (card.phone) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); return; }
         withMsgImg(t.slice(0, 100), { kind: 'reply' }, function (mi) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
       });

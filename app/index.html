@@ -108,9 +108,14 @@
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { margin: 2px 0 0; font-size: 28px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
     .mk p { margin: 8px 0 14px; font-size: 14.5px; line-height: 1.5; opacity: .95; word-break: keep-all; padding-right: 84px; }
-    .mk .mini { position: absolute; right: 16px; top: 14px; width: 66px; height: 86px; border-radius: 14px; background: #fff; transform: rotate(8deg); box-shadow: 0 10px 22px rgba(0,0,0,.25); padding: 10px 9px; }
-    .mk .mini::before { content: ""; display: block; width: 24px; height: 24px; border-radius: 50%; background: #FBE3E6 url(../img/cherry.svg) center/17px no-repeat; margin-bottom: 6px; }
-    .mk .mini i { display: block; height: 7px; border-radius: 4px; background: #F1D4D8; margin-top: 6px; }
+    .mk .ad { position: absolute; right: 8px; top: 6px; width: 96px; height: 128px; pointer-events: none; }
+    .mk .mini { position: absolute; left: 22px; top: 4px; width: 60px; height: 78px; border-radius: 12px; background: #fff; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 9px 8px; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
+    .mk .dance { position: absolute; left: 0; bottom: 0; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
+    @keyframes mkWave { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg) translateY(-3px); } }
+    @keyframes mkHop { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
+    @media (prefers-reduced-motion: reduce) { .mk .mini, .mk .dance { animation: none; } }
+    .mk .mini::before { content: ""; display: block; width: 22px; height: 22px; border-radius: 50%; background: #FBE3E6 url(../img/cherry.svg) center/15px no-repeat; margin-bottom: 4px; }
+    .mk .mini i { display: block; height: 6px; border-radius: 4px; background: #F1D4D8; margin-top: 5px; }
     .mk .mini i:nth-child(1) { width: 80%; background: #B3132B; }
     .mk .mini i:nth-child(3) { width: 60%; }
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
@@ -327,7 +332,7 @@
     v.appendChild(eh);
     // 싸바카드 만들기 — 남색으로 어디야(체리)와 구분, 상자 어디를 눌러도 만들기로
     var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '우리 가게 홍보하기 — 싸바카드 만들기');
-    mk.innerHTML = '<div class="mini" aria-hidden="true"><i></i><i></i><i></i></div><h2>우리 가게 홍보하기</h2><p>카드 한 장 만들어 단골손님 카톡에 보내세요<br><small>모임 공지 · 초대장 · 명함도 OK</small></p>' +
+    mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><i></i><i></i><i></i></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>우리 가게 홍보하기</h2><p>카드 한 장 만들어 단골손님 카톡에 보내세요<br><small>모임 공지 · 초대장 · 명함도 OK</small></p>' +
       '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
     // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸

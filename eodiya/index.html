@@ -286,11 +286,11 @@
     </div>
     <div class="mini3">
       <button type="button" class="mini" id="callBtn"><i>📞</i><b>통화하기</b></button>
-      <button type="button" class="mini" id="photoBtn"><i>📷</i><b>사진</b></button>
+      <button type="button" class="mini" id="photoBtn"><i>📷</i><b>사진 9장</b></button>
       <button type="button" class="mini" id="playBtn"><i>🍻</i><b>놀자</b></button>
     </div>
     <p class="tnote">📍 위치는 누를 때만 확인하고, 싸바는 저장하지 않아요.</p>
-    <input type="file" id="photoIn" accept="image/*" hidden>
+    <input type="file" id="photoIn" accept="image/*" multiple hidden>
     <div class="rbox" id="rBox">
     <div class="rtitle">💬 문자·안부 고르기 <span class="gcount" id="rCount">(마음대로, 최대 3개 이어 보내기)</span></div>
     <div class="bubble" id="rPrev" style="margin-bottom:10px">💬 <b>답장을 골라 보세요</b></div>
@@ -421,7 +421,7 @@
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
       var wide = o.mi || /eodiya-(ask|here|reply2)\.png/.test(o.img), abs = /^https?:/.test(o.img);
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
-        buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide, installUrl: BASE + '?install=1' });
+        buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide || o.nb, installUrl: BASE + '?install=1' });
     }
     if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
@@ -563,19 +563,57 @@
       if (window.SavaMsgImg) SavaMsgImg.soon('지금 통화 돼! 전화해 📞', { kind: 'reply' });
       // 🍻 놀자: 나도 "친구야 놀자!" 보내기 화면으로
       $('playBtn').addEventListener('click', function () { location.href = BASE + '#play'; });
-      $('photoIn').addEventListener('change', function () {
-        var inp = this, f = inp.files && inp.files[0]; if (!f) return;
-        if (!/^image\//.test(f.type)) { toast('사진 파일만 보낼 수 있어요'); return; }
-        toast('사진 올리는 중…');
-        shrink(f, 1080).then(function (sm) {
-          var list; try { var dt = new DataTransfer(); dt.items.add(sm.file); list = dt.files; } catch (e) { list = [sm.file]; }
-          return window.SsakaKakao().then(function (K) { return K.Share.uploadImage({ file: list }); }).then(function (res) {
-            var info = (res && (res.infos || res)) || {}, u = info.original && info.original.url;
-            if (!u) throw new Error('no url');
-            reply({ title: '사진 보냈어요 📷', desc: '', img: u, w: sm.w, h: sm.h, btn: '다시 묻기' });
+      // 📷 사진 최대 9장: 각각 줄여서 카카오에 올림 → 바둑판 모음 그림을 말풍선으로, 누르면 사진 모음 화면
+      function loadImg(f) { return new Promise(function (ok, no) { var u = URL.createObjectURL(f), im = new Image(); im.onload = function () { ok(im); }; im.onerror = no; im.src = u; }); }
+      function collage(files) {
+        return Promise.all(files.map(loadImg)).then(function (ims) {
+          var n = ims.length, cols = n === 1 ? 1 : n <= 4 ? 2 : 3, rows = Math.ceil(n / cols), G = 8;
+          var W = 1000, cw = (W - G * (cols - 1)) / cols, ch = n === 1 ? Math.round(W * ims[0].height / ims[0].width) : cw;
+          if (n === 1) ch = Math.min(1250, Math.max(500, ch));
+          var cw0 = cw, ch0 = ch;
+          var H = n === 3 ? 660 : Math.round(rows * ch + G * (rows - 1));
+          var c = document.createElement('canvas'); c.width = W; c.height = H; var x = c.getContext('2d');
+          x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+          ims.forEach(function (im, i) {
+            var cx = (i % cols) * (cw + G), cy = Math.floor(i / cols) * (ch + G), bw = cw, bh = ch;
+            if (n === 3) { var lw = Math.round((W - G) * 0.6); bh = i === 0 ? H : (H - G) / 2; bw = i === 0 ? lw : W - G - lw; cx = i === 0 ? 0 : lw + G; cy = i === 2 ? bh + G : 0; }
+            cw = bw; ch = bh;
+            var r = Math.max(cw / im.width, ch / im.height), sw = cw / r, sh = ch / r;
+            x.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, cx, cy, cw, ch);
+            cw = cw0; ch = ch0;
           });
-        }).catch(function () { toast('사진을 못 올렸어요. 다시 해주세요'); });
+          if (n > 1) { x.fillStyle = 'rgba(0,0,0,.6)'; x.beginPath(); x.roundRect ? x.roundRect(W - 230, H - 96, 210, 76, 38) : x.rect(W - 230, H - 96, 210, 76); x.fill();
+            x.fillStyle = '#fff'; x.font = '900 44px -apple-system, "Apple SD Gothic Neo", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('📷 ' + n + '장', W - 125, H - 57); }
+          return new Promise(function (ok) { c.toBlob(function (bl) { ok({ file: new File([bl], 'sava-pics.jpg', { type: 'image/jpeg' }), w: W, h: H }); }, 'image/jpeg', 0.85); });
+        });
+      }
+      function upOne(K, f) {
+        var list; try { var dt = new DataTransfer(); dt.items.add(f); list = dt.files; } catch (e) { list = [f]; }
+        return K.Share.uploadImage({ file: list }).then(function (res) { var info = (res && (res.infos || res)) || {}, u = info.original && info.original.url; if (!u) throw new Error('no url'); return u.replace(/^http:/, 'https:'); });
+      }
+      $('photoIn').addEventListener('change', function () {
+        var inp = this, all = Array.prototype.slice.call(inp.files || []).filter(function (f) { return /^image\//.test(f.type); });
         inp.value = '';
+        if (!all.length) { toast('사진 파일만 보낼 수 있어요'); return; }
+        if (all.length > 9) toast('사진은 9장까지만 보내요. 앞의 9장을 보낼게요');
+        var files = all.slice(0, 9), name = myName();
+        setTimeout(function () { toast('사진 ' + files.length + '장 올리는 중…'); }, all.length > 9 ? 1800 : 0);
+        Promise.all(files.map(function (f) { return shrink(f, 1280); })).then(function (sm) {
+          var small = sm.map(function (x) { return x.file; });
+          return window.SsakaKakao().then(function (K) {
+            return Promise.all(small.map(function (f) { return upOne(K, f); })).then(function (urls) {
+              return collage(small).then(function (cg) { return upOne(K, cg.file).then(function (cu) { return { urls: urls, cu: cu, w: cg.w, h: cg.h }; }); });
+            });
+          });
+        }).then(function (r) {
+          var d = SsakaCodec.encode({ m: 'pics', from: name, p: r.urls }), pics = new URL('../pics/', BASE).href;
+          return fetch(new URL('../api/card', BASE).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
+            .then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; })
+            .then(function (j) { return { r: r, url: j && j.id ? pics + '?s=' + j.id : pics + '?d=' + d }; });
+        }).then(function (o) {
+          var n = o.r.urls.length;
+          reply({ title: n > 1 ? '사진 ' + n + '장 보냈어요 📷' : '사진 보냈어요 📷', desc: '', img: o.r.cu, w: o.r.w, h: o.r.h, btn: '👆 사진 보기', url: o.url, nb: true });
+        }).catch(function () { toast('사진을 못 올렸어요. 다시 해주세요'); });
       });
 
       $('hereBtn').addEventListener('click', function () {

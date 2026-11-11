@@ -61,8 +61,22 @@
     return sdkReady;
   }
 
+  // 비상 스위치: 카카오가 싸바 앱을 막으면 /share-mode.json 의 "kakao" 를 false 로 바꿔 올림
+  // → 모든 "카톡으로 보내기"가 카카오 공유 기능 대신 휴대폰 공유 창(카톡 선택)으로 감
+  var kakaoOn = true;
+  try { fetch('/share-mode.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j && j.kakao === false) kakaoOn = false; }).catch(function () {}); } catch (e) {}
+  function nativeShare(c) {
+    var text = c.title + (c.description ? '\n' + c.description : '');
+    if (navigator.share) {
+      navigator.share({ title: c.title, text: text, url: c.url })
+        .catch(function (e) { if (e && e.name !== 'AbortError') copyLink(c.url); });
+    } else {
+      copyLink(c.url);
+    }
+  }
   function shareToKakao(extra) {
     var c = cardInfo(extra);
+    if (!kakaoOn) { nativeShare(c); return; }
     // 카톡 말풍선은 가운데를 정사각형에 가깝게 잘라 보여줘서, 기본 공유 그림은 정사각형으로 바꿔 보냄
     if (/ssaka-share\.png/.test(c.imageUrl || '')) { c.imageUrl = c.imageUrl.replace(/ssaka-share\.png(\?[^#]*)?/, 'ssaka-square.png?v=1'); c.imageWidth = 800; c.imageHeight = 800; }
     if (/eodiya-(ask|here|reply2)\.png/.test(c.imageUrl || '')) { c.imageWidth = 1000; c.imageHeight = 600; }
@@ -88,14 +102,7 @@
           { title: (extra && extra.installTitle) || '싸바카드 설치하기', link: { mobileWebUrl: (extra && extra.installUrl) || INSTALL_URL, webUrl: (extra && extra.installUrl) || INSTALL_URL } }
         ]
       });
-    }).catch(function () {
-      if (navigator.share) {
-        navigator.share({ title: c.title, text: c.description, url: c.url })
-          .catch(function (e) { if (e && e.name !== 'AbortError') copyLink(c.url); });
-      } else {
-        copyLink(c.url);
-      }
-    });
+    }).catch(function () { nativeShare(c); });
   }
 
   // 미리 불러두면 버튼 누를 때 빠름

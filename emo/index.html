@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>싸바 공짜 이모티콘 🍒</title>
+  <meta name="description" content="움직이는 체리 이모티콘을 공짜로! 눌러서 카톡방에 바로 보내요.">
+  <meta name="theme-color" content="#B3142B">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/emo/">
+  <meta property="og:title" content="🍒 싸바 공짜 이모티콘">
+  <meta property="og:description" content="움직이는 체리 이모티콘, 눌러서 카톡방에 바로 보내요. 전부 공짜!">
+  <meta property="og:image" content="https://sava.kr/emo/g/e001.gif">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 520px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 14px calc(30px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { color: var(--ink); text-decoration: none; font-weight: 900; font-size: 16px; display: flex; gap: 6px; align-items: center; }
+    .top a img { width: 24px; height: 24px; }
+    h1 { margin: 10px 0 4px; font-size: 28px; font-weight: 900; letter-spacing: -.03em; }
+    h1 em { font-style: normal; color: var(--ssaka); }
+    .sub { margin: 0 0 12px; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; word-break: keep-all; }
+    .tabs { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 10px; position: sticky; top: 0; background: #fff; z-index: 5; }
+    .tabs button { flex: none; min-height: 38px; padding: 0 13px; border: 0; border-radius: 999px; background: #f1f1f3; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .tabs button[aria-pressed="true"] { background: var(--ssaka); color: #fff; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .grid button { position: relative; border: 0; padding: 0; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1.5px #eee; aspect-ratio: 1; cursor: pointer; overflow: hidden; }
+    .grid img { width: 100%; height: 100%; display: block; }
+    .soon { grid-column: 1 / -1; padding: 18px; border-radius: 16px; background: var(--ssaka-soft); text-align: center; font-size: 14.5px; font-weight: 700; color: var(--ssaka-deep, #8a0f22); word-break: keep-all; }
+    .sheet { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+    .sheet .in { width: 100%; max-width: 520px; background: #fff; border-radius: 24px 24px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); text-align: center; }
+    .sheet img { width: 200px; height: 200px; }
+    .sheet .nm { font-weight: 900; font-size: 18px; margin: 4px 0 12px; }
+    .btn { display: block; width: 100%; min-height: 56px; margin-top: 8px; border: 0; border-radius: 16px; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; text-decoration: none; line-height: 56px; }
+    .btn.k { background: #FEE500; color: #3a1d1d; }
+    .btn.s { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1.5px #ddd; }
+    .btn.x { background: none; color: var(--ink-2); font-size: 15px; font-weight: 700; min-height: 44px; line-height: 44px; }
+    .how { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: #f7f7f9; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); word-break: keep-all; }
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.88); color: #fff; font-size: 14px; font-weight: 700; max-width: 90%; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <div class="top"><a href="../app/"><img src="../img/cherry.svg" alt="">싸바</a></div>
+  <h1><em>공짜</em> 체리 이모티콘 🍒</h1>
+  <p class="sub">움직이는 싸바 체리 이모티콘, 전부 공짜예요. 누르면 카톡방에 바로 보낼 수 있어요.</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+  <div class="how"><b>보내는 법</b> 이모티콘을 누르고 <b>카톡으로 보내기</b> → 카카오톡 → 보낼 방 선택. 안 되면 <b>사진첩에 저장</b>한 뒤 카톡에서 사진으로 보내세요. 움직이는 그대로 가요!</div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="in">
+    <img id="big" alt="">
+    <div class="nm" id="nm"></div>
+    <button type="button" class="btn k" id="send">💬 카톡으로 보내기</button>
+    <a class="btn s" id="save" download>⬇️ 사진첩에 저장</a>
+    <button type="button" class="btn x" id="close">닫기</button>
+  </div>
+</div>
+
+<script src="../js/install.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2400); }
+  // 이모티콘 목록 (주제별) — 그림 파일: g/e001.gif …
+  var CATS = ['전체', '💛 인사', '😊 대답', '😂 감정', '🙏 고마움', '🏃 약속', '🍻 먹고 마시기', '🎉 축하', '👴 가족', '💪 응원', '🗣️ 사투리', '☔ 날씨·일상'];
+  var EMO = [
+    { id: 'e001', n: '싸바 싸바!', c: '💛 인사' },
+    { id: 'e002', n: '싸바?', c: '💛 인사' },
+    { id: 'e003', n: '가는 중!', c: '🏃 약속' },
+    { id: 'e004', n: '미안해…', c: '🙏 고마움' },
+    { id: 'e005', n: '최고!', c: '💪 응원' },
+    { id: 'e006', n: '한잔 콜?', c: '🍻 먹고 마시기' },
+    { id: 'e007', n: '졸려…', c: '☔ 날씨·일상' },
+    { id: 'e008', n: '사랑해', c: '😂 감정' },
+    { id: 'e009', n: '통화 돼?', c: '💛 인사' },
+    { id: 'e010', n: '고마워!', c: '🙏 고마움' }
+  ];
+  var cat = '전체', cur = null;
+  function paint() {
+    var tb = $('tabs'); tb.innerHTML = '';
+    CATS.forEach(function (c) { var b = document.createElement('button'); b.type = 'button'; b.textContent = c; b.setAttribute('aria-pressed', c === cat ? 'true' : 'false'); b.addEventListener('click', function () { cat = c; paint(); }); tb.appendChild(b); });
+    var g = $('grid'); g.innerHTML = '';
+    var list = EMO.filter(function (e) { return cat === '전체' || e.c === cat; });
+    list.forEach(function (e) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', e.n);
+      var im = document.createElement('img'); im.src = 'g/' + e.id + '.gif'; im.alt = e.n; im.loading = 'lazy';
+      b.appendChild(im); b.addEventListener('click', function () { open(e); }); g.appendChild(b);
+    });
+    if (!list.length || cat === '전체') { var s = document.createElement('div'); s.className = 'soon'; s.textContent = list.length ? '🍒 계속 늘어나요! 곧 120개가 돼요.' : '🍒 이 주제 이모티콘은 곧 나와요!'; g.appendChild(s); }
+  }
+  function open(e) {
+    cur = e; $('big').src = 'g/' + e.id + '.gif'; $('nm').textContent = e.n;
+    $('save').href = 'g/' + e.id + '.gif'; $('save').setAttribute('download', '싸바-' + e.n.replace(/[^가-힣a-zA-Z0-9]/g, '') + '.gif');
+    $('sheet').hidden = false;
+  }
+  $('close').addEventListener('click', function () { $('sheet').hidden = true; });
+  $('sheet').addEventListener('click', function (ev) { if (ev.target === this) this.hidden = true; });
+  // 카톡으로 보내기: 폰 공유창에 움직이는 그림 파일을 그대로 넘김 → 카카오톡 선택
+  $('send').addEventListener('click', function () {
+    if (!cur) return;
+    fetch('g/' + cur.id + '.gif').then(function (r) { return r.blob(); }).then(function (b) {
+      var f = new File([b], '싸바-' + cur.id + '.gif', { type: 'image/gif' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f] }).catch(function () {});
+      toast('이 브라우저는 바로 보내기가 안 돼요. "사진첩에 저장" 후 카톡에서 보내 주세요');
+    }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

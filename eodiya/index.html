@@ -279,6 +279,8 @@
       <button type="button" class="reply" data-r="도착했어! 어디 있어?">✅ 도착!</button>
       <button type="button" class="reply" data-r="조금 늦어요, 미안해요 🙏">🙏 조금 늦어</button>
     </div>
+    <div class="sec-t">😄 재밌게 답하기</div>
+    <div class="replies" id="funReplies"></div>
     <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
   </section>
 </div>
@@ -489,9 +491,11 @@
       if (hasLoc) R = R.concat([['🏃 가는 중!', '지금 가는 중! 🏃'], ['⏱ 10분 뒤', '10분 뒤 도착해요'], ['✅ 도착!', '도착했어! 어디 있어?'], ['🙏 조금 늦어', '조금 늦어요, 미안해요 🙏']]);
       if (ks.indexOf('call') >= 0) R = R.concat([['📞 지금 돼!', '지금 통화 돼! 전화해 📞'], ['⏱ 10분 뒤에', '10분 뒤에 통화하자'], ['📵 이따 내가', '지금 좀 그래, 이따 내가 전화할게'], ['💬 문자로 해', '통화는 어렵고 문자로 해줘']]);
       if (ks.indexOf('hi') >= 0 || ks.indexOf('own') >= 0) R = R.concat([['😊 잘 지내!', '응, 잘 지내! 😊'], ['🙂 그럭저럭', '그럭저럭 지내~'], ['🍚 밥 먹었어', '밥 먹었어! 너는?'], ['🍒 너는 싸바?', '나는 싸바! 너는 싸바?']]);
-      if (ks.indexOf('world') >= 0) R = R.concat([['👋 Hi! (안녕!)', 'Hi! (안녕!) 👋'], ['😄 반가워!', '오~ 반가워! 😄']]);
+      if (ks.indexOf('world') >= 0) R = R.concat([['👋 Hi! (하이 · 안녕!)', 'Hi! (하이 · 안녕!) 👋'], ['😄 반가워!', '오~ 반가워! 😄']]);
       if (ks.indexOf('pic') >= 0) R = R.concat([['📷 잠깐만', '잠깐만, 사진 찾아볼게 📷'], ['😍 보고 싶지?', '많이 컸어! 보고 싶지? 😍']]);
       var seen = {}; R = R.filter(function (x) { if (seen[x[1]]) return false; seen[x[1]] = 1; return true; }).slice(0, 8);
+      var FUN = [['🍒 싸바 싸바!', '싸바 싸바! 나 완전 잘 지내 🍒'], ['😎 나야 늘 잘 지내지', '나야 늘 잘 지내지 😎'], ['🍜 방금 라면 먹음', '방금 라면 먹었어 🍜 너는?'], ['🛌 이불 밖은 위험해', '지금 이불 속… 이불 밖은 위험해 🛌'], ['🤫 몰래 답장 중', '지금 회의 중이라 몰래 답장 중 🤫'], ['💸 돈 빼고 다 있어', '돈 빼고 다 있어 ㅋㅋ 💸'], ['☕ 커피 사주면 나감', '커피 사주면 나갈게 ☕'], ['🐶 강아지 산책 중', '강아지랑 산책 중이야 🐶'], ['💤 자다 깼어', '자다 깼어… 무슨 일이야? 💤'], ['📞 목소리 듣고 싶네', '목소리 듣고 싶다, 전화해 📞'], ['🙏 오늘은 쉴래', '오늘은 좀 쉴래, 다음에 꼭! 🙏'], ['🍻 오늘 한잔 콜?', '그런 김에 오늘 한잔 콜? 🍻']];
+      var fb = $('funReplies'); if (fb) FUN.forEach(function (x) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'reply'; bt.dataset.r = x[1]; bt.textContent = x[0]; fb.appendChild(bt); });
       if (R.length) { var rb = $('askReplies'); rb.innerHTML = ''; R.forEach(function (x) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'reply'; bt.dataset.r = x[1]; bt.textContent = x[0]; rb.appendChild(bt); }); }
       // 위치 질문이 없으면 위치 버튼은 작게 맨 아래로
       if (!hasLoc) { var hb = $('hereBtn'); hb.innerHTML = '📍 내 위치 보내기'; hb.style.minHeight = '54px'; hb.style.fontSize = '16px'; hb.style.marginTop = '16px'; var mk = document.querySelector('#viewAsk .mk'); mk.parentNode.insertBefore(hb, mk); }
@@ -615,7 +619,7 @@
     { k: 'call', t: '📞 통화', items: ['통화 괜찮아?', '통화되냐?', '뭐 좀 물어볼라 그러는데..', '바빠?', '안 바빠?'] },
     { k: 'hi', t: '💛 안부', items: ['싸바?', '잘 지내?', '별일 없지?', '밥 먹었냐?', '괜찮냐?'] },
     { k: 'pic', t: '📷 보여줘', items: ['손주·손녀 사진 보여줘', '강아지 사진 보여줘', '오늘 뭐 먹었어? 사진 한 장!'] },
-    { k: 'world', t: '🌏 세계 인사', items: ['Hello! (안녕!)', 'Hola! (안녕!)', 'Bonjour! (안녕!)', 'Ça va? (잘 지내?)', 'Ciao! (안녕!)', 'Guten Tag! (안녕하세요)', 'Olá! (안녕!)', 'こんにちは (안녕하세요)', '你好 (안녕하세요)', 'Xin chào (안녕하세요)', 'Sawasdee (안녕하세요)', 'Namaste (안녕하세요)', 'Merhaba (안녕!)', 'Привет (안녕!)', 'Salam (안녕!)', 'Aloha! (안녕!)'] },
+    { k: 'world', t: '🌏 세계 인사', items: ['Hello! (헬로 · 안녕!)', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va? (싸바 · 잘 지내?)', 'Ciao! (차오 · 안녕!)', 'Guten Tag! (구텐 탁 · 안녕하세요)', 'Olá! (올라 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Sawasdee (사와디 · 안녕하세요)', 'Namaste (나마스떼 · 안녕하세요)', 'Merhaba (메르하바 · 안녕!)', 'Привет (프리벳 · 안녕!)', 'Salam (살람 · 안녕!)', 'Aloha! (알로하 · 안녕!)'] },
     { k: 'hi', t: '✨ 더', items: ['오늘 뭐 해?', '주말에 뭐 해?', '퇴근했어?', '보고 싶다', '고마워', '힘내!', '아프지 마', '비 온다, 우산 챙겨!', '날씨 좋다, 나와!', '생일 축하해 🎂'] }
   ];
   var picked = [{ t: '어디야?', k: 'loc' }], gTab = 0;

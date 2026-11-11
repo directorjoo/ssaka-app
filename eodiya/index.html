@@ -290,6 +290,7 @@
 
 <script src="../js/codec.js"></script>
 <script src="../js/share.js"></script>
+<script src="../js/msgimg.js"></script>
 <script src="../js/install.js"></script>
 <script src="../js/sound.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -335,11 +336,20 @@
     });
   }
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
-  function shareKakao(title, desc, url, forceImg) {
+  // 보내는 말을 크게 그린 그림 (미리 올려 둔 게 있으면 바로, 없으면 잠깐 기다렸다가, 안 되면 기본 그림)
+  function withMsgImg(text, kind, go) {
+    var M = window.SavaMsgImg; if (!M || !text) return go(null);
+    var r = M.ready(text, { kind: kind }); if (r) return go(r);
+    var done = false, fin = function (v) { if (done) return; done = true; clearTimeout(tm); go(v); };
+    var tm = setTimeout(function () { fin(null); }, 2500);
+    toast('말풍선 그림 만드는 중…');
+    M.prepare(text, { kind: kind }).then(fin, function () { fin(null); });
+  }
+  function shareKakao(title, desc, url, forceImg, mi) {
     var play = /놀자/.test(title) && !forceImg;
     var isHere = !play && !forceImg && /여기/.test(title);
-    var img = IMG_BASE + (forceImg || (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=7'));
-    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: play ? 800 : 1000, imageHeight: play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '👆 답장 보내기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', noButtons: !play, installUrl: BASE + '?install=1' });
+    var img = mi ? mi.url : IMG_BASE + (forceImg || (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=7'));
+    window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: mi ? mi.w : play ? 800 : 1000, imageHeight: mi ? mi.h : play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '👆 답장 보내기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', noButtons: !play, installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
     var body = title + (desc ? '\n' + desc : '') + '\n' + url;
@@ -388,10 +398,11 @@
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
     function reply(o) {
       var name = myName();
-      var title = o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
+      var title = o.mi ? (name ? name + '님 답장이 왔어요' : '답장이 왔어요') : o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
+      if (o.mi) { o.img = o.mi.url; o.w = o.mi.w; o.h = o.mi.h; }
       var url = o.url || BASE;
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
-      var wide = /eodiya-(ask|here|reply2)\.png/.test(o.img), abs = /^https?:/.test(o.img);
+      var wide = o.mi || /eodiya-(ask|here|reply2)\.png/.test(o.img), abs = /^https?:/.test(o.img);
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide, installUrl: BASE + '?install=1' });
     }
@@ -511,13 +522,15 @@
         });
         var tx = rText();
         $('rPrev').innerHTML = '💬 <b></b>'; $('rPrev').lastChild.textContent = tx || '답장을 골라 보세요';
+        if (tx && window.SavaMsgImg && !card.phone) SavaMsgImg.soon(tx.slice(0, 100), { kind: 'reply' });
         $('rCount').textContent = rPick.length ? '(' + rPick.length + '/3 · 누른 순서대로)' : '(마음대로, 최대 3개 이어 보내기)';
       }
       $('hereText').addEventListener('input', paintR);
       paintR();
       $('rSend').addEventListener('click', function () {
         var t = rText(); if (!t) { toast('답장을 고르거나 적어주세요'); return; }
-        reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' });
+        if (card.phone) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); return; }
+        withMsgImg(t.slice(0, 100), 'reply', function (mi) { reply({ title: t.slice(0, 100), desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
       });
       // 💬 문자 · 📍 위치 · 📷 사진은 같은 크기로 나란히 — 무엇으로 답할지는 받는 사람 마음
       $('msgBtn').addEventListener('click', function () { var t = document.querySelector('#viewAsk .sec-t'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
@@ -646,6 +659,7 @@
       cb.appendChild(b);
     });
     $('askPrev').textContent = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '싸바?';
+    if (window.SavaMsgImg && mode === 'ask') SavaMsgImg.soon($('askPrev').textContent, { kind: 'ask' });
     $('gCount').textContent = picked.length ? '(' + picked.length + '/3 · 누른 순서대로)' : '(최대 3개, 누른 순서대로)';
   }
   $('gOwn').addEventListener('change', function () {
@@ -693,7 +707,13 @@
     var onlyWhere = !picked.length || (picked.length === 1 && picked[0].t === '어디야?');
     return { url: url, title: title, desc: desc, phone: phone, img: mode === 'ask' ? (onlyWhere ? 'eodiya-ask.png?v=7' : 'eodiya-hi.png?v=1') : null };
   }
-  $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url, b.img); });
+  $('sendKakao').addEventListener('click', function () {
+    var b = build(); if (!b) return;
+    if (mode !== 'ask') { shareKakao(b.title, b.desc, b.url, b.img); return; }
+    // 묻는 말은 그림에 크게, 카톡 제목은 누가 보냈는지만
+    var from = $('from').value.trim();
+    withMsgImg(b.title, 'ask', function (mi) { shareKakao(mi ? (from ? from + '님이 보냈어요' : '싸바가 왔어요') : b.title, b.desc, b.url, b.img, mi); });
+  });
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
   function cancelOut() {
     var fromHere = document.referrer && document.referrer.indexOf(location.origin) === 0;

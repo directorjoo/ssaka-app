@@ -75,6 +75,14 @@
     .when { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--ssaka-soft); color: var(--ssaka-deep); font-weight: 800; font-size: 15px; margin: 6px 0 4px; }
     .memo { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--bg-2); font-size: 16px; line-height: 1.5; }
     .nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .gtabs { display: flex; gap: 6px; overflow-x: auto; margin: 4px 0 10px; padding-bottom: 2px; }
+    .gtab { flex: none; min-height: 38px; padding: 0 13px; border-radius: 999px; border: 0; background: #f1f1f3; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .gtab[aria-pressed="true"] { background: #1a1a1a; color: #fff; }
+    #gChips .chip { min-height: 42px; font-size: 15px; }
+    #gChips .chip[aria-pressed="true"] { background: var(--ssaka); border-color: var(--ssaka); }
+    .gcount { font-weight: 800; color: var(--ssaka); }
+    .photo-btn { display: block; width: 100%; min-height: 64px; margin-top: 12px; border: 0; border-radius: 18px; background: #12924a; color: #fff; font-size: 19px; font-weight: 900; cursor: pointer; }
+    .photo-btn small { display: block; font-size: 12.5px; font-weight: 700; opacity: .9; }
     .replies { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
     .reply { min-height: 54px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font-size: 16px; font-weight: 800; cursor: pointer; }
     .sec-t { font-size: 13px; font-weight: 800; color: var(--ink-2); margin: 22px 0 0; }
@@ -132,8 +140,12 @@
     </div>
 
     <div class="box" id="askBox">
-      <div class="bubble">🙋 <b id="askPrev">어디야?</b></div>
-      <div class="note" style="margin-top:8px">보내면 끝! 친구는 "여기야!" 한 번만 누르면 지도가 와요.</div>
+      <div class="bubble">💬 <b id="askPrev">어디야?</b></div>
+      <label class="l" style="margin-top:14px">첫마디 고르기 <span class="gcount" id="gCount">(최대 3개, 누른 순서대로)</span></label>
+      <div class="gtabs" id="gTabs"></div>
+      <div class="chips" id="gChips"></div>
+      <input type="text" id="gOwn" maxlength="40" placeholder="직접 쓰기 (예: 토요일에 시간 돼?)" style="margin-top:10px">
+      <div class="note" style="margin-top:8px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
     </div>
 
     <div class="box" id="comeBox" hidden>
@@ -174,6 +186,7 @@
         <button type="button" class="act" aria-pressed="false">⛰️ 등산</button>
         <button type="button" class="act" aria-pressed="false">🃏 화투 한 판</button>
         <button type="button" class="act" aria-pressed="false">🍶 한잔하자</button>
+        <button type="button" class="act" aria-pressed="false">🥃 소주 한잔</button>
         <button type="button" class="act" aria-pressed="false">🎱 당구 한판</button>
       </div>
       <label class="l">언제?</label>
@@ -257,8 +270,10 @@
       <input type="text" id="hereText" maxlength="80" placeholder="예: 회의 중, 30분 뒤 연락할게">
       <button type="button" id="hereSend">보내기</button>
     </div>
+    <button type="button" class="photo-btn" id="photoBtn" hidden>📷 사진 보내기<small>사진을 고르면 카톡 큰 그림으로 가요</small></button>
+    <input type="file" id="photoIn" accept="image/*" hidden>
     <div class="sec-t">한 번에 답장하기</div>
-    <div class="replies">
+    <div class="replies" id="askReplies">
       <button type="button" class="reply" data-r="지금 가는 중! 🏃">🏃 가는 중!</button>
       <button type="button" class="reply" data-r="10분 뒤 도착해요">⏱ 10분 뒤</button>
       <button type="button" class="reply" data-r="도착했어! 어디 있어?">✅ 도착!</button>
@@ -295,6 +310,19 @@
     var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
     return (h < 12 ? '오전 ' : '오후 ') + ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m;
   }
+  function shrink(file, max) {
+    return new Promise(function (resolve) {
+      var img = new Image(), u = URL.createObjectURL(file);
+      img.onload = function () {
+        var r = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+        c.toBlob(function (b) { resolve({ file: b ? new File([b], 'sava.jpg', { type: 'image/jpeg' }) : file, w: c.width, h: c.height }); }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); resolve({ file: file, w: 800, h: 800 }); };
+      img.src = u;
+    });
+  }
   function getPos() {
     return new Promise(function (ok, no) {
       if (!navigator.geolocation) return no(new Error('위치를 지원하지 않는 브라우저예요'));
@@ -303,10 +331,10 @@
     });
   }
   // 카톡으로 보내기: 카카오 공유가 안 되면 휴대폰 공유창 → 링크 복사
-  function shareKakao(title, desc, url) {
-    var play = /놀자/.test(title);
-    var isHere = !play && /여기/.test(title);
-    var img = IMG_BASE + (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=7');
+  function shareKakao(title, desc, url, forceImg) {
+    var play = /놀자/.test(title) && !forceImg;
+    var isHere = !play && !forceImg && /여기/.test(title);
+    var img = IMG_BASE + (forceImg || (play ? 'eodiya-play.png?v=4' : isHere ? 'eodiya-here.png?v=6' : 'eodiya-ask.png?v=7'));
     window.SsakaShare({ title: title, description: desc, imageUrl: img, imageWidth: play ? 800 : 1000, imageHeight: play ? 800 : 600, url: url, buttonTitle: play ? '좋아! 갈게' : /여기/.test(title) ? '지도 보기' : '👆 답장 보내기', installTitle: play ? '싸바 놀자 설치' : '싸바 여기야 설치', noButtons: !play, installUrl: BASE + '?install=1' });
   }
   function shareSms(title, desc, url, phone) {
@@ -359,8 +387,8 @@
       var title = o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       var url = o.url || BASE;
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
-      var wide = /eodiya-(ask|here|reply2)\.png/.test(o.img);
-      window.SsakaShare({ title: title, description: o.desc || '', imageUrl: IMG_BASE + o.img, imageWidth: wide ? 1000 : 800, imageHeight: wide ? 600 : 800, url: url,
+      var wide = /eodiya-(ask|here|reply2)\.png/.test(o.img), abs = /^https?:/.test(o.img);
+      window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide, installUrl: BASE + '?install=1' });
     }
     if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
@@ -450,6 +478,44 @@
       nameBox($('hereBtn'));
       document.title = '어디야? · 싸카';
       $('aWho').textContent = who + ' 물어봐요';
+      var qs = Array.isArray(card.q) && card.q.length ? card.q.slice(0, 4).map(function (x) { return String(x).slice(0, 40); }) : ['어디야?'];
+      var ks = String(card.k || 'loc');
+      var hasLoc = ks.indexOf('loc') >= 0;
+      document.querySelector('#viewAsk h1.q').textContent = qs.join(' ');
+      var qlen = qs.join(' ').length, h1q = document.querySelector('#viewAsk h1.q'); if (qlen > 7) { h1q.style.fontSize = qlen > 18 ? '30px' : '40px'; h1q.style.lineHeight = '1.25'; h1q.style.wordBreak = 'keep-all'; }
+      document.title = qs.join(' ') + ' · 싸바';
+      // 주제에 맞는 한 번에 답장
+      var R = [];
+      if (hasLoc) R = R.concat([['🏃 가는 중!', '지금 가는 중! 🏃'], ['⏱ 10분 뒤', '10분 뒤 도착해요'], ['✅ 도착!', '도착했어! 어디 있어?'], ['🙏 조금 늦어', '조금 늦어요, 미안해요 🙏']]);
+      if (ks.indexOf('call') >= 0) R = R.concat([['📞 지금 돼!', '지금 통화 돼! 전화해 📞'], ['⏱ 10분 뒤에', '10분 뒤에 통화하자'], ['📵 이따 내가', '지금 좀 그래, 이따 내가 전화할게'], ['💬 문자로 해', '통화는 어렵고 문자로 해줘']]);
+      if (ks.indexOf('hi') >= 0 || ks.indexOf('own') >= 0) R = R.concat([['😊 잘 지내!', '응, 잘 지내! 😊'], ['🙂 그럭저럭', '그럭저럭 지내~'], ['🍚 밥 먹었어', '밥 먹었어! 너는?'], ['🍒 너는 싸바?', '나는 싸바! 너는 싸바?']]);
+      if (ks.indexOf('world') >= 0) R = R.concat([['👋 Hi! (안녕!)', 'Hi! (안녕!) 👋'], ['😄 반가워!', '오~ 반가워! 😄']]);
+      if (ks.indexOf('pic') >= 0) R = R.concat([['📷 잠깐만', '잠깐만, 사진 찾아볼게 📷'], ['😍 보고 싶지?', '많이 컸어! 보고 싶지? 😍']]);
+      var seen = {}; R = R.filter(function (x) { if (seen[x[1]]) return false; seen[x[1]] = 1; return true; }).slice(0, 8);
+      if (R.length) { var rb = $('askReplies'); rb.innerHTML = ''; R.forEach(function (x) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'reply'; bt.dataset.r = x[1]; bt.textContent = x[0]; rb.appendChild(bt); }); }
+      // 위치 질문이 없으면 위치 버튼은 작게 맨 아래로
+      if (!hasLoc) { var hb = $('hereBtn'); hb.innerHTML = '📍 내 위치 보내기'; hb.style.minHeight = '54px'; hb.style.fontSize = '16px'; hb.style.marginTop = '16px'; var mk = document.querySelector('#viewAsk .mk'); mk.parentNode.insertBefore(hb, mk); }
+      // 사진 답장: '보여줘'면 맨 위, 안부·직접 쓴 말이면 문자 아래
+      if (ks.indexOf('pic') >= 0 || ks.indexOf('hi') >= 0 || ks.indexOf('own') >= 0 || ks.indexOf('world') >= 0) {
+        var pb = $('photoBtn'); pb.hidden = false;
+        if (ks.indexOf('pic') >= 0) { var h1 = document.querySelector('#viewAsk h1.q'); var rn = document.querySelector('#viewAsk .rname'); var anchor = (rn || h1).nextSibling; h1.parentNode.insertBefore(pb, anchor); }
+      }
+      $('photoBtn').addEventListener('click', function () { $('photoIn').click(); });
+      $('photoIn').addEventListener('change', function () {
+        var inp = this, f = inp.files && inp.files[0]; if (!f) return;
+        if (!/^image\//.test(f.type)) { toast('사진 파일만 보낼 수 있어요'); return; }
+        toast('사진 올리는 중…');
+        shrink(f, 1080).then(function (sm) {
+          var list; try { var dt = new DataTransfer(); dt.items.add(sm.file); list = dt.files; } catch (e) { list = [sm.file]; }
+          return window.SsakaKakao().then(function (K) { return K.Share.uploadImage({ file: list }); }).then(function (res) {
+            var info = (res && (res.infos || res)) || {}, u = info.original && info.original.url;
+            if (!u) throw new Error('no url');
+            reply({ title: '사진 보냈어요 📷', desc: '', img: u, w: sm.w, h: sm.h, btn: '다시 묻기' });
+          });
+        }).catch(function () { toast('사진을 못 올렸어요. 다시 해주세요'); });
+        inp.value = '';
+      });
+
       $('hereBtn').addEventListener('click', function () {
         toast('위치를 확인하는 중…');
         getPos().then(function (pos) {
@@ -466,7 +532,7 @@
       document.querySelectorAll('#viewAsk .reply').forEach(function (b) {
         b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
       });
-      playSound(card.sound || 'where');
+      if (hasLoc) playSound(card.sound || 'where');
     }
     return;
   }
@@ -476,7 +542,7 @@
   var DRAFT = 'eodiya-me-v1';
   try { var me = JSON.parse(localStorage.getItem(DRAFT) || '{}'); if (me.from) $('from').value = me.from; } catch (e) {}
   function remember() { try { localStorage.setItem(DRAFT, JSON.stringify({ from: $('from').value.trim() })); } catch (e) {} }
-  function askPreview() { var f = $('from').value.trim(); $('askPrev').textContent = '어디야?'; $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
+  function askPreview() { var f = $('from').value.trim(); $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
   $('from').addEventListener('input', askPreview); askPreview();
 
   document.querySelectorAll('.mode').forEach(function (b) {
@@ -543,6 +609,40 @@
     return t.getTime();
   }
 
+  // ---------- 첫마디 고르기 (최대 3개 이어 붙이기) ----------
+  var GREET = [
+    { k: 'loc', t: '📍 위치', items: ['어디야?'] },
+    { k: 'call', t: '📞 통화', items: ['통화 괜찮아?', '통화되냐?', '뭐 좀 물어볼라 그러는데..', '바빠?', '안 바빠?'] },
+    { k: 'hi', t: '💛 안부', items: ['싸바?', '잘 지내?', '별일 없지?', '밥 먹었냐?', '괜찮냐?'] },
+    { k: 'pic', t: '📷 보여줘', items: ['손주·손녀 사진 보여줘', '강아지 사진 보여줘', '오늘 뭐 먹었어? 사진 한 장!'] },
+    { k: 'world', t: '🌏 세계 인사', items: ['Hello! (안녕!)', 'Hola! (안녕!)', 'Bonjour! (안녕!)', 'Ça va? (잘 지내?)', 'Ciao! (안녕!)', 'Guten Tag! (안녕하세요)', 'Olá! (안녕!)', 'こんにちは (안녕하세요)', '你好 (안녕하세요)', 'Xin chào (안녕하세요)', 'Sawasdee (안녕하세요)', 'Namaste (안녕하세요)', 'Merhaba (안녕!)', 'Привет (안녕!)', 'Salam (안녕!)', 'Aloha! (안녕!)'] },
+    { k: 'hi', t: '✨ 더', items: ['오늘 뭐 해?', '주말에 뭐 해?', '퇴근했어?', '보고 싶다', '고마워', '힘내!', '아프지 마', '비 온다, 우산 챙겨!', '날씨 좋다, 나와!', '생일 축하해 🎂'] }
+  ];
+  var picked = [{ t: '어디야?', k: 'loc' }], gTab = 0;
+  function paintGreet() {
+    var tb = $('gTabs'); tb.innerHTML = '';
+    GREET.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; paintGreet(); }); tb.appendChild(b); });
+    var cb = $('gChips'); cb.innerHTML = '';
+    GREET[gTab].items.forEach(function (t) {
+      var idx = -1; picked.forEach(function (x, i) { if (x.t === t) idx = i; });
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = (idx >= 0 ? (idx + 1) + '. ' : '') + t; b.setAttribute('aria-pressed', idx >= 0 ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        if (idx >= 0) picked.splice(idx, 1);
+        else { if (picked.length >= 3) { toast('최대 3개까지 이어 붙여요'); return; } picked.push({ t: t, k: GREET[gTab].k }); }
+        paintGreet();
+      });
+      cb.appendChild(b);
+    });
+    $('askPrev').textContent = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '어디야?';
+    $('gCount').textContent = picked.length ? '(' + picked.length + '/3 · 누른 순서대로)' : '(최대 3개, 누른 순서대로)';
+  }
+  $('gOwn').addEventListener('change', function () {
+    var v = this.value.trim(); picked = picked.filter(function (x) { return x.k !== 'own'; });
+    if (v) { if (picked.length >= 3) picked.pop(); picked.push({ t: v.slice(0, 40), k: 'own' }); }
+    paintGreet();
+  });
+  paintGreet();
+
   function build() {
     var from = $('from').value.trim(), phone = '';
     if (!from) { toast('보내는 사람 이름을 적어주세요'); $('from').focus(); return null; }
@@ -556,6 +656,7 @@
       var when = playW === 'now' ? '지금 바로' : (new Date(d.at).toDateString() === new Date().toDateString() ? '' : '내일 ') + clockText(d.at);
       return { url: purl, title: from + ': 친구야 놀자!', desc: act + ' · ' + when + (pn ? ' · ' + pn : ''), phone: phone, play: true };
     }
+    if (mode === 'ask' && picked.length) { d.q = picked.map(function (x) { return x.t; }); d.k = picked.map(function (x) { return x.k; }).filter(function (k, i, a) { return a.indexOf(k) === i; }).join(','); }
     var gpsNow = false;
     if (mode === 'come') {
       var name = $('placeName').value.trim();
@@ -573,11 +674,13 @@
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
     var nim = from ? from + '님이 ' : '';
-    var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : '어디야?';
+    var askT = picked.length ? picked.map(function (x) { return x.t; }).join(' ') : '어디야?';
+    var title = mode === 'come' ? (gpsNow ? (from ? nim + '여기 있대요' : '여기야!') : (from ? nim + '여기서 만나재요' : '여기서 만나!')) : askT;
     var desc = mode === 'come' ? ((d.place.name || (gpsNow ? '' : '만날 곳')) + (d.at && !gpsNow ? ' · ' + clockText(d.at) : '')) : '';
-    return { url: url, title: title, desc: desc, phone: phone };
+    var onlyWhere = !picked.length || (picked.length === 1 && picked[0].t === '어디야?');
+    return { url: url, title: title, desc: desc, phone: phone, img: mode === 'ask' ? (onlyWhere ? 'eodiya-ask.png?v=7' : 'eodiya-hi.png?v=1') : null };
   }
-  $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url); });
+  $('sendKakao').addEventListener('click', function () { var b = build(); if (b) shareKakao(b.title, b.desc, b.url, b.img); });
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
   function cancelOut() {
     var fromHere = document.referrer && document.referrer.indexOf(location.origin) === 0;

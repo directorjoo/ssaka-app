@@ -23,10 +23,19 @@
     try { var c = document.createElement('canvas'); c.width = c.height = 2; var x = c.getContext('2d'); x.drawImage(img, 0, 0, 2, 2); x.getImageData(0, 0, 1, 1); return true; }
     catch (e) { return false; }
   }
-  function cover(ctx, img, x, y, w, h) {
-    var r = Math.max(w / img.width, h / img.height), iw = img.width * r, ih = img.height * r;
+  // ip = [크기%, 가로%, 세로%, 전체보이기] — 만들기 화면에서 맞춘 대로
+  function cover(ctx, img, x, y, w, h, ip) {
+    var z = ip ? Math.min(4, Math.max(1, (+ip[0] || 100) / 100)) : 1, px = ip ? (+ip[1] || 0) / 100 : 0.5, py = ip ? (+ip[2] || 0) / 100 : 0.5;
+    if (ip && isNaN(+ip[1])) px = 0.5; if (ip && isNaN(+ip[2])) py = 0.5;
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-    ctx.drawImage(img, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+    if (ip && ip[3]) {
+      var rb = Math.max(w / img.width, h / img.height) * 1.2;
+      ctx.filter = 'blur(28px)'; ctx.drawImage(img, x + (w - img.width * rb) / 2, y + (h - img.height * rb) / 2, img.width * rb, img.height * rb); ctx.filter = 'none';
+    }
+    var r = (ip && ip[3] ? Math.min(w / img.width, h / img.height) : Math.max(w / img.width, h / img.height)), iw = img.width * r, ih = img.height * r;
+    var dx = x + (w - iw) * px, dy = y + (h - ih) * py;
+    if (z !== 1) { var ox = x + w * px, oy = y + h * py; dx = ox + (dx - ox) * z; dy = oy + (dy - oy) * z; iw *= z; ih *= z; }
+    ctx.drawImage(img, dx, dy, iw, ih);
     ctx.restore();
   }
   function round(ctx, x, y, w, h, r) {
@@ -77,7 +86,7 @@
     var sq = h <= 1100;
     var photoH = Math.round(h * (h > 1500 ? 0.56 : sq ? 0.55 : 0.6));
     ctx.fillStyle = col.paper; ctx.fillRect(0, 0, w, h);
-    if (img) cover(ctx, img, 0, 0, w, photoH);
+    if (img) cover(ctx, img, 0, 0, w, photoH, card.__main === img ? card.ip : null);
     else {
       ctx.fillStyle = col.accent; ctx.fillRect(0, 0, w, photoH);
       ctx.font = '800 ' + Math.round(photoH * 0.5) + 'px ' + FONT; ctx.fillStyle = col.onAccent; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -170,6 +179,7 @@
     }).then(function (imgs) {
       imgs = imgs.map(function (im) { return usable(im) ? im : null; });
       var main = card.image ? imgs[0] : null;
+      card = Object.assign({}, card, { __main: main });
       var rest = imgs.filter(function (im, i) { return im && !(card.image && i === 0); }).slice(0, 7);
       var list = [{ name: '01-표지', label: '표지 4:5 (인스타 피드)', c: drawCover(card, col, main || rest[0] || null, 1080, 1350) }];
       rest.forEach(function (im, i) { list.push({ name: '0' + (i + 2) + '-사진', label: '사진 ' + (i + 1), c: drawPhoto(card, col, im, i, rest.length) }); });

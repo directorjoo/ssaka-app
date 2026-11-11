@@ -46,7 +46,21 @@
       border: 2px dashed #c9c3b8; background: var(--bg); cursor: pointer; color: var(--text);
     }
     .ptile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .ptile.has { border-style: solid; border-color: transparent; min-height: 240px; }
+    .ptile.has { border-style: solid; border-color: transparent; min-height: 0; aspect-ratio: 1 / 1; cursor: grab; touch-action: none; background: #222; }
+    .ptile.has.fit #thumb { object-fit: contain; z-index: 1; }
+    .ptile #thumbBlur { position: absolute; inset: -10%; width: 120%; height: 120%; object-fit: cover; filter: blur(20px); opacity: .85; }
+    .ptile.has .ptile-in { z-index: 2; cursor: pointer; }
+    .adj { margin: 2px 0 10px; padding: 12px; border-radius: 16px; background: var(--bg); }
+    .adj .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+    .adj .seg button { min-height: 44px; border-radius: 12px; border: 1.5px solid #ddd; background: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .adj .seg button[aria-pressed="true"] { background: #B3132B; border-color: #B3132B; color: #fff; }
+    .adj .zrow { display: grid; grid-template-columns: auto 48px 1fr 48px; gap: 8px; align-items: center; }
+    .adj .zrow b { font-size: 15px; }
+    .adj .zrow button { height: 48px; border-radius: 12px; border: 1.5px solid #ddd; background: #fff; font: inherit; font-size: 24px; font-weight: 900; cursor: pointer; }
+    .adj input[type=range] { width: 100%; accent-color: #B3132B; height: 32px; }
+    .adj .arow { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 8px; }
+    .adj .arow small { color: var(--muted); font-size: 13px; word-break: keep-all; }
+    .adj .arow button { flex: none; min-height: 38px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #ddd; background: #fff; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; }
     .ptile.has .ptile-in { position: absolute; left: 10px; bottom: 10px; display: block; padding: 7px 12px; border-radius: 999px; background: rgba(20,20,24,.72); color: #fff; }
     .ptile.has .ptile-in small, .ptile.has .ptile-ico { display: none; }
     .ptile.has .ptile-in b { font-size: 13px; }
@@ -236,6 +250,7 @@
         <legend>카드 앞면</legend>
         <div data-for="profile club shop greet">
           <label class="ptile" for="photoFile" id="ptile">
+            <img id="thumbBlur" alt="" hidden>
             <img id="thumb" alt="" hidden>
             <span class="ptile-in">
               <span class="ptile-ico" aria-hidden="true">📷</span>
@@ -244,6 +259,11 @@
             </span>
           </label>
           <input id="photoFile" type="file" accept="image/*" hidden>
+          <div class="adj" id="adj" hidden>
+            <div class="seg" role="group" aria-label="사진 맞추기"><button type="button" id="fitCover" aria-pressed="true">꽉 채우기</button><button type="button" id="fitAll" aria-pressed="false">전체 보이기</button></div>
+            <div class="zrow"><b>크기</b><button type="button" id="zMinus" aria-label="작게">−</button><input type="range" id="zoom" min="100" max="300" step="5" value="100" aria-label="사진 크기"><button type="button" id="zPlus" aria-label="크게">＋</button></div>
+            <div class="arow"><small>사진을 손가락으로 끌어서 위치를 맞추세요</small><button type="button" id="ipReset">처음대로</button></div>
+          </div>
           <div class="photo-row">
             <span class="hint" id="photoStatus">사진은 크기를 줄여서 카카오 서버에 올려요.</span>
             <button type="button" class="mini" id="photoRemove" hidden>사진 빼기</button>
@@ -576,7 +596,7 @@
     el.dataset.id = d.id;
     var cardType = TYPES[type];
     var sample = {
-      title: ex.title, subtitle: ex.subtitle, image: v('image') || '',
+      title: ex.title, subtitle: ex.subtitle, image: v('image') || '', ip: v('image') && IP ? [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0] : undefined,
       body: String(ex.body || '').split('\n').filter(Boolean),
       contact: { name: ex.name || '이름', phone: '010-0000-0000' },
       place: (ex.place && cardType.buttons.indexOf('map') >= 0) ? { name: ex.place } : null,
@@ -725,6 +745,7 @@
       },
       buttons: cfg.buttons.slice()
     };
+    if (card.image && v('image') && (IP.z !== 100 || IP.x !== 50 || IP.y !== 50 || IP.f)) card.ip = [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0];
     if (g('place')) card.place = { name: g('place') };
     if (galList().length) card.gallery = galList();
     if (v('season')) card.season = v('season');
@@ -906,6 +927,7 @@
   // ---------- 사진: 앨범에서 골라 크기 줄이고 카카오 서버에 올리기 ----------
   function showThumb(url) {
     $('thumb').hidden = !url; if (url) $('thumb').src = url;
+    if ($('adj')) { $('adj').hidden = !url; applyIp(); }
     $('photoRemove').hidden = !url;
     $('ptile').classList.toggle('has', !!url);
     $('photoLabel').textContent = url ? '사진 바꾸기' : PHOTO_LABEL[type];
@@ -927,11 +949,63 @@
       img.src = u;
     });
   }
+  // ---------- 대표 사진 맞추기: 꽉 채우기 / 전체 보이기, 크기, 끌어서 위치 ----------
+  var IP = { z: 100, x: 50, y: 50, f: 0 }, autoFit = false;
+  function applyIp() {
+    var t = $('thumb'), b = $('thumbBlur'), has = !$('thumb').hidden;
+    t.style.objectPosition = IP.x + '% ' + IP.y + '%';
+    t.style.transform = IP.z !== 100 ? 'scale(' + IP.z / 100 + ')' : '';
+    t.style.transformOrigin = IP.x + '% ' + IP.y + '%';
+    $('ptile').classList.toggle('fit', !!IP.f);
+    b.hidden = !(has && IP.f); if (has && IP.f) b.src = t.src;
+    if ($('zoom')) $('zoom').value = IP.z;
+    $('fitCover').setAttribute('aria-pressed', IP.f ? 'false' : 'true'); $('fitAll').setAttribute('aria-pressed', IP.f ? 'true' : 'false');
+  }
+  var ipTimer = null;
+  function ipChanged() { applyIp(); clearTimeout(ipTimer); ipTimer = setTimeout(update, 250); }
+  $('fitCover').addEventListener('click', function () { IP.f = 0; autoFit = false; ipChanged(); });
+  $('fitAll').addEventListener('click', function () { IP.f = 1; autoFit = false; ipChanged(); });
+  $('zoom').addEventListener('input', function () { IP.z = +this.value; ipChanged(); });
+  $('zMinus').addEventListener('click', function () { IP.z = Math.max(100, IP.z - 20); ipChanged(); });
+  $('zPlus').addEventListener('click', function () { IP.z = Math.min(300, IP.z + 20); ipChanged(); });
+  $('ipReset').addEventListener('click', function () { IP = { z: 100, x: 50, y: 50, f: IP.f }; ipChanged(); });
+  // 글씨가 들어간 그림(인스타 카드 등)이나 가로·세로로 긴 사진은 "전체 보이기"를 먼저 골라 줌
+  $('thumb').addEventListener('load', function () {
+    if (!autoFit) return; autoFit = false;
+    var im = this, r = im.naturalWidth / im.naturalHeight;
+    if (r > 1.6 || r < 0.62) { IP.f = 1; ipChanged(); return; }
+    try {
+      var c = document.createElement('canvas'), W = 64, H = Math.round(64 / r); c.width = W; c.height = H;
+      var x = c.getContext('2d'); x.drawImage(im, 0, 0, W, H); var d = x.getImageData(0, 0, W, H).data, edges = 0, n = 0;
+      for (var yy = 1; yy < H; yy++) for (var xx = 1; xx < W; xx++) { var i = (yy * W + xx) * 4, j = i - 4, k = i - W * 4;
+        var l = d[i] + d[i + 1] + d[i + 2]; if (Math.abs(l - d[j] - d[j + 1] - d[j + 2]) > 180 || Math.abs(l - d[k] - d[k + 1] - d[k + 2]) > 180) edges++; n++; }
+      if (edges / n > 0.16) { IP.f = 1; ipChanged(); }
+    } catch (e) {}
+  });
+  (function () {
+    var tile = $('ptile'), drag = null, moved = false;
+    tile.addEventListener('click', function (e) { if (tile.classList.contains('has') && !e.target.closest('.ptile-in')) e.preventDefault(); });
+    tile.addEventListener('pointerdown', function (e) {
+      if (!tile.classList.contains('has') || e.target.closest('.ptile-in')) return;
+      drag = { x: e.clientX, y: e.clientY, ix: IP.x, iy: IP.y, w: tile.clientWidth, h: tile.clientHeight }; moved = false;
+      try { tile.setPointerCapture(e.pointerId); } catch (er) {}
+    });
+    tile.addEventListener('pointermove', function (e) {
+      if (!drag) return; moved = true;
+      var k = 140 / (IP.z / 100);
+      IP.x = Math.min(100, Math.max(0, drag.ix - (e.clientX - drag.x) / drag.w * k));
+      IP.y = Math.min(100, Math.max(0, drag.iy - (e.clientY - drag.y) / drag.h * k));
+      applyIp();
+    });
+    function end() { if (drag && moved) ipChanged(); drag = null; }
+    tile.addEventListener('pointerup', end); tile.addEventListener('pointercancel', end);
+  })();
   $('photoFile').addEventListener('change', function () {
     var input = this, file = input.files && input.files[0];
     if (!file) return;
     if (!/^image\//.test(file.type)) { toast('사진 파일만 올릴 수 있어요'); return; }
     $('photoStatus').textContent = '사진 올리는 중…';
+    IP = { z: 100, x: 50, y: 50, f: 0 }; autoFit = true;
     showThumb(URL.createObjectURL(file));
     var lastSmall = null;
     resize(file, 1080).then(function (small) {
@@ -1012,7 +1086,7 @@
   $('season').addEventListener('change', function () { seasonTouched = true; update(); renderGallery(); });
 
   $('photoRemove').addEventListener('click', function () {
-    $('image').value = ''; showThumb(''); $('photoStatus').textContent = '사진을 뺐어요.'; update();
+    $('image').value = ''; IP = { z: 100, x: 50, y: 50, f: 0 }; showThumb(''); $('photoStatus').textContent = '사진을 뺐어요.'; update();
   });
 
   // ---------- 주소: 카카오(다음) 우편번호 검색 ----------
@@ -1288,6 +1362,7 @@
     var ci = c.contact || {};
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
     set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
+    IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
     set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || '');
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }

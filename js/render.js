@@ -72,6 +72,19 @@
     if (card.image && !card.sos) {
       var img = el('img');
       img.src = card.image; img.alt = card.title || ''; img.decoding = 'async';
+      // 대표 사진 맞춤: ip = [크기%, 가로%, 세로%, 전체보이기]
+      var ip = Array.isArray(card.ip) ? card.ip : null;
+      if (ip) {
+        var z = Math.min(400, Math.max(100, +ip[0] || 100)) / 100, px = Math.min(100, Math.max(0, +ip[1])), py = Math.min(100, Math.max(0, +ip[2]));
+        if (isNaN(px)) px = 50; if (isNaN(py)) py = 50;
+        img.style.objectPosition = px + '% ' + py + '%';
+        if (z !== 1) { img.style.transform = 'scale(' + z + ')'; img.style.transformOrigin = px + '% ' + py + '%'; }
+        if (ip[3]) {
+          img.style.objectFit = 'contain'; img.style.position = 'relative'; img.style.zIndex = '1';
+          var blur = el('img', 'sk-photo-blur'); blur.src = card.image; blur.alt = ''; blur.setAttribute('aria-hidden', 'true');
+          photo.appendChild(blur); photo.classList.add('sk-fit');
+        }
+      }
       photo.appendChild(img);
     } else {
       photo.appendChild(el('span', 'sk-mono', (card.title || '싸').trim().charAt(0)));

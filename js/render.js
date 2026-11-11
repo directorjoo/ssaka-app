@@ -151,7 +151,7 @@
         var rmeta = (rv.solo || rv.people === false) ? (rv.menu && rv.menu.length ? word + '·날짜·시간' : '날짜·시간') : (rv.menu && rv.menu.length ? word + '·인원·시간' : '인원·시간');
         acts.appendChild(action('reserve', rv.label || '예약하기', rmeta, null, live && ctx.onReserve, live));
       }
-      if (b === 'rsvp' && c.phone) acts.appendChild(action('rsvp', '참석 답장', (c.name || '총무') + '에게 문자', null, live && ctx.onRsvp, live));
+      if (b === 'rsvp' && c.phone) acts.appendChild(action('rsvp', '참석·불참', (c.name || '총무') + '에게 문자', null, live && ctx.onRsvp, live));
       if (b === 'map' && card.place && card.place.name) {
         if (live) {
           var u = ctx.mapUrls(card.place);

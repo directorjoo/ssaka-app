@@ -289,10 +289,10 @@
     var c = card.contact || {};
     var sheet = document.createElement('div');
     sheet.className = 'sk-sheet';
-    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '참석 답장');
+    sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '참석·불참 답장');
     var box = document.createElement('div'); box.className = 'sk-sheet-box';
     var head = document.createElement('div'); head.className = 'sk-sheet-head';
-    var t = document.createElement('strong'); t.textContent = '참석 답장'; head.appendChild(t);
+    var t = document.createElement('strong'); t.textContent = '참석·불참 답장'; head.appendChild(t);
     var x = document.createElement('button'); x.type = 'button'; x.className = 'sk-x'; x.textContent = '닫기'; head.appendChild(x);
     box.appendChild(head);
     var lab = document.createElement('label'); lab.className = 'sk-f';
@@ -300,6 +300,11 @@
     var nm = document.createElement('input'); nm.type = 'text'; nm.maxLength = 20; nm.autocomplete = 'name'; nm.placeholder = '홍길동';
     try { nm.value = localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
     lab.appendChild(nm); box.appendChild(lab);
+    // 한 줄 메모 (안 써도 그대로 보내짐)
+    var lab2 = document.createElement('label'); lab2.className = 'sk-f';
+    var ls2 = document.createElement('span'); ls2.className = 'sk-f-l'; ls2.textContent = '한마디 (안 써도 돼요)'; lab2.appendChild(ls2);
+    var memo = document.createElement('input'); memo.type = 'text'; memo.maxLength = 40; memo.placeholder = '예: 30분 늦어요 / 집안 행사가 있어요';
+    lab2.appendChild(memo); box.appendChild(lab2);
     var row = document.createElement('div'); row.className = 'sk-rsvp';
     [['yes', '🙋 참석할게요'], ['maybe', '🤔 아직 몰라요'], ['no', '🙏 이번엔 못 가요']].forEach(function (o) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-rsvp-b sk-rsvp-' + o[0]; b.textContent = o[1];
@@ -307,7 +312,8 @@
         var who = nm.value.trim();
         if (!who) { toast('이름을 적어주세요'); nm.focus(); return; }
         try { localStorage.setItem('ssaka-my-name', who); } catch (e) {}
-        var msg = '[' + (card.title || '모임') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + who + ' — ' + o[1].replace(/^\S+\s/, '') + '\n싸바!';
+        var note = memo.value.trim();
+        var msg = '[' + (card.title || '모임') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + who + ' — ' + o[1].replace(/^\S+\s/, '') + (note ? '\n💬 ' + note : '') + '\n싸바!';
         shut();
         if (window.self !== window.top) { toast('미리보기에선 문자가 열리지 않아요'); return; }
         location.href = smsHref(c.phone, msg);

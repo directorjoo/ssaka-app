@@ -102,7 +102,8 @@
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
-    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: #B3132B; color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(142,10,28,.9); }
+    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2B3D6B 0%, #16213F 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(22,33,63,.9); -webkit-tap-highlight-color: transparent; }
+    .mk:active { transform: scale(.985); }
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { margin: 2px 0 0; font-size: 28px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
     .mk p { margin: 8px 0 14px; font-size: 14.5px; line-height: 1.5; opacity: .95; word-break: keep-all; padding-right: 84px; }
@@ -113,7 +114,7 @@
     .mk .mini i:nth-child(3) { width: 60%; }
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
-    .mk .go { display: flex; align-items: center; justify-content: center; min-height: 54px; border-radius: 18px; background: #fff; color: #B3132B; font-size: 19px; font-weight: 900; text-decoration: none; letter-spacing: -0.02em; }
+    .mk .go { display: flex; align-items: center; justify-content: center; min-height: 54px; border-radius: 18px; background: #fff; color: #16213F; font-size: 19px; font-weight: 900; text-decoration: none; letter-spacing: -0.02em; }
     .story { margin: 0 18px 12px; padding: 16px 16px 14px; border-radius: 22px; background: #FFF7E6; box-shadow: inset 0 0 0 1.5px #F3D9A4; }
     .story .st-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .story .st-top img { width: 46px; height: 46px; flex: none; }
@@ -323,10 +324,10 @@
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>카톡 한 번이면 친구 위치가 와요 · 친구 불러 모으기까지</p>' +
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>친구 위치 묻기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>내 위치 보내기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>친구들 불러 모으기 · 차 한잔 · 밥 · 바둑</small></a></div>';
     v.appendChild(eh);
-    // 싸바카드 만들기 — 체리색으로 크게
-    var mk = el('div', 'mk');
+    // 싸바카드 만들기 — 남색으로 어디야(체리)와 구분, 상자 어디를 눌러도 만들기로
+    var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '싸바카드 만들기');
     mk.innerHTML = '<div class="mini" aria-hidden="true"><i></i><i></i><i></i></div><h2>싸바카드 만들기</h2><p>프로필 · 홍보물 · 가게 홍보<br>모임 공지 · 초대장 · 스마트 명함</p>' +
-      '<a class="go" href="../make/">✏️ 지금 만들기 ›</a>';
+      '<span class="go">✏️ 지금 만들기 ›</span>';
     v.appendChild(mk);
     // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸
     var st = el('div', 'story');

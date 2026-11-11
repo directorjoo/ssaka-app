@@ -101,6 +101,13 @@
     .more-opt summary { cursor: pointer; font-size: 15px; font-weight: 900; color: var(--deep); list-style: none; }
     .more-opt summary::-webkit-details-marker { display: none; }
     .more-opt[open] summary { margin-bottom: 4px; }
+    .dhead { margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: #FFF6D6; font-size: 14px; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .dhead b { font-size: 17px; }
+    .names button small { display: block; font-size: 10px; line-height: 1; min-height: 10px; }
+    #ladder.draw { cursor: crosshair; background: repeating-linear-gradient(0deg, transparent 0 22px, rgba(0,0,0,.025) 22px 23px); border-radius: 10px; }
+    .goals div.q { background: #3a3a3a; color: #fff; font-size: 18px; }
+    .dmsg { margin: 10px 0 0; text-align: center; font-size: 15px; font-weight: 900; word-break: keep-all; }
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 90; padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.9); color: #fff; font-size: 14px; font-weight: 700; max-width: 90%; text-align: center; }
     #room { display: none; }
     #room.on { display: block; }
     .rhead { margin-top: 14px; padding: 18px 16px; border-radius: 22px; background: linear-gradient(135deg, #D3122F 0%, #8E0A1C 100%); color: #fff; text-align: center; }
@@ -178,7 +185,7 @@
     <div class="box" id="joinBox">
       <span class="lab">🙋 나도 할래!</span>
       <form class="add" id="joinForm"><input id="joinName" maxlength="8" placeholder="내 이름" enterkeyhint="done"><button type="submit">동의하고 나도!</button></form>
-      <p class="cnote" style="text-align:left">내 이름을 이 놀이에만 쓰고 <b>출발하면 바로 지워요</b> (위치는 저장 안 해요 · <a href="../privacy/" target="_blank">개인정보처리방침</a>)</p>
+      <p class="cnote" style="text-align:left">내 이름을 이 놀이에만 쓰고 <b>결과가 나오면 10분 안에 지워요</b> (위치는 저장 안 해요 · <a href="../privacy/" target="_blank">개인정보처리방침</a>)</p>
       <button type="button" class="big ghost" id="leave" hidden style="margin-top:10px">빠질래요</button>
     </div>
     <div class="acts" id="hostBox" hidden>
@@ -216,7 +223,7 @@
     <a href="../?story=1">🍒 싸바가 뭐지?</a>
   </div>
   <div id="chipBox"></div>
-  <p class="foot">결과는 링크 안의 번호로 정해져서, 누가 열어도 똑같이 나와요.<br>재미로 하는 놀이예요. 돈 걸린 도박에는 쓰지 말아 주세요.<br><a href="../privacy/">개인정보처리방침</a> · <a href="../terms/">이용약관</a></p>
+  <p class="foot">사다리는 매판 새로 그려지고, 다 같이 줄을 그은 뒤에 공개해요. 당첨 칸은 공개 전까지 방장도 몰라요.<br>결과는 링크 안의 번호로 정해져서, 누가 열어도 똑같이 나와요.<br>재미로 하는 놀이예요. 돈 걸린 도박에는 쓰지 말아 주세요.<br><a href="../privacy/">개인정보처리방침</a> · <a href="../terms/">이용약관</a></p>
 </div>
 
 <script src="../js/install.js"></script>
@@ -323,17 +330,36 @@
     if (window.SsakaShare) SsakaShare({ url: url, title: title, description: desc, imageUrl: 'https://sava.kr/img/shoot-share.png?v=2', imageWidth: 800, imageHeight: 800, buttonTitle: done ? '결과 다시 보기' : '사다리 타러 가기', installTitle: '싸바 설치하기' });
   }
   $('toRoom').addEventListener('click', function () { var o = build(); if (o) share(o, false); });
-  $('goNow').addEventListener('click', function () { var o = build(); if (o) { history.replaceState(null, '', '?d=' + enc(o)); run(o); } });
+  $('goNow').addEventListener('click', function () { var o = build(); if (!o) return; if (o.g === 'ladder') { localDraw(o); return; } history.replaceState(null, '', '?d=' + enc(o)); run(o); });
 
   // ---------- 결과 계산 (씨앗 번호로 정해짐 → 누가 열어도 같음) ----------
+  function rowsOf(n) { return Math.max(10, n * 2 + 2); }
   function ladderOf(o) {
-    var R = rng(o.s), n = o.n.length, ROWS = Math.max(10, n * 2 + 2), rungs = [];
-    for (var r = 0; r < ROWS; r++) { var row = []; for (var i = 0; i < n - 1; i++) row.push(!row[i - 1] && R() < 0.42); rungs.push(row); }
-    for (var g = 0; g < n - 1; g++) { var has = rungs.some(function (row) { return row[g]; }); if (!has) { var rr = Math.floor(R() * ROWS); rungs[rr][g] = true; if (g > 0) rungs[rr][g - 1] = false; if (g < n - 2) rungs[rr][g + 1] = false; } }
+    var R = rng(o.s), n = o.n.length, ROWS = rowsOf(n), base = [];
+    for (var r = 0; r < ROWS; r++) { var row = []; for (var i = 0; i < n - 1; i++) row.push(!row[i - 1] && R() < 0.42); base.push(row); }
+    for (var g = 0; g < n - 1; g++) { var has = base.some(function (row) { return row[g]; }); if (!has) { var rr = Math.floor(R() * ROWS); base[rr][g] = true; if (g > 0) base[rr][g - 1] = false; if (g < n - 2) base[rr][g + 1] = false; } }
+    // 칸을 2배로: 짝수 줄 = 처음 그려진 사다리, 홀수 줄 = 사람들이 직접 그은 줄 (o.x = [[줄, 칸, 누가]])
+    var rungs = [], who = [];
+    for (var r2 = 0; r2 < ROWS * 2; r2++) { rungs.push(r2 % 2 ? new Array(n - 1).fill(false) : base[r2 / 2].slice()); who.push({}); }
+    (o.x || []).forEach(function (q) { rungs[q[0]][q[1]] = true; who[q[0]][q[1]] = q[2]; });
+    // 아래 당첨 칸: 비밀 번호(sg)가 있으면 그걸로 (줄 긋는 동안 아무도 미리 못 알게)
+    var RG = typeof o.sg === 'number' ? rng(o.sg) : R;
     var slots = []; for (var j = 0; j < n; j++) slots.push(j);
-    for (var j2 = n - 1; j2 > 0; j2--) { var q = Math.floor(R() * (j2 + 1)), t = slots[j2]; slots[j2] = slots[q]; slots[q] = t; }
+    for (var j2 = n - 1; j2 > 0; j2--) { var q = Math.floor(RG() * (j2 + 1)), t = slots[j2]; slots[j2] = slots[q]; slots[q] = t; }
     var goal = []; for (var k = 0; k < n; k++) goal[k] = slots.indexOf(k) < o.p; // 아래 칸 k 가 '쏜다' 인지
-    return { rows: ROWS, rungs: rungs, goal: goal };
+    return { rows: ROWS * 2, rungs: rungs, who: who, goal: goal };
+  }
+  // 사다리 그림 (공통): 사람이 그은 줄은 그 사람 색으로 굵게
+  function paintLadder(sv, o, L, Ht) {
+    var n = o.n.length, Wd = sv.clientWidth || 340;
+    sv.setAttribute('viewBox', '0 0 ' + Wd + ' ' + Ht);
+    var colW = Wd / n, top = 6, bot = Ht - 6, rowH = (bot - top) / L.rows;
+    var G = { Wd: Wd, colW: colW, top: top, bot: bot, rowH: rowH, X: function (c) { return colW * (c + .5); }, Y: function (r) { return top + rowH * (r + .5); } };
+    var lines = '';
+    for (var c = 0; c < n; c++) lines += '<line x1="' + G.X(c) + '" y1="' + top + '" x2="' + G.X(c) + '" y2="' + bot + '" stroke="#CFC7B4" stroke-width="4" stroke-linecap="round"/>';
+    L.rungs.forEach(function (row, r) { row.forEach(function (on, g) { if (!on) return; var w = L.who[r][g], mine = w != null; lines += '<line x1="' + G.X(g) + '" y1="' + G.Y(r) + '" x2="' + G.X(g + 1) + '" y2="' + G.Y(r) + '" stroke="' + (mine ? COLORS[w % 12] : '#CFC7B4') + '" stroke-width="' + (mine ? 5 : 4) + '" stroke-linecap="round"' + (mine ? ' stroke-dasharray="2 5"' : '') + '/>'; }); });
+    sv.innerHTML = lines;
+    return G;
   }
   function walk(L, c) { var path = [c]; for (var r = 0; r < L.rows; r++) { if (L.rungs[r][c]) c++; else if (c > 0 && L.rungs[r][c - 1]) c--; path.push(c); } return path; }
   function wheelOf(o) {
@@ -463,13 +489,8 @@
     for (var k = 0; k < n; k++) h += '<div class="cover" data-k="' + k + '">' + (L.goal[k] ? (fun(o) ? '🎉<br>당첨!' : esc(stakeWord(o.k)) + '<br>쏜다!') : '통과 👋') + '</div>';
     h += '</div><button type="button" class="big" id="all" style="width:100%;margin-top:12px">🪜 한꺼번에 공개</button><p class="tip">이름을 누르면 한 명씩 내려가요</p>';
     $('stage').innerHTML = h;
-    var sv = document.getElementById('ladder'), Wd = sv.clientWidth || 340, Ht = 300;
-    sv.setAttribute('viewBox', '0 0 ' + Wd + ' ' + Ht);
-    var colW = Wd / n, X = function (c) { return colW * (c + .5); }, top = 6, bot = Ht - 6, rowH = (bot - top) / L.rows, Y = function (r) { return top + rowH * (r + .5); };
-    var lines = '';
-    for (var c = 0; c < n; c++) lines += '<line x1="' + X(c) + '" y1="' + top + '" x2="' + X(c) + '" y2="' + bot + '" stroke="#CFC7B4" stroke-width="4" stroke-linecap="round"/>';
-    L.rungs.forEach(function (row, r) { row.forEach(function (on, g) { if (on) lines += '<line x1="' + X(g) + '" y1="' + Y(r) + '" x2="' + X(g + 1) + '" y2="' + Y(r) + '" stroke="#CFC7B4" stroke-width="4" stroke-linecap="round"/>'; }); });
-    sv.innerHTML = lines;
+    var sv = document.getElementById('ladder'), Ht = 340; sv.style.height = Ht + 'px';
+    var G = paintLadder(sv, o, L, Ht), X = G.X, Y = G.Y, top = G.top, bot = G.bot;
     var queue = Promise.resolve();
     function trace(i) {
       if (done[i]) return queue; done[i] = 1;
@@ -483,7 +504,7 @@
           path.setAttribute('d', d); path.setAttribute('fill', 'none'); path.setAttribute('stroke', COLORS[i % 12]); path.setAttribute('stroke-width', '6'); path.setAttribute('stroke-linejoin', 'round'); path.setAttribute('stroke-linecap', 'round');
           sv.appendChild(path);
           var len = path.getTotalLength(); path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
-          var t0 = performance.now(), D = Math.min(1600, 700 + L.rows * 50), lastN = 0;
+          var t0 = performance.now(), D = Math.min(1800, 700 + L.rows * 28), lastN = 0;
           (function step(now) {
             var t = Math.min(1, (now - t0) / D); path.style.strokeDashoffset = len * (1 - t);
             var nn = Math.floor(t * pts.length); if (nn !== lastN) { tick(); lastN = nn; }
@@ -504,6 +525,45 @@
     }
     document.querySelectorAll('.names button').forEach(function (b) { b.addEventListener('click', function () { ac(); trace(+b.dataset.i); }); });
     document.getElementById('all').addEventListener('click', function () { ac(); this.disabled = true; this.style.opacity = .5; for (var i = 0; i < n; i++) trace(i); });
+  }
+
+  // ---------- 다 같이 줄 긋기 ----------
+  // st: { me: 내 번호(-1 = 구경), left: 남은 줄, onAdd(r,g), host: bool, onOpen(), local: bool, onUndo() }
+  function drawStage(o, st) {
+    var n = o.n.length, L = ladderOf(o), cols = 'repeat(' + n + ', 1fr)';
+    var h = '<div class="dhead">✏️ <b>다 같이 줄 긋기</b><br><span>사다리 아무 곳이나 톡! 누르면 가로줄이 생겨요.<br>당첨 칸은 공개할 때까지 <b>아무도 몰라요</b> (방장도요).</span></div>';
+    h += '<div class="names" style="grid-template-columns:' + cols + '">';
+    o.n.forEach(function (nm, i) { var c = (o.x || []).filter(function (q) { return q[2] === i; }).length; h += '<button type="button" tabindex="-1" style="background:' + COLORS[i % 12] + (st.me === i ? ';box-shadow:0 0 0 3px #1A1A1A' : '') + '">' + esc(nm) + (st.local ? '' : '<br><small>' + '✏️'.repeat(c) + '</small>') + '</button>'; });
+    h += '</div><svg id="ladder" class="draw" preserveAspectRatio="none"></svg><div class="goals" style="grid-template-columns:' + cols + '">';
+    for (var k = 0; k < n; k++) h += '<div class="q">❓</div>';
+    h += '</div><p class="dmsg" id="dmsg"></p>';
+    if (st.local) h += '<button type="button" class="big ghost" id="undo" style="width:100%;margin-top:8px">↩ 마지막 줄 지우기</button>';
+    if (st.host || st.local) h += '<button type="button" class="big" id="dOpen" style="width:100%;margin-top:10px">🎬 다 그었어요! 공개하기</button>';
+    $('stage').innerHTML = h;
+    var sv = document.getElementById('ladder'), Ht = 340; sv.style.height = Ht + 'px';
+    var G = paintLadder(sv, o, L, Ht);
+    var msg = document.getElementById('dmsg');
+    msg.textContent = st.local ? '한 사람씩 돌아가며 톡톡! (' + (o.x || []).length + '줄 그었어요)' : st.me < 0 ? '👀 구경 중이에요. 방장이 공개하면 결과가 떠요' : st.left > 0 ? '✏️ ' + o.n[st.me] + '님, ' + st.left + '줄 더 그을 수 있어요' : '✅ 다 그었어요! ' + (st.host ? '친구들이 다 그으면 공개하세요' : '방장이 공개하면 결과가 떠요');
+    sv.addEventListener('click', function (e) {
+      if (!(st.local || (st.me >= 0 && st.left > 0))) { if (st.me >= 0) toast('줄은 한 사람 2개까지예요'); return; }
+      var rc = sv.getBoundingClientRect(), x = (e.clientX - rc.left) * G.Wd / rc.width, y = (e.clientY - rc.top) * Ht / rc.height;
+      var g = Math.max(0, Math.min(n - 2, Math.floor(x / G.colW - .5)));
+      var rf = (y - G.top) / G.rowH - .5, r = Math.round(rf); if (r % 2 === 0) r = rf > r ? r + 1 : r - 1;
+      r = Math.max(1, Math.min(L.rows - 1, r)); if (r % 2 === 0) r--;
+      if ((o.x || []).some(function (q) { return q[0] === r && Math.abs(q[1] - g) <= 1; })) { toast('바로 옆에 줄이 있어요. 조금 다른 곳에!'); return; }
+      tick(); st.onAdd(r, g);
+    });
+    var u = document.getElementById('undo'); if (u) u.addEventListener('click', function () { st.onUndo(); });
+    var op = document.getElementById('dOpen'); if (op) op.addEventListener('click', function () { ac(); op.disabled = true; op.style.opacity = .5; st.onOpen(); });
+  }
+  function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2000); }
+  // 혼자 폰 하나로 할 때: 폰을 돌려 가며 줄 긋고 공개
+  function localDraw(o) {
+    cur = o; o.x = o.x || [];
+    $('setup').hidden = true; $('play').classList.add('on'); $('final').classList.remove('on'); $('after').hidden = true; $('bung').classList.remove('on'); $('okRib').hidden = true;
+    $('banner').innerHTML = (fun(o) ? '🪜 <b>사다리 한판</b> · 당첨 ' + o.p + '명' : stakeEmoji(o.k) + ' <b>' + esc(stakeWord(o.k)) + '</b> 쏠 사람 ' + o.p + '명') + ' · ' + o.n.length + '명 참가';
+    function paint() { drawStage(o, { local: true, me: -1, onAdd: function (r, g) { o.x.push([r, g, o.x.length % o.n.length]); paint(); }, onUndo: function () { o.x.pop(); paint(); }, onOpen: function () { o.sg = newSeed(); history.replaceState(null, '', '?d=' + enc(o)); run(o); } }); }
+    paint(); scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function rememberMe(n) { try { var o = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); o.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(o)); } catch (e) {} }
@@ -567,7 +627,7 @@
     $('setup').hidden = true; $('play').classList.remove('on'); $('room').classList.add('on');
     history.replaceState(null, '', '?room=' + id);
     try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); if (me.from && !$('joinName').value) $('joinName').value = me.from.slice(0, 8); } catch (e) {}
-    refresh(); clearInterval(poll); poll = setInterval(refresh, 4000);
+    refresh(); clearInterval(poll); poll = setInterval(refresh, 2500);
     scrollTo({ top: 0, behavior: 'smooth' });
   }
   function gone(msg) {
@@ -579,8 +639,39 @@
     if (document.hidden) return;
     api(roomId).then(function (j) {
       if (j._s === 404) return gone('🚀 이미 출발했거나 끝난 모임이에요. 결과는 단톡방 링크로 확인하세요!');
+      if (j.names && j.info && j.info.d) return drawRoom(j);
       if (j.names) paintRoom(j); else if (j.error === 'no-db') gone('서버 연결 준비 중이에요.');
     }, function () {});
+  }
+  var dHost = '', dLast = '';
+  function roomO(j) {
+    var o = { v: 1, g: 'ladder', n: j.names, k: j.info.k, p: Math.min(j.info.p, j.names.length - 1), s: j.info.d.s, x: j.info.d.x || [] };
+    if (typeof j.info.d.sg === 'number') o.sg = j.info.d.sg;
+    if (j.info.w) { o.w = j.info.w; if (j.info.t) o.t = j.info.t; }
+    return o;
+  }
+  function drawRoom(j) {
+    var o = roomO(j), hk = hosts()[roomId] || dHost;
+    if (j.info.d.open && typeof o.sg === 'number') { // 공개됨 → 결과
+      clearInterval(poll); if (hosts()[roomId]) setHost(roomId, null); setJoin('');
+      $('room').classList.remove('on'); history.replaceState(null, '', '?d=' + enc(o)); run(o);
+      $('banner').innerHTML += '<br><small style="opacity:.8">모인 이름은 10분 뒤 서버에서 지워져요 🧹</small>';
+      return;
+    }
+    var key = JSON.stringify(o.x) + '|' + o.n.length; if (key === dLast && $('play').classList.contains('on')) return; dLast = key;
+    var mine = myJoin(), me = o.n.indexOf(mine), used = o.x.filter(function (q) { return q[2] === me; }).length;
+    $('room').classList.remove('on'); $('setup').hidden = true; $('play').classList.add('on'); $('final').classList.remove('on'); $('after').hidden = true; $('bung').classList.remove('on'); $('okRib').hidden = true;
+    $('banner').innerHTML = (fun(o) ? '🪜 <b>사다리 한판</b> · 당첨 ' + o.p + '명' : stakeEmoji(o.k) + ' <b>' + esc(stakeWord(o.k)) + '</b> 쏠 사람 ' + o.p + '명') + ' · ' + o.n.length + '명 참가' + (o.w ? '<br>📍 ' + esc(o.w) + (o.t ? ' · ' + esc(o.t) : '') : '');
+    drawStage(o, {
+      me: me, left: me < 0 ? 0 : 2 - used, host: !!hk,
+      onAdd: function (r, g) {
+        api(roomId, { a: 'line', name: mine, r: r, g: g }).then(function (k) {
+          if (k.error === 'near') toast('바로 옆에 줄이 있어요. 조금 다른 곳에!'); else if (k.error === 'max') toast('줄은 한 사람 2개까지예요');
+          if (k.names && k.info && k.info.d) { dLast = ''; drawRoom(k); }
+        });
+      },
+      onOpen: function () { api(roomId, { a: 'open', hk: hk }).then(function (k) { if (k.names && k.info && k.info.d) drawRoom(k); }); }
+    });
   }
   $('joinForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -607,6 +698,7 @@
     $('goRoom').disabled = true;
     api(roomId, { a: 'go', hk: hk }).then(function (j) {
       if (!j.names) { $('goRoom').disabled = false; $('rMsg').textContent = '잠깐 문제가 있어요. 다시 눌러 주세요.'; return; }
+      if (j.info && j.info.d) { dHost = hk; clearInterval(poll); poll = setInterval(refresh, 2000); drawRoom(j); return; } // 사다리: 다 같이 줄 긋기
       clearInterval(poll); setHost(roomId, null); setJoin('');
       var o = { v: 1, g: j.info.g, n: j.names, k: j.info.k, p: Math.min(j.info.p, j.names.length - 1), s: newSeed() };
       if (j.info.w) { o.w = j.info.w; if (j.info.t) o.t = j.info.t; }
@@ -623,6 +715,7 @@
   var o = d && dec(d);
   if (o && o.n && o.n.length >= 2 && o.n.length <= 12 && typeof o.s === 'number') {
     o.n = o.n.map(function (s) { return String(s).slice(0, 8); }); o.k = String(o.k || '☕ 커피').slice(0, 16); o.p = Math.max(1, Math.min(o.n.length - 1, o.p | 0 || 1)); o.g = o.g === 'wheel' ? 'wheel' : 'ladder';
+    var RW = rowsOf(o.n.length) * 2; o.x = Array.isArray(o.x) ? o.x.filter(function (q) { return Array.isArray(q) && (q[0] | 0) % 2 === 1 && q[0] > 0 && q[0] < RW && q[1] >= 0 && q[1] <= o.n.length - 2; }).slice(0, 40).map(function (q) { return [q[0] | 0, q[1] | 0, Math.abs(q[2] | 0) % 12]; }) : undefined; if (typeof o.sg !== 'number') delete o.sg;
     o.w = o.w ? String(o.w).slice(0, 24) : undefined; o.t = o.t ? String(o.t).slice(0, 12) : undefined; o.c = o.c ? String(o.c).slice(0, 8) : undefined;
     run(o);
   }

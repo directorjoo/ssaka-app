@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css">
+  <link rel="stylesheet" href="../css/sk.css?v=70">
   <link rel="stylesheet" href="../css/sk-world.css">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -380,6 +380,21 @@
         </div>
       </fieldset>
 
+      <fieldset data-for="profile club shop greet" id="copyFs">
+        <legend id="copyLeg">복사 버튼 (선택)</legend>
+        <div class="hint" id="copyHint">받는 사람이 단추를 누르면 적은 내용이 그대로 복사돼요.</div>
+        <div class="row">
+          <div>
+            <label for="copyLabel">버튼 이름</label>
+            <input id="copyLabel" maxlength="12">
+          </div>
+          <div>
+            <label for="copyValue" id="copyValLab">복사될 내용</label>
+            <input id="copyValue" maxlength="120">
+          </div>
+        </div>
+      </fieldset>
+
       <fieldset data-for="shop">
         <legend>예약 받기</legend>
         <label class="switch"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
@@ -426,19 +441,6 @@
         <div class="hint">받는 사람에 맞춰 고르세요. 손님·어른께는 정중하게, 친구·후배에겐 재미있게. 카드를 열자마자 나오고, 휴대폰이 막으면 첫 탭에 나와요.</div>
       </fieldset>
 
-      <fieldset data-for="profile club shop greet">
-        <legend>복사 버튼 (선택)</legend>
-        <div class="row">
-          <div>
-            <label for="copyLabel">버튼 이름</label>
-            <input id="copyLabel" maxlength="12">
-          </div>
-          <div>
-            <label for="copyValue">복사될 내용</label>
-            <input id="copyValue" maxlength="120">
-          </div>
-        </div>
-      </fieldset>
     </form>
 
     <section class="preview" aria-label="미리보기">
@@ -528,7 +530,7 @@
 
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js"></script>
-<script src="../js/render.js"></script>
+<script src="../js/render.js?v=70"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -547,7 +549,7 @@
     club: {
       theme: 'light', buttons: ['call', 'rsvp', 'map', 'save', 'copy'],
       labels: { title: '모임 제목', subtitle: '날짜 · 시간', contact: '보내는 사람', name: '보내는 사람 이름', phone: '답장 받을 전화번호', body: '코스 · 준비물 · 회비 (한 줄에 하나씩)' },
-      ex: { title: '순천중고 산악회 11월 정기산행', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 싸바산악회', place: '북한산 우이역 2번 출구' }
+      ex: { title: '순천중고 산악회 11월 정기산행', subtitle: '11월 16일(일) 오전 9시', name: '박영수', body: '코스: 우이역 → 백운대 (약 5시간)\n준비물: 도시락, 물\n회비: 2만원', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고산악회', place: '북한산 우이역 2번 출구' }
     },
     shop: {
       theme: 'light', buttons: ['call', 'map', 'save', 'copy'],
@@ -733,6 +735,13 @@
   // 업종 종류(가게·모임·프로필…)마다 적은 내용을 따로 보관 — 모임 제목이 가게 카드에 따라오지 않게
   var byType = {}, KEEP_ALL = ['season', 'sound', 'resvMin', 'resvRate'];
   function setType(t) {
+    (function () { // 복사 단추 안내를 종류에 맞게
+      var C = { club: ['💰 회비 계좌 (누르면 복사돼요)', '받는 사람이 단추를 누르면 은행·계좌번호·이름이 한 번에 복사돼요. 은행 앱에 붙여넣기만 하면 돼요.', '회비 계좌', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'],
+        shop: ['📋 주소·계좌 복사 단추 (선택)', '누르면 적은 내용이 그대로 복사돼요. 주소나 입금 계좌를 넣어 두면 좋아요.', '주소 복사', '복사될 내용', '예: 서울 강남구 신사동 609-1'],
+        greet: ['💰 축의금·조의금 계좌 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요.', '마음 전할 곳', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'] }[t] || ['복사 버튼 (선택)', '받는 사람이 단추를 누르면 적은 내용이 그대로 복사돼요.', '', '복사될 내용', ''];
+      $('copyLeg').textContent = C[0]; $('copyHint').textContent = C[1]; $('copyValLab').textContent = C[3];
+      $('copyLabel').placeholder = C[2] || '예: 인스타 링크'; $('copyValue').placeholder = C[4] || '복사될 글이나 링크';
+    })();
     if (type && t !== type) {
       var cur = {}; FIELDS.forEach(function (f) { if ($(f) && KEEP_ALL.indexOf(f) < 0) { cur[f] = $(f).value; $(f).value = ''; } });
       cur.ip = IP; byType[type] = cur;

@@ -168,7 +168,6 @@
         s.setAttribute('data-save', '1');
         acts.appendChild(s);
       }
-      if (b === 'copy' && card.copy && card.copy.value) acts.appendChild(action('copy', card.copy.label || '복사', null, null, live && ctx.onCopy, live));
     });
     // 단추가 3개면 한 줄에 나란히 (목록형 디자인은 제외), 아니면 홀수일 때 마지막을 넓게
     var listy = { cinema: 1, magazine: 1, minimal: 1 }[design && design.style];
@@ -176,6 +175,16 @@
     else if (acts.children.length % 2 === 1) acts.lastChild.classList.add('sk-wide');
     if (acts.children.length) wrap.appendChild(acts);
     if (mapc) wrap.appendChild(mapc);
+    // 복사 칸: 단추 동그라미 대신 내용이 다 보이는 큰 칸 (계좌번호·이름을 눈으로 보고 누르면 복사)
+    if ((card.buttons || []).indexOf('copy') >= 0 && card.copy && card.copy.value) {
+      var cbx = el(live ? 'button' : 'div', 'sk-copybox');
+      if (live) cbx.type = 'button'; else { cbx.tabIndex = -1; cbx.setAttribute('aria-hidden', 'true'); }
+      var cl = el('span', 'sk-cb-l', card.copy.label || '복사'), cvv = el('span', 'sk-cb-v', String(card.copy.value)), cgo = el('span', 'sk-cb-go', '📋 복사');
+      var ct = el('span', 'sk-cb-t'); ct.appendChild(cl); ct.appendChild(cvv);
+      cbx.appendChild(ct); cbx.appendChild(cgo);
+      if (live) on(cbx, function () { cbx.classList.add('done'); cgo.textContent = '✔ 복사됨'; setTimeout(function () { cbx.classList.remove('done'); cgo.textContent = '📋 복사'; }, 2500); ctx.onCopy && ctx.onCopy(); });
+      wrap.appendChild(cbx);
+    }
     // 가게의 다른 곳: 당근 · 네이버 · 카톡 채널 · 인스타 (넣은 것만)
     var LK = [['dg', '🥕 당근'], ['nv', '🟢 네이버'], ['kc', '💬 카톡 채널'], ['ig', '📷 인스타']], lks = card.links || {};
     var lrow = el('div', 'sk-links');

@@ -44,10 +44,7 @@
   }
 
   function copyText(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-      return navigator.clipboard.writeText(text);
-    }
-    return new Promise(function (resolve, reject) {
+    function legacy() { return new Promise(function (resolve, reject) {
       var ta = document.createElement('textarea');
       ta.value = text;
       ta.setAttribute('readonly', '');
@@ -57,7 +54,9 @@
       ta.select();
       try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
       ta.remove();
-    });
+    }); }
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(legacy);
+    return legacy();
   }
 
   // 지도 검색어: "서울 강남구 신사동 609-1 지하1층 (압구정역 3번출구 50m)" → 괄호 설명은 빼고 검색
@@ -143,7 +142,7 @@
       onSave: onSave,
       onCopy: function () {
         copyText(card.copy.value)
-          .then(function () { toast('복사했어요: ' + card.copy.value); })
+          .then(function () { var acct = /\d{2,}[-\s]?\d{2,}[-\s]?\d{2,}/.test(card.copy.value) && !/^https?:/.test(card.copy.value); toast(acct ? '💰 계좌를 복사했어요! 은행 앱에서 붙여넣기 하세요' : '복사했어요: ' + card.copy.value); try { navigator.vibrate && navigator.vibrate(40); } catch (e) {} })
           .catch(function () { toast('복사하지 못했어요'); });
       },
       onLocation: function () { sendMyLocation(card); },

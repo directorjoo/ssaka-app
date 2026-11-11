@@ -306,7 +306,8 @@
     var memo = document.createElement('input'); memo.type = 'text'; memo.maxLength = 40; memo.placeholder = '예: 30분 늦어요 / 집안 행사가 있어요';
     lab2.appendChild(memo); box.appendChild(lab2);
     var row = document.createElement('div'); row.className = 'sk-rsvp';
-    [['yes', '🙋 참석할게요'], ['maybe', '🤔 아직 몰라요'], ['no', '🙏 이번엔 못 가요']].forEach(function (o) {
+    [['yes', '🙋 참석할게요'], ['maybe', '🤔 아직 몰라요'], ['no', '📣 이번엔 응원만 할게요!'], ['no', '💌 마음만 보낼게요, 다음엔 꼭!'], ['no', '🙏 아쉽지만 다음에 꼭 갈게요!']].forEach(function (o, i) {
+      if (i === 2) { var nl = document.createElement('p'); nl.className = 'sk-rsvp-nl'; nl.textContent = '못 갈 때는 하나 골라 주세요'; row.appendChild(nl); }
       var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-rsvp-b sk-rsvp-' + o[0]; b.textContent = o[1];
       b.addEventListener('click', function () {
         var who = nm.value.trim();

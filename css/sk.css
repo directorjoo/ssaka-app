@@ -495,3 +495,6 @@
 .sk[data-style="glass"] .sk-actions .sk-act.sk-save .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-save .sk-ico { background: #8A5CD6; color: #fff; box-shadow: 0 8px 18px -8px #8A5CD6; }
 .sk[data-style="glass"] .sk-actions .sk-act.sk-reserve .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-reserve .sk-ico { background: #F08A24; color: #fff; box-shadow: 0 8px 18px -8px #F08A24; }
 .sk[data-style="glass"] .sk-actions .sk-act.sk-copy .sk-ico, .sk[data-style="pastel"] .sk-actions .sk-act.sk-copy .sk-ico { background: #6B7A8F; color: #fff; box-shadow: 0 8px 18px -8px #6B7A8F; }
+
+.sk-rsvp-nl { margin: 6px 0 -2px; font-size: 13.5px; font-weight: 700; color: var(--sub); }
+.sk-rsvp-b.sk-rsvp-no { min-height: 48px; font-size: 15.5px; }

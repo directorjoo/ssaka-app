@@ -147,6 +147,12 @@
   STYLES.glass.mood = 'modern';
   var GLASS_PICK = [0, 3, 7];
 
+  // 압구정 순천만 계절 메뉴 (예시) — 3~5월 봄, 6~8월 여름, 9~10월 가을, 11~2월 겨울
+  var SC_M = new Date().getMonth() + 1;
+  var SC = SC_M >= 3 && SC_M <= 5 ? { line: '봄 한정: 도다리쑥국', menu: '' }
+    : SC_M >= 6 && SC_M <= 8 ? { line: '여름 한정: 민어탕', menu: '\n민어탕·지리 (2인) 17000' }
+    : SC_M >= 9 && SC_M <= 10 ? { line: '가을 한정: 전어구이 · 전어무침', menu: '' }
+    : { line: '겨울 한정: 벌교꼬막 · 생굴무침', menu: '\n벌교꼬막 (겨울 한정) 30000\n생굴무침 (겨울 한정) 30000' };
   var INDUSTRIES = [
     { id: 'actor', label: '배우·모델', emoji: '🎬', type: 'profile', styles: ['cinema', 'magazine', 'glass'], gallery: true,
       L: { body: '출연작 · 필모그래피 (한 줄에 하나씩)' },
@@ -172,7 +178,7 @@
       res: { label: '방문 상담 예약', word: '매물', people: false, deposit: false },
       ex: { title: '싸바공인중개사', subtitle: '아파트 · 상가 · 원룸 매매·전월세', name: '싸바공인중개사', body: '이번 주 추천 매물: 역세권 30평대\n상담 예약 환영', copyLabel: '매물 목록', copyValue: 'https://example.com', place: '여수 웅천동' } },
     { id: 'restaurant', label: '음식점', emoji: '🍲', type: 'shop', styles: ['poster', 'sticker', 'cinema'], world: true,
-      ex: { title: '압구정 순천만', subtitle: '11:30 – 22:00 (15–17시 쉬는 시간) · 일·공휴일 휴무', name: '압구정 순천만', phone: '02-541-2125', body: '겨울 한정: 벌교꼬막 · 생굴무침\n점심: 굴국밥 · 매생이 굴떡국 12,000원\n남도 생선구이 13,000원부터\n배달은 하지 않아요', copyLabel: '주소 복사', copyValue: '서울 강남구 신사동 609-1 지하1층', place: '압구정 순천만', menu: '갈치 구이 13000\n굴국밥 12000\n매생이 굴떡국 12000\n꼬막 비빔밥 12000\n짱뚱어탕 15000\n갈치조림 40000\n홍어삼합 60000\n벌교꼬막 (겨울 한정) 30000', account: 'OO은행 000-0000-0000 압구정 순천만', lkNv: 'https://m.place.naver.com/restaurant/11888959/home' } },
+      ex: { title: '압구정 순천만', subtitle: '11:30 – 22:00 (15–17시 쉬는 시간) · 일·공휴일 휴무', name: '압구정 순천만', phone: '02-541-2125', body: SC.line + '\n점심: 굴국밥 · 매생이 굴떡국 12,000원\n남도 생선구이 13,000원부터\n배달은 하지 않아요', copyLabel: '주소 복사', copyValue: '서울 강남구 신사동 609-1 지하1층', place: '압구정 순천만', menu: '갈치 구이 13000\n굴국밥 12000\n매생이 굴떡국 12000\n꼬막 비빔밥 12000\n짱뚱어탕 15000\n갈치조림 40000\n홍어삼합 60000' + SC.menu, account: 'OO은행 000-0000-0000 압구정 순천만', lkNv: 'https://m.place.naver.com/restaurant/11888959/home' } },
     { id: 'cafe', label: '카페·베이커리', emoji: '☕', type: 'shop', styles: ['sticker', 'glass', 'magazine'], world: true,
       ex: { title: '카페 싸바', subtitle: '매일 10:00 – 21:00', name: '카페 싸바', body: '오늘 갓 구운 소금빵\n아메리카노 2+1 (오후 3시까지)', copyLabel: '주소 복사', copyValue: '여수시 (예시)', place: '여수 낭만포차', menu: '아메리카노 4500\n카페라떼 5000\n소금빵 3500\n홀케이크 (예약) 32000', account: 'OO은행 000-0000-0000 카페 싸바' } },
     { id: 'beauty', label: '미용·네일', emoji: '💅', type: 'shop', styles: ['glass', 'magazine', 'cinema'],

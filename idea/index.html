@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B3132B">
   <title>의견 보내고 쿠폰 받기 · 싸바</title>
-  <meta property="og:title" content="💡 싸바에 의견 보내고 7,000원 쿠폰 받기">
-  <meta property="og:description" content="고칠 점, 새 아이디어를 보내 주세요. 좋은 의견엔 압구정 순천만 7,000원 할인 쿠폰을 드려요.">
+  <meta property="og:title" content="💡 싸바에 의견 보내기 · 채택되면 7,000원 쿠폰">
+  <meta property="og:description" content="고칠 점, 새 아이디어를 보내 주세요. 채택된 의견에는 압구정 순천만 7,000원 할인 쿠폰을 드려요.">
   <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
@@ -48,8 +48,9 @@
 <body>
 <div class="w">
   <a class="back" href="../app/">← 싸바</a>
-  <h1>💡 의견 보내고<br><em>7,000원 쿠폰</em> 받기</h1>
-  <p class="sub">싸바를 써 보고 고칠 점이나 새 아이디어를 보내 주세요. 대표가 직접 읽고, 도움 되는 의견에는 <b>압구정 순천만 7,000원 할인 쿠폰</b>을 드려요.</p>
+  <h1>💡 의견이 채택되면<br><em>7,000원 쿠폰</em>을 드려요</h1>
+  <p class="sub">싸바를 써 보고 고칠 점이나 새 아이디어를 보내 주세요. 대표가 직접 읽고, <b>채택된 의견에 한해</b> 압구정 순천만 7,000원 할인 쿠폰을 드려요.</p>
+  <p class="note" style="margin:-8px 0 14px">※ 모든 의견에 쿠폰을 드리지는 않아요. 비슷한 의견이 이미 있거나 바로 적용하기 어려운 의견은 채택되지 않을 수 있어요.</p>
 
   <div class="kinds" role="group" aria-label="의견 종류">
     <button type="button" data-k="better" aria-pressed="true">🔧 고칠 점</button>
@@ -83,7 +84,7 @@
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
       .then(function (x) {
         btn.disabled = false;
-        if (x.j.ok && x.j.t) { var l = mine(); l.push({ t: x.j.t, text: text.slice(0, 60), at: Date.now() }); keep(l); $('txt').value = ''; $('n').textContent = 0; toast('고마워요! 읽어 보고 쿠폰을 열어 드릴게요 🍒'); load(); return; }
+        if (x.j.ok && x.j.t) { var l = mine(); l.push({ t: x.j.t, text: text.slice(0, 60), at: Date.now() }); keep(l); $('txt').value = ''; $('n').textContent = 0; toast('고마워요! 읽어 보고 채택되면 쿠폰을 열어 드릴게요 🍒'); load(); return; }
         toast(x.s === 429 ? '오늘은 더 보낼 수 없어요. 내일 다시 보내 주세요' : x.s === 422 ? '보낼 수 없는 내용이 들어 있어요' : '잠시 뒤 다시 보내 주세요');
       }).catch(function () { btn.disabled = false; toast('잠시 뒤 다시 보내 주세요'); });
   });
@@ -126,7 +127,7 @@
           box.appendChild(d);
         }
         var i = document.createElement('div'); i.className = 'item';
-        var st = it.st === 'ok' ? '🎁 쿠폰을 드렸어요' : it.st === 'no' ? '🙏 고마워요! 이번 의견은 쿠폰 대상이 아니에요' : it.st === 'gone' ? '지워진 의견이에요' : '⏳ 대표가 읽고 있어요';
+        var st = it.st === 'ok' ? '🎉 채택됐어요! 쿠폰을 드렸어요' : it.st === 'no' ? '🙏 고마워요! 이번 의견은 채택되지 않았어요' : it.st === 'gone' ? '지워진 의견이에요' : '⏳ 대표가 읽고 있어요 (채택되면 쿠폰이 열려요)';
         i.innerHTML = '<b></b><span></span>'; i.firstChild.textContent = st; i.lastChild.textContent = (my.at ? fmt(my.at) + ' · ' : '') + (my.text || '');
         box.appendChild(i);
       });

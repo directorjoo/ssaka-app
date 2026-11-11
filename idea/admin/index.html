@@ -30,7 +30,7 @@
   <h1>💡 의견 관리</h1>
   <div class="key"><input id="k" type="password" placeholder="관리 비밀번호 (ADMIN_KEY)" autocomplete="current-password"><button id="go" class="ok">열기</button></div>
   <div class="tabs" id="tabs" hidden>
-    <button data-f="new" aria-pressed="true">읽을 것</button><button data-f="ok" aria-pressed="false">쿠폰 준 것</button><button data-f="no" aria-pressed="false">넘긴 것</button><button data-f="" aria-pressed="false">전체</button>
+    <button data-f="new" aria-pressed="true">읽을 것</button><button data-f="ok" aria-pressed="false">채택한 것</button><button data-f="no" aria-pressed="false">넘긴 것</button><button data-f="" aria-pressed="false">전체</button>
   </div>
   <div id="list"></div>
 </div>
@@ -57,7 +57,7 @@
       var m = document.createElement('div'); m.className = 'meta'; m.textContent = (KIND[x.kind] || '') + ' · ' + new Date(x.at).toLocaleString('ko-KR') + (x.code ? ' · 쿠폰 ' + x.code : '') + (x.used ? ' · ✔ 사용함' : '');
       var p = document.createElement('p'); p.textContent = x.text;
       var a = document.createElement('div'); a.className = 'acts';
-      [['ok', '🎁 쿠폰 주기'], ['no', '🙏 넘기기'], ['new', '되돌리기']].forEach(function (o) {
+      [['ok', '🎉 채택 · 쿠폰 주기'], ['no', '🙏 넘기기'], ['new', '되돌리기']].forEach(function (o) {
         if (x.st === o[0]) return;
         if (x.used && o[0] !== 'ok') return;
         var b = document.createElement('button'); b.className = o[0] === 'ok' ? 'ok' : o[0] === 'no' ? 'no' : 're'; b.textContent = o[1];

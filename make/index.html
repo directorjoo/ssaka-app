@@ -624,7 +624,7 @@
     el.dataset.id = d.id;
     var cardType = TYPES[type];
     var sample = {
-      title: ex.title, subtitle: ex.subtitle, image: v('image') || '', ip: v('image') && IP ? [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0] : undefined,
+      title: ex.title, subtitle: ex.subtitle, image: v('image') || ex.image || '', ip: v('image') && IP ? [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0] : undefined,
       body: String(ex.body || '').split('\n').filter(Boolean),
       contact: { name: ex.name || '이름', phone: '010-0000-0000' },
       place: (ex.place && cardType.buttons.indexOf('map') >= 0) ? { name: ex.place } : null,
@@ -793,6 +793,7 @@
     var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = g(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
     if (Object.keys(lk).length) card.links = lk;
     if (galList().length) card.gallery = galList();
+    else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
     if (v('season')) card.season = v('season');
     if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
     if (type === 'shop' && $('resvOn').checked) {

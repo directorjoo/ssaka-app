@@ -15,11 +15,14 @@ async function sha(s) {
 function kstDay() { return new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); }
 
 const RULES = `너는 동네 가게·학원·모임의 네이버 블로그 글을 대신 써 주는 작가다.
-주어진 '싸바카드' 정보만 사실로 쓴다. 카드에 없는 가격, 수상, 순위, 손님 수, 재료 산지 같은 사실은 지어내지 않는다.
+주어진 '싸바카드' 정보와 '사장님 한마디'만 사실로 쓴다. 거기 없는 가격, 수상, 순위, 손님 수, 재료 산지, 경력 같은 사실은 지어내지 않는다.
+사장님 한마디가 있으면 글의 중심으로 삼아 사장님 목소리로 살린다. 정보가 적으면 억지로 늘리지 말고 짧게(800자 안팎) 쓴다.
 손님 후기인 척하는 글, '맛집 1위', '보장', '무조건' 같은 과장은 쓰지 않는다. 가게 주인이 직접 소개하는 말투(존댓말)로 쓴다.
-본문은 공백 제외 1,200~1,600자. 짧은 문장, 쉬운 말. 별표(*)와 마크다운 기호 금지.
+본문은 공백 제외 800~1,600자(정보 양에 맞춰). 짧은 문장, 쉬운 말, 한 문단 2~3문장. 별표(*)와 마크다운 기호 금지.
+도입은 설명이 아니라 장면이나 계절로 시작한다(예: 찬 바람 불면 생각나는 국물). '안녕하세요'로 시작하지 않는다.
 구성: 도입 → 소제목 3~4개('1. ○○' 형식) → 찾아오는 길·문의 → 마무리 한 줄.
-사진 자리 블록을 사진 개수(N)만큼, 도입 앞과 각 소제목 아래에 고르게 넣는다.
+검색어(지역+업종, 대표 메뉴 이름)는 제목에 1번, 본문에 자연스럽게 3~4번만. 같은 말 반복 금지.
+사진 자리 블록을 사진 개수(N)만큼 넣는다. 사진 목록이 주어지면 그 사진 내용과 맞는 문단 바로 앞에 놓는다(n은 목록 번호).
 마지막 문단에 '예약·길찾기·전화는 아래 싸바카드에서 한 번에 할 수 있어요.'라고 쓴다(링크는 프로그램이 붙임).
 태그 10개: #을 붙이고 띄어쓰기 없이, 지역명+업종 조합 위주.
 답은 JSON 하나만, 코드블록 없이:
@@ -60,6 +63,8 @@ export async function onRequest({ request, env }) {
   const card = b.card || {};
   if (!clean(card.title, 60)) return json({ error: 'empty' }, 400);
   const nImg = Math.max(1, Math.min(8, b.images | 0 || 3));
+  const photos = (Array.isArray(b.photos) ? b.photos : []).slice(0, 8).map(x => clean(x, 40));
+  const owner = (Array.isArray(b.owner) ? b.owner : []).map(x => clean(x, 200)).filter(Boolean).slice(0, 3);
 
   // 남용 막기 (D1 있으면)
   const db = env.DB, day = kstDay();
@@ -82,7 +87,7 @@ export async function onRequest({ request, env }) {
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: RULES,
-      messages: [{ role: 'user', content: `사진 개수 N=${nImg}\n\n[싸바카드]\n${cardText(card, b.industry)}` }]
+      messages: [{ role: 'user', content: `사진 개수 N=${nImg}\n` + (photos.length ? '[사진 목록]\n' + photos.map((x, i) => (i + 1) + '. ' + x).join('\n') + '\n' : '') + `\n[싸바카드]\n${cardText(card, b.industry)}` + (owner.length ? '\n\n[사장님 한마디]\n' + owner.map(x => '- ' + x).join('\n') : '') }]
     })
   });
   if (!r.ok) return json({ error: 'ai', status: r.status }, 502);

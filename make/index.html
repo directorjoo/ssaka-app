@@ -172,8 +172,24 @@
     .biz-list button { width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font: inherit; cursor: pointer; display: grid; gap: 2px; }
     .biz-list b { font-size: 15px; } .biz-list span { font-size: 13px; color: var(--muted); }
     .owner-note { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: var(--ssaka-soft); color: var(--ssaka-deep); font-size: 14px; font-weight: 700; }
-    .blog-prev { text-align: left; max-height: 38vh; overflow: auto; background: var(--bg, #f6f6f6); border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
-    .blog-prev b { display: block; font-size: 16px; margin-bottom: 8px; }
+    .exp-how, .exp-how li { text-align: left; }
+    .blog-ask { text-align: left; }
+    .blog-ask label { display: block; margin: 10px 0 4px; font-size: 14px; font-weight: 800; }
+    .blog-ask label small { font-weight: 500; color: #888; margin-left: 4px; }
+    .blog-ask textarea { width: 100%; border: 1.5px solid #ddd; border-radius: 12px; padding: 10px; font: inherit; font-size: 15px; resize: vertical; }
+    .blog-ed { text-align: left; max-height: 52vh; overflow: auto; background: #fff; border: 1.5px solid #e6e6e6; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .blog-ed .bt { width: 100%; border: 0; border-bottom: 2px solid #eee; padding: 6px 0 10px; font: inherit; font-size: 19px; font-weight: 900; margin-bottom: 10px; }
+    .blog-ed .bh, .blog-ed .bp { outline: none; border-radius: 8px; padding: 4px 6px; margin: 0 -6px 10px; line-height: 1.75; word-break: keep-all; }
+    .blog-ed .bh { font-size: 16.5px; font-weight: 900; margin-top: 16px; }
+    .blog-ed .bp { font-size: 15px; }
+    .blog-ed .bh:focus, .blog-ed .bp:focus { background: #FFF7E0; }
+    .blog-ed .bi { position: relative; margin: 4px 0 14px; }
+    .blog-ed .bi img { display: block; width: 100%; border-radius: 10px; }
+    .blog-ed .bi .no { position: absolute; left: 8px; top: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.65); color: #fff; font-size: 13px; font-weight: 800; }
+    .blog-ed .bi .tools { position: absolute; right: 6px; top: 6px; display: flex; gap: 4px; }
+    .blog-ed .bi .tools button { width: 36px; height: 36px; border: 0; border-radius: 10px; background: rgba(255,255,255,.92); font-size: 16px; font-weight: 900; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+    .blog-ed .tags { color: #3366cc; font-size: 14px; outline: none; margin-top: 8px; }
+    .blog-ed .hint { font-size: 12.5px; color: #999; margin: -4px 0 12px; }
     .exp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 14px; }
     .exp-grid figure { margin: 0; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
@@ -492,17 +508,27 @@
 <div class="modal" id="blogModal" hidden>
   <div class="modal-box done-box">
     <div class="modal-head"><b>네이버 블로그 글</b><button type="button" class="mini" id="blogClose">닫기</button></div>
-    <p class="done-sub" id="blogStatus">카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)</p>
-    <div class="blog-prev" id="blogPrev" hidden></div>
+    <div class="blog-ask" id="blogAsk">
+      <p class="done-sub">✍️ 한두 줄만 적어 주시면 글이 훨씬 좋아져요. <b>안 적어도 돼요.</b></p>
+      <label>우리 집 자랑 <small>예: 짱뚱어는 순천에서 바로 받아 써요</small></label><textarea id="bq1" maxlength="200" rows="2"></textarea>
+      <label>가게 이야기 <small>예: 순천 출신 사장이 고향 맛 그대로</small></label><textarea id="bq2" maxlength="200" rows="2"></textarea>
+      <label>손님께 한마디 <small>예: 처음 오시면 짱뚱어탕부터 드셔 보세요</small></label><textarea id="bq3" maxlength="200" rows="2"></textarea>
+      <button type="button" class="kakao big" id="blogGo" style="width:100%;margin-top:12px">📝 이걸로 블로그 글 쓰기</button>
+    </div>
+    <p class="done-sub" id="blogStatus" hidden>카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)</p>
+    <div class="blog-ed" id="blogEd" hidden></div>
+    <div id="blogActs" hidden>
     <button type="button" class="kakao big" id="blogT" disabled>① 제목 복사</button>
     <button type="button" class="kakao big" id="blogB" disabled>② 본문 복사 (태그·카드 링크 포함)</button>
     <button type="button" class="ghost big" id="blogP" disabled>③ 사진 저장</button>
     <a class="ghost big" id="blogOpen" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">④ 네이버 블로그 글쓰기 열기</a>
+    </div>
     <button type="button" class="textbtn" id="blogAgain" hidden>🔄 다시 쓰기</button>
     <ol class="exp-how">
       <li>네이버 블로그 앱(또는 웹)에서 <b>글쓰기</b>를 누르세요.</li>
       <li>제목 칸에 ①, 본문에 ②를 붙여넣으세요.</li>
       <li>본문의 <b>[사진 1]</b> 자리마다 ③에서 저장한 사진을 순서대로 넣고 그 표시는 지우세요.</li>
+      <li>위 미리보기에서 글자를 눌러 바로 고칠 수 있고, 사진은 ⬆⬇로 자리를 바꾸거나 ✕로 뺄 수 있어요. 고친 그대로 복사·저장돼요.</li>
       <li>마지막 줄 #태그는 발행할 때 태그 칸에 넣어도 좋아요. 확인하고 <b>발행</b>!</li>
     </ol>
     <p class="done-sub" style="font-size:12px">AI가 카드 내용만 보고 쓴 초안이에요. 사실과 다른 곳이 없는지 꼭 읽어보고 올려주세요.</p>
@@ -1341,38 +1367,90 @@
     try { var d = localStorage.getItem('sava-dev'); if (!d) { d = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sava-dev', d); } return d; }
     catch (e) { return 'x'; }
   }
+  // 편집기에서 지금 보이는 그대로 글·사진 순서를 읽음
+  function edState() {
+    var ed = $('blogEd'), blocks = [], imgs = [];
+    ed.querySelectorAll('[data-k]').forEach(function (el) {
+      var k = el.dataset.k;
+      if (k === 'img') { imgs.push(blogImgs[+el.dataset.i]); blocks.push({ t: 'img' }); }
+      else { var t = el.innerText.trim(); if (t) blocks.push({ t: k, text: t }); }
+    });
+    var ti = ed.querySelector('.bt'), tg = ed.querySelector('.tags');
+    return { title: ti ? ti.value.trim() : (blogPost && blogPost.title) || '', blocks: blocks, imgs: imgs, tags: tg ? tg.innerText.trim().split(/\s+/).filter(Boolean) : [] };
+  }
   function blogText(p, withTags) {
-    var out = [], n = 0;
-    p.blocks.forEach(function (b) {
+    var st = $('blogEd').hidden ? null : edState(), src = st || p, out = [], n = 0;
+    src.blocks.forEach(function (b) {
       if (b.t === 'img') { n++; out.push('[사진 ' + n + ']'); }
       else out.push(b.text);
       out.push('');
     });
     out.push('👉 예약 · 길찾기 · 전화: ' + blogUrl);
-    if (withTags && p.tags && p.tags.length) { out.push(''); out.push(p.tags.join(' ')); }
+    var tags = st ? st.tags : p.tags;
+    if (withTags && tags && tags.length) { out.push(''); out.push(tags.join(' ')); }
     return out.join('\n');
   }
+  function paintEditor(p) {
+    var ed = $('blogEd'); ed.innerHTML = '';
+    var ti = document.createElement('input'); ti.className = 'bt'; ti.value = p.title; ti.setAttribute('aria-label', '제목'); ed.appendChild(ti);
+    var hint = document.createElement('div'); hint.className = 'hint'; hint.textContent = '글자를 눌러 바로 고칠 수 있어요 · 사진은 ⬆⬇✕'; ed.appendChild(hint);
+    function addImg(i) {
+      var box = document.createElement('div'); box.className = 'bi'; box.dataset.k = 'img'; box.dataset.i = i;
+      var im = document.createElement('img'); im.src = URL.createObjectURL(blogImgs[i].blob); im.alt = '사진';
+      var no = document.createElement('span'); no.className = 'no';
+      var tools = document.createElement('div'); tools.className = 'tools';
+      [['⬆', -1], ['⬇', 1], ['✕', 0]].forEach(function (o) {
+        var bt = document.createElement('button'); bt.type = 'button'; bt.textContent = o[0];
+        bt.addEventListener('click', function () {
+          if (!o[1]) { box.remove(); renum(); return; }
+          var sib = o[1] < 0 ? box.previousElementSibling : box.nextElementSibling;
+          if (!sib || sib.classList.contains('hint') || sib.classList.contains('tags')) return;
+          if (o[1] < 0) sib.before(box); else sib.after(box);
+          renum(); box.scrollIntoView({ block: 'nearest' });
+        });
+        tools.appendChild(bt);
+      });
+      box.appendChild(im); box.appendChild(no); box.appendChild(tools); ed.appendChild(box);
+    }
+    var used = 0, taken = {};
+    p.blocks.forEach(function (b) {
+      if (b.t === 'img') {
+        var want = (b.n | 0) - 1, i = want >= 0 && want < blogImgs.length && !taken[want] ? want : blogImgs.findIndex(function (x, k) { return !taken[k]; });
+        if (i < 0) return;
+        taken[i] = 1; used++;
+        addImg(i);
+      } else {
+        var d = document.createElement('div'); d.className = b.t === 'h' ? 'bh' : 'bp'; d.dataset.k = b.t; d.contentEditable = 'true'; d.textContent = b.text; ed.appendChild(d);
+      }
+    });
+    // 글이 사진 자리를 다 못 쓰면 남은 사진은 끝에
+    blogImgs.forEach(function (x, k) { if (taken[k]) return; taken[k] = 1; p = Object.assign({}, p); addImg(k); });
+    var tg = document.createElement('div'); tg.className = 'tags'; tg.contentEditable = 'true'; tg.textContent = (p.tags || []).join(' '); ed.appendChild(tg);
+    renum(); ed.hidden = false;
+  }
+  function renum() { var n = 0; $('blogEd').querySelectorAll('.bi .no').forEach(function (x) { x.textContent = '사진 ' + (++n); }); var c = $('blogEd').querySelectorAll('.bi').length; $('blogP').textContent = '③ 사진 ' + c + '장 저장'; $('blogP').disabled = !c; }
   function copyText(t, msg) {
     var done = function () { toast(msg); };
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('복사하세요', t); });
     else prompt('복사하세요', t);
   }
   function blogRun() {
+    $('blogAsk').hidden = true; $('blogStatus').hidden = false;
     $('blogStatus').textContent = '카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)';
-    $('blogPrev').hidden = true; $('blogAgain').hidden = true;
+    $('blogEd').hidden = true; $('blogAgain').hidden = true;
     ['blogT', 'blogB', 'blogP'].forEach(function (id) { $(id).disabled = true; });
     var ind = D.industry(industry) || {};
     // 사진은 미리 만들어 둠 (정사각 표지 → 올린 사진 → 안내)
     var imgsP = window.SsakaExport.build(blogCard, curDesign(), { pics: localPics }).then(function (list) {
-      var sq = list.filter(function (x) { return /정사각/.test(x.name); });
-      var photos = list.filter(function (x) { return /사진/.test(x.name); });
-      var info = list.filter(function (x) { return /안내/.test(x.name); });
-      return sq.concat(photos, info).slice(0, 6);
+      // 가게: 표지 → 대표 메뉴 → 메뉴판 → 한정 메뉴 → 찾아오는 길 / 그 밖: 정사각 표지 → 사진 → 안내
+      var pick = function (re) { return list.filter(function (x) { return re.test(x.name); }); };
+      if (pick(/표지/).length && pick(/대표메뉴|메뉴판|오시는길/).length) return pick(/01-표지/).concat(pick(/대표메뉴/), pick(/메뉴판/), pick(/한정메뉴/), pick(/오시는길/)).slice(0, 8);
+      return pick(/정사각/).concat(pick(/사진/), pick(/안내/)).slice(0, 6);
     }).catch(function () { return []; });
     imgsP.then(function (imgs) {
       blogImgs = imgs;
       return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ card: blogCard, industry: ind.label || '', images: Math.max(1, imgs.length), dev: devId() }) });
+        body: JSON.stringify({ card: blogCard, industry: ind.label || '', images: Math.max(1, imgs.length), photos: imgs.map(function (x) { return x.label || x.name; }), owner: [v2('bq1'), v2('bq2'), v2('bq3')], dev: devId() }) });
     }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (x) {
         if (!x.ok) {
@@ -1385,14 +1463,9 @@
           return;
         }
         blogPost = x.j;
-        $('blogPrev').innerHTML = '';
-        var b = document.createElement('b'); b.textContent = blogPost.title; $('blogPrev').appendChild(b);
-        $('blogPrev').appendChild(document.createTextNode(blogText(blogPost, true)));
-        $('blogPrev').hidden = false;
-        $('blogStatus').textContent = '다 썼어요! ①②③ 순서대로 눌러 네이버 블로그에 붙여넣으세요.';
+        paintEditor(blogPost); $('blogActs').hidden = false;
+        $('blogStatus').textContent = '다 썼어요! 아래에서 고친 다음 ①②③ 순서대로 눌러 네이버 블로그에 붙여넣으세요.';
         ['blogT', 'blogB'].forEach(function (id) { $(id).disabled = false; });
-        $('blogP').disabled = !blogImgs.length;
-        $('blogP').textContent = '③ 사진 ' + blogImgs.length + '장 저장';
         $('blogAgain').hidden = false;
       }).catch(function () { $('blogStatus').textContent = '인터넷 연결을 확인하고 다시 눌러주세요.'; $('blogAgain').hidden = false; });
   }
@@ -1400,14 +1473,19 @@
     var c = current(); if (!c) return;
     blogCard = c.card; blogUrl = link(c); blogPost = null;
     $('doneModal').hidden = true; $('blogModal').hidden = false;
-    blogRun();
+    $('blogAsk').hidden = false; $('blogStatus').hidden = true; $('blogEd').hidden = true; $('blogAgain').hidden = true; $('blogActs').hidden = true;
+    ['blogT', 'blogB', 'blogP'].forEach(function (id) { $(id).disabled = true; });
   });
-  $('blogAgain').addEventListener('click', blogRun);
-  $('blogT').addEventListener('click', function () { if (blogPost) copyText(blogPost.title, '제목을 복사했어요'); });
+  function v2(id) { try { localStorage.setItem('sava-' + id, $(id).value); } catch (e) {} return $(id).value.trim().slice(0, 200); }
+  ['bq1', 'bq2', 'bq3'].forEach(function (id) { try { $(id).value = localStorage.getItem('sava-' + id) || ''; } catch (e) {} });
+  $('blogGo').addEventListener('click', blogRun);
+  $('blogAgain').addEventListener('click', function () { $('blogActs').hidden = true; $('blogAsk').hidden = false; $('blogStatus').hidden = true; $('blogEd').hidden = true; $('blogAgain').hidden = true; });
+  $('blogT').addEventListener('click', function () { if (blogPost) copyText($('blogEd').hidden ? blogPost.title : edState().title, '제목을 복사했어요'); });
   $('blogB').addEventListener('click', function () { if (blogPost) copyText(blogText(blogPost, true), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
   $('blogP').addEventListener('click', function () {
-    if (!blogImgs.length) return;
-    var files = blogImgs.map(function (x, i) { return new File([x.blob], '사진' + (i + 1) + '.jpg', { type: 'image/jpeg' }); });
+    var cur = $('blogEd').hidden ? blogImgs : edState().imgs;
+    if (!cur.length) return;
+    var files = cur.map(function (x, i) { return new File([x.blob], '사진' + (i + 1) + '.jpg', { type: 'image/jpeg' }); });
     if (navigator.canShare && navigator.canShare({ files: files })) { navigator.share({ files: files }).catch(function () {}); return; }
     files.forEach(function (f, i) {
       setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 350);

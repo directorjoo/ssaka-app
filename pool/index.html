@@ -165,7 +165,7 @@
     .chatB.new::after { content: ""; position: absolute; right: 4px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--cherry); }
     body.game .chat { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 55; margin: 0; border-radius: 20px 20px 0 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 30px rgba(0,0,0,.25); }
     body.game .chat:not(.open) { display: none; }
-    .big.solo { display: flex; flex-direction: column; gap: 2px; min-height: 84px; margin-top: 18px; background: linear-gradient(135deg, #1d6fd1, #134d93); box-shadow: 0 5px 0 #0d3a70; font-size: 26px; }
+    .big.solo { margin-top: 14px; background: var(--blue); box-shadow: 0 4px 0 #134d93; }
     .big.solo small { font-size: 14px; font-weight: 800; opacity: .85; }
   </style>
 </head>
@@ -180,7 +180,6 @@
   <section id="vHome">
     <h1>🎱 오늘 당구 한판?</h1>
     <p class="sub">집에서 <b>각자 자기 폰으로</b> 친구들과 치는 쓰리쿠션<br>당점 25칸 · 두께 · 밀어·끌어·끊어치기 · 대화창</p>
-    <button type="button" class="big solo" id="practice">🎯 혼자 연습하기<small>가입·초대 없이 바로 쳐요</small></button>
     <div class="box">
       <span class="lab" style="font-size:16px;margin-bottom:12px">👫 친구랑 치기</span>
       <span class="lab">내 별명 <small>게임·대화에서 보여요</small></span>
@@ -193,6 +192,7 @@
       <button type="button" class="big" id="make">🎱 방 만들고 친구 부르기</button>
       <div class="err" id="err1"></div>
     </div>
+    <button type="button" class="big solo" id="practice">🎯 혼자 연습하기</button>
     <div class="how">
       <b>치는 법</b> ① <b>큐를 손가락으로 잡고 돌려서</b> 방향을 잡아요. 맞힐 공을 누르고 <b>두께</b>를 골라도 돼요. ◀ ▶ 로 아주 조금씩.<br>
       ② 아래 작은 공을 눌러 <b>당점</b>(상하좌우·대각선 1~3팁)과 스트로크를 골라요.<br>

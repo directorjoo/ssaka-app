@@ -1,17 +1,17 @@
-// 싸바 사장님 설문 — 공통 질문 60개 + 업종 ★특별 질문 40개 = 100개
+// 싸바 대표님 설문 — 공통 질문 60개 + 업종 ★특별 질문 40개 = 100개
 // 한 줄 형식: "질문|예시|글 형"   (형: 1~10, 0 = 모든 형)   맨 앞 ! = 꼭 필요한 질문(빠른 설문)
-// {곳} {손님} 은 업종마다 바뀝니다. 매출·직원 개인정보·계좌는 묻지 않습니다.
+// {곳} {손님} {님}(호칭: 대표님·원장님 등) 은 업종마다 바뀝니다. 매출·직원 개인정보·계좌는 묻지 않습니다.
 (function () {
   var TYPES = [
     { n: 1, name: '기본 안내형', d: '처음 찾는 분이 알아야 할 것 정리' },
     { n: 2, name: '계절·한정형', d: '지금 계절, 기간 한정 메뉴·프로그램' },
-    { n: 3, name: '사장님 이야기형', d: '사장님 목소리로 시작한 이유와 원칙' },
+    { n: 3, name: '{님} 이야기형', d: '{님} 목소리로 시작한 이유와 원칙' },
     { n: 4, name: '이야기형', d: '실제 있었던 한 장면을 짧은 이야기로' },
     { n: 5, name: '묻고 답하기형', d: '자주 묻는 질문 Q&A' },
     { n: 6, name: '추천 코스형', d: '처음·둘이·가족·모임별 추천' },
     { n: 7, name: '고르기형', d: 'A와 B, 나에게 맞는 것 고르기' },
     { n: 8, name: '다섯 가지 이유형', d: '꼭 가 봐야 할 다섯 가지 이유' },
-    { n: 9, name: '하루 일기형', d: '새벽부터 마감까지 사장님의 하루' },
+    { n: 9, name: '하루 일기형', d: '새벽부터 마감까지 {님}의 하루' },
     { n: 10, name: '동네·나들이형', d: '동네 나들이 코스 속 우리 가게' }
   ];
 
@@ -42,7 +42,7 @@
       '계절·기간 한정으로 하는 것은?|예: 겨울 꼬막, 방학 특강|2',
       '함께하면 더 좋은 조합은?|예: 삼합에 막걸리|6'
     ] },
-    { t: '사장님 이야기', q: [
+    { t: '{님} 이야기', q: [
       '!이 일을 시작한 계기는?|예: 어머니 손맛을 서울에 알리고 싶어서|3,4',
       '이 동네를 고른 이유는?|예: 고향 분들이 많이 사는 곳이라|3,10',
       '처음 문 열던 날 기억나는 장면 하나|예: 첫 손님이 국물까지 다 비우고 가셨어요|3,4',
@@ -127,7 +127,7 @@
       '마지막 주문 시간은?|예: 21시|1,5',
       '외국인 손님도 오나요? 메뉴 설명은?|예: 영어 메뉴판 있어요|5',
       '단골에게만 드리는 작은 정이 있나요?|예: 생일엔 미역국|3,8',
-      '사장님이 직접 드시는 가장 좋아하는 메뉴는?|예: 매생이탕에 밥 말아서|3,6',
+      '{님}이 직접 드시는 가장 좋아하는 메뉴는?|예: 매생이탕에 밥 말아서|3,6',
       '처음 먹는 분도 쉽게 먹는 법|예: 홍어가 처음이면 삼합으로 시작|5,7',
       '쌀·밥은 어디 것? 어떻게 짓나요?|예: 순천 쌀, 솥밥|8',
       '재료 손질에 가장 공들이는 부분|예: 꼬막은 하나하나 손으로 까요|8,9',
@@ -370,7 +370,7 @@
       '자주 고민하는 A와 B (예: 단과 vs 종합)|예: 약한 과목 하나면 단과|7',
       '수업 시간표|예: 평일 오후 4시~10시|1',
       '상담 가능한 시간|예: 평일 2시~4시|5',
-      '원장님이 직접 가르치는 수업이 있나요?|예: 고3 독해반|3',
+      '{님}이 직접 가르치는 수업이 있나요?|예: 고3 독해반|3',
       '수업 전 준비하는 하루|예: 아이별 오답 노트 확인|9',
       '시험 끝난 날 {곳} 풍경|예: 다 같이 떡볶이|9,4',
       '결과를 알릴 때 지키는 원칙|예: 실제 결과만, 이름은 동의받고|8',
@@ -495,17 +495,17 @@
       { id: 'stay', label: '숙박·펜션', e: '🏝️', set: 'stay', w: '숙소', c: '손님' }
     ] },
     { g: '교육·학원', list: [
-      { id: 'toefl', label: '토플·어학원', e: '🌍', set: 'academy', w: '학원', c: '학생' },
-      { id: 'bigacademy', label: '대형 어학원', e: '🏫', set: 'academy', w: '학원', c: '학생' },
-      { id: 'academy', label: '보습·내신학원', e: '📚', set: 'academy', w: '학원', c: '학생' },
-      { id: 'entrance', label: '입시·수능', e: '🎯', set: 'academy', w: '학원', c: '학생' },
-      { id: 'tutor', label: '과외 선생님', e: '✏️', set: 'academy', w: '공부방', c: '학생' },
-      { id: 'arts', label: '예체능·코딩', e: '🎨', set: 'academy', w: '학원', c: '학생' }
+      { id: 'toefl', label: '토플·어학원', e: '🌍', set: 'academy', w: '학원', c: '학생', h: '원장님' },
+      { id: 'bigacademy', label: '대형 어학원', e: '🏫', set: 'academy', w: '학원', c: '학생', h: '원장님' },
+      { id: 'academy', label: '보습·내신학원', e: '📚', set: 'academy', w: '학원', c: '학생', h: '원장님' },
+      { id: 'entrance', label: '입시·수능', e: '🎯', set: 'academy', w: '학원', c: '학생', h: '원장님' },
+      { id: 'tutor', label: '과외 선생님', e: '✏️', set: 'academy', w: '공부방', c: '학생', h: '선생님' },
+      { id: 'arts', label: '예체능·코딩', e: '🎨', set: 'academy', w: '학원', c: '학생', h: '원장님' }
     ] },
     { g: '사람·전문직', list: [
       { id: 'freelancer', label: '강사·프리랜서', e: '🎤', set: 'person', w: '일터', c: '의뢰인', over: PERSON },
-      { id: 'director', label: '감독·크리에이터', e: '🎥', set: 'person', w: '일터', c: '관객', over: PERSON },
-      { id: 'actor', label: '배우·모델', e: '🎬', set: 'person', w: '일터', c: '관객', over: PERSON },
+      { id: 'director', label: '감독·크리에이터', e: '🎥', set: 'person', w: '일터', c: '관객', h: '감독님', over: PERSON },
+      { id: 'actor', label: '배우·모델', e: '🎬', set: 'person', w: '일터', c: '관객', h: '배우님', over: PERSON },
       { id: 'newcar', label: '자동차 영업', e: '🚘', set: 'car', w: '매장', c: '고객' },
       { id: 'usedcar', label: '중고차', e: '🚙', set: 'car', w: '매장', c: '고객' }
     ] }
@@ -522,7 +522,7 @@
   }
   function fill(s, ind) {
     return josa(s.replace(/\{곳\}를/g, '{곳}{을를}').replace(/\{곳\}는/g, '{곳}{은는}').replace(/\{손님\}이/g, '{손님}{이가}')
-      .replace(/\{곳\}/g, ind.w).replace(/\{손님\}/g, ind.c));
+      .replace(/\{님\}/g, ind.h || '대표님').replace(/\{곳\}/g, ind.w).replace(/\{손님\}/g, ind.c));
   }
   function parse(line, id, ind) {
     var key = line.charAt(0) === '!'; if (key) line = line.slice(1);
@@ -539,5 +539,6 @@
     out.push({ t: '★ ' + ind.label + ' 특별 질문', star: true, q: sp.map(function (l, i) { no++; var x = parse(l, ind.set + '-' + (i + 1), ind); x.no = no; x.star = true; return x; }) });
     return out;
   }
-  window.SavaSurvey = { TYPES: TYPES, IND: IND, BY: BY, build: build };
+  function types(indId) { var ind = BY[indId] || BY.restaurant; return TYPES.map(function (t) { return { n: t.n, name: fill(t.name, ind), d: fill(t.d, ind) }; }); }
+  window.SavaSurvey = { TYPES: TYPES, types: types, IND: IND, BY: BY, build: build };
 })();

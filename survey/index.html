@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B3132B">
-  <title>사장님 설문 · 싸바</title>
-  <meta property="og:title" content="📋 싸바 사장님 설문 — 한 번 답하면 블로그 글 10가지">
+  <title>대표님 설문 · 싸바</title>
+  <meta property="og:title" content="📋 싸바 대표님 설문 — 한 번 답하면 블로그 글 10가지">
   <meta property="og:description" content="짧게 답만 적어 주세요. 싸바가 우리 가게 블로그 글을 10가지로 써 드려요.">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png">
   <link rel="icon" href="../img/favicon.png?v=2">
@@ -82,7 +82,7 @@
 <div class="w">
   <a class="back" href="../app/">‹ 싸바</a>
   <div class="hero">
-    <div class="k">SAVA · 사장님 설문</div>
+    <div class="k" id="kTitle">SAVA · 대표님 설문</div>
     <h1>📋 한 번 답하면<br>블로그 글이 10가지</h1>
     <p>글은 안 쓰셔도 돼요. 아는 대로 짧게 답만 적어 주세요. 모르는 건 비워 두셔도 돼요.<br>답은 이 휴대폰에 바로바로 저장돼요.</p>
   </div>
@@ -128,7 +128,7 @@
   <button type="button" class="btn red" id="toGen">📝 글 만들기</button>
 </div></div>
 
-<script src="../js/survey-q.js?v=1"></script>
+<script src="../js/survey-q.js?v=2"></script>
 <script>
 (function () {
   var S = window.SavaSurvey, $ = function (id) { return document.getElementById(id); };
@@ -175,20 +175,21 @@
   });
   $('linkCopy').addEventListener('click', function () { copy(myLink(), '링크를 복사했어요. 이 링크는 믿는 분께만 보내세요.'); });
   $('linkShare').addEventListener('click', function () {
-    var t = '싸바 사장님 설문이에요. 아는 것만 짧게 답해 주세요 🙏';
-    if (navigator.share) navigator.share({ title: '싸바 사장님 설문', text: t, url: myLink() }).catch(function () {});
+    var t = '싸바 ' + who() + ' 설문이에요. 아는 것만 짧게 답해 주세요 🙏';
+    if (navigator.share) navigator.share({ title: '싸바 ' + who() + ' 설문', text: t, url: myLink() }).catch(function () {});
     else copy(t + '\n' + myLink(), '링크를 복사했어요. 카톡에 붙여넣어 보내세요.');
   });
 
   // ---- 업종 ----
+  function who() { return (S.BY[st.ind] || {}).h || '대표님'; }
   function paintInds() {
-    var box = $('inds'); box.innerHTML = '';
+    var box = $('inds'); box.innerHTML = ''; $('kTitle').textContent = 'SAVA · ' + who() + ' 설문';
     S.IND.forEach(function (g) {
       var l = document.createElement('div'); l.className = 'gl'; l.textContent = g.g; box.appendChild(l);
       g.list.forEach(function (x) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = x.e + ' ' + x.label;
         b.setAttribute('aria-pressed', x.id === st.ind ? 'true' : 'false');
-        b.addEventListener('click', function () { st.ind = x.id; save(); paintInds(); paintQs(); });
+        b.addEventListener('click', function () { st.ind = x.id; save(); paintInds(); paintQs(); paintTypes(); });
         box.appendChild(b);
       });
     });
@@ -254,7 +255,7 @@
   var TY = {};
   function paintTypes() {
     var box = $('types'); box.innerHTML = '';
-    S.TYPES.forEach(function (t) {
+    S.types(st.ind).forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ty';
       b.innerHTML = '<b></b><span></span><span class="s"></span>';
       b.querySelector('b').textContent = t.n + '형 · ' + t.name; b.querySelector('span').textContent = t.d;
@@ -270,7 +271,7 @@
     setTy(n, 'work', '✍️ 쓰는 중… (30초쯤)');
     var ind = S.BY[st.ind];
     return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ mode: 'survey', type: n, survey: { ind: ind.label, qa: qa() }, images: 4, hasCard: !!cardLink(), dev: dev() }) })
+      body: JSON.stringify({ mode: 'survey', type: n, survey: { ind: ind.label, who: ind.h || '대표님', qa: qa() }, images: 4, hasCard: !!cardLink(), dev: dev() }) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (x) {
         if (!x.ok) {
@@ -310,7 +311,7 @@
     return t;
   }
   function paintPost(n) {
-    var p = posts[n], ty = S.TYPES[n - 1], old = $('post' + n);
+    var p = posts[n], ty = S.types(st.ind)[n - 1], old = $('post' + n);
     var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
     el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2"><button type="button" class="btn gh c3">🔄 이 형 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 네이버 블로그 열기</a></div>';
     el.querySelector('.ty2').textContent = n + '형 · ' + ty.name;

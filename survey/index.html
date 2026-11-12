@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B3132B">
+  <title>사장님 설문 · 싸바</title>
+  <meta property="og:title" content="📋 싸바 사장님 설문 — 한 번 답하면 블로그 글 10가지">
+  <meta property="og:description" content="짧게 답만 적어 주세요. 싸바가 우리 가게 블로그 글을 10가지로 써 드려요.">
+  <meta property="og:image" content="https://sava.kr/img/ssaka-share.png">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #FBF7F1; color: var(--ink); font-family: var(--font); -webkit-text-size-adjust: 100%; }
+    .w { max-width: 620px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    a.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-decoration: none; font-weight: 700; }
+    .hero .k { font-size: 13px; font-weight: 800; color: var(--ssaka); letter-spacing: .05em; }
+    .hero h1 { margin: 4px 0 8px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; line-height: 1.25; }
+    .hero p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.65; word-break: keep-all; }
+    h2 { font-size: 18px; margin: 26px 0 10px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .gl { width: 100%; font-size: 12.5px; font-weight: 800; color: var(--ink-2); margin: 8px 0 0; }
+    .chip { min-height: 42px; padding: 0 13px; border-radius: 999px; border: 1.5px solid #e6dfd5; background: #fff; font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; color: var(--ink); }
+    .chip[aria-pressed="true"] { background: var(--ssaka); border-color: var(--ssaka); color: #fff; }
+    .note { font-size: 12.5px; color: var(--ink-2); margin: 8px 0 0; line-height: 1.55; }
+    .mode { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mode button { min-height: 58px; border-radius: 14px; border: 1.5px solid #e6dfd5; background: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; color: var(--ink); line-height: 1.3; }
+    .mode button small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+    .mode button[aria-pressed="true"] { border-color: var(--ssaka); background: var(--ssaka-soft); }
+    details.sec { background: #fff; border-radius: 16px; margin: 10px 0; box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 6px 18px -14px rgba(0,0,0,.3); }
+    details.sec > summary { list-style: none; cursor: pointer; padding: 16px; font-size: 16.5px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    details.sec > summary::-webkit-details-marker { display: none; }
+    details.sec > summary .cnt { margin-left: auto; font-size: 13px; font-weight: 800; color: var(--ink-2); background: #f3eee7; border-radius: 999px; padding: 3px 9px; }
+    details.sec > summary .cnt.full { background: #e6f4ea; color: #1d7a3a; }
+    details.sec > summary::after { content: '▾'; color: #b5aa9b; font-size: 14px; }
+    details.sec[open] > summary::after { content: '▴'; }
+    details.sec.star > summary { color: var(--ssaka); }
+    .q { padding: 4px 16px 14px; }
+    .q label { display: block; font-size: 15px; font-weight: 800; line-height: 1.45; margin-bottom: 6px; word-break: keep-all; }
+    .q label .no { color: #b5aa9b; font-weight: 800; margin-right: 4px; }
+    .q label .st { color: var(--ssaka); }
+    .q label .key { display: inline-block; font-size: 11px; font-weight: 800; color: #fff; background: var(--ssaka); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 2px; }
+    .q textarea { width: 100%; min-height: 46px; padding: 11px 12px; border-radius: 12px; border: 1.5px solid #e6dfd5; background: #fffdfa; font: inherit; font-size: 16px; line-height: 1.5; resize: none; overflow: hidden; color: var(--ink); }
+    .q textarea:focus { outline: none; border-color: var(--ssaka); background: #fff; }
+    .q textarea::placeholder { color: #b9ad9e; }
+    .save { margin-top: 18px; padding: 16px; border-radius: 16px; background: #fff; }
+    .save p { margin: 0 0 10px; font-size: 14px; color: var(--ink-2); line-height: 1.6; word-break: keep-all; }
+    .btn { display: grid; place-items: center; width: 100%; min-height: 52px; border-radius: 14px; border: 0; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; text-decoration: none; }
+    .btn.red { background: var(--ssaka); color: #fff; } .btn.ink { background: var(--ink); color: #fff; } .btn.yel { background: #FEE500; color: #191919; } .btn.gh { background: #f0ece6; color: var(--ink); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .linkbox { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #f6f2ec; font-size: 13px; word-break: break-all; color: var(--ink-2); }
+    .gen { margin-top: 26px; padding: 18px 16px; border-radius: 20px; background: linear-gradient(135deg, #B3132B, #7d0c1d); color: #fff; }
+    .gen h2 { margin: 0 0 6px; } .gen p { margin: 0 0 12px; font-size: 14px; opacity: .92; line-height: 1.6; word-break: keep-all; }
+    .gen input { width: 100%; min-height: 46px; padding: 0 12px; border-radius: 12px; border: 0; font: inherit; font-size: 15px; margin-bottom: 10px; }
+    .types { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .ty { text-align: left; padding: 11px 12px; border-radius: 14px; border: 0; background: rgba(255,255,255,.14); color: #fff; font: inherit; cursor: pointer; min-height: 64px; }
+    .ty b { display: block; font-size: 14.5px; } .ty span { display: block; font-size: 12px; opacity: .85; margin-top: 2px; line-height: 1.35; }
+    .ty .s { font-size: 11.5px; font-weight: 800; margin-top: 5px; opacity: 1; }
+    .ty.done { background: #fff; color: var(--ink); } .ty.work { background: rgba(255,255,255,.3); }
+    .gen .btn.yel { margin-top: 4px; }
+    .out { margin-top: 18px; }
+    .post { background: #fff; border-radius: 18px; margin: 12px 0; padding: 16px; box-shadow: 0 8px 26px -18px rgba(0,0,0,.35); }
+    .post .ty2 { font-size: 12.5px; font-weight: 900; color: var(--ssaka); }
+    .post .pt { width: 100%; margin: 6px 0 10px; border: 0; border-bottom: 1.5px dashed #e6dfd5; font: inherit; font-size: 18px; font-weight: 900; padding: 4px 0; color: var(--ink); background: transparent; }
+    .post .pb { font-size: 15.5px; line-height: 1.75; white-space: pre-wrap; word-break: keep-all; outline: none; padding: 6px; border-radius: 10px; }
+    .post .pb:focus { background: #fffbf3; }
+    .post .tg { font-size: 13px; color: #8A7660; margin-top: 8px; word-break: break-all; }
+    .post .row2 { margin-top: 12px; }
+    .warn { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.55; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(251,247,241,.96); backdrop-filter: blur(8px); border-top: 1px solid #ece4d8; z-index: 5; }
+    .bar .in { max-width: 620px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+    .bar .pg { flex: 1; font-size: 13px; font-weight: 800; color: var(--ink-2); }
+    .bar .pg i { display: block; height: 7px; border-radius: 9px; background: #eadfd0; margin-top: 5px; overflow: hidden; }
+    .bar .pg i b { display: block; height: 100%; width: 0; background: var(--ssaka); transition: width .3s; }
+    .bar .btn { width: auto; padding: 0 16px; min-height: 48px; font-size: 15px; }
+    .toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.92); color: #fff; font-size: 14px; font-weight: 700; z-index: 9; max-width: 90vw; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <a class="back" href="../app/">‹ 싸바</a>
+  <div class="hero">
+    <div class="k">SAVA · 사장님 설문</div>
+    <h1>📋 한 번 답하면<br>블로그 글이 10가지</h1>
+    <p>글은 안 쓰셔도 돼요. 아는 대로 짧게 답만 적어 주세요. 모르는 건 비워 두셔도 돼요.<br>답은 이 휴대폰에 바로바로 저장돼요.</p>
+  </div>
+
+  <h2>1. 업종 고르기</h2>
+  <div class="chips" id="inds"></div>
+  <p class="note">보험·금융·부동산·병의원은 광고 규정이 엄격해서 아직 설문 글쓰기를 하지 않아요.</p>
+
+  <h2>2. 얼마나 답할까요?</h2>
+  <div class="mode">
+    <button type="button" id="mQuick" aria-pressed="true">⚡ 꼭 필요한 것만<small id="mQn">17개 · 5분</small></button>
+    <button type="button" id="mAll" aria-pressed="false">📋 전체 100개<small>많이 답할수록 글이 좋아져요</small></button>
+  </div>
+
+  <h2 id="qh">3. 질문</h2>
+  <div id="qs"></div>
+
+  <div class="save">
+    <p>☁️ <b>링크로 저장</b>하면 다른 휴대폰(예: 사모님 폰)에서도 이어서 답할 수 있어요. 링크를 가진 사람만 열 수 있어요.</p>
+    <button type="button" class="btn ink" id="saveBtn">☁️ 링크로 저장하기</button>
+    <div id="saved" hidden>
+      <div class="linkbox" id="linkBox"></div>
+      <div class="row2"><button type="button" class="btn gh" id="linkCopy">🔗 링크 복사</button><button type="button" class="btn yel" id="linkShare">💬 보내기</button></div>
+      <p class="note" id="syncMsg">고치면 자동으로 저장돼요.</p>
+    </div>
+  </div>
+
+  <section class="gen" id="gen">
+    <h2>📝 블로그 글 만들기</h2>
+    <p>답한 내용으로 싸바 AI가 네이버 블로그 글을 써요. 하나씩 눌러도 되고, 10가지를 한 번에 써도 돼요.</p>
+    <input id="cardUrl" inputmode="url" placeholder="싸바카드 링크가 있으면 붙여넣기 (글 끝에 붙어요)">
+    <div class="types" id="types"></div>
+    <button type="button" class="btn yel" id="allGo">⚡ 10가지 한 번에 쓰기</button>
+    <p class="warn" style="color:#fff;opacity:.85" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 12편까지 써요.</p>
+  </section>
+
+  <div class="out" id="out"></div>
+  <p class="warn">AI가 답만 보고 쓴 초안이에요. 사실과 다른 곳이 없는지 꼭 읽어 보고 올려 주세요. [사진 n] 자리에는 그 장면 사진을 넣고 표시는 지워 주세요.</p>
+</div>
+
+<div class="bar"><div class="in">
+  <div class="pg"><span id="pgT">답 0개</span><i><b id="pgB"></b></i></div>
+  <button type="button" class="btn red" id="toGen">📝 글 만들기</button>
+</div></div>
+
+<script src="../js/survey-q.js?v=1"></script>
+<script>
+(function () {
+  var S = window.SavaSurvey, $ = function (id) { return document.getElementById(id); };
+  var LS = 'sava-survey';
+  var st = { ind: 'restaurant', mode: 'quick', a: {}, url: '', sid: '', key: '', at: 0 };
+  try { Object.assign(st, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
+  var qp = new URLSearchParams(location.search);
+  if (qp.get('ind') && S.BY[qp.get('ind')]) st.ind = qp.get('ind');
+  var posts = {};
+  function dev() { try { var d = localStorage.getItem('sava-dev'); if (!d) { d = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sava-dev', d); } return d; } catch (e) { return 'x'; } }
+  function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2400); }
+  function copy(t, msg) {
+    var ok = function () { toast(msg); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, function () { prompt('복사하세요', t); });
+    else { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) { prompt('복사하세요', t); } ta.remove(); }
+  }
+
+  // ---- 저장 (휴대폰 + 링크 저장했으면 서버) ----
+  var syncT = 0;
+  function save() {
+    st.at = Date.now();
+    try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+    if (st.sid && st.key) { clearTimeout(syncT); syncT = setTimeout(push, 1500); $('syncMsg').textContent = '저장하는 중…'; }
+  }
+  function body() { return JSON.stringify({ ind: st.ind, a: st.a, url: st.url, v: 1 }); }
+  function push() {
+    fetch('../api/survey/' + st.sid, { method: 'PUT', headers: { 'content-type': 'application/json', 'x-key': st.key }, body: body() })
+      .then(function (r) { $('syncMsg').textContent = r.ok ? '✅ 링크에 저장됐어요. 고치면 자동으로 저장돼요.' : '링크 저장이 안 됐어요. 이 휴대폰에는 저장돼 있어요.'; })
+      .catch(function () { $('syncMsg').textContent = '인터넷이 끊겨 링크 저장이 안 됐어요. 이 휴대폰에는 저장돼 있어요.'; });
+  }
+  function myLink() { return location.origin + location.pathname + '#s=' + st.sid + '.' + st.key; }
+  function showSaved() {
+    if (!st.sid) return;
+    $('saveBtn').hidden = true; $('saved').hidden = false; $('linkBox').textContent = myLink();
+  }
+  $('saveBtn').addEventListener('click', function () {
+    $('saveBtn').disabled = true;
+    fetch('../api/survey', { method: 'POST', headers: { 'content-type': 'application/json' }, body: body() })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        if (!j.id) throw 0;
+        st.sid = j.id; st.key = j.key; save(); showSaved(); toast('링크로 저장했어요!');
+      }).catch(function () { toast('지금은 저장이 안 돼요. 잠시 뒤 다시 눌러 주세요.'); })
+      .then(function () { $('saveBtn').disabled = false; });
+  });
+  $('linkCopy').addEventListener('click', function () { copy(myLink(), '링크를 복사했어요. 이 링크는 믿는 분께만 보내세요.'); });
+  $('linkShare').addEventListener('click', function () {
+    var t = '싸바 사장님 설문이에요. 아는 것만 짧게 답해 주세요 🙏';
+    if (navigator.share) navigator.share({ title: '싸바 사장님 설문', text: t, url: myLink() }).catch(function () {});
+    else copy(t + '\n' + myLink(), '링크를 복사했어요. 카톡에 붙여넣어 보내세요.');
+  });
+
+  // ---- 업종 ----
+  function paintInds() {
+    var box = $('inds'); box.innerHTML = '';
+    S.IND.forEach(function (g) {
+      var l = document.createElement('div'); l.className = 'gl'; l.textContent = g.g; box.appendChild(l);
+      g.list.forEach(function (x) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = x.e + ' ' + x.label;
+        b.setAttribute('aria-pressed', x.id === st.ind ? 'true' : 'false');
+        b.addEventListener('click', function () { st.ind = x.id; save(); paintInds(); paintQs(); });
+        box.appendChild(b);
+      });
+    });
+  }
+
+  // ---- 질문 ----
+  var secs = [];
+  function grow(t) { t.style.height = 'auto'; t.style.height = Math.max(46, t.scrollHeight + 2) + 'px'; }
+  function allQs() { var l = []; secs.forEach(function (s) { s.q.forEach(function (q) { l.push(q); }); }); return l; }
+  function paintQs() {
+    secs = S.build(st.ind);
+    var quick = st.mode === 'quick', box = $('qs'), openKey = {};
+    box.querySelectorAll('details[open]').forEach(function (d) { openKey[d.dataset.i] = 1; });
+    box.innerHTML = '';
+    var nk = allQs().filter(function (q) { return q.key; }).length;
+    $('mQn').textContent = nk + '개 · 5분';
+    $('qh').textContent = '3. 질문 ' + (quick ? nk : 100) + '개';
+    secs.forEach(function (s, si) {
+      var list = s.q.filter(function (q) { return !quick || q.key || (st.a[q.id] || '').trim(); });
+      if (!list.length) return;
+      var d = document.createElement('details'); d.className = 'sec' + (s.star ? ' star' : ''); d.dataset.i = si;
+      if (openKey[si] || (si === 0 && !Object.keys(openKey).length)) d.open = true;
+      var sm = document.createElement('summary'); sm.innerHTML = '<span></span><span class="cnt"></span>'; sm.firstChild.textContent = s.t;
+      d.appendChild(sm);
+      list.forEach(function (q) {
+        var w = document.createElement('div'); w.className = 'q';
+        var lb = document.createElement('label'); lb.htmlFor = 'q_' + q.id;
+        lb.innerHTML = '<span class="no"></span>' + (q.star ? '<span class="st">★ </span>' : '') + '<span class="tx"></span>' + (q.key && !quick ? '<span class="key">꼭</span>' : '');
+        lb.querySelector('.no').textContent = q.no + '.'; lb.querySelector('.tx').textContent = q.q;
+        var ta = document.createElement('textarea'); ta.id = 'q_' + q.id; ta.rows = 1; ta.maxLength = 400;
+        ta.placeholder = q.ex; ta.value = st.a[q.id] || '';
+        ta.addEventListener('input', function () { grow(ta); var v = ta.value; if (v.trim()) st.a[q.id] = v; else delete st.a[q.id]; counts(); save(); });
+        w.appendChild(lb); w.appendChild(ta); d.appendChild(w);
+        setTimeout(function () { grow(ta); }, 0);
+      });
+      d.addEventListener('toggle', function () { if (d.open) d.querySelectorAll('textarea').forEach(grow); });
+      box.appendChild(d);
+    });
+    counts();
+  }
+  function answered() { var ids = {}; allQs().forEach(function (q) { ids[q.id] = q; }); return Object.keys(st.a).filter(function (k) { return ids[k] && st.a[k].trim(); }).map(function (k) { return ids[k]; }); }
+  function counts() {
+    var quick = st.mode === 'quick';
+    $('qs').querySelectorAll('details.sec').forEach(function (d) {
+      var s = secs[+d.dataset.i], shown = s.q.filter(function (q) { return !quick || q.key || (st.a[q.id] || '').trim(); });
+      var n = shown.filter(function (q) { return (st.a[q.id] || '').trim(); }).length, c = d.querySelector('.cnt');
+      c.textContent = n + ' / ' + shown.length; c.classList.toggle('full', n === shown.length);
+    });
+    var n = answered().length, tot = quick ? allQs().filter(function (q) { return q.key; }).length : 100;
+    $('pgT').textContent = '답 ' + n + '개' + (quick ? ' (꼭 필요한 것 ' + answered().filter(function (q) { return q.key; }).length + '/' + tot + ')' : ' / 100');
+    $('pgB').style.width = Math.min(100, Math.round((quick ? answered().filter(function (q) { return q.key; }).length : n) / tot * 100)) + '%';
+    $('allGo').disabled = n < 5;
+    $('genMsg').textContent = n < 5 ? '답이 5개 넘게 있어야 쓸 수 있어요. 지금 ' + n + '개예요.' : '답 ' + n + '개로 써요. 많이 답할수록 글이 좋아져요. 하루 12편까지 써요.';
+  }
+  function setMode(m) { st.mode = m; $('mQuick').setAttribute('aria-pressed', m === 'quick'); $('mAll').setAttribute('aria-pressed', m === 'all'); save(); paintQs(); }
+  $('mQuick').addEventListener('click', function () { setMode('quick'); });
+  $('mAll').addEventListener('click', function () { setMode('all'); });
+  $('toGen').addEventListener('click', function () { $('gen').scrollIntoView({ behavior: 'smooth' }); });
+  $('cardUrl').value = st.url || '';
+  $('cardUrl').addEventListener('input', function () { st.url = $('cardUrl').value.trim().slice(0, 300); save(); });
+
+  // ---- 글 만들기 ----
+  var TY = {};
+  function paintTypes() {
+    var box = $('types'); box.innerHTML = '';
+    S.TYPES.forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ty';
+      b.innerHTML = '<b></b><span></span><span class="s"></span>';
+      b.querySelector('b').textContent = t.n + '형 · ' + t.name; b.querySelector('span').textContent = t.d;
+      b.addEventListener('click', function () { if (posts[t.n]) { var el = $('post' + t.n); if (el) el.scrollIntoView({ behavior: 'smooth' }); return; } run([t.n]); });
+      TY[t.n] = b; box.appendChild(b);
+    });
+  }
+  function setTy(n, cls, s) { var b = TY[n]; b.classList.remove('done', 'work'); if (cls) b.classList.add(cls); b.querySelector('.s').textContent = s || ''; }
+  function cardLink() { var u = (st.url || '').trim(); return /^https?:\/\/(www\.)?sava\.kr\//.test(u) ? u : ''; }
+  function qa() { return answered().map(function (q) { return [q.q, st.a[q.id].trim().slice(0, 400), q.t.join(',')]; }); }
+  var busy = 0, stopAll = false;
+  function one(n) {
+    setTy(n, 'work', '✍️ 쓰는 중… (30초쯤)');
+    var ind = S.BY[st.ind];
+    return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mode: 'survey', type: n, survey: { ind: ind.label, qa: qa() }, images: 4, hasCard: !!cardLink(), dev: dev() }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok) {
+          var e = x.j && x.j.error;
+          if (e === 'limit' || e === 'busy' || e === 'no-key') stopAll = true;
+          setTy(n, '', e === 'limit' ? '오늘은 다 썼어요. 내일 다시!' : e === 'busy' ? '오늘 요청이 많아요. 내일 다시!' : e === 'no-key' ? '준비 중이에요' : e === 'few' ? '답이 더 필요해요' : '다시 눌러 주세요');
+          return;
+        }
+        posts[n] = x.j; paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
+      }).catch(function () { setTy(n, '', '인터넷 확인 후 다시'); });
+  }
+  function run(list) {
+    if (answered().length < 5) { toast('답을 5개 넘게 적어 주세요'); return; }
+    stopAll = false;
+    var q = list.slice(), live = 0;
+    q.forEach(function (n) { setTy(n, 'work', '⏳ 차례 기다리는 중'); });
+    return new Promise(function (done) {
+      function next() {
+        if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) done(); return; }
+        var n = q.shift(); live++;
+        one(n).then(function () { live--; next(); });
+      }
+      for (var i = 0; i < 4; i++) next();
+    });
+  }
+  $('allGo').addEventListener('click', function () {
+    var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; });
+    if (!list.length) { toast('10가지 다 썼어요!'); return; }
+    run(list);
+  });
+  function postText(n, el) {
+    var lines = [], k = 0;
+    el.querySelectorAll('.pb').forEach(function (p) { lines.push(p.innerText.trim()); });
+    var t = lines.join('\n\n') + '\n\n';
+    var link = cardLink(); if (link) t += '👉 싸바카드: ' + link + '\n\n';
+    t += el.querySelector('.tg').innerText.trim();
+    return t;
+  }
+  function paintPost(n) {
+    var p = posts[n], ty = S.TYPES[n - 1], old = $('post' + n);
+    var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
+    el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2"><button type="button" class="btn gh c3">🔄 이 형 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 네이버 블로그 열기</a></div>';
+    el.querySelector('.ty2').textContent = n + '형 · ' + ty.name;
+    el.querySelector('.pt').value = p.title;
+    var txt = p.blocks.map(function (b) { return b.t === 'img' ? '[사진 ' + b.n + (b.hint ? ' · ' + b.hint : '') + ']' : b.text; }).join('\n\n');
+    el.querySelector('.pb').textContent = txt;
+    el.querySelector('.tg').textContent = (p.tags || []).join(' ');
+    el.querySelector('.c1').addEventListener('click', function () { copy(el.querySelector('.pt').value, '제목을 복사했어요'); });
+    el.querySelector('.c2').addEventListener('click', function () { copy(postText(n, el), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
+    el.querySelector('.c3').addEventListener('click', function () { delete posts[n]; run([n]); });
+    var out = $('out');
+    if (old) old.replaceWith(el);
+    else { var after = null; out.querySelectorAll('.post').forEach(function (x) { if (+x.id.slice(4) > n && !after) after = x; }); out.insertBefore(el, after); }
+  }
+
+  // ---- 링크로 열었을 때 (#s=번호.열쇠) ----
+  function boot() { paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved(); }
+  var m = /#s=([0-9A-Za-z]{6,16})\.([0-9A-Za-z]{16,40})/.exec(location.hash);
+  if (m && (m[1] !== st.sid || m[2] !== st.key)) {
+    fetch('../api/survey/' + m[1], { headers: { 'x-key': m[2] } }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.d) throw 0;
+      var d = JSON.parse(j.d);
+      st.sid = m[1]; st.key = m[2]; st.ind = S.BY[d.ind] ? d.ind : st.ind; st.a = d.a || {}; st.url = d.url || '';
+      $('cardUrl').value = st.url;
+      try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+      boot(); toast('저장된 설문을 불러왔어요');
+    }).catch(function () { boot(); toast('링크가 맞지 않거나 지워진 설문이에요'); });
+  } else if (st.sid && st.key) {
+    // 다른 폰에서 고친 게 있으면 받아 오기
+    boot();
+    fetch('../api/survey/' + st.sid, { headers: { 'x-key': st.key } }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.d || j.at <= st.at) return;
+      var d = JSON.parse(j.d); st.a = d.a || st.a; st.ind = S.BY[d.ind] ? d.ind : st.ind; st.url = d.url || st.url; st.at = j.at;
+      try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+      $('cardUrl').value = st.url; paintInds(); paintQs(); toast('다른 휴대폰에서 고친 답을 불러왔어요');
+    }).catch(function () {});
+  } else boot();
+})();
+</script>
+</body>
+</html>

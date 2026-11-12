@@ -514,6 +514,7 @@
       <label>가게 이야기 <small>예: 순천 출신 사장이 고향 맛 그대로</small></label><textarea id="bq2" maxlength="200" rows="2"></textarea>
       <label>손님께 한마디 <small>예: 처음 오시면 짱뚱어탕부터 드셔 보세요</small></label><textarea id="bq3" maxlength="200" rows="2"></textarea>
       <button type="button" class="kakao big" id="blogGo" style="width:100%;margin-top:12px">📝 이걸로 블로그 글 쓰기</button>
+      <a class="ghost big" id="blogSurvey" href="../survey/" style="width:100%;margin-top:8px">📋 사장님 설문에 답하고 글 10가지 만들기</a>
     </div>
     <p class="done-sub" id="blogStatus" hidden>카드 내용으로 블로그 글을 쓰는 중이에요… (20초쯤)</p>
     <div class="blog-ed" id="blogEd" hidden></div>
@@ -1472,6 +1473,8 @@
   $('blog2').addEventListener('click', function () {
     var c = current(); if (!c) return;
     blogCard = c.card; blogUrl = link(c); blogPost = null;
+    var svOk = /^(restaurant|cafe|beauty|fitness|flower|stay|toefl|bigacademy|academy|entrance|tutor|arts|freelancer|director|actor|newcar|usedcar)$/.test(industry);
+    $('blogSurvey').hidden = !svOk; $('blogSurvey').href = '../survey/?ind=' + industry;
     $('doneModal').hidden = true; $('blogModal').hidden = false;
     $('blogAsk').hidden = false; $('blogStatus').hidden = true; $('blogEd').hidden = true; $('blogAgain').hidden = true; $('blogActs').hidden = true;
     ['blogT', 'blogB', 'blogP'].forEach(function (id) { $(id).disabled = true; });

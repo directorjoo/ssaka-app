@@ -119,6 +119,7 @@
     <p class="warn" style="color:#fff;opacity:.85" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 12편까지 써요.</p>
   </section>
 
+  <h2 id="outH">📚 쓴 글 <small style="font-size:13px;color:var(--ink-2);font-weight:700">이 휴대폰에 저장돼요 · 눌러서 고칠 수 있어요</small></h2>
   <div class="out" id="out"></div>
   <p class="warn">AI가 답만 보고 쓴 초안이에요. 사실과 다른 곳이 없는지 꼭 읽어 보고 올려 주세요. [사진 n] 자리에는 그 장면 사진을 넣고 표시는 지워 주세요.</p>
 </div>
@@ -137,7 +138,9 @@
   try { Object.assign(st, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   var qp = new URLSearchParams(location.search);
   if (qp.get('ind') && S.BY[qp.get('ind')]) st.ind = qp.get('ind');
-  var posts = {};
+  var posts = {}, PK = 'sava-survey-posts';
+  function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} }
+  function loadPosts() { try { var o = JSON.parse(localStorage.getItem(PK) || '{}'); return o.ind === st.ind ? o.posts || {} : {}; } catch (e) { return {}; } }
   function dev() { try { var d = localStorage.getItem('sava-dev'); if (!d) { d = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sava-dev', d); } return d; } catch (e) { return 'x'; } }
   function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2400); }
   function copy(t, msg) {
@@ -189,7 +192,7 @@
       g.list.forEach(function (x) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = x.e + ' ' + x.label;
         b.setAttribute('aria-pressed', x.id === st.ind ? 'true' : 'false');
-        b.addEventListener('click', function () { st.ind = x.id; save(); paintInds(); paintQs(); paintTypes(); });
+        b.addEventListener('click', function () { st.ind = x.id; save(); posts = loadPosts(); $('out').innerHTML = ''; Object.keys(posts).map(Number).sort(function (a, c) { return a - c; }).forEach(paintPost); paintInds(); paintQs(); paintTypes(); });
         box.appendChild(b);
       });
     });
@@ -261,6 +264,7 @@
       b.querySelector('b').textContent = t.n + '형 · ' + t.name; b.querySelector('span').textContent = t.d;
       b.addEventListener('click', function () { if (posts[t.n]) { var el = $('post' + t.n); if (el) el.scrollIntoView({ behavior: 'smooth' }); return; } run([t.n]); });
       TY[t.n] = b; box.appendChild(b);
+      if (posts[t.n]) setTy(t.n, 'done', '✅ 다 썼어요 · 보기');
     });
   }
   function setTy(n, cls, s) { var b = TY[n]; b.classList.remove('done', 'work'); if (cls) b.classList.add(cls); b.querySelector('.s').textContent = s || ''; }
@@ -280,7 +284,7 @@
           setTy(n, '', e === 'limit' ? '오늘은 다 썼어요. 내일 다시!' : e === 'busy' ? '오늘 요청이 많아요. 내일 다시!' : e === 'no-key' ? '준비 중이에요' : e === 'few' ? '답이 더 필요해요' : '다시 눌러 주세요');
           return;
         }
-        posts[n] = x.j; paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
+        posts[n] = x.j; savePosts(); paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
       }).catch(function () { setTy(n, '', '인터넷 확인 후 다시'); });
   }
   function run(list) {
@@ -300,7 +304,8 @@
   $('allGo').addEventListener('click', function () {
     var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; });
     if (!list.length) { toast('10가지 다 썼어요!'); return; }
-    run(list);
+    var p = run(list);
+    if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편이 아래에 있어요 👇'); $('out').scrollIntoView({ behavior: 'smooth' }); } });
   });
   function postText(n, el) {
     var lines = [], k = 0;
@@ -317,18 +322,23 @@
     el.querySelector('.ty2').textContent = n + '형 · ' + ty.name;
     el.querySelector('.pt').value = p.title;
     var txt = p.blocks.map(function (b) { return b.t === 'img' ? '[사진 ' + b.n + (b.hint ? ' · ' + b.hint : '') + ']' : b.text; }).join('\n\n');
-    el.querySelector('.pb').textContent = txt;
-    el.querySelector('.tg').textContent = (p.tags || []).join(' ');
+    el.querySelector('.pb').textContent = p.edited || txt;
+    el.querySelector('.tg').textContent = p.etags || (p.tags || []).join(' ');
     el.querySelector('.c1').addEventListener('click', function () { copy(el.querySelector('.pt').value, '제목을 복사했어요'); });
     el.querySelector('.c2').addEventListener('click', function () { copy(postText(n, el), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
-    el.querySelector('.c3').addEventListener('click', function () { delete posts[n]; run([n]); });
+    el.querySelector('.c3').addEventListener('click', function () { delete posts[n]; savePosts(); run([n]); });
+    el.addEventListener('input', function () { posts[n] = Object.assign({}, posts[n], { title: el.querySelector('.pt').value, edited: el.querySelector('.pb').innerText, etags: el.querySelector('.tg').innerText }); savePosts(); });
     var out = $('out');
     if (old) old.replaceWith(el);
     else { var after = null; out.querySelectorAll('.post').forEach(function (x) { if (+x.id.slice(4) > n && !after) after = x; }); out.insertBefore(el, after); }
   }
 
   // ---- 링크로 열었을 때 (#s=번호.열쇠) ----
-  function boot() { paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved(); }
+  function boot() {
+    posts = loadPosts(); $('out').innerHTML = '';
+    paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved();
+    Object.keys(posts).map(Number).sort(function (a, b) { return a - b; }).forEach(paintPost);
+  }
   var m = /#s=([0-9A-Za-z]{6,16})\.([0-9A-Za-z]{16,40})/.exec(location.hash);
   if (m && (m[1] !== st.sid || m[2] !== st.key)) {
     fetch('../api/survey/' + m[1], { headers: { 'x-key': m[2] } }).then(function (r) { return r.json(); }).then(function (j) {

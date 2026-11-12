@@ -74,7 +74,7 @@
     .bar .pg { flex: 1; font-size: 13px; font-weight: 800; color: var(--ink-2); }
     .bar .pg i { display: block; height: 7px; border-radius: 9px; background: #eadfd0; margin-top: 5px; overflow: hidden; }
     .bar .pg i b { display: block; height: 100%; width: 0; background: var(--ssaka); transition: width .3s; }
-    .bar .btn { width: auto; padding: 0 16px; min-height: 48px; font-size: 15px; }
+    .bar .btn { width: auto; white-space: nowrap; padding: 0 16px; min-height: 48px; font-size: 15px; }
     .toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.92); color: #fff; font-size: 14px; font-weight: 700; z-index: 9; max-width: 90vw; text-align: center; }
   </style>
 </head>
@@ -86,6 +86,8 @@
     <h1>📋 한 번 답하면<br>블로그 글이 10가지</h1>
     <p>글은 안 쓰셔도 돼요. 아는 대로 짧게 답만 적어 주세요. 모르는 건 비워 두셔도 돼요.<br>답은 이 휴대폰에 바로바로 저장돼요.</p>
   </div>
+
+  <button type="button" class="btn red" id="seePosts" hidden style="margin-top:16px;min-height:60px;font-size:17px">📚 내가 쓴 블로그 글 보기</button>
 
   <h2>1. 업종 고르기</h2>
   <div class="chips" id="inds"></div>
@@ -116,7 +118,7 @@
     <input id="cardUrl" inputmode="url" placeholder="싸바카드 링크가 있으면 붙여넣기 (글 끝에 붙어요)">
     <div class="types" id="types"></div>
     <button type="button" class="btn yel" id="allGo">⚡ 10가지 한 번에 쓰기</button>
-    <p class="warn" style="color:#fff;opacity:.85" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 12편까지 써요.</p>
+    <p class="warn" style="color:#fff;opacity:.85" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 25편까지 써요.</p>
   </section>
 
   <h2 id="outH">📚 쓴 글 <small style="font-size:13px;color:var(--ink-2);font-weight:700">이 휴대폰에 저장돼요 · 눌러서 고칠 수 있어요</small></h2>
@@ -126,7 +128,7 @@
 
 <div class="bar"><div class="in">
   <div class="pg"><span id="pgT">답 0개</span><i><b id="pgB"></b></i></div>
-  <button type="button" class="btn red" id="toGen">📝 글 만들기</button>
+  <button type="button" class="btn ink" id="toPosts" hidden>📚 쓴 글</button><button type="button" class="btn red" id="toGen">📝 글 만들기</button>
 </div></div>
 
 <script src="../js/survey-q.js?v=2"></script>
@@ -139,7 +141,14 @@
   var qp = new URLSearchParams(location.search);
   if (qp.get('ind') && S.BY[qp.get('ind')]) st.ind = qp.get('ind');
   var posts = {}, PK = 'sava-survey-posts';
-  function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} }
+  function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} postBtns(); }
+  function postBtns() {
+    var n = Object.keys(posts).length;
+    $('seePosts').hidden = !n; $('seePosts').textContent = '📚 내가 쓴 블로그 글 ' + n + '편 보기';
+    $('toPosts').hidden = !n; $('toPosts').textContent = '📚 쓴 글 ' + n;
+    $('outH').hidden = !n;
+  }
+  function goPosts() { var f = $('out').querySelector('.post'); (f || $('out')).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   function loadPosts() { try { var o = JSON.parse(localStorage.getItem(PK) || '{}'); return o.ind === st.ind ? o.posts || {} : {}; } catch (e) { return {}; } }
   function dev() { try { var d = localStorage.getItem('sava-dev'); if (!d) { d = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sava-dev', d); } return d; } catch (e) { return 'x'; } }
   function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2400); }
@@ -192,7 +201,7 @@
       g.list.forEach(function (x) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = x.e + ' ' + x.label;
         b.setAttribute('aria-pressed', x.id === st.ind ? 'true' : 'false');
-        b.addEventListener('click', function () { st.ind = x.id; save(); posts = loadPosts(); $('out').innerHTML = ''; Object.keys(posts).map(Number).sort(function (a, c) { return a - c; }).forEach(paintPost); paintInds(); paintQs(); paintTypes(); });
+        b.addEventListener('click', function () { st.ind = x.id; save(); posts = loadPosts(); $('out').innerHTML = ''; Object.keys(posts).map(Number).sort(function (a, c) { return a - c; }).forEach(paintPost); postBtns(); paintInds(); paintQs(); paintTypes(); });
         box.appendChild(b);
       });
     });
@@ -245,7 +254,7 @@
     $('pgT').textContent = '답 ' + n + '개' + (quick ? ' (꼭 필요한 것 ' + answered().filter(function (q) { return q.key; }).length + '/' + tot + ')' : ' / 100');
     $('pgB').style.width = Math.min(100, Math.round((quick ? answered().filter(function (q) { return q.key; }).length : n) / tot * 100)) + '%';
     $('allGo').disabled = n < 5;
-    $('genMsg').textContent = n < 5 ? '답이 5개 넘게 있어야 쓸 수 있어요. 지금 ' + n + '개예요.' : '답 ' + n + '개로 써요. 많이 답할수록 글이 좋아져요. 하루 12편까지 써요.';
+    $('genMsg').textContent = n < 5 ? '답이 5개 넘게 있어야 쓸 수 있어요. 지금 ' + n + '개예요.' : '답 ' + n + '개로 써요. 많이 답할수록 글이 좋아져요. 하루 25편까지 써요.';
   }
   function setMode(m) { st.mode = m; $('mQuick').setAttribute('aria-pressed', m === 'quick'); $('mAll').setAttribute('aria-pressed', m === 'all'); save(); paintQs(); }
   $('mQuick').addEventListener('click', function () { setMode('quick'); });
@@ -305,7 +314,7 @@
     var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; });
     if (!list.length) { toast('10가지 다 썼어요!'); return; }
     var p = run(list);
-    if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편이 아래에 있어요 👇'); $('out').scrollIntoView({ behavior: 'smooth' }); } });
+    if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편이 아래에 있어요 👇'); goPosts(); } });
   });
   function postText(n, el) {
     var lines = [], k = 0;
@@ -334,10 +343,12 @@
   }
 
   // ---- 링크로 열었을 때 (#s=번호.열쇠) ----
+  $('seePosts').addEventListener('click', goPosts); $('toPosts').addEventListener('click', goPosts);
   function boot() {
     posts = loadPosts(); $('out').innerHTML = '';
     paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved();
     Object.keys(posts).map(Number).sort(function (a, b) { return a - b; }).forEach(paintPost);
+    postBtns();
   }
   var m = /#s=([0-9A-Za-z]{6,16})\.([0-9A-Za-z]{16,40})/.exec(location.hash);
   if (m && (m[1] !== st.sid || m[2] !== st.key)) {

@@ -114,7 +114,7 @@ async function overLimit(db, keys) {
   return '';
 }
 
-// 대표님 설문 → 10가지 글 형 중 하나. 기기당 하루 12편(10가지 한 번에 + 다시 쓰기 2번), IP당 하루 24편.
+// 대표님 설문 → 10가지 글 형 중 하나. 기기당 하루 25편, IP당 하루 40편.
 async function survey(b, request, env, key) {
   const type = b.type | 0;
   if (!TYPE_RULES[type]) return json({ error: 'bad' }, 400);
@@ -122,7 +122,7 @@ async function survey(b, request, env, key) {
   if (sv.n < 5) return json({ error: 'few' }, 400);
   if (env.DB) {
     const ip = request.headers.get('cf-connecting-ip') || 'x';
-    const e = await overLimit(env.DB, [['all', +(env.BLOG_DAILY_CAP || 300)], ['svip:' + await sha(ip), 24], ['svdev:' + clean(b.dev, 40), 12]]);
+    const e = await overLimit(env.DB, [['all', +(env.BLOG_DAILY_CAP || 300)], ['svip:' + await sha(ip), 40], ['svdev:' + clean(b.dev, 40), 25]]);
     if (e) return json({ error: e }, 429);
   }
   const nImg = Math.max(2, Math.min(6, b.images | 0 || 4));

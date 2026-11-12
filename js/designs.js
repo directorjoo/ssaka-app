@@ -276,6 +276,34 @@
     };
   }
 
+
+  // ---------- 사진 색으로 만드는 디자인 (대표 사진에서 뽑은 색 → 3가지 느낌) ----------
+  // pal = { bg, paper, ink, accent, c1, c2, c3 } (카드 링크에 같이 저장되어 받는 사람 화면에서도 똑같이 나옴)
+  var PHOTO = {
+    'ph-calm':  { style: 'minimal', name: '사진 색 · 은은하게' },
+    'ph-dark':  { style: 'mdark',   name: '사진 색 · 고급스럽게' },
+    'ph-vivid': { style: 'glass',   name: '사진 색 · 화사하게' }
+  };
+  function isHex(x) { return /^#[0-9a-f]{6}$/i.test(String(x || '')); }
+  function photoPalettes(cols) {
+    // cols: { dom, viv, more: [..] } (hex)
+    var dom = cols.dom, viv = cols.viv, m = (cols.more || []).concat([viv, dom]);
+    var light = function (c, t) { return mix(c, '#ffffff', t); }, dark = function (c, t) { return mix(c, '#000000', t); };
+    var vivOnDark = lum(viv) < 0.12 ? light(viv, 0.35) : viv;
+    return {
+      'ph-calm':  { bg: light(dom, 0.88), paper: '#ffffff', ink: dark(dom, 0.82), accent: viv },
+      'ph-dark':  { bg: dark(dom, 0.86), paper: dark(dom, 0.74), ink: light(dom, 0.9), accent: vivOnDark },
+      'ph-vivid': { bg: light(viv, 0.86), paper: '#ffffff', ink: dark(viv, 0.8), accent: viv, c1: light(m[0], 0.3), c2: light(m[1], 0.3), c3: light(m[2], 0.3) }
+    };
+  }
+  function photoDesign(id, pal) {
+    var P = PHOTO[id]; if (!P || !pal || !isHex(pal.bg) || !isHex(pal.ink) || !isHex(pal.accent)) return null;
+    var clean = {}; ['bg', 'paper', 'ink', 'accent', 'c1', 'c2', 'c3'].forEach(function (k) { if (isHex(pal[k])) clean[k] = pal[k]; });
+    if (!clean.paper) clean.paper = '#ffffff';
+    var st = STYLES[P.style];
+    return { id: id, name: P.name, style: P.style, font: st.title, mood: st.mood || 'modern', photo: true, pal: clean, colors: colorsFor(P.style, clean) };
+  }
+
   var BY_ID = {}, BY_INDUSTRY = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
@@ -360,7 +388,10 @@
     list: function (industryId) { return BY_INDUSTRY[industryId] || []; },
     industry: function (id) { return INDUSTRIES.filter(function (x) { return x.id === id; })[0] || null; },
     all: function () { return Object.keys(BY_ID).map(function (k) { return BY_ID[k]; }); },
-    apply: apply, register: register, fallback: fallback, contrast: contrast
+    apply: apply, register: register, fallback: fallback, contrast: contrast,
+    PHOTO_IDS: Object.keys(PHOTO), photoPalettes: photoPalettes, photoDesign: photoDesign,
+    // 카드에 담긴 디자인 찾기: 보통 디자인 → 사진 색 디자인 → 기본
+    forCard: function (card) { return BY_ID[card && card.design] || (card && photoDesign(card.design, card.pal)) || fallback(card); }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   global.SsakaDesigns = api;

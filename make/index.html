@@ -91,6 +91,11 @@
     .step span { font-weight: 500; color: var(--muted); font-size: 13px; margin-left: 4px; }
     .inds { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .inds::-webkit-scrollbar { display: none; }
+    .phsug { margin: 0 0 12px; padding: 12px 10px 4px; border-radius: 18px; background: linear-gradient(135deg, #FFF4F6, #F4F0FF); box-shadow: inset 0 0 0 1.5px #F1D6DD; }
+    .phsug-h { font-size: 15px; padding: 0 4px; } .phsug-h span { font-size: 12.5px; color: #777; margin-left: 4px; }
+    .phsug-cols { display: flex; gap: 6px; padding: 8px 4px 2px; } .phsug-cols i { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 1px 4px rgba(0,0,0,.2); }
+    .phsug-g { margin-bottom: 0; }
+    .phsug-tip { margin: 0 0 10px; padding: 9px 12px; border-radius: 12px; background: #F7F7F9; font-size: 13.5px; color: #555; }
     .moods { display: flex; gap: 6px; overflow-x: auto; margin: 0 0 10px; scrollbar-width: none; }
     .moods::-webkit-scrollbar { display: none; }
     .moods button { flex: none; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
@@ -256,6 +261,12 @@
       <div class="hlinks" id="hLinks" hidden></div>
 
       <div class="step">2. 디자인 고르기 <span id="designInfo"></span></div>
+      <div class="phsug" id="phSug" hidden>
+        <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
+        <div class="phsug-cols" id="phCols"></div>
+        <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
+      </div>
+      <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
       <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
 
       <fieldset>
@@ -530,7 +541,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js"></script>
+<script src="../js/designs.js?v=75"></script>
 <script src="../js/render.js?v=71"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
@@ -663,7 +674,51 @@
     }
     return hasNew && mood ? all.filter(function (d) { return d.mood === mood; }) : all;
   }
+
+  // ---------- 📸 사진 색으로 디자인 3가지 ----------
+  var PHPAL = null, PHFOR = '';
+  function rgb2hsl(r, g, b) { r /= 255; g /= 255; b /= 255; var mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn, s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1)); return [s, l]; }
+  function hx(r, g, b) { return '#' + [r, g, b].map(function (v) { v = Math.round(v); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
+  function photoColors(img) {
+    var N = 56, cv = document.createElement('canvas'); cv.width = N; cv.height = N;
+    var x = cv.getContext('2d'); x.drawImage(img, 0, 0, N, N);
+    var d = x.getImageData(0, 0, N, N).data, B = {};
+    for (var i = 0; i < d.length; i += 4) {
+      var k = (d[i] >> 4) + '-' + (d[i + 1] >> 4) + '-' + (d[i + 2] >> 4), b = B[k] || (B[k] = { n: 0, r: 0, g: 0, b: 0 });
+      b.n++; b.r += d[i]; b.g += d[i + 1]; b.b += d[i + 2];
+    }
+    var L = Object.keys(B).map(function (k) { var b = B[k], r = b.r / b.n, g = b.g / b.n, bl = b.b / b.n, sl = rgb2hsl(r, g, bl); return { n: b.n, r: r, g: g, b: bl, s: sl[0], l: sl[1], hex: hx(r, g, bl) }; });
+    L.sort(function (a, b) { return b.n - a.n; });
+    var mid = L.filter(function (c) { return c.l > 0.1 && c.l < 0.9; });
+    var dom = mid.slice().sort(function (a, b) { return b.n * (0.35 + b.s) - a.n * (0.35 + a.s); })[0] || L[0]; // 많이 나오면서 색이 있는 쪽
+    var vivs = L.filter(function (c) { return c.s > 0.28 && c.l > 0.22 && c.l < 0.72; }).sort(function (a, b) { return b.s * Math.sqrt(b.n) - a.s * Math.sqrt(a.n); });
+    var viv = vivs[0] ? vivs[0].hex : (dom.s > 0.15 ? dom.hex : '#B3132B');
+    var dist = function (a, b) { return Math.abs(a.r - b.r) + Math.abs(a.g - b.g) + Math.abs(a.b - b.b); };
+    var more = []; (vivs.length ? vivs : mid).forEach(function (c) { if (more.length < 3 && more.every(function (m) { return dist(m, c) > 70; })) more.push(c); });
+    return { dom: dom.hex, viv: viv, more: more.map(function (c) { return c.hex; }), show: [dom.hex, viv].concat(more.map(function (c) { return c.hex; })).filter(function (v, i, a) { return a.indexOf(v) === i; }).slice(0, 5) };
+  }
+  function makePhotoSug() {
+    var u = v('image');
+    if (!u) { PHPAL = null; PHFOR = ''; $('phSug').hidden = true; $('phTip').hidden = false; return; }
+    if (PHFOR === u && PHPAL) return paintPhotoSug();
+    var im = new Image(), blob = localPics[u];
+    im.onload = function () {
+      try { var cols = photoColors(im); PHPAL = D.photoPalettes(cols); PHPAL._show = cols.show; PHFOR = u; paintPhotoSug(); } catch (e) { $('phSug').hidden = true; }
+    };
+    im.onerror = function () { $('phSug').hidden = true; };
+    if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = u; }
+  }
+  function paintPhotoSug() {
+    if (!PHPAL || !D.photoDesign) return;
+    $('phSug').hidden = false; $('phTip').hidden = true;
+    $('phCols').innerHTML = (PHPAL._show || []).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('');
+    var g = $('phGal'); g.innerHTML = '';
+    var ex = EX(), shown = Object.assign({}, ex, { title: v('title') || ex.title, subtitle: v('subtitle') || ex.subtitle, body: v('body') || ex.body, name: v('name') || ex.name });
+    D.PHOTO_IDS.forEach(function (id) { var d = D.photoDesign(id, PHPAL[id]); if (d) g.appendChild(thumb(d, shown)); });
+  }
+  function curDesign() { return D.get(design) || (/^ph-/.test(design) && PHPAL && D.photoDesign(design, PHPAL[design])) || D.list(industry)[0]; }
   function designNo(id) { var l = D.list(industry); for (var i = 0; i < l.length; i++) if (l[i].id === id) return i + 1; return 1; }
+  function designInfoText(id) { return /^ph-/.test(id) ? '📸 사진 색 디자인' : D.list(industry).length + '개 중 ' + designNo(id) + '번'; }
   function renderGallery() {
     var box = $('gallery'); box.innerHTML = '';
     var list = moodList(), ex = EX();
@@ -675,14 +730,15 @@
     list.forEach(function (d) { box.appendChild(thumb(d, shown)); });
     box.dataset.ind = industry;
     box.scrollLeft = keep;
-    $('designInfo').textContent = D.list(industry).length + '개 중 ' + designNo(design) + '번';
+    $('designInfo').textContent = designInfoText(design);
+    makePhotoSug();
   }
   function setDesign(id) {
     design = id;
     document.querySelectorAll('.tcard').forEach(function (t) {
       t.setAttribute('aria-pressed', t.dataset.id === id ? 'true' : 'false');
     });
-    $('designInfo').textContent = D.list(industry).length + '개 중 ' + designNo(id) + '번';
+    $('designInfo').textContent = designInfoText(id);
     update();
   }
   function setIndustry(id, userPicked) {
@@ -690,7 +746,7 @@
     industry = ind.id;
     mood = '';
     if (D.groupOf && D.groupOf(industry).id !== curGroup) { curGroup = D.groupOf(industry).id; renderIndustries(); }
-    if (!D.get(design) || D.get(design).industry !== industry) design = D.list(industry)[0].id;
+    if (!/^ph-/.test(design) && (!D.get(design) || D.get(design).industry !== industry)) design = D.list(industry)[0].id;
     document.querySelectorAll('.inds button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.ind === industry ? 'true' : 'false');
     });
@@ -797,6 +853,7 @@
       },
       buttons: cfg.buttons.slice()
     };
+    if (/^ph-/.test(design)) { if (PHPAL && PHPAL[design] && v('image')) card.pal = PHPAL[design]; else card.design = D.list(industry)[0].id; }
     if (card.image && v('image') && (IP.z !== 100 || IP.x !== 50 || IP.y !== 50 || IP.f)) card.ip = [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0];
     if (g('place')) card.place = { name: g('place') };
     // 당근·네이버·카톡 채널·인스타 (https 주소만)
@@ -1010,7 +1067,7 @@
   // 쓰던 내용 기억 (이 기기·이 브라우저에서만)
   function saveDraft() {
     try {
-      var d = { type: type, industry: industry, design: design, resvOn: $('resvOn').checked, soundTouched: soundTouched, seasonTouched: seasonTouched, byType: byType };
+      var d = { type: type, industry: industry, design: design, pal: /^ph-/.test(design) && PHPAL ? PHPAL : undefined, palFor: PHFOR, resvOn: $('resvOn').checked, soundTouched: soundTouched, seasonTouched: seasonTouched, byType: byType };
       FIELDS.forEach(function (f) { if ($(f)) d[f] = $(f).value; });
       localStorage.setItem(DRAFT, JSON.stringify(d));
     } catch (e) {}
@@ -1023,6 +1080,7 @@
       if (d.byType && typeof d.byType === 'object') byType = d.byType;
       if (d.type && TYPES[d.type]) type = d.type;
       if (d.design && D.get(d.design)) design = d.design;
+      if (d.design && /^ph-/.test(d.design) && d.pal && d.pal[d.design]) { design = d.design; PHPAL = d.pal; PHFOR = d.palFor || ''; }
       if (d.industry && D.industry(d.industry)) return d.industry;
       var byType = { profile: 'actor', club: 'club', shop: 'restaurant', safe: 'kid', greet: 'greeting' };
       return byType[d.type] || 'actor';
@@ -1305,7 +1363,7 @@
     ['blogT', 'blogB', 'blogP'].forEach(function (id) { $(id).disabled = true; });
     var ind = D.industry(industry) || {};
     // 사진은 미리 만들어 둠 (정사각 표지 → 올린 사진 → 안내)
-    var imgsP = window.SsakaExport.build(blogCard, D.get(design), { pics: localPics }).then(function (list) {
+    var imgsP = window.SsakaExport.build(blogCard, curDesign(), { pics: localPics }).then(function (list) {
       var sq = list.filter(function (x) { return /정사각/.test(x.name); });
       var photos = list.filter(function (x) { return /사진/.test(x.name); });
       var info = list.filter(function (x) { return /안내/.test(x.name); });
@@ -1367,7 +1425,7 @@
     $('expModal').hidden = false;
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
     $('expStatus').textContent = '이미지를 만드는 중이에요…';
-    window.SsakaExport.build(c.card, D.get(design), { pics: localPics }).then(function (list) {
+    window.SsakaExport.build(c.card, curDesign(), { pics: localPics }).then(function (list) {
       expFiles = list;
       list.forEach(function (x) {
         var u = URL.createObjectURL(x.blob);

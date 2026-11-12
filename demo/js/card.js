@@ -108,7 +108,7 @@
     document.title = card.title ? card.title + ' · 싸바' : '싸바';
 
     var D = window.SsakaDesigns;
-    var design = D ? (D.get(card.design) || D.fallback(card)) : null;
+    var design = D ? (D.forCard ? D.forCard(card) : (D.get(card.design) || D.fallback(card))) : null;
 
     function onSave() {
       // 만들기 화면의 미리보기 안에서는 휴대폰이 저장을 막음

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<!-- 압구정 순천만 인스타 시안 1차: 피드 4:5(1080x1350) 5장 + 스토리 9:16(1080x1920) 1장 -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #888; }
+  :root { --ink: #1B130C; --deep: #241911; --cream: #F5EBD9; --paper: #FBF6EC; --orange: #D9822B; --seal: #B3261E; --mute: #B9A589; }
+  .s { width: 1080px; height: 1350px; position: relative; overflow: hidden; font-family: "Noto Sans CJK KR", sans-serif; color: var(--cream); background: var(--deep); margin-bottom: 40px; }
+  .story { height: 1920px; }
+  .serif { font-family: "Noto Serif CJK KR", serif; }
+  .ph { position: absolute; background-size: cover; background-position: center; }
+  .shade { position: absolute; inset: 0; }
+  .callig { display: block; filter: invert(.96) sepia(.25) saturate(1.4) brightness(1.02); }
+  .seal { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 104px; height: 104px; border-radius: 10px; background: var(--seal); color: #fff; font-family: "Noto Serif CJK KR", serif; font-weight: 900; font-size: 34px; line-height: 1.05; transform: rotate(-4deg); box-shadow: inset 0 0 0 4px rgba(255,255,255,.18); }
+  .mark { position: absolute; right: 34px; bottom: 26px; font-size: 18px; color: rgba(245,235,217,.45); letter-spacing: .04em; }
+  .mark.dk { color: rgba(27,19,12,.35); }
+  .num { position: absolute; left: 60px; top: 52px; font-size: 22px; letter-spacing: .3em; color: var(--mute); }
+
+  /* 1 표지 */
+  #s1 .ph { inset: 0 0 34% 0; }
+  #s1 .shade { background: linear-gradient(180deg, rgba(27,19,12,0) 40%, rgba(27,19,12,.65) 60%, var(--deep) 66%); }
+  #s1 .bot { position: absolute; left: 0; right: 0; bottom: 92px; text-align: center; }
+  #s1 .callig { width: 640px; margin: 0 auto; }
+  #s1 .line { margin-top: 18px; font-size: 44px; font-weight: 700; letter-spacing: .02em; }
+  #s1 .line b { color: var(--orange); }
+  #s1 .where { margin-top: 18px; font-size: 26px; color: var(--mute); letter-spacing: .08em; }
+  #s1 .seal { position: absolute; right: 86px; top: 760px; }
+
+  /* 2 대표 메뉴 */
+  #s2 { background: var(--paper); color: var(--ink); }
+  #s2 h2 { position: absolute; left: 60px; right: 60px; top: 60px; font-size: 64px; font-weight: 900; }
+  #s2 h2 small { display: block; font-size: 26px; font-weight: 500; color: #8A7660; margin-bottom: 6px; letter-spacing: .1em; }
+  #s2 .grid { position: absolute; left: 60px; right: 60px; top: 236px; bottom: 80px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 22px; }
+  #s2 .it { position: relative; border-radius: 22px; overflow: hidden; background-size: cover; background-position: center; }
+  #s2 .it::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 52%, rgba(20,13,8,.82)); }
+  #s2 .it div { position: absolute; left: 22px; right: 22px; bottom: 18px; z-index: 1; color: #fff; }
+  #s2 .it b { display: block; font-size: 40px; font-weight: 900; }
+  #s2 .it span { font-size: 30px; font-weight: 700; color: #FFD9A8; }
+  #s2 .hot { position: absolute; left: 18px; top: 18px; z-index: 1; padding: 4px 14px; border-radius: 8px; background: var(--seal); color: #fff; font-size: 22px; font-weight: 800; }
+
+  /* 3 메뉴판 */
+  #s3 { background: url(../../../img/ex/suncheon-menu-b6.jpg) center/cover; }
+  #s3b { background: url(../../../img/ex/suncheon-menu-a6.jpg) center/cover; }
+
+  /* 4 계절 메뉴 */
+  #s4 { background: #16283C; }
+  #s4 .ring { position: absolute; width: 1400px; height: 1400px; left: -160px; top: -520px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.07), transparent 60%); }
+  #s4 .wrap { position: absolute; left: 80px; right: 80px; top: 130px; }
+  #s4 .tag { display: inline-block; padding: 8px 20px; border-radius: 8px; background: var(--cream); color: #16283C; font-size: 28px; font-weight: 900; letter-spacing: .12em; }
+  #s4 h2 { margin-top: 34px; font-size: 92px; line-height: 1.18; font-weight: 900; }
+  #s4 h2 em { font-style: normal; color: #9CC9F0; }
+  #s4 .menu { margin-top: 50px; border-top: 2px solid rgba(245,235,217,.35); }
+  #s4 .row { display: flex; align-items: baseline; gap: 16px; padding: 30px 0; border-bottom: 2px solid rgba(245,235,217,.2); font-size: 50px; font-weight: 800; }
+  #s4 .row i { flex: 1; border-bottom: 3px dotted rgba(245,235,217,.35); transform: translateY(-12px); }
+  #s4 .row span { font-size: 46px; color: #FFD9A8; }
+  #s4 .note { margin-top: 44px; font-size: 30px; line-height: 1.6; color: rgba(245,235,217,.75); }
+  #s4 .callig { position: absolute; right: 80px; top: 150px; width: 260px; opacity: .85; }
+  #s4 .ban { position: absolute; left: 80px; right: 80px; bottom: 80px; }
+  #s4 .bimg { height: 250px; border-radius: 20px; background: url(../../../img/ex/suncheon-banchan.jpg) center/cover; }
+  #s4 .ban span { display: block; margin-top: 14px; font-size: 26px; color: rgba(245,235,217,.7); }
+
+  /* 5 찾아오는 길 */
+  #s5 .ph { inset: 0 0 52% 0; background-position: center 40%; }
+  #s5 .shade { background: linear-gradient(180deg, transparent 30%, var(--deep) 48%); }
+  #s5 .info { position: absolute; left: 70px; right: 70px; top: 610px; }
+  #s5 h2 { font-size: 60px; font-weight: 900; margin-bottom: 30px; }
+  #s5 .r { display: flex; gap: 26px; padding: 20px 0; border-bottom: 1px solid rgba(245,235,217,.18); font-size: 34px; line-height: 1.4; }
+  #s5 .r b { flex: none; width: 120px; color: var(--orange); font-weight: 800; }
+  #s5 .r small { display: block; font-size: 27px; color: var(--mute); }
+  #s5 .cta { margin-top: 34px; padding: 22px 26px; border-radius: 18px; background: var(--cream); color: var(--ink); font-size: 34px; font-weight: 900; text-align: center; }
+  #s5 .cta span { color: var(--seal); }
+
+  /* 스토리 */
+  #st .ph { inset: 0 0 46% 0; }
+  #st .shade { background: linear-gradient(180deg, rgba(27,19,12,.55) 0, transparent 14%, transparent 34%, var(--deep) 54%); }
+  #st .mid { position: absolute; left: 0; right: 0; top: 880px; text-align: center; }
+  #st .callig { width: 700px; margin: 0 auto; }
+  #st .line { margin-top: 18px; font-size: 52px; font-weight: 800; }
+  #st .line b { color: var(--orange); }
+  #st .sub { margin-top: 16px; font-size: 32px; color: var(--mute); }
+  #st .seal { position: absolute; right: 90px; top: 790px; }
+  #st .linkzone { position: absolute; left: 0; right: 0; bottom: 0; height: 672px; display: flex; align-items: flex-start; justify-content: center; padding-top: 330px; }
+  #st .linkzone div { font-size: 30px; color: rgba(245,235,217,.55); }
+</style></head><body>
+
+<!-- 1 표지 -->
+<section class="s" id="s1">
+  <div class="ph" style="background-image:url(../../../img/ex/suncheon-tang.jpg)"></div>
+  <div class="shade"></div>
+  <div class="seal">남도<br>맛집</div>
+  <div class="bot">
+    <img class="callig" src="../sign-name.png" alt="순천만">
+    <div class="line">남도의 맛, <b>압구정</b>에서</div>
+    <div class="where">짱뚱어탕 · 홍어삼합 · 생선찜 · 신사동</div>
+  </div>
+  <div class="mark">sava.kr</div>
+</section>
+
+<!-- 2 대표 메뉴 -->
+<section class="s" id="s2">
+  <h2><small>SIGNATURE</small>순천만 대표 메뉴</h2>
+  <div class="grid">
+    <div class="it" style="background-image:url(../../../img/ex/suncheon-tang.jpg)"><em class="hot">인기 1위</em><div><b>짱뚱어탕</b><span>15,000원</span></div></div>
+    <div class="it" style="background-image:url(../../../img/ex/suncheon-muchim.jpg)"><div><b>무침 <small style="font-size:26px;font-weight:700">서대회·갑오징어</small></b><span>40,000원</span></div></div>
+    <div class="it" style="background-image:url(../../../img/ex/suncheon-jorim.jpg)"><div><b>고등어조림</b><span>35,000원</span></div></div>
+    <div class="it" style="background-image:url(../../../img/ex/suncheon-gui.jpg)"><div><b>생선구이 (점심)</b><span>13,000원</span></div></div>
+  </div>
+  <div class="mark dk">sava.kr</div>
+</section>
+
+<!-- 3 메뉴판 -->
+<section class="s" id="s3"></section>
+
+<!-- 3-2 식사 메뉴판 -->
+<section class="s" id="s3b"></section>
+
+<!-- 4 계절 메뉴 -->
+<section class="s" id="s4">
+  <div class="ring"></div>
+  <div class="wrap">
+    <span class="tag">겨울 한정</span>
+    <h2>찬 바람 불 때<br><em>딱 이맘때</em> 맛</h2>
+    <div class="menu">
+      <div class="row">벌교꼬막<i></i><span>30,000</span></div>
+      <div class="row">생굴무침<i></i><span>30,000</span></div>
+    </div>
+    <div class="note">봄 도다리쑥국 · 여름 민어탕 · 가을 전어<br>계절마다 남도 바다를 차려 드려요</div>
+  </div>
+  <div class="ban"><div class="bimg"></div><span>남도식 밑반찬은 기본으로 차려 드려요</span></div>
+  <img class="callig" src="../sign-name.png" alt="">
+  <div class="mark">sava.kr</div>
+</section>
+
+<!-- 5 찾아오는 길 -->
+<section class="s" id="s5">
+  <div class="ph" style="background-image:url(../../../img/ex/suncheon-sign2.jpg)"></div>
+  <div class="shade"></div>
+  <div class="info">
+    <h2>찾아오시는 길</h2>
+    <div class="r"><b>주소</b><div>서울 강남구 신사동 609-1 지하1층</div></div>
+    <div class="r"><b>영업</b><div>11:30 – 22:00<small>15:00 – 17:00 쉬는 시간</small></div></div>
+    <div class="r"><b>휴무</b><div>일요일 · 공휴일</div></div>
+    <div class="r"><b>전화</b><div>02-541-2125<small>배달은 하지 않아요</small></div></div>
+    <div class="cta">예약은 <span>프로필 링크</span>에서 👆</div>
+  </div>
+  <div class="mark">sava.kr</div>
+</section>
+
+<!-- 스토리 9:16 -->
+<section class="s story" id="st">
+  <div class="ph" style="background-image:url(../../../img/ex/suncheon-tang.jpg)"></div>
+  <div class="shade"></div>
+  <div class="seal">남도<br>맛집</div>
+  <div class="mid">
+    <img class="callig" src="../sign-name.png" alt="순천만">
+    <div class="line">남도의 맛, <b>압구정</b>에서</div>
+    <div class="sub">겨울 한정 벌교꼬막 · 생굴무침</div>
+  </div>
+  <div class="linkzone"></div><!-- 아래 35%는 링크 스티커 자리로 비워 둠 -->
+</section>
+</body></html>

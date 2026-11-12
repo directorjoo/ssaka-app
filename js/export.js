@@ -167,7 +167,208 @@
     };
   }
 
+
+  // ================= 가게용 인스타 세트 (식당 1차 시안 틀) =================
+  // 피드 4:5: 표지 · 대표 메뉴 · 메뉴판(1~2장) · 계절/알림 · 찾아오는 길  + 스토리 9:16 (아래 35% 링크 스티커 자리)
+  var SERIF = '"Noto Serif KR", "Noto Serif CJK KR", serif';
+  function loadSerif() {
+    if (typeof document === 'undefined' || !document.fonts) return Promise.resolve();
+    if (!document.getElementById('sava-serif')) { var l = document.createElement('link'); l.id = 'sava-serif'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&display=swap'; document.head.appendChild(l); }
+    var t = new Promise(function (r) { setTimeout(r, 2500); });
+    return Promise.race([Promise.all([document.fonts.load('900 100px "Noto Serif KR"', '순천만'), document.fonts.load('700 40px "Noto Serif KR"', '가')]).catch(function () {}), t]);
+  }
+  function hexRgb(c) { c = String(c || '').replace('#', ''); if (c.length === 3) c = c.replace(/./g, '$&$&'); return [0, 2, 4].map(function (i) { return parseInt(c.substr(i, 2), 16) || 0; }); }
+  function lumOf(c) { var r = hexRgb(c); return (r[0] * 0.299 + r[1] * 0.587 + r[2] * 0.114) / 255; }
+  function mixC(a, b, t) { var x = hexRgb(a), y = hexRgb(b); return 'rgb(' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t); }).join(',') + ')'; }
+  function shopColors(design) {
+    var d = (design && design.colors) || {};
+    var dark = lumOf(d.bg || '#fff') < 0.35 ? d.bg : (lumOf(d.ink || '#222') < 0.35 ? d.ink : '#1F1812');
+    var acc = d.accent || '#D9822B';
+    dark = mixC(dark, '#000000', 0.25);
+    var dr = dark.match(/\d+/g).map(Number); if (Math.max.apply(0, dr) - Math.min.apply(0, dr) < 12) dark = mixC('#' + dr.map(function (v) { return (v < 16 ? '0' : '') + v.toString(16); }).join(''), acc, 0.14); // 회색이면 강조색으로 살짝 따뜻하게
+    return { dark: dark, cream: '#F5EBD9', mute: '#B9A589', paper: '#FBF6EC', ink: '#1B130C', accent: lumOf(acc) < 0.3 ? mixC(acc, '#ffffff', 0.35) : acc, seal: '#B3261E', gold: '#FFD9A8' };
+  }
+  function grad(ctx, x0, y0, x1, y1, stops) { var g = ctx.createLinearGradient(x0, y0, x1, y1); stops.forEach(function (s) { g.addColorStop(s[0], s[1]); }); return g; }
+  function fade(ctx, w, h, from, to, color) { ctx.fillStyle = grad(ctx, 0, from, 0, to, [[0, 'rgba(0,0,0,0)'], [1, color]]); ctx.fillRect(0, from, w, to - from); ctx.fillStyle = color; ctx.fillRect(0, to, w, h - to); }
+  function centerText(ctx, str, y, size, color, weight, family, max) {
+    ctx.font = (weight || 700) + ' ' + size + 'px ' + (family || FONT); ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    var s2 = String(str || ''); while (max && ctx.measureText(s2).width > max && s2.length > 2) s2 = s2.slice(0, -1);
+    if (s2 !== String(str || '')) s2 = s2.slice(0, -1) + '…';
+    ctx.fillText(s2, 540, y); ctx.textAlign = 'left'; return y + size * 1.3;
+  }
+  function fitFont(ctx, str, max, start, weight, family) { var sz = start; do { ctx.font = weight + ' ' + sz + 'px ' + family; if (ctx.measureText(str).width <= max) break; sz -= 4; } while (sz > 40); return sz; }
+  function mark(ctx, w, h, dark) { ctx.font = '500 18px ' + FONT; ctx.fillStyle = dark ? 'rgba(27,19,12,.35)' : 'rgba(245,235,217,.45)'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('sava.kr', w - 34, h - 26); ctx.textAlign = 'left'; }
+  function pick(card, re) { var l = (card.body || []).filter(function (x) { return re.test(x); })[0]; return l ? l.replace(re, '').replace(/^[\s:·]+/, '').trim() : ''; }
+  function won(p) { return p ? Number(p).toLocaleString('ko-KR') : ''; }
+
+  function shopCover(card, sc, img, H) {
+    var W = 1080, c = canvas(W, H), ctx = c.getContext('2d'), story = H > 1500;
+    ctx.fillStyle = sc.dark; ctx.fillRect(0, 0, W, H);
+    var ph = Math.round(H * (story ? 0.54 : 0.66));
+    if (img) cover(ctx, img, 0, 0, W, ph, card.__main === img ? card.ip : null);
+    if (story) { ctx.fillStyle = grad(ctx, 0, 0, 0, 260, [[0, 'rgba(0,0,0,.5)'], [1, 'rgba(0,0,0,0)']]); ctx.fillRect(0, 0, W, 260); }
+    fade(ctx, W, H, ph - (story ? 420 : 300), ph + 10, sc.dark);
+    var y = story ? 900 : Math.round(H * 0.6);
+    var title = String(card.title || '').trim();
+    var ts = fitFont(ctx, title, 900, story ? 150 : 140, 900, SERIF);
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24;
+    y = centerText(ctx, title, y, ts, sc.cream, 900, SERIF) + 6; ctx.restore();
+    var line = pick(card, /^(한 ?줄|소개)\s*[:：]/) || card.subtitle || '';
+    if (line) y = centerText(ctx, line, y, story ? 40 : 36, sc.cream, 700, FONT, 940) + 8;
+    var pop = pick(card, /^인기\s*[:：]/) || pick(card, /한정\s*[:：]/);
+    if (pop) centerText(ctx, pop, y + 6, story ? 32 : 28, sc.mute, 500, FONT, 940);
+    if (!story) mark(ctx, W, H);
+    return c;
+  }
+  function shopSignature(card, sc, imgs) {
+    var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
+    ctx.fillStyle = sc.paper; ctx.fillRect(0, 0, W, H);
+    ctx.font = '500 26px ' + FONT; ctx.fillStyle = '#8A7660'; ctx.textBaseline = 'top'; ctx.fillText('SIGNATURE', 60, 64);
+    ctx.font = '900 64px ' + FONT; ctx.fillStyle = sc.ink; ctx.fillText(String(card.title || '').slice(0, 10) + ' 대표 메뉴', 60, 104);
+    var menu = ((card.reserve && card.reserve.menu) || []).filter(function (m) { return m.p; }).slice(0, 4);
+    var pics = imgs.slice(0, 4), n = Math.max(pics.length, 1);
+    var listH = menu.length ? 70 + Math.ceil(menu.length / 2) * 74 : 0;
+    var gx = 60, gy = 236, gw = W - 120, gh = H - 236 - 80 - listH, gap = 22;
+    var cols = n === 1 ? 1 : 2, rows = n <= 2 ? 1 : 2;
+    var cw = (gw - gap * (cols - 1)) / cols, ch = (gh - gap * (rows - 1)) / rows;
+    pics.forEach(function (im, i) {
+      var x = gx + (i % cols) * (cw + gap), y = gy + Math.floor(i / cols) * (ch + gap);
+      ctx.save(); round(ctx, x, y, cw, ch, 22); ctx.clip(); cover(ctx, im, x, y, cw, ch); ctx.restore();
+    });
+    // 사진마다 이름을 모르니 사진엔 이름을 안 붙이고, 아래에 대표 메뉴·가격을 따로 적음
+    if (menu.length) {
+      var ly = H - 80 - listH + 40;
+      ctx.fillStyle = sc.ink; ctx.fillRect(60, ly - 14, W - 120, 3);
+      menu.forEach(function (m, i) {
+        var x = 60 + (i % 2) * ((W - 120) / 2 + 20), y = ly + 20 + Math.floor(i / 2) * 74, colW = (W - 120) / 2 - 20;
+        ctx.font = '800 38px ' + FONT; ctx.fillStyle = sc.ink; ctx.textBaseline = 'top';
+        var nm = m.n; while (ctx.measureText(nm).width > colW - 170 && nm.length > 2) nm = nm.slice(0, -1);
+        ctx.fillText(nm, x, y);
+        ctx.font = '800 36px ' + FONT; ctx.fillStyle = sc.seal; ctx.textAlign = 'right'; ctx.fillText(won(m.p), x + colW, y); ctx.textAlign = 'left';
+      });
+    }
+    mark(ctx, W, H, true);
+    return c;
+  }
+  function shopMenuBoards(card, sc) {
+    var menu = (card.reserve && card.reserve.menu) || [];
+    if (!menu.length) return [];
+    var per = 13, pages = [];
+    for (var i = 0; i < menu.length && pages.length < 2; i += per) pages.push(menu.slice(i, i + per));
+    return pages.map(function (items, pi) {
+      var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
+      ctx.fillStyle = '#7A5634'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = sc.paper; ctx.fillRect(34, 34, W - 68, H - 68);
+      ctx.strokeStyle = '#CDB89A'; ctx.lineWidth = 2; ctx.strokeRect(56, 56, W - 112, H - 112);
+      var ts = fitFont(ctx, String(card.title || ''), 760, 96, 900, SERIF);
+      ctx.font = '900 ' + ts + 'px ' + SERIF; ctx.fillStyle = sc.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(card.title || '', 540, 96);
+      ctx.font = '500 28px ' + FONT; ctx.fillStyle = '#7A6650'; ctx.fillText(pages.length > 1 ? '차림표 ' + (pi + 1) + ' / ' + pages.length : '차림표', 540, 96 + ts * 1.22);
+      ctx.textAlign = 'left';
+      var y = 96 + ts * 1.22 + 80, x = 120, r = W - 120;
+      items.forEach(function (m) {
+        ctx.font = '700 38px ' + FONT; ctx.fillStyle = sc.ink; ctx.textBaseline = 'alphabetic';
+        var nm = m.n; while (ctx.measureText(nm).width > 600 && nm.length > 2) nm = nm.slice(0, -1);
+        ctx.fillText(nm, x, y);
+        var nw = ctx.measureText(nm).width;
+        var pr = m.p ? won(m.p) : (m.note || '시세');
+        ctx.font = '800 38px ' + FONT; var pw = ctx.measureText(pr).width;
+        ctx.textAlign = 'right'; ctx.fillText(pr, r, y); ctx.textAlign = 'left';
+        ctx.strokeStyle = '#CDB89A'; ctx.setLineDash([3, 8]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + nw + 18, y - 10); ctx.lineTo(r - pw - 18, y - 10); ctx.stroke(); ctx.setLineDash([]);
+        y += 70;
+      });
+      var ft = [card.subtitle, card.contact && card.contact.phone ? '예약 ' + card.contact.phone : ''].filter(Boolean).join('  ·  ');
+      ctx.fillStyle = '#CDB89A'; ctx.fillRect(120, H - 190, W - 240, 2);
+      ctx.font = '600 26px ' + FONT; ctx.fillStyle = '#6B5A47'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      var f2 = ft; while (ctx.measureText(f2).width > W - 240 && f2.length > 4) f2 = f2.slice(0, -1); ctx.fillText(f2, 540, H - 160); ctx.textAlign = 'left';
+      mark(ctx, W, H, true);
+      return c;
+    });
+  }
+  function shopSeason(card, sc) {
+    var line = (card.body || []).filter(function (l) { return /한정/.test(l); })[0];
+    if (!line) return null;
+    var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
+    ctx.fillStyle = '#16283C'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'radial-gradient' && grad(ctx, 0, 0, 0, 700, [[0, 'rgba(255,255,255,.07)'], [1, 'rgba(255,255,255,0)']]); ctx.fillRect(0, 0, W, 700);
+    var m = line.match(/^(.*?한정)\s*[:：]?\s*(.*)$/) || [line, '이번 한정', line];
+    var tag = m[1].trim(), items = (m[2] || '').split(/[·,]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 4);
+    ctx.font = '900 30px ' + FONT; var tw = ctx.measureText(tag).width + 44;
+    ctx.fillStyle = sc.cream; round(ctx, 80, 150, tw, 58, 10); ctx.fill(); ctx.fillStyle = '#16283C'; ctx.textBaseline = 'middle'; ctx.fillText(tag, 102, 180);
+    ctx.textBaseline = 'top'; ctx.font = '900 92px ' + FONT; ctx.fillStyle = sc.cream; ctx.fillText('지금만', 80, 260);
+    ctx.fillStyle = '#9CC9F0'; ctx.fillText('맛볼 수 있어요', 80, 370);
+    var menu = (card.reserve && card.reserve.menu) || [];
+    var y = 560; ctx.fillStyle = 'rgba(245,235,217,.35)'; ctx.fillRect(80, y, W - 160, 2);
+    items.forEach(function (it) {
+      var nm = it.replace(/\(.*?\)/g, '').trim(), hit = menu.filter(function (mm) { return mm.n.replace(/\s|\(.*?\)/g, '').indexOf(nm.replace(/\s/g, '')) >= 0; })[0];
+      var pr = /시세/.test(it) ? '시세' : hit && hit.p ? won(hit.p) : '';
+      y += 46; ctx.font = '800 52px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'alphabetic'; ctx.fillText(nm, 80, y + 50);
+      if (pr) { ctx.font = '800 48px ' + FONT; ctx.fillStyle = sc.gold; ctx.textAlign = 'right'; ctx.fillText(pr, W - 80, y + 50); ctx.textAlign = 'left'; }
+      y += 90; ctx.fillStyle = 'rgba(245,235,217,.2)'; ctx.fillRect(80, y, W - 160, 2);
+    });
+    ctx.font = '700 34px ' + FONT; ctx.fillStyle = 'rgba(245,235,217,.75)'; ctx.textBaseline = 'top'; ctx.fillText(String(card.title || '').slice(0, 14), 80, H - 140);
+    mark(ctx, W, H);
+    return c;
+  }
+  function shopInfo(card, sc, img) {
+    var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d'), ci = card.contact || {};
+    ctx.fillStyle = sc.dark; ctx.fillRect(0, 0, W, H);
+    if (img) cover(ctx, img, 0, 0, W, 650);
+    fade(ctx, W, H, 400, 660, sc.dark);
+    var x = 70, y = 640;
+    ctx.font = '900 60px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'top'; ctx.fillText('찾아오시는 길', x, y); y += 100;
+    var addr = (card.copy && /[로길동]\s?\d|구\s/.test(card.copy.value || '') ? card.copy.value : '') || (card.place && card.place.name) || '';
+    var rows = [];
+    if (addr) rows.push(['주소', addr]);
+    if (card.subtitle) rows.push(['영업', card.subtitle]);
+    if (ci.phone) rows.push(['전화', ci.phone]);
+    var extra = (card.body || []).filter(function (l) { return /배달|주차|포장|단체/.test(l); })[0];
+    if (extra) rows.push(['안내', extra]);
+    rows.slice(0, 4).forEach(function (r) {
+      ctx.font = '800 32px ' + FONT; ctx.fillStyle = sc.accent; ctx.fillText(r[0], x, y);
+      y = text(ctx, r[1], x + 130, y, 32, sc.cream, 500, W - x * 2 - 130, 2, 1.35) + 22;
+      ctx.fillStyle = 'rgba(245,235,217,.18)'; ctx.fillRect(x, y - 10, W - x * 2, 1); y += 14;
+    });
+    var cy = Math.min(y + 20, H - 170);
+    ctx.fillStyle = sc.cream; round(ctx, x, cy, W - x * 2, 96, 18); ctx.fill();
+    ctx.font = '900 34px ' + FONT; ctx.fillStyle = sc.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('예약 · 길찾기는 프로필 링크에서 👆', 540, cy + 49); ctx.textAlign = 'left';
+    mark(ctx, W, H);
+    return c;
+  }
+  function buildShop(card, design, opts) {
+    opts = opts || {};
+    var pics = opts.pics || {}, sc = shopColors(design);
+    var srcs = [card.image].concat(card.gallery || []).filter(Boolean);
+    var uniq = srcs.filter(function (s, i) { return srcs.indexOf(s) === i; }).slice(0, 11);
+    var fontReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function () {}) : Promise.resolve();
+    return Promise.all([fontReady, loadSerif()]).then(function () {
+      return Promise.all(uniq.map(function (s) { return loadImg(s, pics[s]); }));
+    }).then(function (imgs) {
+      imgs = imgs.map(function (im) { return usable(im) ? im : null; });
+      var main = card.image ? imgs[0] : null;
+      card = Object.assign({}, card, { __main: main });
+      if (!(card.reserve && card.reserve.menu && card.reserve.menu.length) && opts.menu) card.reserve = Object.assign({}, card.reserve || {}, { menu: opts.menu });
+      var all = imgs.filter(Boolean), rest = imgs.filter(function (im, i) { return im && !(card.image && i === 0); });
+      var first = main || all[0] || null, list = [];
+      list.push({ name: '01-표지', label: '① 표지', c: shopCover(card, sc, first, 1350) });
+      var sig = (main ? [main] : []).concat(rest).slice(0, 4);
+      if (sig.length) list.push({ name: '02-대표메뉴', label: '② 대표 메뉴', c: shopSignature(card, sc, sig) });
+      shopMenuBoards(card, sc).forEach(function (b, i) { list.push({ name: '0' + (list.length + 1) + '-메뉴판', label: '③ 메뉴판' + (i ? ' 2' : ''), c: b }); });
+      var se = shopSeason(card, sc); if (se) list.push({ name: '0' + (list.length + 1) + '-한정메뉴', label: '④ 한정 메뉴', c: se });
+      var wide = rest.slice().reverse().filter(function (im) { return im.naturalWidth / im.naturalHeight >= 1.3; })[0];
+      list.push({ name: '0' + (list.length + 1) + '-오시는길', label: '⑤ 찾아오시는 길', c: shopInfo(card, sc, wide || first) });
+      list.push({ name: '스토리', label: '스토리 9:16 (아래는 링크 스티커 자리)', c: shopCover(card, sc, first, 1920) });
+      list.push({ name: '정사각', label: '정사각 1:1 (플레이스·당근·카톡)', c: drawCover(card, colors(design), first, 1080, 1080) });
+      var skipped = uniq.length - imgs.filter(Boolean).length;
+      return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
+        var out = list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, blob: blobs[i], w: x.c.width, h: x.c.height }; });
+        out.skipped = skipped;
+        return out;
+      });
+    });
+  }
+
   function build(card, design, opts) {
+    if (card && card.template === 'shop' && !(opts && opts.classic)) return buildShop(card, design, opts);
     opts = opts || {};
     var pics = opts.pics || {};
     var col = colors(design);

@@ -484,7 +484,7 @@
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
     <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
     <button type="button" class="ghost big" id="blog2">📝 네이버 블로그 글 만들기 (AI가 써줘요)</button>
-    <button type="button" class="ghost big" id="exp2">📸 인스타·카톡 채널·플레이스용 이미지 (3가지 사이즈)</button>
+    <button type="button" class="ghost big" id="exp2">📸 인스타용 사진 세트 만들기 (피드·스토리·정사각)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
   </div>
@@ -541,13 +541,13 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=75"></script>
+<script src="../js/designs.js?v=76"></script>
 <script src="../js/render.js?v=71"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js"></script>
+<script src="../js/export.js?v=76"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -1425,7 +1425,7 @@
     $('expModal').hidden = false;
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
     $('expStatus').textContent = '이미지를 만드는 중이에요…';
-    window.SsakaExport.build(c.card, curDesign(), { pics: localPics }).then(function (list) {
+    window.SsakaExport.build(c.card, curDesign(), { pics: localPics, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
       expFiles = list;
       list.forEach(function (x) {
         var u = URL.createObjectURL(x.blob);

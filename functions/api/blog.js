@@ -84,7 +84,7 @@ export async function onRequest({ request, env }) {
 
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
     body: JSON.stringify({
       model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: RULES,
       messages: [{ role: 'user', content: `사진 개수 N=${nImg}\n` + (photos.length ? '[사진 목록]\n' + photos.map((x, i) => (i + 1) + '. ' + x).join('\n') + '\n' : '') + `\n[싸바카드]\n${cardText(card, b.industry)}` + (owner.length ? '\n\n[사장님 한마디]\n' + owner.map(x => '- ' + x).join('\n') : '') }]

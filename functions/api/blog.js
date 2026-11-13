@@ -205,6 +205,55 @@ async function quick(b, request, env, key) {
   return json(x.post);
 }
 
+// ---------- 붙여 넣은 행사·안내 글 정리 (mode: 'tidy') ----------
+const TIDY_RULES = `너는 한국어 행사 초대장·안내문 편집자다. 사용자가 포스터·보도자료·카톡 공지에서 복사해 붙인 어수선한 글을 받아, 모바일 카드 한 장에 들어갈 체계적인 내용으로 정리한다.
+원칙:
+1. 원문에 있는 사실만 쓴다. 날짜·시간·이름·장소·숫자를 지어내거나 바꾸지 않는다.
+2. 같은 내용이 여러 번 나오면 한 번만 쓴다.
+3. 포스터처럼 제목(행사명·일시·장소·주최…)과 내용이 따로 떨어져 있으면 짝을 맞춰 붙인다. 시간표의 시간과 순서도 짝지어 한 줄로 만든다.
+4. 짝이나 순서가 원문만으로 확실하지 않으면 그 항목에 "q":true 를 붙인다(사용자가 확인함).
+5. 초대의 글(인사말)은 원문 말투를 살려 2~5문장, 문단은 한 줄씩. 원문에 인사말이 없으면 원문 사실로 짧게 2문장만 만든다.
+6. 영어 행사명은 그대로 둔다. 별표(*)·마크다운 금지. 이모지 금지.
+7. 섹션은 필요한 것만, 아래 순서로: 초대의 글(para) → 프로그램·시간표(time) → 참여자·출연·연사(list) → 신청·참가 방법·준비물·회비 등 안내(kv) → 주최·주관·후원·파트너(kv, h는 "함께하는 곳") → 문의(kv).
+8. title 은 40자, subtitle(일시) 은 60자, place 는 60자 이내. intro 는 행사를 한 줄로 소개(40자 안팎, 원문 근거).
+답은 JSON 하나만, 코드블록 없이:
+{"title":"","when":"2026년 11월 27일(금) 12:00–18:00","place":"","intro":"","sections":[{"h":"초대의 글","kind":"para","lines":["..."]},{"h":"프로그램","kind":"time","rows":[{"t":"12:00–12:26","i":"오프닝","q":true}]},{"h":"참여 감독","kind":"list","lines":["이명세","..."]},{"h":"함께하는 곳","kind":"kv","rows":[{"k":"주최","v":"..."}]}]}`;
+async function tidy(b, request, env, key) {
+  const text = String(b.text || '').replace(/\r/g, '').slice(0, 8000).trim();
+  if (text.length < 10) return json({ error: 'few' }, 400);
+  let lim = null;
+  if (env.DB) {
+    const ip = request.headers.get('cf-connecting-ip') || 'x';
+    lim = [['all', +(env.BLOG_DAILY_CAP || 300)], ['tdip:' + await sha(ip), 20], ['tddev:' + clean(b.dev, 40), 15]];
+    const e = await overLimit(env.DB, lim);
+    if (e) return json({ error: e }, 429);
+  }
+  const fail = async (o, st) => { if (lim) await refund(env.DB, lim); return json(o, st); };
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+    body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 4000, system: TIDY_RULES,
+      messages: [{ role: 'user', content: (b.title ? '[지금 적힌 제목] ' + clean(b.title, 60) + '\n' : '') + '[붙여 넣은 글]\n' + text }] })
+  });
+  if (!r.ok) return fail({ error: 'ai', status: r.status }, 502);
+  const out = await r.json();
+  const raw = (out.content || []).filter(x => x.type === 'text').map(x => x.text).join('').trim().replace(/^```(json)?|```$/g, '');
+  let o;
+  try { o = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) { return fail({ error: 'parse' }, 502); }
+  const S = (x, n) => clean(String(x == null ? '' : x).replace(/\*/g, ''), n);
+  const sections = (Array.isArray(o.sections) ? o.sections : []).slice(0, 10).map(s => {
+    const kind = ['para', 'time', 'list', 'kv'].includes(s.kind) ? s.kind : 'list';
+    const sec = { h: S(s.h, 24), kind };
+    if (kind === 'time') sec.rows = (Array.isArray(s.rows) ? s.rows : []).slice(0, 30).map(x => ({ t: S(x.t, 24), i: S(x.i, 160), q: !!x.q })).filter(x => x.i);
+    else if (kind === 'kv') sec.rows = (Array.isArray(s.rows) ? s.rows : []).slice(0, 20).map(x => ({ k: S(x.k, 12), v: S(x.v, 300), q: !!x.q })).filter(x => x.v);
+    else sec.lines = (Array.isArray(s.lines) ? s.lines : []).slice(0, 30).map(x => S(x, 400)).filter(Boolean);
+    return sec;
+  }).filter(s => s.h && ((s.rows && s.rows.length) || (s.lines && s.lines.length)));
+  const res = { title: S(o.title, 40), when: S(o.when, 60), place: S(o.place, 60), intro: S(o.intro, 80), sections };
+  if (!res.title && !sections.length) return fail({ error: 'parse' }, 502);
+  return json(res);
+}
+
 export async function onRequest({ request, env }) {
   // 연결 점검: GET /api/blog?check=1 → AI 연결 상태만 알려 줌 (키 값은 절대 안 보여 줌)
   if (request.method === 'GET' && new URL(request.url).searchParams.get('check')) {
@@ -229,6 +278,7 @@ export async function onRequest({ request, env }) {
   catch (e) { return json({ error: 'bad' }, 400); }
   if (b.mode === 'survey') return survey(b, request, env, key);
   if (b.mode === 'quick') return quick(b, request, env, key);
+  if (b.mode === 'tidy') return tidy(b, request, env, key);
   const card = b.card || {};
   if (!clean(card.title, 60)) return json({ error: 'empty' }, 400);
   const nImg = Math.max(1, Math.min(8, b.images | 0 || 3));

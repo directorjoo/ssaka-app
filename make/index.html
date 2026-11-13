@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=78">
+  <link rel="stylesheet" href="../css/sk.css?v=79">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -281,6 +281,7 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .mwrite { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: #E7EFFB; color: #1B3F7A; font-size: 14.5px; text-decoration: none; font-weight: 700; }
   .mwrite b { font-weight: 900; }
+  #tidyBox:not([hidden]) { display: flex; }
 </style>
 <script src="/js/launch.js?v=2"></script>
 </head>
@@ -445,6 +446,19 @@
           <div class="moods" id="invPick" style="margin-bottom:8px"><button type="button" data-k="0">정중하게</button><button type="button" data-k="1">행사·포럼</button><button type="button" data-k="2">친근하게</button></div>
         </div>
         <textarea id="body" maxlength="8000"></textarea>
+        <button type="button" class="mini" id="tidyBtn" style="width:100%;margin-top:8px;font-weight:800">✨ 붙여 넣은 글 AI로 정리하기</button>
+        <div class="hint">포스터·보도자료·카톡 공지를 위 칸에 그대로 붙여 넣고 누르세요. 겹친 말은 빼고, 일시·장소·프로그램·주최를 나눠 정리해 줘요. 넣기 전에 먼저 보여 드려요.</div>
+        <div id="tidyBox" hidden style="position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center">
+          <div style="background:#fff;width:100%;max-width:560px;max-height:88dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column">
+            <div style="padding:16px 18px 8px;font-weight:800;font-size:17px">✨ 이렇게 정리했어요</div>
+            <div class="hint" style="margin:0 18px 8px">❓ 표시는 원문만으로 확실하지 않은 곳이에요. 넣은 뒤 꼭 확인해 주세요.</div>
+            <div id="tidyView" style="overflow:auto;padding:4px 18px 12px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;word-break:keep-all"></div>
+            <div style="display:flex;gap:8px;padding:12px 18px calc(12px + env(safe-area-inset-bottom))">
+              <button type="button" class="mini" id="tidyNo" style="flex:1">닫기</button>
+              <button type="button" class="mini" id="tidyOk" style="flex:2;background:#B3132B;color:#fff;border-color:#B3132B;font-weight:800">카드에 넣기</button>
+            </div>
+          </div>
+        </div>
         <div data-for="profile">
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
           <div class="hint">동영상은 유튜브에 "일부 공개"로 올린 뒤 그 링크를 붙여넣으세요.</div>
@@ -552,7 +566,7 @@
     </form>
 
     <section class="preview" aria-label="미리보기">
-      <h2>미리보기</h2>
+      <h2>미리보기 <small style="font-weight:600;font-size:12px;opacity:.7">· 글자를 누르면 바로 고쳐요</small></h2>
       <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
       <div class="done">
         <button type="button" class="kakao" id="send">💬 카톡으로 보내기</button>
@@ -657,7 +671,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=83"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=79"></script>
+<script src="../js/render.js?v=80"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -1152,6 +1166,77 @@
     var rest = $('body').value.split('\n').filter(function (l) { return !tpl[l.trim()]; }).join('\n').replace(/^\s+/, '');
     $('body').value = invText(+b.dataset.k) + (rest ? '\n\n' + rest : '');
     update(); toast('초대의 글을 넣었어요. 고쳐 쓰셔도 돼요');
+  });
+  // ---------- 미리보기에서 글자 눌러 바로 고치기 (c/ 미리보기가 불러 줌) ----------
+  window.SavaPreviewEdit = function (key, idx, part, text) {
+    remember();
+    text = text.replace(/\s*❓\s*/g, ' ').trim(); // 손으로 고친 줄은 확인한 것으로 봄
+    if (key === 'title' || key === 'subtitle') {
+      $(key).value = text.slice(0, key === 'title' ? 40 : 60); $(key).classList.remove('missing');
+    } else if (key === 'body') {
+      var raw = v('body') ? $('body').value.split('\n') : String(EX().body || '').split('\n');
+      var n = -1, at = -1;
+      for (var i = 0; i < raw.length; i++) { if (raw[i].trim()) { n++; if (n === idx) { at = i; break; } } }
+      if (at < 0) return;
+      var old = raw[at].trim(), m, line;
+      if (part === 'val' && (m = /^(\d{1,2}[:：.]\d{2}(?:\s*[~\-–—]\s*\d{1,2}[:：.]\d{2})?\s+|[^:：]{1,8}[:：]\s*)/.exec(old))) line = text ? m[1] + text : '';
+      else if (/^■/.test(old)) line = text ? '■ ' + text : '';
+      else if (/^[·•\-]\s*/.test(old)) line = text ? '· ' + text : '';
+      else line = text;
+      if (line === old) return;
+      if (line) raw[at] = line; else raw.splice(at, 1);
+      $('body').value = raw.join('\n');
+    }
+    update();
+    toast('✏️ 고쳤어요');
+  };
+  // ---------- 붙여 넣은 글 AI로 정리 ----------
+  var tidyRes = null;
+  function tidyBody(r) {
+    var L = [];
+    if (r.intro) L.push(r.intro);
+    (r.sections || []).forEach(function (sec) {
+      L.push('■ ' + sec.h);
+      if (sec.kind === 'time') sec.rows.forEach(function (x) { L.push((x.t ? x.t + ' ' : '· ') + x.i + (x.q ? ' ❓' : '')); });
+      else if (sec.kind === 'kv') sec.rows.forEach(function (x) { L.push((x.k ? x.k + ': ' : '') + x.v + (x.q ? ' ❓' : '')); });
+      else if (sec.kind === 'list') sec.lines.forEach(function (x) { L.push('· ' + x); });
+      else sec.lines.forEach(function (x) { L.push(x); });
+    });
+    return L.join('\n');
+  }
+  $('tidyBtn').addEventListener('click', function () {
+    var text = $('body').value.trim(), btn = this;
+    if (text.length < 10) { toast('먼저 위 칸에 행사 글을 붙여 넣어 주세요'); $('body').focus(); return; }
+    btn.disabled = true; btn.textContent = '✨ 정리하는 중… (10~20초)';
+    fetch(new URL('../api/blog', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mode: 'tidy', text: text, title: v('title'), dev: devId() }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok) throw new Error(x.j && x.j.error || 'x');
+        tidyRes = x.j;
+        var head = [x.j.title && '제목: ' + x.j.title, x.j.when && '일시: ' + x.j.when, x.j.place && '장소: ' + x.j.place].filter(Boolean).join('\n');
+        $('tidyView').textContent = (head ? head + '\n\n' : '') + tidyBody(x.j).replace(/^■ /gm, '\n■ ').trim();
+        $('tidyBox').hidden = false;
+      })
+      .catch(function (e) {
+        var m = String(e.message);
+        toast(m === 'limit' ? '오늘 정리 횟수를 다 썼어요. 내일 다시 해 주세요' : m === 'few' ? '글이 너무 짧아요' : '정리하지 못했어요. 잠시 뒤 다시 눌러 주세요');
+      })
+      .then(function () { btn.disabled = false; btn.textContent = '✨ 붙여 넣은 글 AI로 정리하기'; });
+  });
+  $('tidyNo').addEventListener('click', function () { $('tidyBox').hidden = true; });
+  $('tidyBox').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+  $('tidyOk').addEventListener('click', function () {
+    var r = tidyRes; if (!r) return;
+    remember();
+    if (r.title) $('title').value = r.title.slice(0, 40);
+    if (r.when) $('subtitle').value = r.when.slice(0, 60);
+    if (r.place && $('place')) $('place').value = r.place.slice(0, 60);
+    $('body').value = tidyBody(r);
+    ['title', 'subtitle'].forEach(function (f) { $(f).classList.remove('missing'); });
+    $('tidyBox').hidden = true;
+    update();
+    toast('정리한 내용을 넣었어요. ↩ 되돌리기로 원래 글로 돌아갈 수 있어요');
   });
   $('finish').addEventListener('click', function () {
     if (industry === 'event' && !v('body')) {

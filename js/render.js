@@ -172,7 +172,26 @@
     if (card.body && card.body.length) {
       var ul = el('ul', 'sk-list');
       // 인사말처럼 문장으로 끝나는 줄(…니다. …요.)은 글머리표 없이 문단으로
-      card.body.forEach(function (line) { ul.appendChild(el('li', /(니다|니까|어요|아요|해요|세요|네요|군요|에요|이요|요)[.!?]?$/.test(line) && !/^[^:：]{1,8}[:：]/.test(line) ? 'sk-p' : '', line)); });
+      // ■ 로 시작하는 줄 = 묶음 제목, '12:00–12:30 내용' = 시간표 줄, '주최: …' = 이름표 줄
+      var doc = card.body.some(function (l) { return /^■/.test(l); }), small = false;
+      if (doc) ul.classList.add('sk-doc');
+      card.body.forEach(function (line) {
+        var m, li;
+        if ((m = /^■\s*(.+)$/.exec(line))) {
+          small = /주최|주관|후원|협찬|파트너|함께/.test(m[1]);
+          ul.appendChild(el('li', 'sk-h', m[1])); return;
+        }
+        if ((m = /^(\d{1,2}[:：.]\d{2}(?:\s*[~\-–—]\s*\d{1,2}[:：.]\d{2})?)\s+(.+)$/.exec(line))) {
+          li = el('li', 'sk-tt'); li.appendChild(el('span', 'sk-tm', m[1].replace(/\s+/g, ''))); li.appendChild(el('span', 'sk-ti', m[2]));
+        } else if (doc && (m = /^([^:：]{1,8})[:：]\s*(.+)$/.exec(line))) {
+          li = el('li', 'sk-kv'); li.appendChild(el('b', '', m[1])); li.appendChild(el('span', '', m[2]));
+        } else if (doc) {
+          // 정리된 본문: '· ' 로 시작하면 목록, 나머지는 문단
+          li = /^[·•\-]\s*/.test(line) ? el('li', '', line.replace(/^[·•\-]\s*/, '')) : el('li', 'sk-p', line);
+        } else li = el('li', /(니다|니까|어요|아요|해요|세요|네요|군요|에요|이요|요)[.!?]?$/.test(line) && !/^[^:：]{1,8}[:：]/.test(line) ? 'sk-p' : '', line);
+        if (small) li.classList.add('sk-sm');
+        ul.appendChild(li);
+      });
       main.appendChild(ul);
     }
     wrap.appendChild(main);

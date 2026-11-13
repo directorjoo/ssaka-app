@@ -611,3 +611,24 @@
 .sk .sk-actions.sk-row .sk-ico { width: 30px !important; height: 30px !important; }
 .sk .sk-actions.sk-row .sk-ico svg { width: 20px !important; height: 20px !important; }
 .sk .sk-actions.sk-row .sk-wide { grid-column: auto !important; }
+
+/* 정리된 본문: ■ 묶음 제목 · 시간표 · 이름표 줄 */
+.sk .sk-list li.sk-h, .sk .sk-list li.sk-tt, .sk .sk-list li.sk-kv { padding-left: 0 !important; list-style: none; }
+.sk .sk-list li.sk-h::before, .sk .sk-list li.sk-tt::before, .sk .sk-list li.sk-kv::before { display: none !important; content: none !important; }
+.sk .sk-list li.sk-h {
+  margin-top: 20px; padding: 0 0 6px !important; border: 0 !important; border-bottom: 2px solid var(--accent-line, var(--accent, currentColor)) !important;
+  font-size: 13.5px !important; font-weight: 800 !important; letter-spacing: .06em; color: var(--accent-line, inherit); text-align: left;
+}
+.sk .sk-list li.sk-h:first-child { margin-top: 4px; }
+.sk .sk-list li.sk-h + li { border-top: 0 !important; }
+.sk .sk-list li.sk-tt { display: grid !important; grid-template-columns: 6.6em 1fr; gap: 10px; align-items: baseline; text-align: left; }
+.sk .sk-list li.sk-tt .sk-tm { font-size: .86em; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; opacity: .8; }
+.sk .sk-list li.sk-kv { display: grid !important; grid-template-columns: auto 1fr; gap: 10px; align-items: baseline; text-align: left; }
+.sk .sk-list li.sk-kv > b { font-size: .86em; font-weight: 800; opacity: .7; white-space: nowrap; }
+.sk .sk-list.sk-doc li.sk-p { text-align: left; line-height: 1.7; }
+.sk .sk-list li.sk-sm { font-size: 13px !important; font-weight: 500 !important; opacity: .85; }
+.sk .sk-list li.sk-h.sk-sm { font-size: 12.5px !important; font-weight: 800 !important; }
+
+/* 만들기 미리보기에서 바로 고치기 */
+.sk-pe .sk-title, .sk-pe .sk-sub, .sk-pe .sk-list li { cursor: text; }
+.sk-pe [contenteditable="true"] { outline: 2px dashed #B3132B; outline-offset: 3px; border-radius: 4px; background: rgba(255,255,255,.08); }

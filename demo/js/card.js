@@ -218,11 +218,34 @@
     }, true);
     // 받은 카드함에 기록 (만들기 화면 미리보기는 제외)
     if (window.SsakaStore && window.self === window.top && /[?&][ds]=/.test(location.search)) SsakaStore.saveInbox(card, location.href);
+    // 만들기 화면 미리보기: 글자를 눌러 바로 고치기
+    try {
+      var PE = window.self !== window.top && window.parent.SavaPreviewEdit;
+      if (PE) {
+        root.classList.add('sk-pe');
+        root.addEventListener('click', function (e) {
+          var t = e.target.closest('.sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li');
+          if (!t || t.isContentEditable) return;
+          var li = t.closest('.sk-list li'), key, idx = -1, part = 'all';
+          if (li) {
+            key = 'body'; idx = Array.prototype.indexOf.call(li.parentNode.children, li);
+            if (t === li && li.querySelector('span:last-child')) t = li.querySelector('span:last-child');
+            if (t !== li) part = 'val';
+          } else key = t.classList.contains('sk-title') ? 'title' : 'subtitle';
+          e.preventDefault(); e.stopPropagation();
+          t.contentEditable = 'true'; t.focus();
+          try { var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); } catch (x) {}
+          t.addEventListener('keydown', function (k) { if (k.key === 'Enter') { k.preventDefault(); t.blur(); } });
+          t.addEventListener('blur', function () { t.contentEditable = 'false'; PE(key, idx, part, t.textContent.replace(/\s+/g, ' ').trim()); }, { once: true });
+        }, true);
+      }
+    } catch (e) {}
     // 내가 만든 카드라면: 수정하기 · 복사해서 새로 만들기
     try {
       var dq = new URLSearchParams(location.search).get('d') || window.__ssakaD;
+      var here = location.href.split('#')[0];
       var mine = dq && window.SsakaStore && window.self === window.top && SsakaStore.mine().some(function (x) {
-        try { return new URL(x.url).searchParams.get('d') === dq; } catch (e) { return false; }
+        try { return x.url.split('#')[0] === here || new URL(x.url).searchParams.get('d') === dq; } catch (e) { return false; }
       });
       if (mine) {
         var bar = document.createElement('div'); bar.className = 'sk-owner';

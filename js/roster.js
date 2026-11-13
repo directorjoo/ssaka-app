@@ -35,7 +35,7 @@
     // 카톡방에서 이미 받은 명단(총무가 붙여넣은 것)을 앞에 두고, 싸바로 신청한 사람을 뒤에 이어 붙임
     var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1 }; });
     function merge(srv) {
-      if (priv && !isOwner) return srv; // 남의 이름은 보이지 않게 (내 신청만)
+      if (!isOwner) return srv.filter(function (x) { return x.me; }); // 남의 이름은 주최자만 (받은 사람은 내 신청만)
       var used = {}, outL = pre.map(function (x) {
         for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; return srv[k]; }
         return x;
@@ -43,34 +43,54 @@
       srv.forEach(function (x, k) { if (!used[k]) outL.push(x); });
       return outL;
     }
-    var box = el('section', 'sk-roster'); box.setAttribute('aria-label', '참석 명단');
-    var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 명단'), cnt = el('span', 'sk-ro-cnt', '불러오는 중…');
+    var box = el('section', 'sk-roster'); box.setAttribute('aria-label', '참석 신청');
+    var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 신청'), cnt = el('span', 'sk-ro-cnt', '');
     head.appendChild(ttl); head.appendChild(cnt); box.appendChild(head);
+    var myLine = el('p', 'sk-ro-mine'); myLine.hidden = true; box.appendChild(myLine);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
-    var privNote = el('p', 'sk-fine', '🔒 참석자 이름은 주최하는 분만 볼 수 있어요. 내 신청만 보여요.'); privNote.hidden = true; box.appendChild(privNote);
     var ol = el('ol', 'sk-ro-list'); box.appendChild(ol);
-    var join = el('button', 'sk-ro-join', '🙋 참석 신청하기'); join.type = 'button'; box.appendChild(join);
-    var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사'); copy.type = 'button'; box.appendChild(copy);
-    box.appendChild(el('p', 'sk-fine', '번호는 신청한 순서대로 자동으로 매겨져요. 명단엔 이름·기수·탑승지만 보여요.'));
+    var btns = el('div', 'sk-ro-btns');
+    var join = el('button', 'sk-ro-join', '🙋 참석할게요'); join.type = 'button'; btns.appendChild(join);
+    var nogo = el('button', 'sk-ro-no', '🙅 못 가요'); nogo.type = 'button'; btns.appendChild(nogo);
+    box.appendChild(btns);
+    var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button'; box.appendChild(copy);
+    var fine = el('p', 'sk-fine', ''); box.appendChild(fine);
 
     function draw() {
       var mine = list.filter(function (x) { return x.me; })[0];
-      var shown = priv && !isOwner;
-      var nN = shown ? srvCount + pre.length : list.length, nP = shown ? srvPeople + people(pre) : people(list);
-      cnt.textContent = nN ? nN + '명 신청 · 총 ' + nP + '명' : '아직 신청한 사람이 없어요';
-      ttl.textContent = priv ? (isOwner ? '🔒 참석 명단 (주최자만 보여요)' : '🙋 참석 신청') : '🙋 참석 명단';
-      privNote.hidden = !shown;
-      join.textContent = mine ? '✏️ 내 신청 고치기 · 취소' : '🙋 참석 신청하기';
+      box.classList.toggle('host', isOwner);
+      if (isOwner) {
+        var all = list, nN = all.length, nP = people(all);
+        ttl.textContent = '🔒 참석 명단 · 나만 보여요';
+        cnt.textContent = nN ? nN + '명 신청 · 총 ' + nP + '명' : '아직 신청한 사람이 없어요';
+        fine.textContent = '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. 전화번호를 누르면 바로 걸려요.';
+      } else {
+        ttl.textContent = '🙋 참석 여부를 알려 주세요';
+        cnt.textContent = '';
+        fine.textContent = '참석자 명단은 모임을 연 분만 볼 수 있어요.';
+      }
+      myLine.hidden = !mine || isOwner;
+      if (mine) myLine.textContent = '✅ 참석 신청했어요: ' + line(mine, 0).replace(/^\d+\./, '');
+      join.textContent = mine ? '✏️ 내 신청 고치기' : '🙋 참석할게요';
+      nogo.textContent = mine ? '🙅 신청 취소' : '🙅 못 가요';
       byStop.innerHTML = '';
-      if (stops.length && list.length && !shown) stops.forEach(function (s) {
+      if (isOwner && stops.length && list.length) stops.forEach(function (s) {
         var n = people(list.filter(function (x) { return x.s && shortStop(x.s) === shortStop(s); }));
-        var c = el('span', '', shortStop(s) + ' ' + n + '명'); byStop.appendChild(c);
+        byStop.appendChild(el('span', '', shortStop(s) + ' ' + n + '명'));
       });
       ol.innerHTML = '';
-      list.forEach(function (x, i) { var li = el('li', x.me ? 'me' : '', shown ? '✅ 내 신청: ' + line(x, 0).replace(/^\d+\./, '') : line(x, i)); ol.appendChild(li); });
-      copy.hidden = !list.length || shown;
+      ol.hidden = !isOwner;
+      if (isOwner) list.forEach(function (x, i) {
+        var li = el('li', x.me ? 'me' : '', line(x, i));
+        if (x.ph) { var a = el('a', 'sk-ro-ph', x.ph); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); li.appendChild(document.createTextNode(' ')); li.appendChild(a); }
+        ol.appendChild(li);
+      });
+      copy.style.display = isOwner && list.length ? '' : 'none';
+      btns.style.display = isOwner ? 'none' : '';
+      ol.style.display = isOwner ? '' : 'none';
+      myLine.style.display = mine && !isOwner ? '' : 'none';
     }
-    function take(j) { isOwner = !!j.owner || (priv && !j.priv && !!hk); srvCount = j.count || 0; srvPeople = j.people || 0; list = merge(j.list || []); draw(); }
+    function take(j) { isOwner = !!j.owner; srvCount = j.count || 0; srvPeople = j.people || 0; list = merge(j.list || []); draw(); }
     function load() {
       return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
         .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
@@ -87,6 +107,23 @@
       else prompt('복사하세요', t);
     });
     join.addEventListener('click', function () { openSheet(); });
+    nogo.addEventListener('click', function () {
+      var mine = list.filter(function (x) { return x.me; })[0], boss = card.contact && card.contact.phone;
+      var tell = function (nm) { if (boss && live) setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + '이번에는 참석이 어려워요 🙏\n싸바!'); }, 500); };
+      if (mine) {
+        if (!confirm('참석 신청을 취소할까요?')) return;
+        send({ op: 'del' }).then(function () { toast('신청을 취소했어요'); tell(mine.n); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+      } else {
+        var nm = ''; try { nm = localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
+        toast(boss ? '못 간다고 문자로 알려 드릴게요' : '알려 주셔서 고마워요'); tell(nm);
+      }
+    });
+    // 카드 주인 화면: 명단을 '나만 보기'로 잠그고 다시 불러오기 (예전에 만든 공개 명단도)
+    global.SsakaRoster.own = function () {
+      if (!live) return;
+      try { if (!hk) { hk = rnd(24); localStorage.setItem('sava-roster-key-' + R.id, hk); } } catch (e) {}
+      fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok }) }).then(load, load);
+    };
 
     function openSheet() {
       var mine = list.filter(function (x) { return x.me; })[0] || {};
@@ -98,6 +135,9 @@
       var nm = document.createElement('input'); nm.maxLength = 12; nm.autocomplete = 'name'; nm.placeholder = '홍길동';
       try { nm.value = mine.n || localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
       field('이름', nm);
+      var ph = document.createElement('input'); ph.type = 'tel'; ph.inputMode = 'tel'; ph.maxLength = 20; ph.autocomplete = 'tel'; ph.placeholder = '010-0000-0000';
+      try { ph.value = mine.ph || localStorage.getItem('sava-my-phone') || ''; } catch (e) {}
+      field('전화번호 (모임 연 분만 봐요)', ph);
       var gs = null;
       if (R.g) { gs = document.createElement('input'); gs.maxLength = 6; gs.inputMode = 'numeric'; gs.placeholder = '예: 28'; try { gs.value = mine.g || localStorage.getItem('sava-my-gisu') || ''; } catch (e) {} field('기수 (선택)', gs); }
       var stSel = null;
@@ -129,13 +169,14 @@
       ok.addEventListener('click', function () {
         var n = nm.value.trim(); if (!n) { toast('이름을 적어주세요'); nm.focus(); return; }
         var g = gs ? gs.value.trim().replace(/기$/, '') : '', s = stSel ? stSel.value : '';
-        try { localStorage.setItem('ssaka-my-name', n); if (g) localStorage.setItem('sava-my-gisu', g); if (s) localStorage.setItem('sava-my-stop', s); } catch (e) {}
+        var phv = ph.value.trim();
+        try { localStorage.setItem('ssaka-my-name', n); if (phv) localStorage.setItem('sava-my-phone', phv); if (g) localStorage.setItem('sava-my-gisu', g); if (s) localStorage.setItem('sava-my-stop', s); } catch (e) {}
         ok.disabled = true;
-        send({ op: 'add', n: n, g: g, s: s, p: plus }).then(function () {
+        send({ op: 'add', n: n, ph: phv, g: g, s: s, p: plus }).then(function () {
           shut(); toast(mine.n ? '고쳤어요' : '참석 신청했어요! 싸바 🙌');
           if (smsOn && smsOn.checked && live) {
             var me = list.map(function (x, i) { return x.me ? line(x, i) : null; }).filter(Boolean)[0] || n;
-            setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '참석') + ']\n' + me + ' ' + (mine.n ? '신청 내용 고쳤어요' : '참석합니다') + (priv && !isOwner ? '' : '\n(지금 ' + list.length + '명 신청 · 총 ' + people(list) + '명)') + '\n싸바!'); }, 600);
+            setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '참석') + ']\n' + me + ' ' + (mine.n ? '신청 내용 고쳤어요' : '참석합니다') + '' + '\n싸바!'); }, 600);
           }
         })
           .catch(function () { ok.disabled = false; toast('잠시 뒤 다시 눌러 주세요'); });
@@ -154,5 +195,5 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
   }
 
-  global.SsakaRoster = { mount: mount, line: line, shortStop: shortStop };
+  global.SsakaRoster = Object.assign(global.SsakaRoster || {}, { mount: mount, line: line, shortStop: shortStop });
 })(typeof window !== 'undefined' ? window : globalThis);

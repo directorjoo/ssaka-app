@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=81">
+  <link rel="stylesheet" href="../css/sk.css?v=82">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -513,7 +513,7 @@
           <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
           <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
           <label class="switch"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
-          <label class="switch"><input type="checkbox" id="privOn"> <span>🔒 참석자 이름은 주최자만 보기 (받는 사람은 인원 수와 내 신청만 봐요)</span></label>
+          <label class="switch"><input type="checkbox" id="privOn" checked> <span>🔒 참석자 명단(이름·전화번호)은 나만 보기 — 받는 사람은 [참석할게요][못 가요]만 봐요</span></label>
           <label for="pre">카톡방에서 이미 받은 참석자 (한 줄에 한 명, 선택)</label>
           <textarea id="pre" maxlength="3000" placeholder="정병회34 교대&#10;이호영36+1 당산"></textarea>
           <div class="hint">여기 적은 사람이 명단 맨 앞에 먼저 들어가고, 싸바로 신청한 사람이 그 뒤로 번호가 이어져요.</div>
@@ -1137,7 +1137,9 @@
   $('open').addEventListener('click', function (e) {
     var c = current(); if (!c) { e.preventDefault(); return; }
     e.preventDefault();
-    var w = window.open('about:blank', '_blank');
+    // 홈 화면 앱(설치형)에선 새 창이 사파리로 열려 로그인·내 카드 정보가 끊기므로 앱 안에서 엶
+    var inApp = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+    var w = inApp ? null : window.open('about:blank', '_blank');
     ensureShort(c).then(function (u) { u = u || c.url; if (w) w.location.href = u; else location.href = u; });
   });
   function openDone() { try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 

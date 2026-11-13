@@ -264,6 +264,8 @@
       });
       var ownerBar = function () {
         if (document.querySelector('.sk-owner')) return;
+        // 참석 명단: 카드 주인 화면에서만 이름·전화번호가 보이게 잠금
+        if (card.roster && window.SsakaRoster && SsakaRoster.own) { try { SsakaRoster.own(); } catch (e) {} }
         var bar = document.createElement('div'); bar.className = 'sk-owner';
         var st = document.createElement('div'); st.className = 'sk-stats'; st.textContent = '📊 손님 반응 불러오는 중…';
         fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {

@@ -643,3 +643,11 @@
 .sk-edbar .no { background: #3B4250; color: #fff; }
 .sk-edbar .ok { flex: 2; background: #B3132B; color: #fff; }
 .sk-edok { display: block; width: 100%; min-height: 46px; margin: -6px 0 12px; border: 0; border-radius: 12px; background: #B3132B; color: #fff; font: 800 15px/1 system-ui, sans-serif; }
+
+/* 참석 신청: 받는 사람은 [참석할게요][못 가요]만, 명단은 모임 연 사람만 */
+.sk-ro-btns { display: flex; gap: 8px; margin-top: 12px; }
+.sk-ro-btns .sk-ro-join { flex: 2; margin-top: 0; }
+.sk-ro-no { flex: 1; min-height: 54px; border: 1.5px solid var(--line-ink, rgba(0,0,0,.15)); border-radius: 14px; background: transparent; color: var(--ink); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.sk-ro-mine { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,.05); font-weight: 700; font-size: 15px; }
+.sk-ro-ph { margin-left: 4px; font-size: .92em; font-weight: 700; color: var(--accent-line, var(--accent)); text-decoration: none; white-space: nowrap; }
+.sk-roster.host .sk-ro-head b { color: var(--accent-line, inherit); }

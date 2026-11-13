@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=71">
+  <link rel="stylesheet" href="../css/sk.css?v=72">
   <link rel="stylesheet" href="../css/sk-world.css">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -466,6 +466,17 @@
         </div>
       </fieldset>
 
+      <fieldset data-for="club">
+        <legend>🙋 참석 명단 받기</legend>
+        <label class="switch"><input type="checkbox" id="rosterOn" checked> <span>카드에서 참석 신청 받고, 번호 매긴 명단 자동으로 만들기</span></label>
+        <div id="rosterBox">
+          <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
+          <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
+          <label class="switch"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
+          <div class="hint">받는 사람이 이름·기수·탑승지·동반 인원을 고르면 "01.홍길동28 교대"처럼 번호가 자동으로 붙은 명단이 카드에 보여요. 신청할 때 위 전화번호(총무님)로 문자도 보낼 수 있고, 명단은 카톡방에 붙여넣게 한 번에 복사돼요.</div>
+        </div>
+      </fieldset>
+
       <fieldset data-for="profile club shop greet">
         <legend>시즌 테마</legend>
         <select id="season">
@@ -592,7 +603,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=78"></script>
+<script src="../js/designs.js?v=79"></script>
 <script src="../js/render.js?v=72"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
@@ -630,7 +641,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
+  var FIELDS = ['title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -926,6 +937,13 @@
       };
       var ci = card.buttons.indexOf('call');
       card.buttons.splice(ci >= 0 ? ci + 1 : 0, 0, 'reserve');
+    }
+    if (type === 'club' && $('rosterOn').checked) {
+      // 같은 제목이면 같은 명단(고쳐서 다시 보내도 신청자가 그대로), 제목이 바뀌면 새 명단
+      var rkey = 'sava-roster-ids', rmap = {}, rt = (card.title || '').trim() || '모임';
+      try { rmap = JSON.parse(localStorage.getItem(rkey) || '{}'); } catch (e) {}
+      if (!rmap[rt]) { var ra = 'abcdefghjkmnpqrstuvwxyz23456789', rb = crypto.getRandomValues(new Uint8Array(10)), rs = ''; for (var ri = 0; ri < 10; ri++) rs += ra[rb[ri] % ra.length]; rmap[rt] = rs; if (!isEmpty) try { localStorage.setItem(rkey, JSON.stringify(rmap)); } catch (e) {} }
+      card.roster = { id: rmap[rt], st: g('stops').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8), g: $('gisuOn').checked ? 1 : 0 };
     }
     if ($('sound').value) card.sound = $('sound').value;
     if (cfg.sos) {
@@ -1386,6 +1404,8 @@
     if (!SsakaSound.play($('sound').value)) toast('소리를 먼저 골라주세요');
   });
   $('resvOn').addEventListener('change', function () { $('resvBox').hidden = !this.checked; update(); });
+  $('rosterOn').addEventListener('change', function () { $('rosterBox').hidden = !this.checked; update(); });
+  $('gisuOn').addEventListener('change', function () { update(); });
   // ---------- 네이버 블로그 글 (AI) ----------
   var blogPost = null, blogCard = null, blogUrl = '', blogImgs = [];
   function devId() {

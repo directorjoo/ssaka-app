@@ -525,3 +525,22 @@
 .sk-phhold-t { white-space: pre-line; text-align: center; font-size: 17px; font-weight: 900; line-height: 1.5; color: #333; background: rgba(255,255,255,.85); padding: 10px 16px; border-radius: 14px; }
 .sk-photo.sk-phhold::after { display: none; }
 .sk-photo.sk-phhold .sk-mono { display: none !important; }
+
+/* 참석 명단 (산악회·동문회 공지) */
+.sk-roster { margin: 18px 0 6px; padding: 16px; border-radius: 18px; background: color-mix(in srgb, var(--paper) 92%, var(--ink)); color: var(--ink); border: 1.5px solid var(--line-ink, rgba(0,0,0,.12)); font-family: var(--f-body); }
+.sk-ro-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sk-ro-head b { font-size: 18px; font-weight: 800; }
+.sk-ro-cnt { font-size: 14px; font-weight: 700; color: var(--accent); }
+.sk-ro-stops { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sk-ro-stops:empty { display: none; }
+.sk-ro-stops span { padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, var(--paper)); font-size: 13.5px; font-weight: 700; }
+.sk-ro-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 2px; max-height: 360px; overflow-y: auto; font-size: 16.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sk-ro-list li { padding: 6px 4px; border-bottom: 1px dashed var(--line-ink, rgba(0,0,0,.12)); }
+.sk-ro-list li.me { color: var(--accent); font-weight: 800; }
+.sk-ro-list li.me::after { content: ' ← 나'; font-size: 13px; }
+.sk-ro-join, .sk-ro-copy { display: block; width: 100%; min-height: 54px; margin-top: 12px; border-radius: 14px; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+.sk-ro-join { border: 0; background: var(--accent); color: var(--on-accent, #fff); }
+.sk-ro-copy { border: 1.5px solid var(--line-ink, rgba(0,0,0,.15)); background: transparent; color: var(--ink); font-size: 15.5px; min-height: 48px; margin-top: 8px; }
+.sk-ro-sms { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
+.sk-rform .sk-ro-sms input { width: 22px; height: 22px; min-height: 0; padding: 0; flex: none; -webkit-appearance: auto; appearance: auto; accent-color: var(--accent); }
+.sk-roster .sk-fine { margin: 10px 0 0; font-size: 12.5px; color: var(--sub); }

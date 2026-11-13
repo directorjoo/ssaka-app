@@ -178,6 +178,8 @@
     };
 
     var root = SsakaRender.build(card, design, ctx);
+    // 산악회·동문회 공지: 참석 명단 (신청·번호 자동·카톡용 복사)
+    if (card.roster && window.SsakaRoster) { try { SsakaRoster.mount(card, root, toast); } catch (e) {} }
     // ---------- 손님 반응 숫자: 열람·버튼 '횟수'만 보냄 (만든 사람 본인 화면은 빼고) ----------
     var statKey = (function () { var q = new URLSearchParams(location.search); return q.get('s') ? { s: q.get('s') } : (q.get('d') || window.__ssakaD) ? { d: q.get('d') || window.__ssakaD } : null; })();
     function isMine() {

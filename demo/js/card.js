@@ -329,14 +329,40 @@
         try { localStorage.setItem('ssaka-my-name', who); } catch (e) {}
         var note = memo.value.trim();
         var msg = '[' + (card.title || '모임') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + who + ' — ' + o[1].replace(/^\S+\s/, '') + (note ? '\n💬 ' + note : '') + '\n싸바!';
-        shut();
-        if (window.self !== window.top) { toast('미리보기에선 문자가 열리지 않아요'); return; }
-        location.href = smsHref(c.phone, msg);
+        // 참석이고 카드에 참석 명단이 있으면 명단에 바로 올리기 (번호 자동)
+        if (o[0] === 'yes' && card.roster) { shut(); var jb = root.querySelector('.sk-ro-join'); if (jb) { jb.scrollIntoView({ block: 'center' }); jb.click(); return; } }
+        // 어디로 보낼지 고르기: 카톡(기본) 또는 문자
+        box.innerHTML = '';
+        var h2 = document.createElement('div'); h2.className = 'sk-sheet-head';
+        var tt = document.createElement('strong'); tt.textContent = '어디로 보낼까요?'; h2.appendChild(tt);
+        var xx = document.createElement('button'); xx.type = 'button'; xx.className = 'sk-x'; xx.textContent = '닫기'; xx.addEventListener('click', shut); h2.appendChild(xx);
+        box.appendChild(h2);
+        var pv = document.createElement('p'); pv.className = 'sk-fine'; pv.style.whiteSpace = 'pre-line'; pv.style.fontSize = '15px'; pv.textContent = msg; box.appendChild(pv);
+        var kb = document.createElement('button'); kb.type = 'button'; kb.className = 'sk-rsvp-b sk-rsvp-yes'; kb.textContent = '💬 카톡으로 보내기 (모임방·총무 고르기)';
+        var sb = document.createElement('button'); sb.type = 'button'; sb.className = 'sk-rsvp-b'; sb.textContent = '✉️ 문자로 보내기' + (c.name ? ' (' + c.name + '님께)' : '');
+        var r2 = document.createElement('div'); r2.className = 'sk-rsvp'; r2.appendChild(kb); if (c.phone) r2.appendChild(sb); box.appendChild(r2);
+        kb.addEventListener('click', function () {
+          shut();
+          if (window.self !== window.top) { toast('미리보기에선 보내지지 않아요'); return; }
+          var url = location.href, txt = msg.slice(0, 190);
+          var fallback = function () {
+            if (navigator.share) navigator.share({ text: msg + '\n' + url }).catch(function () {});
+            else if (navigator.clipboard) navigator.clipboard.writeText(msg).then(function () { toast('답장을 복사했어요. 카톡방에 붙여넣으세요'); });
+          };
+          if (window.SsakaKakao) window.SsakaKakao().then(function (K) {
+            K.Share.sendDefault({ objectType: 'text', text: txt, link: { mobileWebUrl: url, webUrl: url }, buttonTitle: '카드 보기' });
+          }).catch(fallback); else fallback();
+        });
+        sb.addEventListener('click', function () {
+          shut();
+          if (window.self !== window.top) { toast('미리보기에선 문자가 열리지 않아요'); return; }
+          location.href = smsHref(c.phone, msg);
+        });
       });
       row.appendChild(b);
     });
     box.appendChild(row);
-    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = (c.name ? c.name + '님' : '보낸 사람') + '에게 문자로 답장이 가요.';
+    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = '고른 뒤 카톡(모임방이나 ' + (c.name ? c.name + '님' : '총무') + ')이나 문자로 보낼 수 있어요.';
     box.appendChild(fine);
     function shut() { sheet.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') shut(); }

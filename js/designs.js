@@ -100,8 +100,8 @@
   var FAMILIES = [
     W('minimal', '미니멀', 'calm', 'sanskr', [
       { bg: '#ffffff', paper: '#f5f5f3', ink: '#111111', accent: '#111111' },
-      { bg: '#f4f1ec', paper: '#ffffff', ink: '#24201c', accent: '#9a6b3f' },
-      { bg: '#eef1f0', paper: '#ffffff', ink: '#18201e', accent: '#2f6b5e' }]),
+      { bg: '#efe6d8', paper: '#f8f2e8', ink: '#2a2118', accent: '#9a5a2e' },
+      { bg: '#23332e', paper: '#2c3f39', ink: '#eef2ec', accent: '#c9b37e' }]),
     W('pastel', '파스텔', 'calm', 'sanskr', [
       { bg: '#fff4f6', paper: '#ffffff', ink: '#3a2030', accent: '#ef6f93', c1: '#ffd0dc', c2: '#d9ccff', c3: '#ffe3b8' },
       { bg: '#eef8ff', paper: '#ffffff', ink: '#142a3c', accent: '#4a8fe0', c1: '#c9e6ff', c2: '#d6f5e8', c3: '#fff1b8' },
@@ -315,7 +315,7 @@
         for (var pi = 0; pi < 3; pi++) {
           var pal = fk === 'glass' ? st.palettes[GLASS_PICK[pi]] : st.palettes[(pi + (ind.id === 'cafe' ? 1 : ind.id === 'toefl' ? 2 : 0)) % 3];
           w++;
-          var dw = { id: ind.id + '-w' + w, industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
+          var dw = { id: ind.id + '-w' + w, industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, v: pi + 1, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
           BY_ID[dw.id] = dw; list.push(dw);
         }
       });
@@ -330,6 +330,8 @@
       var d = {
         id: ind.id + '-' + (i + 1), industry: ind.id,
         name: st.label + ' ' + (i + 1), style: styleKey, font: st.title, mood: st.mood || 'classic',
+        // 새 디자인 가족이 있는 업종은 예전 1~12번도 같은 이름끼리 모양을 다르게 (1·2·3·4번째)
+        v: ind.world && styleKey !== 'safe' ? (k % 4) + 1 : undefined,
         colors: colorsFor(styleKey, pal)
       };
       BY_ID[d.id] = d; list.push(d);
@@ -363,6 +365,8 @@
     s.setProperty('--f-title', (FONTS[d.font] || FONTS.sys).stack);
     s.setProperty('--f-body', FONTS.sys.stack);
     el.setAttribute('data-style', d.style);
+    // 같은 가족 안에서도 1·2·3번이 모양부터 다르게 (사진 자리·제목 자리)
+    if (d.v) el.setAttribute('data-v', String(d.v)); else el.removeAttribute('data-v');
     loadFont(d.font);
   }
 

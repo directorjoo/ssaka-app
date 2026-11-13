@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=84">
+  <link rel="stylesheet" href="../css/sk.css?v=85">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -244,6 +244,7 @@
     .bar-in { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 8px; align-items: center; }
     .bar-undo { background: var(--surface); color: var(--text); border: 1px solid var(--line) !important; }
     .bar-undo:disabled { opacity: .4; }
+    .bar-undo:not(:disabled) { border-color: #B3132B !important; color: #B3132B; }
     .prog { min-width: 0; font-size: 13px; }
     .prog b { display: block; margin-bottom: 4px; white-space: nowrap; }
     .track { display: block; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
@@ -259,12 +260,12 @@
     @media (max-width: 560px) {
       .bar { padding-top: 8px; }
       body { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
-      .bar-in { grid-template-columns: auto 1fr 1fr 1.1fr; row-gap: 6px; gap: 6px; }
+      .bar-in { grid-template-columns: 64px 1fr 1fr 1.2fr; row-gap: 6px; gap: 6px; }
       .prog { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
       .prog b { margin: 0; font-size: 12.5px; }
       .prog .track { flex: 1; }
       .bar button { min-height: 50px; padding: 0 8px; font-size: 14.5px; }
-      .bar-undo { font-size: 0 !important; width: 46px; } .bar-undo::before { content: '↩'; font-size: 20px; }
+      .bar-undo { font-size: 13px !important; line-height: 1.15; white-space: normal !important; width: 64px; padding: 0 4px !important; }
     }
     @media (min-width: 860px) { .bar-pv { display: none; } }
     .done-box { text-align: center; display: grid; gap: 10px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
@@ -584,8 +585,8 @@
   <div class="bar-in">
     <div class="prog"><b id="progText">필수 0/3</b><span class="track"><i id="progFill"></i></span></div>
     <button type="button" class="bar-undo" id="undo" disabled aria-label="방금 고친 것 되돌리기">↩ 되돌리기</button>
-    <button type="button" class="bar-pv" id="goPreview">👀 미리보기</button>
-    <button type="button" class="bar-ed" id="goEdit">✏️ 수정하기</button>
+    <button type="button" class="bar-pv" id="goPreview">👀 보기</button>
+    <button type="button" class="bar-ed" id="goEdit">✏️ 수정</button>
     <button type="button" class="bar-done" id="finish">✅ 완료</button>
   </div>
 </div>
@@ -1113,7 +1114,7 @@
     $('progFill').style.width = (done / REQUIRED.length * 100) + '%';
     var btn = $('finish'), was = btn.classList.contains('ready');
     btn.classList.toggle('ready', !miss.length);
-    btn.textContent = miss.length ? '✅ 완료' : '✅ 완료 · 보내기';
+    btn.textContent = miss.length ? '✅ 완료' : '✅ 보내기';
     if (!was && !miss.length) { btn.style.animation = 'none'; void btn.offsetWidth; btn.style.animation = ''; }
     REQUIRED.forEach(function (f) { if (v(f)) $(f).classList.remove('missing'); });
   }
@@ -1286,7 +1287,7 @@
   // ---------- ✏️ 수정하기: 미리보기 카드에서 바로 고치는 모드 ----------
   function editMode(on) {
     $('goEdit').classList.toggle('on', on);
-    $('goEdit').textContent = on ? '✓ 수정 끝' : '✏️ 수정하기';
+    $('goEdit').textContent = on ? '✓ 수정 끝' : '✏️ 수정';
     try { var w = $('frame').contentWindow; if (w && w.SavaPreviewMode) w.SavaPreviewMode(on); } catch (e) {}
   }
   window.SavaEditOn = function () { return $('goEdit').classList.contains('on'); };

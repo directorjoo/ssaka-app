@@ -380,8 +380,26 @@
     var tip = h('div', { class: 'sk-edtip', text: '✏️ 고칠 글자를 누르세요 · 내용은 줄바꿈까지 자유롭게' });
     var foot = h('div', { class: 'sk-edbar' });
     var bNo = h('button', { type: 'button', class: 'no', text: '취소' });
+    var bUn = h('button', { type: 'button', class: 'no un', text: '↩ 되돌리기' });
     var bOk = h('button', { type: 'button', class: 'ok', text: '💾 저장' });
-    foot.appendChild(bNo); foot.appendChild(bOk);
+    foot.appendChild(bNo); foot.appendChild(bUn); foot.appendChild(bOk);
+    // 되돌리기: 고칠 때마다 그 전 모습을 기억해 두고 한 단계씩 돌아감
+    var HIST = [];
+    function txt(sel) { var e = root.querySelector(sel); return e ? e.textContent : null; }
+    function snapE() { return JSON.stringify({ k: txt('.sk-kick'), t: txt('.sk-title'), s: txt('.sk-sub'), b: lines }); }
+    function push() { var x = snapE(); if (HIST[HIST.length - 1] !== x) HIST.push(x); bUn.disabled = HIST.length < 2; }
+    function redrawList() {
+      var tmp = SsakaRender.build(Object.assign({}, card, { body: lines.concat(addr) }), design, ctx);
+      var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' }), ol = root.querySelector('.sk-list');
+      if (ol) ol.replaceWith(nl);
+    }
+    bUn.addEventListener('click', function () {
+      if (HIST.length < 2) return;
+      HIST.pop(); var d = JSON.parse(HIST[HIST.length - 1]);
+      [['.sk-kick', d.k], ['.sk-title', d.t], ['.sk-sub', d.s]].forEach(function (x) { var e = root.querySelector(x[0]); if (e && x[1] != null) e.textContent = x[1]; });
+      lines = d.b; redrawList(); bUn.disabled = HIST.length < 2;
+      toast('↩ 한 단계 되돌렸어요');
+    });
     document.body.appendChild(tip); document.body.appendChild(foot);
     var tipT = setTimeout(function () { tip.style.opacity = '0'; }, 3500);
     // 제목·한 줄 소개·맨 위 한마디
@@ -389,6 +407,7 @@
       var e = root.querySelector(sel); if (!e) return;
       e.contentEditable = 'true'; e.classList.add('sk-edf');
       e.addEventListener('keydown', function (k) { if (k.key === 'Enter') { k.preventDefault(); e.blur(); } });
+      e.addEventListener('blur', push);
     });
     // 내용: 누르면 줄 단위로 고치는 칸으로 바뀜
     function list() { return root.querySelector('.sk-list'); }
@@ -406,9 +425,11 @@
         var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' });
         ta.replaceWith(nl);
         tip.style.opacity = '0';
+        push();
       }, { once: true });
     }
     root.addEventListener('click', openBody, true);
+    push();
     if (!list() && !lines.length) {
       // 내용이 비어 있던 카드: 제목 아래에 빈 칸을 하나 만들어 둠
       var sub = root.querySelector('.sk-sub') || root.querySelector('.sk-title');

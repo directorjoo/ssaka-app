@@ -655,3 +655,5 @@
 .sk-nw { white-space: nowrap; }
 .sk .sk-sub { text-wrap: balance; }
 .sk .sk-list li.sk-tt .sk-tm { white-space: nowrap; }
+.sk-edbar .un { flex: 1.2; background: #fff; color: #B3132B; border: 1.5px solid #B3132B; }
+.sk-edbar .un:disabled { opacity: .45; }

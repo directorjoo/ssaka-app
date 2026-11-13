@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=75">
+  <link rel="stylesheet" href="../css/sk.css?v=76">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -516,6 +516,19 @@
       </fieldset>
 
       <fieldset>
+        <legend>🎬 움직이는 카드 (짧은 영상처럼)</legend>
+        <select id="motion">
+          <option value="">움직임 없음</option>
+          <option value="zoom">🎥 사진이 천천히 다가오기</option>
+          <option value="steam">♨️ 김이 모락모락 (음식·차)</option>
+          <option value="shine">✨ 반짝반짝 빛나기</option>
+          <option value="petal">🌸 꽃잎 흩날리기</option>
+          <option value="cherry">🍒 체리가 톡톡 떨어지기</option>
+        </select>
+        <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
+      </fieldset>
+
+      <fieldset>
         <legend>카드 열면 나오는 소리</legend>
         <div class="addr">
           <select id="sound"></select>
@@ -632,7 +645,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=83"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=76"></script>
+<script src="../js/render.js?v=77"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -669,7 +682,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -740,7 +753,7 @@
       body: String(ex.body || '').split('\n').filter(Boolean),
       contact: { name: ex.name || '이름', phone: '010-0000-0000' },
       place: (ex.place && cardType.buttons.indexOf('map') >= 0) ? { name: ex.place } : null,
-      gallery: galList().slice(0, 4), season: v('season') || undefined,
+      gallery: galList().slice(0, 4), season: v('season') || undefined, motion: v('motion') || undefined,
       copy: ex.copyValue ? { label: ex.copyLabel || '복사', value: ex.copyValue } : null,
       buttons: cardType.buttons.slice(), sos: !!cardType.sos, sosLabel: ex.sosLabel
     };
@@ -968,6 +981,7 @@
     if (galList().length) card.gallery = galList();
     else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
     if (v('season')) card.season = v('season');
+    if (v('motion')) card.motion = v('motion');
     if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
     if (type === 'shop' && $('resvOn').checked) {
       var ires = (D.industry(industry) || {}).res || {};
@@ -1444,6 +1458,7 @@
     });
   });
   $('season').addEventListener('change', function () { seasonTouched = true; update(); renderGallery(); });
+  $('motion').addEventListener('change', function () { update(); });
 
   $('photoRemove').addEventListener('click', function () {
     $('image').value = ''; IP = { z: 100, x: 50, y: 50, f: 0 }; showThumb(''); $('photoStatus').textContent = '사진을 뺐어요.'; update();
@@ -1903,7 +1918,7 @@
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
     set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
     IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
-    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || '');
+    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || ''); set('motion', c.motion || '');
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));

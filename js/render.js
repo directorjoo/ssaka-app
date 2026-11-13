@@ -65,6 +65,22 @@
       root.appendChild(sea);
     }
 
+    // 움직이는 카드: 사진이 다가오기 · 김 · 반짝 · 꽃잎 · 체리 (소리 없이 반복)
+    var MOTION = { zoom: 1, steam: 1, shine: 1, petal: 1, cherry: 1 };
+    var motion = MOTION[card.motion] ? card.motion : '';
+    if (motion) root.classList.add('sk-mo', 'sk-mo-' + motion);
+    if (motion === 'petal' || motion === 'cherry') {
+      var fall = el('div', 'sk-mofall'); fall.setAttribute('aria-hidden', 'true');
+      for (var pf = 0; pf < 14; pf++) {
+        var pi = el('i');
+        pi.style.left = ((pf * 29 + 7) % 100) + '%';
+        pi.style.animationDelay = (-(pf * 0.9) % 8).toFixed(1) + 's';
+        pi.style.animationDuration = (6 + (pf % 4)) + 's';
+        fall.appendChild(pi);
+      }
+      root.appendChild(fall);
+    }
+
     var wrap = el('div', 'sk-wrap');
     var main = el('div', 'sk-main');
     var hero = el('header', 'sk-hero');
@@ -91,6 +107,11 @@
       photo.appendChild(img);
     } else {
       photo.appendChild(el('span', 'sk-mono', (card.title || '싸').trim().charAt(0)));
+    }
+    if (card.image && !card.sos && (motion === 'steam' || motion === 'shine')) {
+      var fx = el('div', 'sk-mofx'); fx.setAttribute('aria-hidden', 'true');
+      for (var mf = 0; mf < (motion === 'steam' ? 5 : 9); mf++) fx.appendChild(el('i'));
+      photo.appendChild(fx);
     }
     if (!card.sos) hero.appendChild(photo);
     var titles = el('div', 'sk-titles');

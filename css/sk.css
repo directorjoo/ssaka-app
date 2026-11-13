@@ -559,3 +559,40 @@
 .sk .sk-kick { margin: 0 0 10px; font-family: var(--f-title); font-size: 17px; font-weight: 800; letter-spacing: .18em; color: var(--accent-line, var(--accent)); }
 .sk .sk-kick::before, .sk .sk-kick::after { content: '—'; margin: 0 .5em; opacity: .6; letter-spacing: 0; }
 .sk-thumb .sk-kick { font-size: 15px; }
+
+/* =========================================================
+   움직이는 카드 (짧은 영상처럼) — card.motion
+   ========================================================= */
+.sk-mo .sk-photo { overflow: hidden; }
+.sk-mo-zoom .sk-photo:not(.sk-nophoto) > img:not(.sk-photo-blur) { animation: sk-kb 12s ease-in-out infinite alternate; transform-origin: 60% 40%; }
+@keyframes sk-kb { from { transform: scale(1); } to { transform: scale(1.16) translate(-2%, 2%); } }
+.sk-mofx { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+/* 김 모락모락 */
+.sk-mo-steam .sk-mofx i { position: absolute; bottom: 18%; width: 22%; height: 46%; border-radius: 50%; background: radial-gradient(ellipse at 50% 60%, rgba(255,255,255,.75), rgba(255,255,255,0) 68%); filter: blur(8px); opacity: 0; animation: sk-steam 5s ease-in infinite; }
+.sk-mo-steam .sk-mofx i:nth-child(1) { left: 18%; animation-delay: 0s; }
+.sk-mo-steam .sk-mofx i:nth-child(2) { left: 38%; animation-delay: -1s; }
+.sk-mo-steam .sk-mofx i:nth-child(3) { left: 56%; animation-delay: -2s; }
+.sk-mo-steam .sk-mofx i:nth-child(4) { left: 30%; animation-delay: -3s; }
+.sk-mo-steam .sk-mofx i:nth-child(5) { left: 48%; animation-delay: -4s; }
+@keyframes sk-steam { 0% { transform: translateY(20%) scaleX(.7); opacity: 0; } 25% { opacity: .9; } 100% { transform: translateY(-75%) scaleX(1.3) rotate(8deg); opacity: 0; } }
+/* 반짝반짝 */
+.sk-mo-shine .sk-mofx i { position: absolute; width: 16px; height: 16px; background: #fff; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); filter: drop-shadow(0 0 6px rgba(255,255,255,.9)); opacity: 0; animation: sk-twinkle 2.4s ease-in-out infinite; }
+.sk-mo-shine .sk-mofx i:nth-child(1) { left: 12%; top: 16%; } .sk-mo-shine .sk-mofx i:nth-child(2) { left: 72%; top: 12%; animation-delay: -.6s; }
+.sk-mo-shine .sk-mofx i:nth-child(3) { left: 46%; top: 38%; animation-delay: -1.2s; width: 22px; height: 22px; } .sk-mo-shine .sk-mofx i:nth-child(4) { left: 82%; top: 58%; animation-delay: -1.8s; }
+.sk-mo-shine .sk-mofx i:nth-child(5) { left: 22%; top: 70%; animation-delay: -.3s; } .sk-mo-shine .sk-mofx i:nth-child(6) { left: 60%; top: 80%; animation-delay: -1.5s; width: 12px; height: 12px; }
+.sk-mo-shine .sk-mofx i:nth-child(7) { left: 34%; top: 8%; animation-delay: -2.1s; width: 10px; height: 10px; } .sk-mo-shine .sk-mofx i:nth-child(8) { left: 88%; top: 30%; animation-delay: -.9s; width: 12px; height: 12px; }
+.sk-mo-shine .sk-mofx i:nth-child(9) { left: 6%; top: 44%; animation-delay: -1.1s; width: 12px; height: 12px; }
+.sk-mo-shine .sk-photo::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); background-size: 250% 100%; animation: sk-sweep 4s ease-in-out infinite; }
+@keyframes sk-twinkle { 0%, 100% { transform: scale(.2) rotate(0); opacity: 0; } 50% { transform: scale(1) rotate(45deg); opacity: 1; } }
+@keyframes sk-sweep { 0% { background-position: 150% 0; } 60%, 100% { background-position: -100% 0; } }
+/* 꽃잎 · 체리 흩날리기 (카드 전체) */
+.sk-mofall { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.sk-mofall i { position: absolute; top: -24px; width: 12px; height: 10px; border-radius: 80% 0 80% 0; background: #ffb7c9; opacity: .9; animation: sk-petal 7s linear infinite; }
+.sk-mofall i:nth-child(3n) { background: #ffd1dc; width: 9px; height: 8px; }
+.sk-mo-cherry .sk-mofall i { width: 20px; height: 20px; border-radius: 0; background: url(../img/cherry.svg) center / contain no-repeat; }
+.sk-mo-cherry .sk-mofall i:nth-child(3n) { width: 14px; height: 14px; background: url(../img/cherry.svg) center / contain no-repeat; }
+@keyframes sk-petal { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(30px, 52vh) rotate(180deg); } 100% { transform: translate(-10px, 105vh) rotate(360deg); } }
+/* 고르기 칸의 작은 그림에서는 멈춘 모습 */
+.sk-thumb.sk-mo * { animation: none !important; }
+.sk-thumb .sk-mofall i:nth-child(odd) { top: 20%; } .sk-thumb .sk-mofall i:nth-child(even) { top: 60%; }
+@media (prefers-reduced-motion: reduce) { .sk-mo * { animation: none !important; } .sk-mofall { display: none; } }

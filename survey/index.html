@@ -60,6 +60,11 @@
     .ty .s { font-size: 11.5px; font-weight: 800; margin-top: 5px; opacity: 1; }
     .ty.done { background: #fff; color: var(--ink); } .ty.work { background: rgba(255,255,255,.3); }
     .gen .btn.yel { margin-top: 4px; }
+    .qk { margin-top: 18px; }
+    .qk label { display: block; font-size: 13.5px; font-weight: 800; margin: 4px 0 6px; }
+    .qkn { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 12px; }
+    .qkn button { min-height: 46px; border-radius: 12px; border: 0; background: rgba(255,255,255,.16); color: #fff; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .qkn button[aria-pressed="true"] { background: #fff; color: var(--ink); }
     .prog { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff; color: var(--ink); }
     .prog .pt2 { font-size: 16px; font-weight: 900; }
     .prog i { display: block; height: 10px; border-radius: 9px; background: #eee3d6; margin: 10px 0 4px; overflow: hidden; }
@@ -98,7 +103,25 @@
   <h2>1. 업종 고르기</h2>
   <div class="chips" id="inds"></div>
 
-  <h2>2. 얼마나 답할까요?</h2>
+  <section class="gen qk" id="qk">
+    <h2>⚡ 빠르게 쓰기 <small style="font-size:13px;opacity:.85">추천</small></h2>
+    <p id="qkInfo">네이버 상위 블로그를 분석한 틀로 써요. 아래 칸만 채우면 돼요.</p>
+    <label for="qkName">상호 (꼭)</label><input id="qkName" maxlength="40" placeholder="예: 족집게어학원">
+    <label for="qkRegion">지역</label><input id="qkRegion" maxlength="40" placeholder="예: 대치동">
+    <label for="qkKw">대표 키워드 (쉼표로 2~3개)</label><input id="qkKw" maxlength="80" placeholder="예: 토플학원, 토플 100점">
+    <label for="qkS1">우리만의 강점 (꼭, 1~3개)</label>
+    <input id="qkS1" maxlength="200" placeholder="강점 1 (예: 토플 강의 19년, 수험서 저자 원장 직강)">
+    <input id="qkS2" maxlength="200" placeholder="강점 2 (예: 소수정예, 예습·복습 개인 관리)">
+    <input id="qkS3" maxlength="200" placeholder="강점 3 (예: 기초 학생도 단기간 80점대 목표)">
+    <label for="qkPhone">전화 (선택)</label><input id="qkPhone" maxlength="20" inputmode="tel" placeholder="예: 02-000-0000">
+    <label for="qkNote">꼭 넣을 것 (선택)</label><input id="qkNote" maxlength="600" placeholder="예: 겨울방학 올데이반 모집, 선릉역 3분">
+    <div class="qkn" role="group" aria-label="몇 편 쓸까요"><button type="button" data-n="3" aria-pressed="true">3편</button><button type="button" data-n="5" aria-pressed="false">5편</button><button type="button" data-n="10" aria-pressed="false">10편</button></div>
+    <button type="button" class="btn yel" id="qkGo">✍️ 상위 블로그 방식으로 3편 쓰기</button>
+    <div class="prog" id="qkprog" hidden><div class="pt2" id="qkprogT"></div><i><b id="qkprogB"></b></i><div class="pe" id="qkprogE" hidden></div><button type="button" class="btn yel" id="qkprogSee" hidden>📚 쓴 글 보기</button></div>
+    <p class="warn" style="color:#fff;opacity:.85">글마다 다른 틀(고르는 기준 · 안 되는 이유 · 묻고 답하기 · 단계별 안내 …)로 써요. 하루 25편까지.</p>
+  </section>
+
+  <h2>2. 더 자세히 쓰고 싶다면 — 설문 (선택)</h2>
   <div class="mode">
     <button type="button" id="mQuick" aria-pressed="true">⚡ 꼭 필요한 것만<small id="mQn">17개 · 5분</small></button>
     <button type="button" id="mAll" aria-pressed="false">📋 전체 100개<small>많이 답할수록 글이 좋아져요</small></button>
@@ -287,15 +310,16 @@
       if (posts[t.n]) setTy(t.n, 'done', '✅ 다 썼어요 · 보기');
     });
   }
-  function setTy(n, cls, s) { var b = TY[n]; b.classList.remove('done', 'work'); if (cls) b.classList.add(cls); b.querySelector('.s').textContent = s || ''; }
+  function setTy(n, cls, s) { var b = TY[n]; if (!b) return; b.classList.remove('done', 'work'); if (cls) b.classList.add(cls); b.querySelector('.s').textContent = s || ''; }
   function cardLink() { var u = (st.url || '').trim(); return /^https?:\/\/(www\.)?sava\.kr\//.test(u) ? u : ''; }
   function qa() { return answered().map(function (q) { return [q.q, st.a[q.id].trim().slice(0, 400), q.t.join(',')]; }); }
   var busy = 0, stopAll = false, lastErr = '';
   function one(n) {
     setTy(n, 'work', '✍️ 쓰는 중… (30초쯤)');
     var ind = S.BY[st.ind];
-    return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ mode: 'survey', type: n, survey: { ind: ind.label, who: ind.h || '대표님', qa: qa() }, images: 4, hasCard: !!cardLink(), dev: dev() }) })
+    var body = n > 100 ? { mode: 'quick', type: n - 100, quick: qkData(), hasCard: !!cardLink(), dev: dev() }
+      : { mode: 'survey', type: n, survey: { ind: ind.label, who: ind.h || '대표님', qa: qa() }, images: 4, hasCard: !!cardLink(), dev: dev() };
+    return fetch('../api/blog', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (x) {
         if (!x.ok) {
@@ -309,20 +333,23 @@
       }).catch(function () { lastErr = '인터넷이 끊겼거나 시간이 너무 걸렸어요'; setTy(n, '', '인터넷 확인 후 다시'); });
   }
   function run(list) {
-    if (answered().length < 5) { toast('답을 5개 넘게 적어 주세요'); return; }
+    var isQ = list[0] > 100, pfx = isQ ? 'qk' : '';
+    var $p = function (id) { return $(pfx + id); };
+    if (isQ) { var d = qkData(); if (!d.name || !d.strengths.length) { toast('상호와 강점을 적어 주세요'); $(d.name ? 'qkS1' : 'qkName').focus(); return; } }
+    else if (answered().length < 5) { toast('답을 5개 넘게 적어 주세요'); return; }
     stopAll = false; lastErr = '';
     var q = list.slice(), live = 0, total = q.length, fin = 0, ok0 = Object.keys(posts).length;
     q.forEach(function (n) { setTy(n, 'work', '⏳ 차례 기다리는 중'); });
     function prog(end) {
       var okN = Object.keys(posts).length - ok0;
-      $('prog').hidden = false;
-      $('progT').textContent = end ? (okN ? '✅ ' + okN + '편 다 썼어요!' + (okN < total ? ' (' + (total - okN) + '편은 못 썼어요)' : '') : '❌ 글을 못 썼어요') : '✍️ 쓰는 중… ' + fin + ' / ' + total + '편 (1~2분 걸려요)';
-      $('progB').style.width = Math.round(fin / total * 100) + '%';
-      $('progE').hidden = !lastErr; $('progE').textContent = lastErr ? '이유: ' + lastErr + ' — 이 화면을 캡처해서 보내 주세요' : '';
-      $('progSee').hidden = !(end && Object.keys(posts).length);
-      $('progSee').textContent = '📚 쓴 글 ' + Object.keys(posts).length + '편 보기 ↓';
+      $p('prog').hidden = false;
+      $p('progT').textContent = end ? (okN ? '✅ ' + okN + '편 다 썼어요!' + (okN < total ? ' (' + (total - okN) + '편은 못 썼어요)' : '') : '❌ 글을 못 썼어요') : '✍️ 쓰는 중… ' + fin + ' / ' + total + '편 (1~2분 걸려요)';
+      $p('progB').style.width = Math.round(fin / total * 100) + '%';
+      $p('progE').hidden = !lastErr; $p('progE').textContent = lastErr ? '이유: ' + lastErr + ' — 이 화면을 캡처해서 보내 주세요' : '';
+      $p('progSee').hidden = !(end && Object.keys(posts).length);
+      $p('progSee').textContent = '📚 쓴 글 ' + Object.keys(posts).length + '편 보기 ↓';
     }
-    prog(false); $('prog').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    prog(false); $p('prog').scrollIntoView({ behavior: 'smooth', block: 'center' });
     return new Promise(function (done) {
       function next() {
         if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) { prog(true); done(); } return; }
@@ -348,10 +375,10 @@
     return t;
   }
   function paintPost(n) {
-    var p = posts[n], ty = S.types(st.ind)[n - 1], old = $('post' + n);
+    var p = posts[n], ty = n > 100 ? { name: QT[n - 101] } : S.types(st.ind)[n - 1], old = $('post' + n);
     var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
     el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2"><button type="button" class="btn gh c3">🔄 이 형 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 네이버 블로그 열기</a></div>';
-    el.querySelector('.ty2').textContent = n + '형 · ' + ty.name;
+    el.querySelector('.ty2').textContent = n > 100 ? '⚡ 상위글 틀 · ' + ty.name : n + '형 · ' + ty.name;
     el.querySelector('.pt').value = p.title;
     var txt = p.blocks.map(function (b) { return b.t === 'img' ? '[사진 ' + b.n + (b.hint ? ' · ' + b.hint : '') + ']' : b.text; }).join('\n\n');
     el.querySelector('.pb').textContent = p.edited || txt;
@@ -366,6 +393,35 @@
   }
 
   // ---- 링크로 열었을 때 (#s=번호.열쇠) ----
+  // ---- 빠르게 쓰기 ----
+  var QT = ['고르기 전 확인할 것', '최신 정보', '이런 분께 맞아요', '단계별 안내', '이벤트·시즌 안내', '안 되는 이유와 해결', '묻고 답하기', '대표 이야기', '비교해 드려요', '찾아오는 길'];
+  var QORDER = [1, 6, 7, 4, 8, 3, 9, 2, 5, 10], qkN = 3, PAT = null;
+  var QF = ['qkName', 'qkRegion', 'qkKw', 'qkS1', 'qkS2', 'qkS3', 'qkPhone', 'qkNote'];
+  function qkData() {
+    var v = function (id) { return $(id).value.trim(); }, ind = S.BY[st.ind] || {};
+    return { indId: st.ind, ind: ind.label || '', who: ind.h || '대표님', name: v('qkName'), region: v('qkRegion'),
+      kw: v('qkKw').split(/[,，、]/).map(function (x) { return x.trim(); }).filter(Boolean),
+      strengths: [v('qkS1'), v('qkS2'), v('qkS3')].filter(Boolean), phone: v('qkPhone'), note: v('qkNote') };
+  }
+  var qk0 = st.qk || {};
+  QF.forEach(function (id) { if (qk0[id]) $(id).value = qk0[id]; $(id).addEventListener('input', function () { st.qk = st.qk || {}; st.qk[id] = $(id).value; save(); }); });
+  document.querySelectorAll('.qkn button').forEach(function (b) {
+    b.addEventListener('click', function () { qkN = +b.dataset.n; document.querySelectorAll('.qkn button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); $('qkGo').textContent = '✍️ 상위 블로그 방식으로 ' + qkN + '편 쓰기'; });
+  });
+  $('qkGo').addEventListener('click', function () {
+    var list = QORDER.slice(0, qkN).map(function (k) { return 100 + k; });
+    QORDER.slice(0, qkN).forEach(function (k) { delete posts[100 + k]; var o = $('post' + (100 + k)); if (o) o.remove(); });
+    var p = run(list); if (p) p.then(function () { savePosts(); });
+  });
+  function qkInfo() {
+    var p = PAT && PAT[st.ind], ind = S.BY[st.ind] || {};
+    $('qkInfo').textContent = p ? '네이버 상위 블로그 ' + p.n + '편(' + p.q.join(' · ') + ')을 분석한 틀로 써요. 상위 글은 보통 ' + p.chars.toLocaleString('ko-KR') + '자 · 사진 ' + p.imgs + '장' + (p.qTitle >= 20 ? ' · 질문형 제목이 많아요' : '') + '.' : '네이버 상위 블로그를 분석한 틀로 써요. 아래 칸만 채우면 돼요.';
+    $('qkName').placeholder = '예: ' + (ind.ex || (st.ind === 'toefl' ? '족집게어학원' : st.ind === 'restaurant' ? '압구정 순천만' : st.ind === 'beauty' ? '비온비 성수점' : '싸바'));
+  }
+  fetch('../api/blog-patterns').then(function (r) { return r.json(); }).then(function (j) { PAT = j; qkInfo(); }).catch(function () {});
+  $('inds').addEventListener('click', function () { setTimeout(qkInfo, 0); });
+  $('qkprogSee').addEventListener('click', goPosts);
+
   $('seePosts').addEventListener('click', goPosts); $('progSee').addEventListener('click', goPosts); $('toPosts').addEventListener('click', goPosts);
   function boot() {
     posts = loadPosts(); $('out').innerHTML = '';

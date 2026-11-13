@@ -2,6 +2,7 @@
 // 비밀키는 Cloudflare 환경변수 ANTHROPIC_API_KEY 에만 둡니다 (앞단 코드에 절대 넣지 않음).
 // 남용 막기: 기기당 하루 2편, IP당 하루 4편, 전체 하루 BLOG_DAILY_CAP(기본 300)편.
 // 저장하는 것: 날짜·횟수 세기용 키(기기 임의번호/IP의 해시)뿐. 글 내용은 저장하지 않습니다.
+import { PATTERNS } from './blog-patterns.js';
 const MODEL_DEFAULT = 'claude-sonnet-5-5';
 
 function json(o, status) {
@@ -89,7 +90,7 @@ async function ask(env, key, system, content) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-    body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 3000, system, messages: [{ role: 'user', content }] })
+    body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 4000, system, messages: [{ role: 'user', content }] })
   });
   if (!r.ok) { let m = ''; try { m = ((await r.json()).error || {}).type || ''; } catch (e) {} return { err: json({ error: 'ai', status: r.status, type: m }, 502) }; }
   const out = await r.json();
@@ -141,6 +142,69 @@ async function survey(b, request, env, key) {
   return json(x.post);
 }
 
+// ---------- 빠르게 쓰기: 상호·지역·키워드·강점만 넣으면, 그 업종 네이버 상위 글 틀로 씀 ----------
+const QUICK_TYPES = {
+  1: '고르기 전 확인할 것형: 제목은 "○○ 고르기 전에 꼭 확인할 N가지"처럼 손님이 고르는 기준을 알려 준다. 소제목 "1."~"N."(3~5개). 각 기준마다 우리 가게(학원)가 어떻게 하는지 강점으로 잇는다.',
+  2: '최신 정보형: 이 업종 손님이 요즘 궁금해하는 변화·계절 정보를 정리하고 우리 곳에서 어떻게 대비하는지로 잇는다. 숫자·날짜·제도는 [사실]에 있는 것만 쓰고, 일반 상식이라도 확실하지 않으면 숫자 없이 쓴다.',
+  3: '이런 분께 맞아요형: 어떤 손님(학생)에게 잘 맞는지 2~4가지 사례 유형으로 나눠 설명한다. [사실]에 실제 사례가 없으면 "이런 고민으로 많이 찾아오세요"처럼 쓰고, 점수·숫자·이름을 지어내지 않는다.',
+  4: '단계별 안내형: 처음 연락부터 상담·수업(이용)·마무리까지 1단계~4단계로 안내한다. 소제목 "1단계. ○○" 형식.',
+  5: '이벤트·시즌 안내형: 지금 계절·방학·연말에 맞춘 안내. [사실]에 기간·가격·혜택이 없으면 지어내지 말고 "자세한 일정은 문의해 주세요"로 쓴다.',
+  6: '안 되는 이유형: 제목은 "○○가 잘 안 되는 이유 N가지"처럼. 손님이 겪는 흔한 문제 3~4가지와 그 해결 방법을 차례로 쓰고, 해결 방법을 우리 강점과 잇는다.',
+  7: '묻고 답하기형: 손님이 실제로 많이 묻는 질문 6~8개. 소제목 블록(h)은 "Q. 질문", 바로 뒤 문단은 답만.',
+  8: '대표 이야기형: {님} 1인칭(저는, 제가)으로 이 일을 하는 이유와 지키는 원칙. 담담하고 진심 있게. 사건·숫자는 [사실]에 있는 것만.',
+  9: '비교형: 손님이 고민하는 선택지 2~3쌍(예: 혼자 vs 함께, 짧게 vs 길게)을 비교하고 어떤 분께 무엇이 맞는지. 한쪽을 깎아내리지 않는다.',
+  10: '찾아오는 길형: 가까운 역·주차·처음 오는 길을 순서대로 안내하고 근처 동네 분위기를 곁들인다. [사실]에 없는 가게·장소 이름은 쓰지 않는다.'
+};
+function patternText(id) {
+  const p = PATTERNS[id]; if (!p) return '';
+  return `[이 업종 네이버 상위 글 분석 — 형식만 따르고 문장은 절대 베끼지 않는다]
+- 검색어: ${p.q.join(', ')}
+- 글 길이: 공백 빼고 약 ${p.chars}자 (±30%)
+- 사진 자리: 약 ${p.imgs}장${p.mapPct >= 30 ? ' · 지도(찾아오는 길)를 넣는 글이 많음' : ''}
+- 제목: 질문형 ${p.qTitle}% · 숫자 넣은 제목 ${p.numTitle}% · 대괄호 [ ] 시작 ${p.bracket}%
+- 상위 글 제목 예시(문체 참고만): ${p.titles.slice(0, 8).join(' / ')}
+- 상위 글 첫 문장 예시(문체 참고만): ${p.openers.slice(0, 4).join(' / ')}
+- 상위 글 소제목 예시: ${p.heads.slice(0, 8).join(' / ')}
+- 자주 나오는 낱말: ${p.words.slice(0, 18).join(', ')}
+- 자주 쓰는 태그: ${p.tags.slice(0, 12).map(t => '#' + t).join(' ')}`;
+}
+const QUICK_RULES = `너는 동네 가게·학원·사람의 네이버 블로그 글을 대신 써 주는 작가다. 아래 [상위 글 분석]은 이 업종에서 네이버 검색 상위에 오른 글들의 형식이다. 길이·사진 수·제목 모양·첫 문장 방식·소제목 짜임·태그 쓰는 법을 이 분석에 맞춘다. 하지만 예시 문장을 그대로 옮기면 네이버 유사문서로 걸러지므로 문장은 전부 새로 쓴다.
+[사실]에 적힌 것만 이 가게(학원)의 사실로 쓴다. 없는 가격, 수상, 순위, 점수, 합격자 수, 손님 수, 경력 연수, 사람 이름, 기간은 지어내지 않는다. 손님 후기인 척하는 글, '1위', '최고', '보장', '무조건', '100% 합격' 같은 과장은 쓰지 않는다. 존댓말, {님} 목소리.
+운영하는 분은 '{님}'으로 부르고 '사장님'이라고 쓰지 않는다.
+제목: 메인 검색어(지역+업종 또는 대표 키워드)를 맨 앞에 두고 35자 안팎. 첫 문장에 제목의 검색어를 자연스럽게 한 번 더 넣고 이 글이 무엇을 알려 주는지 한 줄로 말한다. '안녕하세요'로 시작하지 않는다.
+본문에 검색어는 4~6번 자연스럽게. 짧은 문장, 한 문단 2~3문장. 별표(*)와 마크다운 기호 금지.
+사진 자리 블록을 N개 넣고, 각 자리에 "hint"로 찍으면 좋은 장면을 12자 안팎으로 적는다.
+마지막 문단에 상담·예약·문의 안내 한 줄(전화번호는 [사실]에 있을 때만).
+태그 10~15개: #을 붙이고 띄어쓰기 없이, 상위 글 태그 쓰는 법을 따라 지역+업종+키워드 조합.
+답은 JSON 하나만, 코드블록 없이:
+{"title":"...","blocks":[{"t":"img","n":1,"hint":"..."},{"t":"p","text":"..."},{"t":"h","text":"..."}],"tags":["#..."]}`;
+async function quick(b, request, env, key) {
+  const type = b.type | 0, q = b.quick || {};
+  if (!QUICK_TYPES[type]) return json({ error: 'bad' }, 400);
+  const name = clean(q.name, 40), region = clean(q.region, 40);
+  const kws = (Array.isArray(q.kw) ? q.kw : []).map(x => clean(x, 30)).filter(Boolean).slice(0, 5);
+  const strengths = (Array.isArray(q.strengths) ? q.strengths : []).map(x => clean(x, 200)).filter(Boolean).slice(0, 5);
+  if (!name || !strengths.length) return json({ error: 'few' }, 400);
+  let lim = null;
+  if (env.DB) {
+    const ip = request.headers.get('cf-connecting-ip') || 'x';
+    lim = [['all', +(env.BLOG_DAILY_CAP || 300)], ['sv2ip:' + await sha(ip), 40], ['sv2dev:' + clean(b.dev, 40), 25]];
+    const e = await overLimit(env.DB, lim);
+    if (e) return json({ error: e }, 429);
+  }
+  const p = PATTERNS[clean(q.indId, 20)];
+  const nImg = Math.max(3, Math.min(12, p ? Math.round(p.imgs * 0.6) : 5));
+  const who = ['대표님', '원장님', '선생님', '감독님', '배우님'].includes(q.who) ? q.who : '대표님';
+  const facts = ['상호: ' + name, region ? '지역: ' + region : '', '업종: ' + clean(q.ind, 30), kws.length ? '대표 키워드: ' + kws.join(', ') : '',
+    '강점:\n' + strengths.map(x => '- ' + x).join('\n'), q.note ? '그 밖에 꼭 넣을 것: ' + clean(q.note, 600) : '', q.phone ? '전화: ' + clean(q.phone, 20) : ''].filter(Boolean).join('\n');
+  const end = b.hasCard ? '\n마지막 문단에 \'예약·길찾기·전화는 아래 싸바카드에서 한 번에 할 수 있어요.\'라고 쓴다(링크는 프로그램이 붙임).' : '';
+  const sys = (QUICK_RULES + '\n\n' + patternText(clean(q.indId, 20)) + '\n\n[이번 글 틀]\n' + QUICK_TYPES[type] + end).replace(/\{님\}/g, who);
+  const x = await ask(env, key, sys, `사진 개수 N=${nImg}\n\n[사실]\n${facts}`);
+  if (x.err) { if (lim) await refund(env.DB, lim); return x.err; }
+  x.post.type = 100 + type;
+  return json(x.post);
+}
+
 export async function onRequest({ request, env }) {
   // 연결 점검: GET /api/blog?check=1 → AI 연결 상태만 알려 줌 (키 값은 절대 안 보여 줌)
   if (request.method === 'GET' && new URL(request.url).searchParams.get('check')) {
@@ -164,6 +228,7 @@ export async function onRequest({ request, env }) {
   try { const t = await request.text(); if (t.length > 60000) return json({ error: 'big' }, 413); b = JSON.parse(t); }
   catch (e) { return json({ error: 'bad' }, 400); }
   if (b.mode === 'survey') return survey(b, request, env, key);
+  if (b.mode === 'quick') return quick(b, request, env, key);
   const card = b.card || {};
   if (!clean(card.title, 60)) return json({ error: 'empty' }, 400);
   const nImg = Math.max(1, Math.min(8, b.images | 0 || 3));

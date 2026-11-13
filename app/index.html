@@ -188,7 +188,9 @@
 
     .toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 30; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  </style>
+      .kk-btn { height: 38px; padding: 0 12px; margin-right: 6px; border: 0; border-radius: 999px; background: #FEE500; color: #3A1D1D; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .top-act { display: flex; align-items: center; }
+</style>
 </head>
 <body>
 <div class="shell">
@@ -199,6 +201,7 @@
         <h1>홈</h1>
       </div>
       <div class="top-act">
+        <button type="button" class="kk-btn" onclick="window.SavaNav && SavaNav.kakao()" aria-label="카카오톡 대화창으로">💬 카톡</button>
         <a class="icon-btn" href="../make/" aria-label="새 카드 만들기"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 9v6M9 12h6"/></svg></a>
       </div>
     </div>
@@ -574,5 +577,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
+<script src="/js/home.js?v=2" defer data-bar="0"></script>
 </body>
 </html>

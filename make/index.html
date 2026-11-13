@@ -34,6 +34,9 @@
     .mhome svg { width: 32px; height: 32px; }
     .mprev { min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px 0 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 15px; font-weight: 800; }
     .mtop .mhome { margin-right: auto; margin-left: 8px; }
+    .mhomebtn { margin-left: 6px; }
+    .mkakao { background: #FEE500; border-color: #F2D900; color: #3A1D1D; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    @media (max-width: 380px) { .mtop .mhome { font-size: 0; gap: 0; } }
     .mback { min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 14px; font-weight: 700; }
     header h1 { font-size: 26px; margin: 4px 0 4px; letter-spacing: -0.02em; }
     header p { margin: 0 0 18px; color: var(--muted); font-size: 15px; }
@@ -262,11 +265,12 @@
   <header>
     <div class="mtop">
       <a class="mprev" id="prevPage" href="../app/" aria-label="이전 화면으로">‹ 이전</a>
+      <a class="mback mhomebtn" href="../app/" aria-label="싸바 홈으로">🏠 홈</a>
       <a class="mhome" href="../app/" aria-label="싸바 홈">
         <img src="../img/cherry.svg" alt="" width="32" height="32" style="display:block">
         싸바
       </a>
-      <a class="mback" href="../app/" aria-label="싸바 홈으로">🏠 홈</a>
+      <button type="button" class="mback mkakao" onclick="window.SavaNav && SavaNav.kakao()" aria-label="카카오톡 대화창으로">💬 카톡</button>
     </div>
     <h1>10초 만에 카드 만들기</h1>
     <p>적으면 오른쪽(아래)에 바로 보여요. 다 되면 카톡으로 보내기를 누르세요.</p>
@@ -1720,5 +1724,6 @@
   renderGal();
 })();
 </script>
+<script src="/js/home.js?v=2" defer data-bar="0"></script>
 </body>
 </html>

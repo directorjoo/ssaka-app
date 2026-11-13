@@ -65,6 +65,28 @@
       seen[r[1]] = 1;
       out.pre.push({ n: r[1], g: r[2] || '', p: +(r[4] || 0), s: r[5] || '', fam: r[3] ? 1 : 0 });
     });
+    // ---- 초대장·행사 안내 형식 (행사명 / 일시 / 장소 / 주최 …) ----
+    var KV = {}, kre = /^(행사명|모임명|제목|일시|날짜|일정|시간|장소|위치|주소|주최|주관|참가비|회비|문의|연락처|드레스\s*코드|준비물|프로그램|참여\s*감독|참석|대상|파트너|후원)\s*[:：]?\s*(.+)$/;
+    lines.forEach(function (l) { var mm = l.match(kre); if (mm && !KV[mm[1].replace(/\s/g, '')]) KV[mm[1].replace(/\s/g, '')] = sq(mm[2]); });
+    var isInv = KV['행사명'] || KV['모임명'] || ((KV['일시'] || KV['날짜']) && (KV['장소'] || KV['위치']));
+    if (isInv) {
+      var tt2 = KV['행사명'] || KV['모임명'] || KV['제목'];
+      if (tt2) out.title = tt2.slice(0, 60);
+      else { var f = lines.filter(function (l) { return !/^(안녕|INFORMATION|TIMETABLE)/i.test(l) && l.length <= 40; })[0]; if (f) out.title = f; }
+      var when = KV['일시'] || KV['날짜'] || KV['일정'] || '';
+      var dm = when.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*\(?\s*([월화수목금토일])?\s*\)?/), tmm = when.match(/(\d{1,2})\s*:\s*(\d{2})(?:\s*[-–~]\s*(\d{1,2})\s*:\s*(\d{2}))?/);
+      var hk = function (h, m) { h = +h; m = +m; return (h < 12 ? '오전 ' : h === 12 ? '낮 ' : '오후 ') + ((h % 12) || 12) + '시' + (m ? ' ' + m + '분' : ''); };
+      if (dm) out.subtitle = dm[1] + '월 ' + dm[2] + '일' + (dm[3] ? '(' + dm[3] + ')' : '') + (tmm ? ' ' + hk(tmm[1], tmm[2]) + (tmm[3] ? ' – ' + hk(tmm[3], tmm[4]).replace(/^(오전|오후|낮) /, function (x) { return x; }) : '') : '');
+      var where = KV['장소'] || KV['위치'] || KV['주소'];
+      if (where) { out.place = where.slice(0, 60); out.stops = []; }
+      var bd = [];
+      ['프로그램', '참여감독', '대상', '참가비', '회비', '드레스코드', '준비물', '주최', '주관', '파트너', '후원', '문의'].forEach(function (k) { if (KV[k]) bd.push((k === '참여감독' ? '참여 감독' : k) + ': ' + KV[k]); });
+      // 시간표: "12:00 - 12:26 오프닝"
+      lines.forEach(function (l) { var tl = l.match(/^(\d{1,2}:\d{2})\s*(?:[-–~]\s*\d{1,2}:\d{2})?\s+(.+)$/); if (tl && bd.length < 14) bd.push(tl[1] + ' ' + tl[2]); });
+      if (where && /관|홀|층|호/.test(where)) bd.push('장소: ' + where);
+      out.body = bd.map(function (x) { return x.slice(0, 80); });
+      if (KV['참가비'] || KV['회비']) out.fee = KV['참가비'] || KV['회비'];
+    }
     return out;
   }
   // 명단 한 줄 ↔ 글

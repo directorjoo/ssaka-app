@@ -306,7 +306,7 @@
       <fieldset data-for="club">
         <legend>📋 카톡 공지로 자동 채우기</legend>
         <div class="hint">카톡방에 올렸던 공지 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·탑승지·회비 계좌·코스·점심·참석자 명단을 알아서 채워 드려요.</div>
-        <textarea id="noticeIn" maxlength="6000" placeholder="229회 재경순천중.고 동문산악회 11월 오대산 선재길&#10;○집결일시 : 11월 14일(토)&#10;7시-당산역 8번 출구&#10;…"></textarea>
+        <textarea id="noticeIn" maxlength="6000" placeholder="👉 여기를 길게 눌러 [붙여넣기]&#10;(카톡방 공지 글 전체를 복사해 오세요)"></textarea>
         <button type="button" class="kakao big" id="noticeGo" style="margin-top:8px">✨ 붙여넣은 공지로 카드 채우기</button>
       </fieldset>
 
@@ -1419,7 +1419,16 @@
   $('rosterOn').addEventListener('change', function () { $('rosterBox').hidden = !this.checked; update(); });
   $('noticeGo').addEventListener('click', function () {
     var t = $('noticeIn').value.trim();
-    if (!t) { toast('카톡 공지 글을 먼저 붙여넣어 주세요'); $('noticeIn').focus(); return; }
+    if (!t) {
+      // 칸이 비어 있으면 복사해 둔 글을 바로 가져와 봄 (휴대폰이 '붙여넣기' 허락을 물어볼 수 있음)
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText().then(function (c) {
+          if (c && c.trim().length > 10) { $('noticeIn').value = c; $('noticeGo').click(); }
+          else { toast('칸이 비어 있어요. 카톡 공지를 복사한 뒤 칸을 길게 눌러 [붙여넣기] 하세요'); $('noticeIn').focus(); }
+        }, function () { toast('칸이 비어 있어요. 카톡 공지를 복사한 뒤 칸을 길게 눌러 [붙여넣기] 하세요'); $('noticeIn').focus(); });
+      } else { toast('칸이 비어 있어요. 카톡 공지를 복사한 뒤 칸을 길게 눌러 [붙여넣기] 하세요'); $('noticeIn').focus(); }
+      return;
+    }
     var r = SsakaNotice.parse(t), got = [];
     var put = function (id, val, what) { if (val && $(id)) { $(id).value = val; $(id).classList.remove('missing'); got.push(what); } };
     put('title', r.title, '제목'); put('subtitle', r.subtitle, '날짜');
@@ -1429,7 +1438,14 @@
     if (r.pre.length) { put('pre', SsakaNotice.preText(r.pre), '참석자 ' + r.pre.length + '명'); $('rosterOn').checked = true; $('rosterBox').hidden = false; }
     ['title', 'subtitle', 'body', 'place', 'copyValue', 'stops', 'pre'].forEach(function (f) { if ($(f)) $(f).dispatchEvent(new Event('input', { bubbles: true })); });
     update(); try { refreshProgress(); } catch (e) {}
-    toast(got.length ? '채웠어요: ' + got.join(' · ') + ' — 이름·전화(총무)만 확인하세요' : '알아볼 수 있는 내용이 없었어요. 칸에 직접 적어 주세요');
+    if (!got.length) { toast('알아볼 수 있는 내용이 없었어요. 칸에 직접 적어 주세요'); return; }
+    // 남은 필수 칸(보통 총무 이름·전화)을 바로 보여 줌
+    var miss = missingFields();
+    if (miss.length) {
+      miss.forEach(function (f) { $(f).classList.add('missing'); });
+      $(miss[0]).scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $(miss[0]).focus(); }, 400);
+      toast('채웠어요: ' + got.join(' · ') + ' — 이제 ' + miss.map(function (f) { return { title: '제목', name: '보내는 사람(총무) 이름', phone: '총무 전화번호' }[f] || f; }).join('·') + '만 적으면 완료!');
+    } else toast('채웠어요: ' + got.join(' · ') + ' — 완료를 누르세요!');
   });
   $('gisuOn').addEventListener('change', function () { update(); });
   // ---------- 네이버 블로그 글 (AI) ----------

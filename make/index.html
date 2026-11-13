@@ -307,7 +307,7 @@
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
         <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·프로그램·회비 계좌·탑승지·참석자 명단을 알아서 채워 드려요.</div>
         <textarea id="noticeIn" maxlength="6000" placeholder="👉 여기를 길게 눌러 [붙여넣기]&#10;(공지·초대장 글 전체를 복사해 오세요)"></textarea>
-        <button type="button" class="kakao big" id="noticeGo" style="margin-top:8px">✨ 붙여넣은 공지로 카드 채우기</button>
+        <button type="button" class="kakao big" id="noticeGo" style="margin-top:8px">✨ 붙여넣은 글로 카드 채우기</button>
       </fieldset>
 
       <fieldset>
@@ -1464,7 +1464,7 @@
     var r = SsakaNotice.parse(t), got = [];
     var put = function (id, val, what) { if (val && $(id)) { $(id).value = val; $(id).classList.remove('missing'); got.push(what); } };
     put('title', r.title, '제목'); put('subtitle', r.subtitle, '날짜');
-    put('body', r.body.join('\n'), '코스·회비'); put('place', r.place, '모이는 곳');
+    put('body', r.body.join('\n'), '내용'); put('place', r.place, '모이는 곳');
     put('stops', r.stops.join('\n'), '탑승지');
     if (r.account) { $('copyLabel').value = '회비 계좌'; put('copyValue', r.account, '계좌'); }
     if (r.pre.length) { put('pre', SsakaNotice.preText(r.pre), '참석자 ' + r.pre.length + '명'); $('rosterOn').checked = true; $('rosterBox').hidden = false; }
@@ -1476,7 +1476,7 @@
     if (miss.length) {
       miss.forEach(function (f) { $(f).classList.add('missing'); });
       $(miss[0]).scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $(miss[0]).focus(); }, 400);
-      toast('채웠어요: ' + got.join(' · ') + ' — 이제 ' + miss.map(function (f) { return { title: '제목', name: '보내는 사람(총무) 이름', phone: '총무 전화번호' }[f] || f; }).join('·') + '만 적으면 완료!');
+      toast('채웠어요: ' + got.join(' · ') + ' — 이제 ' + miss.map(function (f) { return { title: '제목', name: '보내는 사람 이름', phone: '보내는 사람 전화번호' }[f] || f; }).join('·') + '만 적으면 완료!');
     } else toast('채웠어요: ' + got.join(' · ') + ' — 완료를 누르세요!');
   });
   $('gisuOn').addEventListener('change', function () { update(); });

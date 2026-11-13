@@ -344,7 +344,7 @@
       '<div class="st-btns"><a href="../?story=1">🍒 싸바가 뭐지?</a><button type="button">💬 카톡으로 보내기</button></div>';
     st.querySelector('button').addEventListener('click', function () {
       if (!window.SsakaShare) { location.href = '../?story=1'; return; }
-      SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 안부 한마디로 사람을 이어 주는 회사', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
+      SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
     v.appendChild(st);
     // 싸바 놀이터 — 단톡방 미끼
@@ -486,7 +486,7 @@
     fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
       if (j && j.user && j.user.agreed) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님)'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; }
     }).catch(function () {});
-    [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '회사 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
+    [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '싸바 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
     });
     var up = el('button', ''); up.type = 'button';

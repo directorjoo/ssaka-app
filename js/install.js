@@ -123,7 +123,7 @@
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
   // ---------- 최신 버전 업데이트 ----------
-  var VER = '2026.11.12-85'; // 올릴 때마다 version.json 과 같이 올림
+  var VER = '2026.11.13-86'; // 올릴 때마다 version.json 과 같이 올림
   var BASE_DIR = SELF ? SELF.replace(/js\/install\.js.*$/, '') : '/';
   var CORE = ['js/install.js', 'js/share.js', 'js/msgimg.js', 'js/designs.js', 'js/render.js', 'js/export.js', 'js/codec.js', 'js/store.js', 'demo/js/card.js', 'css/sk.css', 'css/brand.css', 'sw.js', 'app/', 'make/', 'eodiya/', 'c/'];
   // 휴대폰 브라우저가 묵혀 둔 파일을 서버의 새 파일로 바꿔 둠 (화면은 그대로)

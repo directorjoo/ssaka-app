@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=74">
+  <link rel="stylesheet" href="../css/sk.css?v=75">
   <link rel="stylesheet" href="../css/sk-world.css">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -346,6 +346,11 @@
           <input id="galUrls" type="hidden">
           <div class="hint" id="galStatus">여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.</div>
         </div>
+        <div data-for="club greet">
+          <label for="kick">맨 위 한마디 (선택)</label>
+          <input id="kick" maxlength="20" placeholder="예: 초대합니다">
+          <div class="moods" id="kickPick" style="margin-top:6px"><button type="button">초대합니다</button><button type="button">모십니다</button><button type="button">함께해요</button><button type="button">You're Invited</button><button type="button">없음</button></div>
+        </div>
         <label for="title" class="req" data-l="title">제목</label>
         <input id="title" maxlength="40">
         <label for="subtitle" data-l="subtitle">한 줄 소개</label>
@@ -616,8 +621,8 @@
 
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=81"></script>
-<script src="../js/notice.js?v=3"></script>
-<script src="../js/render.js?v=75"></script>
+<script src="../js/notice.js?v=4"></script>
+<script src="../js/render.js?v=76"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -654,7 +659,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -923,6 +928,7 @@
       template: type,
       design: design,
       theme: cfg.theme,
+      kick: type === 'club' || type === 'greet' ? (v('kick') === '없음' ? '' : (v('kick') || (industry === 'event' ? '초대합니다' : ''))) : undefined,
       title: g('title'),
       subtitle: g('subtitle'),
       image: g('image'),
@@ -1464,7 +1470,7 @@
     }
     var r = SsakaNotice.parse(t), got = [];
     var put = function (id, val, what) { if (val && $(id)) { $(id).value = val; $(id).classList.remove('missing'); got.push(what); } };
-    put('title', r.title, '제목'); put('subtitle', r.subtitle, '날짜');
+    put('title', r.title, '제목'); if (r.kick) put('kick', r.kick, '초대 문구'); put('subtitle', r.subtitle, '날짜');
     put('body', r.body.join('\n'), '내용'); put('place', r.place, '모이는 곳');
     put('stops', r.stops.join('\n'), '탑승지');
     if (r.account) { $('copyLabel').value = '회비 계좌'; put('copyValue', r.account, '계좌'); }
@@ -1482,6 +1488,7 @@
   });
   $('gisuOn').addEventListener('change', function () { update(); });
   $('privOn').addEventListener('change', function () { update(); });
+  $('kickPick').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; $('kick').value = b.textContent; update(); });
   // ---------- 네이버 블로그 글 (AI) ----------
   var blogPost = null, blogCard = null, blogUrl = '', blogImgs = [];
   function devId() {

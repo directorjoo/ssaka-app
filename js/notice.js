@@ -70,6 +70,7 @@
     lines.forEach(function (l) { var mm = l.match(kre); if (mm && !KV[mm[1].replace(/\s/g, '')]) KV[mm[1].replace(/\s/g, '')] = sq(mm[2]); });
     var isInv = KV['행사명'] || KV['모임명'] || ((KV['일시'] || KV['날짜']) && (KV['장소'] || KV['위치']));
     if (isInv) {
+      if (/초대합니다|초대드립니다|모십니다/.test(text)) out.kick = /모십니다/.test(text) && !/초대/.test(text) ? '모십니다' : '초대합니다';
       var tt2 = KV['행사명'] || KV['모임명'] || KV['제목'];
       if (tt2) out.title = tt2.slice(0, 60);
       else { var f = lines.filter(function (l) { return !/^(안녕|INFORMATION|TIMETABLE)/i.test(l) && l.length <= 40; })[0]; if (f) out.title = f; }

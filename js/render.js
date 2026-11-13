@@ -94,6 +94,7 @@
     }
     if (!card.sos) hero.appendChild(photo);
     var titles = el('div', 'sk-titles');
+    if (card.kick) titles.appendChild(el('p', 'sk-kick', card.kick));
     var h1 = el('h1', 'sk-title', card.title || '');
     // 영어처럼 띄어쓰기 없는 긴 낱말이 있으면 글자를 줄여 낱말 중간에서 줄이 끊기지 않게
     var longW = Math.max.apply(0, String(card.title || '').split(/\s+/).map(function (w) { return w.length; }));

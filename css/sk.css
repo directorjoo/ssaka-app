@@ -554,3 +554,8 @@
 .sk .sk-list li.sk-p { padding-left: 0 !important; list-style: none; }
 .sk .sk-list li.sk-p::before { display: none !important; content: none !important; }
 .sk .sk-list li.sk-p + li:not(.sk-p) { margin-top: 10px; }
+
+/* 맨 위 한마디 (초대합니다 · 모십니다) */
+.sk .sk-kick { margin: 0 0 10px; font-family: var(--f-title); font-size: 17px; font-weight: 800; letter-spacing: .18em; color: var(--accent-line, var(--accent)); }
+.sk .sk-kick::before, .sk .sk-kick::after { content: '—'; margin: 0 .5em; opacity: .6; letter-spacing: 0; }
+.sk-thumb .sk-kick { font-size: 15px; }

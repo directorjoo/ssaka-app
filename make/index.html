@@ -1941,6 +1941,9 @@
   if (qSeason && $('season').querySelector('option[value="' + qSeason.replace(/[^a-z]/g, '') + '"]')) { $('season').value = qSeason; seasonTouched = true; update(); renderGallery(); }
   showThumb($('image').value);
   renderGal();
+  // 싸바알림 화면에서 '디자인 먼저'·'사진 한 장으로'를 눌러 들어오면 그 자리로
+  var jump = /^#(gallery|ptile)$/.test(location.hash) && document.getElementById(location.hash.slice(1));
+  if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();
 </script>
 <script src="/js/home.js?v=3" defer data-bar="0"></script>

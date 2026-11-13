@@ -90,15 +90,15 @@
     .svc em { position: absolute; top: -4px; right: 10%; font-style: normal; font-size: 10.5px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--ssaka); color: #fff; }
     .svc-cap { margin: 2px 22px 0; font-size: 13.5px; color: var(--ink-2); }
     .eo-hero { position: relative; overflow: hidden; margin: 6px 18px 12px; padding: 22px 20px 18px; border-radius: 26px; background: linear-gradient(135deg, #C8162F 0%, #8E0F22 100%); color: #fff; box-shadow: 0 18px 36px -20px rgba(142,15,34,.9); }
-    .eo-hero .pin { position: absolute; right: 14px; top: 8px; font-size: 76px; line-height: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
-    .eo-hero h2 { margin: 0; font-size: 44px; line-height: 1.05; font-weight: 900; letter-spacing: -0.04em; }
+    .eo-hero .pin { position: absolute; right: 14px; top: 10px; font-size: 58px; line-height: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
+    .eo-hero h2 { margin: 0; font-size: 34px; line-height: 1.05; font-weight: 900; letter-spacing: -0.04em; }
     .eo-hero p { margin: 8px 0 16px; font-size: 15px; opacity: .95; word-break: keep-all; padding-right: 70px; }
     .eo-hero .eo-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .eo-hero .eo-btns a { display: grid; place-items: center; min-height: 64px; border-radius: 18px; background: #fff; color: #8E0F22; font-size: 18px; font-weight: 900; text-decoration: none; letter-spacing: -0.02em; line-height: 1.15; text-align: center; }
+    .eo-hero .eo-btns a { display: grid; place-items: center; align-content: center; gap: 4px; min-height: 86px; padding: 8px 4px; border-radius: 18px; background: #fff; color: #8E0F22; font-size: 18px; font-weight: 900; text-decoration: none; letter-spacing: -0.02em; line-height: 1.15; text-align: center; }
     .eo-hero .eo-btns a small { display: block; font-size: 12px; font-weight: 700; color: #9a5a63; letter-spacing: 0; }
     .eo-hero .eo-btns a.alt { background: rgba(255,255,255,.16); color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
     .eo-hero .eo-btns a.alt small { color: rgba(255,255,255,.85); }
-    .eo-hero .eo-btns a.play { grid-column: 1 / -1; min-height: 62px; padding: 10px 8px 12px; background: #FFE27A; color: #5a3b00; font-size: 20px; }
+    .eo-hero .eo-btns a.play { background: #FFE27A; color: #5a3b00; }
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
@@ -112,7 +112,7 @@
     .wr em { margin-left: auto; font-style: normal; flex: none; padding: 9px 12px; border-radius: 14px; background: #fff; color: #1B3F7A; font-size: 14px; font-weight: 900; }
     .mk p small { display: block; margin-top: 4px; font-size: 13px; opacity: .8; }
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
-    .mk h2 { color: #F4E7C8; margin: 2px 0 0; font-size: 28px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
+    .mk h2 { color: #F4E7C8; margin: 2px 0 0; font-size: 34px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
     .mk p { margin: 8px 0 14px; font-size: 14.5px; line-height: 1.5; opacity: .95; word-break: keep-all; padding-right: 84px; }
     .mk .ad { position: absolute; right: 8px; top: 6px; width: 96px; height: 128px; pointer-events: none; }
     .mk .mini { position: absolute; left: 22px; top: 4px; width: 60px; height: 78px; border-radius: 12px; background: #fff; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 9px 8px; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
@@ -186,6 +186,23 @@
     .tab-make { color: var(--ink); }
     .icon-btn:focus-visible, .tab:focus-visible, .row:focus-visible, .ind:focus-visible, .row-act:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
 
+    /* 싸바알림 화면 (캔바처럼: 찾기 → 이어서 만들기 → 무엇을 만들까요 → 인기 카드 → 업종별) */
+    .al-search { display: flex; align-items: center; gap: 10px; margin: 8px 18px 14px; height: 52px; padding: 0 16px; border-radius: 26px; background: var(--bg-2); }
+    .al-search svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; }
+    .al-search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: var(--ink); outline: none; }
+    .al-none { margin: 0 22px 12px; font-size: 14px; color: var(--ink-2); }
+    .al-recent { display: flex; gap: 10px; overflow-x: auto; padding: 4px 18px 12px; -webkit-overflow-scrolling: touch; }
+    .al-recent a { flex: 0 0 108px; display: grid; gap: 6px; text-decoration: none; color: var(--ink); font-size: 13px; font-weight: 700; }
+    .al-recent .th { height: 136px; border-radius: 14px; overflow: hidden; display: grid; place-items: center; background: var(--ssaka-soft); color: var(--ssaka-deep); font-size: 34px; font-weight: 900; }
+    .al-recent .th img { width: 100%; height: 100%; object-fit: cover; }
+    .al-recent .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .al-opt { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; margin-bottom: 10px; padding: 14px 16px; box-sizing: border-box; border: 0; border-radius: 18px; background: var(--bg-2); color: var(--ink); text-decoration: none; font: inherit; text-align: left; cursor: pointer; }
+    .al-opt.main { background: var(--ssaka); color: #fff; }
+    .al-opt i { font-style: normal; font-size: 28px; flex: none; }
+    .al-opt b { display: block; font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
+    .al-opt span { display: block; margin-top: 2px; font-size: 13px; opacity: .85; }
+    .al-opt:focus-visible, .al-recent a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
+    .al-more { display: block; width: calc(100% - 36px); margin: 4px 18px 10px; min-height: 46px; border: 0; border-radius: 14px; background: var(--bg-2); font: inherit; font-size: 14.5px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
     .toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 30; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
       .tr-btn { width: 38px; height: 38px; margin-right: 6px; border: 0; border-radius: 50%; background: #f2eee8; font-size: 19px; cursor: pointer; }
@@ -212,6 +229,8 @@
 
   <!-- 홈 -->
   <main class="view" id="v-home"></main>
+  <!-- 싸바알림 (만들기) -->
+  <main class="view" id="v-alim" hidden></main>
   <!-- 받은 카드 -->
   <main class="view" id="v-inbox" hidden></main>
   <!-- 예약 -->
@@ -224,7 +243,7 @@
   <div class="tabs-in" role="tablist">
     <button class="tab" role="tab" data-v="home" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>홈</button>
     <button class="tab" role="tab" data-v="inbox" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>받은 카드</button>
-    <a class="tab tab-make" href="../make/"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i>만들기</a>
+    <button class="tab tab-make" role="tab" data-v="alim" aria-selected="false"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i>만들기</button>
     <button class="tab" role="tab" data-v="resv" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>예약</button>
     <button class="tab" role="tab" data-v="more" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>더보기</button>
   </div>
@@ -239,7 +258,7 @@
 (function () {
   var D = window.SsakaDesigns, S = window.SsakaStore;
   var $ = function (id) { return document.getElementById(id); };
-  var TITLES = { home: '홈', inbox: '받은 카드', resv: '예약', more: '더보기' };
+  var TITLES = { home: '홈', alim: '싸바알림', inbox: '받은 카드', resv: '예약', more: '더보기' };
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2000); }
@@ -334,20 +353,131 @@
     return g;
   }
 
+  // ---------- 업종별로 바로 만들기 (싸바알림 화면) ----------
+  // 업종마다 또렷이 구분되는 파스텔 바탕 (이모지가 잘 보이도록 밝게)
+  var TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
+    cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
+    arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
+    greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
+  function indTile(ind) {
+    var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
+    if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
+    a.appendChild(el('i', '', ind.emoji)); a.appendChild(document.createTextNode(ind.label));
+    a.addEventListener('click', function (e) { e.preventDefault(); howSheet(ind.id); });
+    return a;
+  }
+  function industries(v) {
+    (D.GROUPS || [{ label: '', emoji: '', ids: D.INDUSTRIES.map(function (x) { return x.id; }) }]).forEach(function (grp) {
+      if (grp.label) v.appendChild(el('div', 'grp', grp.emoji + ' ' + grp.label));
+      var g = el('div', 'inds');
+      grp.ids.forEach(function (id) { var ind = D.industry(id); if (ind) g.appendChild(indTile(ind)); });
+      v.appendChild(g);
+    });
+  }
+  function isOpen(id) { return !D.isOpen || D.isOpen(id); }
+  function soon(label) { toast(label + ' 카드는 곧 열려요! 지금은 모임·행사·안부와 음식점 카드를 만들 수 있어요'); }
+
+  // ---------- 어떻게 만들까요? (아래에서 올라오는 창) ----------
+  function howSheet(id) {
+    var ind = D.industry(id); if (!ind) return;
+    if (!isOpen(id)) return soon(ind.label);
+    var w = el('div', 'inst'); w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', '어떻게 만들까요');
+    var b = el('div', 'inst-box');
+    b.appendChild(el('h2', '', ind.emoji + ' ' + ind.label + ' 카드'));
+    b.appendChild(el('p', '', '어떻게 만들까요?'));
+    var base = '../make/?ind=' + id;
+    [['main', '⚡', '바로 만들기', '몇 칸만 채우면 카드가 완성돼요', base],
+     ['', '🎨', '디자인 먼저 고르기', ind.label + ' 디자인 중에서 골라요', base + '#gallery'],
+     ['', '📷', '사진 한 장으로', '가게·모임 사진부터 올려요', base + '#ptile']].forEach(function (o) {
+      var a = el('a', 'al-opt' + (o[0] ? ' ' + o[0] : '')); a.href = o[4];
+      a.innerHTML = '<i aria-hidden="true">' + o[1] + '</i><div><b>' + o[2] + '</b><span>' + o[3] + '</span></div>';
+      b.appendChild(a);
+    });
+    var later = el('button', 'later', '닫기'); later.type = 'button'; b.appendChild(later);
+    function shut() { w.remove(); }
+    later.addEventListener('click', shut);
+    w.addEventListener('click', function (e) { if (e.target === w) shut(); });
+    w.appendChild(b); document.body.appendChild(w);
+    later.focus();
+  }
+
+  // ---------- 싸바알림 (만들기) ----------
+  // 찾기 칸에 쓰는 말 → 업종
+  var WORDS = { restaurant: '식당 가게 메뉴 메뉴판 음식 맛집 예약 홍보 오픈', cafe: '카페 커피 빵 베이커리', party: '송년 신년 회식 모임 연말', club: '산악 등산 동호회 모임 공지 산행',
+    alumni: '동창 동문 향우 동기', event: '행사 초대 초대장 결혼 돌잔치 개업 생일', greeting: '인사 새해 연말 첫눈 크리스마스 설 추석 안부', actor: '프로필 배우 모델 오디션',
+    director: '감독 크리에이터 유튜버', beauty: '미용 네일 헤어', toefl: '토플 어학원 영어', academy: '학원 보습 내신', fitness: '헬스 필라테스 운동', flower: '꽃 공방', stay: '숙박 펜션' };
+  function renderAlim() {
+    var v = $('v-alim'); v.innerHTML = '';
+    var sb = el('label', 'al-search');
+    sb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" enterkeyhint="search" placeholder="어떤 카드를 만들까요? (송년회, 메뉴판…)" aria-label="만들 카드 찾기">';
+    v.appendChild(sb);
+    var res = el('div'); v.appendChild(res);
+    var inp = sb.querySelector('input');
+    inp.addEventListener('input', function () {
+      var q = inp.value.replace(/\s/g, ''); res.innerHTML = '';
+      if (!q) return;
+      var hits = D.INDUSTRIES.filter(function (x) {
+        if (!isOpen(x.id)) return false;
+        var words = (WORDS[x.id] || '').split(' ');
+        return x.label.replace(/\s/g, '').indexOf(q) >= 0 || words.some(function (k) { return k && (k.indexOf(q) >= 0 || q.indexOf(k) >= 0); });
+      });
+      if (!hits.length) { res.appendChild(el('p', 'al-none', '"' + inp.value.trim() + '" 카드는 아직 없어요. 아래에서 골라 보세요.')); return; }
+      var g = el('div', 'inds'); hits.forEach(function (x) { g.appendChild(indTile(x)); }); res.appendChild(g);
+    });
+    // 이어서 만들기 — 내가 만든 카드를 고쳐서 다시 보내기
+    var mine = S.mine();
+    if (mine.length) {
+      v.appendChild(secHead('이어서 만들기'));
+      var rc = el('div', 'al-recent');
+      mine.slice(0, 10).forEach(function (m) {
+        var dq = ''; try { dq = new URL(m.url).searchParams.get('d') || ''; } catch (e) {}
+        var a = el('a'); a.href = dq ? '../make/?edit=' + encodeURIComponent(dq) : m.url;
+        var th = el('span', 'th');
+        if (m.image) { var im = el('img'); im.src = m.image; im.alt = ''; im.loading = 'lazy'; th.appendChild(im); } else th.textContent = (m.title || '싸').trim().charAt(0);
+        a.appendChild(th); a.appendChild(el('span', 't', m.title || '이름 없는 카드'));
+        rc.appendChild(a);
+      });
+      v.appendChild(rc);
+    }
+    // 무엇을 만들까요?
+    v.appendChild(secHead('무엇을 만들까요?'));
+    var KINDS = [['club', '모임 공지', '🏔️', '#E1F0D5'], ['party', '송년회·신년회', '🥂', '#FFE0E6'], ['restaurant', '가게 홍보', '🍽️', '#FFE1CF'], ['actor', '프로필', '🎬', '#FFE8B8'],
+      ['event', '초대장', '🎉', '#FFEFD1'], ['greeting', '인사 카드', '❄️', '#E2EEFB'], ['alumni', '동문회', '🎓', '#EDE4FF'], ['blog', '블로그 글', '✍️', '#DDE3FF']];
+    var sv = el('div', 'svc');
+    KINDS.forEach(function (k) {
+      var bt = el('button', isOpen(k[0]) || k[0] === 'blog' ? '' : 'soon'); bt.type = 'button';
+      var i = el('i', '', k[2]); i.setAttribute('aria-hidden', 'true'); i.style.setProperty('--tint', k[3]); bt.appendChild(i);
+      bt.appendChild(document.createTextNode(k[1]));
+      if (bt.className === 'soon') bt.appendChild(el('em', '', '곧'));
+      bt.addEventListener('click', function () {
+        if (k[0] === 'blog') { location.href = '../survey/'; return; }
+        if (!isOpen(k[0])) return soon(k[1]);
+        howSheet(k[0]);
+      });
+      sv.appendChild(bt);
+    });
+    v.appendChild(sv);
+    v.appendChild(secHead('이번 주 인기 싸바카드'));
+    v.appendChild(campaigns());
+    v.appendChild(el('div', 'divider'));
+    v.appendChild(secHead('업종별로 바로 만들기'));
+    industries(v);
+  }
+
   // ---------- 홈 ----------
   function renderHome() {
     var v = $('v-home'); v.innerHTML = '';
-    // 어디야? — 싸바의 얼굴. 홈 맨 위에 크게
+    // 어디야? — 싸바의 얼굴. [어디야?] [친구야 놀자!] 두 버튼 (여기야!는 어디야 화면 안에)
     var eh = el('div', 'eo-hero');
-    eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요 · 친구 불러 모으기까지</p>' +
-      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="alt" href="../eodiya/#come">📍 여기야!<small>여기서 만나자</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-10px"> 친구야 놀자!</span><small>보고 싶은 친구에게 "놀자!" 한마디<br>차 한잔 · 소주 한잔 · 식사 · 산책 · 당구 · 수다</small></a></div>';
+    eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
+      '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="28" height="28" style="vertical-align:-7px"> 친구야 놀자!</span><small>보고 싶은 친구 부르기</small></a></div>';
     v.appendChild(eh);
-    // 싸바카드 만들기 — 보틀 그린+골드로 어디야(체리)와 구분, 상자 어디를 눌러도 만들기로
-    var mk = el('a', 'mk'); mk.href = '../make/'; mk.setAttribute('aria-label', '싸바알림 — 가게홍보 · 모임공지 · 프로필 · 초대장 · 스마트명함');
+    // 싸바알림 — 누르면 싸바알림 화면(무엇을 만들까요)으로
+    var mk = el('a', 'mk'); mk.href = '#alim'; mk.setAttribute('aria-label', '싸바알림 — 가게홍보 · 모임공지 · 프로필 · 초대장 · 스마트명함');
     mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><b class="w">오픈!</b></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>싸바알림</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장 · 스마트명함<br><small>카톡 · SNS에 올리세요!</small></p>' +
       '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
-    // 블로그 글쓰기 — 카드 만들기 바로 아래
+    // 블로그 글쓰기
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
     v.appendChild(wr);
@@ -355,8 +485,23 @@
     (function () { var W = ['오픈!', '할인', '신메뉴', '예약', '이벤트', '단골 모집'], i = 0, w = mk.querySelector('.w');
       if (!w || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
       clearInterval(window.__mkW); window.__mkW = setInterval(function () { if (!document.body.contains(w)) return clearInterval(window.__mkW); i = (i + 1) % W.length; w.textContent = W[i]; w.classList.toggle('long', W[i].length > 3); }, 1600); })();
-    // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸
-    var st = el('div', 'story');
+    if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
+    // 내가 만든 카드 — 3장만, 나머지는 "더 보기"
+    var mine = S.mine();
+    if (mine.length) {
+      v.appendChild(secHead('내가 만든 카드 ' + mine.length, { text: '+ 새로 만들기', href: '#alim' }));
+      mine.slice(0, 3).forEach(function (m) { v.appendChild(cardRow(m, { share: true })); });
+      if (mine.length > 3) {
+        var mb = el('button', 'al-more', '더 보기 (' + (mine.length - 3) + ')'); mb.type = 'button';
+        mb.addEventListener('click', function () { var f = document.createDocumentFragment(); mine.slice(3).forEach(function (m) { f.appendChild(cardRow(m, { share: true })); }); mb.replaceWith(f); });
+        v.appendChild(mb);
+      }
+    }
+    v.appendChild(secHead('지금 보내기 좋은 카드'));
+    v.appendChild(campaigns());
+    v.appendChild(el('div', 'divider'));
+    // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸 (맨 아래)
+    var st = el('div', 'story'); st.style.marginTop = '12px';
     st.innerHTML = '<div class="st-top"><img src="../img/cherry-dance.svg" alt=""><div><b>싸바 이야기</b><span>싸바가 뭐냐고 물으면 이걸 보여 주세요</span></div></div>' +
       '<div class="st-btns"><a href="../?story=1">🍒 싸바가 뭐지?</a><button type="button">💬 카톡으로 보내기</button></div>';
     st.querySelector('button').addEventListener('click', function () {
@@ -364,44 +509,6 @@
       SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
     v.appendChild(st);
-    // 싸바 놀이터 — 단톡방 미끼
-    var pg = el('div', 'play-h'); pg.textContent = '🎮 싸바 놀이터'; v.appendChild(pg);
-    var gw = el('div', 'tiles');
-    gw.innerHTML = '<a class="tile t1" href="../lucky/"><i>7.<u>00</u></i><b>럭키 7초</b><span>100억 체리</span></a>' +
-      '<a class="tile t4" href="../pool/"><i>🎱</i><b>당구 한판?</b><span>진짜 쓰리쿠션</span></a>' +
-      '<a class="tile t2" href="../shoot/"><i>🪜</i><b>사다리 한번?</b><span>나도! 모으기</span></a>' +
-      '<a class="tile t3" href="../fly/"><i>🪰</i><b>파리 잡기</b><span>눈 감고 도사</span></a>' +
-      '<a class="tile t5" href="../emo/"><img src="../emo/g/e001.gif" alt="" width="64" height="64"><b>공짜 이모티콘</b><span>움직이는 체리 · 카톡으로 바로</span></a>';
-    v.appendChild(gw);
-    if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
-    var mine = S.mine();
-    if (mine.length) {
-      v.appendChild(cardRow(mine[0], { me: true, share: true }));
-      v.appendChild(el('div', 'divider'));
-      v.appendChild(secHead('내가 만든 카드 ' + mine.length, { text: '+ 새로 만들기', href: '../make/' }));
-      mine.forEach(function (m) { v.appendChild(cardRow(m, { share: true })); });
-    }
-    v.appendChild(secHead('지금 보내기 좋은 카드'));
-    v.appendChild(campaigns());
-    v.appendChild(el('div', 'divider'));
-    v.appendChild(secHead('업종별로 바로 만들기'));
-    // 업종마다 또렷이 구분되는 파스텔 바탕 (이모지가 잘 보이도록 밝게)
-    var TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
-      cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
-      arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
-      greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
-    (D.GROUPS || [{ label: '', emoji: '', ids: D.INDUSTRIES.map(function (x) { return x.id; }) }]).forEach(function (grp) {
-      if (grp.label) v.appendChild(el('div', 'grp', grp.emoji + ' ' + grp.label));
-      var g = el('div', 'inds');
-      grp.ids.forEach(function (id) {
-        var ind = D.industry(id); if (!ind) return;
-        var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
-        if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
-        var i = el('i', '', ind.emoji); a.appendChild(i); a.appendChild(document.createTextNode(ind.label));
-        g.appendChild(a);
-      });
-      v.appendChild(g);
-    });
   }
 
   // ---------- 받은 카드 ----------
@@ -533,7 +640,7 @@
     document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + name; });
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === name ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
-    ({ home: renderHome, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
+    ({ home: renderHome, alim: renderAlim, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
     try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) {}
     window.scrollTo(0, 0);
   }
@@ -543,6 +650,8 @@
   var current = (location.hash || '').slice(1);
   if (!TITLES[current]) current = 'home';
   renderAll();
+  // 화면 안의 #alim 같은 링크로도 화면 바꾸기
+  window.addEventListener('hashchange', function () { var h = (location.hash || '').slice(1); if (TITLES[h] && h !== current) { current = h; show(current); } });
 
   // ---------- 싸바카드 설치하기 (홈 화면에 추가) ----------
   var deferred = null;

@@ -1408,10 +1408,33 @@
   });
 
   // ---------- 주소: 카카오(다음) 우편번호 검색 ----------
-  function openPostcode(target) {
-    if (!window.daum || !daum.Postcode) { toast('주소 검색을 불러오는 중이에요. 잠시 뒤 다시 눌러주세요'); return; }
-    var wrap = $('postWrap'); wrap.innerHTML = '';
+  var postP = null;
+  function loadPostcode() {
+    if (window.daum && daum.Postcode) return Promise.resolve();
+    if (postP) return postP;
+    postP = new Promise(function (ok, no) {
+      var sc = document.createElement('script');
+      sc.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+      sc.onload = function () { window.daum && daum.Postcode ? ok() : no(new Error('x')); };
+      sc.onerror = function () { no(new Error('load')); };
+      document.head.appendChild(sc);
+      setTimeout(function () { no(new Error('timeout')); }, 8000);
+    });
+    postP.catch(function () { postP = null; });
+    return postP;
+  }
+  function openPostcode(target, q) {
+    var wrap = $('postWrap');
     $('postModal').hidden = false;
+    if (!(window.daum && daum.Postcode)) {
+      wrap.innerHTML = '<p style="padding:24px;text-align:center">주소 검색을 불러오는 중…</p>';
+      loadPostcode().then(function () { openPostcode(target, q); }).catch(function () {
+        wrap.innerHTML = '<p style="padding:24px;text-align:center;line-height:1.6">주소 검색을 불러오지 못했어요.<br>인터넷 연결을 확인하거나, 주소를 칸에 직접 적어 주세요.</p>';
+        if (target !== 'place') $('addr1').readOnly = false;
+      });
+      return;
+    }
+    wrap.innerHTML = '';
     new daum.Postcode({
       width: '100%', height: '100%',
       oncomplete: function (d) {
@@ -1428,7 +1451,7 @@
         $('postModal').hidden = true;
         update();
       }
-    }).embed(wrap);
+    }).embed(wrap, q ? { q: q } : undefined);
   }
   document.querySelectorAll('[data-postcode]').forEach(function (b) {
     b.addEventListener('click', function () { openPostcode(b.dataset.postcode); });
@@ -1773,7 +1796,10 @@
         });
       });
     }).catch(function () {
-      $('bizMsg').textContent = '지금은 장소 검색을 쓸 수 없어요. (카카오디벨로퍼스에서 카카오맵 사용 설정이 필요할 수 있어요) 직접 적어 주세요.';
+      // 카카오맵 검색이 안 되면 → 도로명·건물명 주소 검색으로 바로 넘김
+      $('bizModal').hidden = true;
+      toast('주소 검색으로 찾을게요 (건물 이름·도로명)');
+      openPostcode(bizMode === 'place' ? 'place' : 'contact', q);
     });
   }
   function applyBiz(p) {

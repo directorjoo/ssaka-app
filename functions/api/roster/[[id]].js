@@ -30,11 +30,9 @@ async function list(db, request, id, tok, hk) {
   const r = await db.prepare('SELECT tok, n, ph, g, s, p, t FROM roster WHERE rid = ? ORDER BY t ASC LIMIT ?').bind(id, MAX).all();
   const all = (r.results || []).map(function (x) { return { n: x.n, ph: x.ph || undefined, g: x.g, s: x.s, p: x.p, t: x.t, me: tok && x.tok === tok ? 1 : undefined }; });
   const h = await isHost(db, request, id, hk);
-  if (h.meta && !h.host) {
-    return { priv: 1, list: all.filter(function (x) { return x.me; }) };
-  }
-  if (!h.meta) all.forEach(function (x) { delete x.ph; }); // 공개 명단엔 전화번호를 내보내지 않음
-  return { priv: h.meta ? 1 : undefined, owner: h.meta ? 1 : undefined, count: all.length, people: all.reduce(function (a, x) { return a + 1 + (x.p || 0); }, 0), list: all };
+  // 주최자가 아니면(아직 잠그지 않은 명단도) 자기 신청만 돌려줌
+  if (!h.host) return { priv: 1, list: all.filter(function (x) { return x.me; }) };
+  return { priv: 1, owner: 1, count: all.length, people: all.reduce(function (a, x) { return a + 1 + (x.p || 0); }, 0), list: all };
 }
 
 export async function onRequest({ request, env, params }) {

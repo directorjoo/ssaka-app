@@ -248,7 +248,8 @@
       var mine = dq && window.SsakaStore && window.self === window.top && SsakaStore.mine().some(function (x) {
         try { return x.url.split('#')[0] === here || new URL(x.url).searchParams.get('d') === dq; } catch (e) { return false; }
       });
-      if (mine) {
+      var ownerBar = function () {
+        if (document.querySelector('.sk-owner')) return;
         var bar = document.createElement('div'); bar.className = 'sk-owner';
         var st = document.createElement('div'); st.className = 'sk-stats'; st.textContent = '📊 손님 반응 불러오는 중…';
         fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {
@@ -268,6 +269,22 @@
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
         bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
         document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
+      };
+      var sidQ = new URLSearchParams(location.search).get('s');
+      if (mine) {
+        ownerBar();
+        // 이 폰에서 만든 카드: 로그인돼 있으면 계정에 묶어 둠 (다른 폰에서도 고칠 수 있게)
+        if (sidQ) fetch(new URL('../api/card/' + encodeURIComponent(sidQ), location.href).href + '?own=1', { cache: 'no-store', headers: { 'x-sava-k': SsakaStore.ownerKey() } }).catch(function () {});
+      } else if (sidQ && dq && window.self === window.top) {
+        // 다른 폰: 같은 아이디로 로그인했거나 이 폰의 열쇠가 맞으면 내 카드
+        fetch(new URL('../api/card/' + encodeURIComponent(sidQ), location.href).href + '?own=1', { cache: 'no-store', headers: { 'x-sava-k': window.SsakaStore ? SsakaStore.ownerKey() : '' } })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (!j || !j.mine) return;
+            try { SsakaStore.saveMine(pristine, new URL('?d=' + dq, location.href).href); } catch (e) {}
+            var rp = document.querySelector('.sk-report'); if (rp) rp.remove();
+            ownerBar();
+          }).catch(function () {});
       }
     } catch (e) {}
     app.innerHTML = '';

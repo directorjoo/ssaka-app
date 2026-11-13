@@ -97,7 +97,6 @@
 
   <h2>1. 업종 고르기</h2>
   <div class="chips" id="inds"></div>
-  <p class="note" id="indNote">지금은 음식점부터 열었어요. 카페·학원·미용 등 다른 업종도 곧 열려요.</p>
 
   <h2>2. 얼마나 답할까요?</h2>
   <div class="mode">
@@ -142,13 +141,7 @@
 <script>
 (function () {
   var S = window.SavaSurvey, $ = function (id) { return document.getElementById(id); };
-  // 1차 공개: 음식점만 (감독님 폰은 ?all=1 이면 전체)
-  (function () {
-    var all = false;
-    try { var qa = new URLSearchParams(location.search).get('all'); if (qa === '1') localStorage.setItem('sava-all', '1'); if (qa === '0') localStorage.removeItem('sava-all'); all = localStorage.getItem('sava-all') === '1'; } catch (e) {}
-    if (all) return;
-    S.IND = S.IND.map(function (g) { return { g: g.g, list: g.list.filter(function (x) { return x.id === 'restaurant'; }) }; }).filter(function (g) { return g.list.length; });
-  })();
+  // 블로그 글쓰기는 모든 업종 공개 (2026-11-13)
   var LS = 'sava-survey';
   var st = { ind: 'restaurant', mode: 'quick', a: {}, url: '', sid: '', key: '', at: 0 };
   try { Object.assign(st, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}

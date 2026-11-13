@@ -214,9 +214,10 @@
       }
     });
     // 단추가 3개면 한 줄에 나란히 (목록형 디자인은 제외), 아니면 홀수일 때 마지막을 넓게
-    var listy = { cinema: 1, magazine: 1, minimal: 1 }[design && design.style];
-    if (acts.children.length === 3 && !listy) acts.classList.add('sk-n3');
-    else if (acts.children.length % 2 === 1) acts.lastChild.classList.add('sk-wide');
+    // 단추는 크게 늘어놓지 않고 한 줄에 작게 (2~5개)
+    var nAct = acts.children.length;
+    if (nAct >= 2 && nAct <= 5) { acts.classList.add('sk-row'); acts.style.setProperty('--n', nAct); }
+    else if (nAct % 2 === 1) acts.lastChild.classList.add('sk-wide');
     if (acts.children.length) wrap.appendChild(acts);
     if (mapc) wrap.appendChild(mapc);
     // 복사 칸: 단추 동그라미 대신 내용이 다 보이는 큰 칸 (계좌번호·이름을 눈으로 보고 누르면 복사)

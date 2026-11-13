@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=77">
+  <link rel="stylesheet" href="../css/sk.css?v=78">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -444,7 +444,7 @@
           <div class="hint" style="margin:0 0 6px">✉️ 초대의 글을 고르면 아래 칸에 들어가요. 그다음 고쳐 쓰세요.</div>
           <div class="moods" id="invPick" style="margin-bottom:8px"><button type="button" data-k="0">정중하게</button><button type="button" data-k="1">행사·포럼</button><button type="button" data-k="2">친근하게</button></div>
         </div>
-        <textarea id="body" maxlength="1500"></textarea>
+        <textarea id="body" maxlength="8000"></textarea>
         <div data-for="profile">
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
           <div class="hint">동영상은 유튜브에 "일부 공개"로 올린 뒤 그 링크를 붙여넣으세요.</div>
@@ -657,7 +657,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=83"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=78"></script>
+<script src="../js/render.js?v=79"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -1144,8 +1144,13 @@
   }
   $('invPick').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    var cur = v('body');
-    $('body').value = invText(+b.dataset.k) + (cur && !/^(바쁘신|좋은 분들|"|이번 행사)/.test(cur) ? '\n' + cur : '');
+    // 전에 넣은 초대 문구만 바꾸고, 직접 쓰거나 붙여 넣은 행사 설명은 그대로 둠
+    var t = v('title'), tpl = {};
+    INV.forEach(function (x) { ['"' + t + '"', '이번 행사'].forEach(function (tt) { x.replace('{t}', tt).split('\n').forEach(function (l) { tpl[l.trim()] = 1; }); }); });
+    if (v('subtitle')) tpl['일시: ' + v('subtitle')] = 1;
+    if (v('place')) tpl['장소: ' + v('place')] = 1;
+    var rest = $('body').value.split('\n').filter(function (l) { return !tpl[l.trim()]; }).join('\n').replace(/^\s+/, '');
+    $('body').value = invText(+b.dataset.k) + (rest ? '\n\n' + rest : '');
     update(); toast('초대의 글을 넣었어요. 고쳐 쓰셔도 돼요');
   });
   $('finish').addEventListener('click', function () {

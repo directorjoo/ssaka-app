@@ -601,3 +601,13 @@
 .sk-photo .sk-clip { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; background: #000; }
 .sk-clip-snd { position: absolute; right: 10px; bottom: 10px; z-index: 4; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
 .sk-clip-snd:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+/* 카드 아래 단추: 한 줄에 작게 (모든 디자인 공통) */
+.sk .sk-actions.sk-row { display: grid !important; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)) !important; gap: 6px !important; border: 0 !important; }
+.sk .sk-actions.sk-row .sk-act { flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; gap: 5px !important; min-height: 66px !important; padding: 8px 2px !important; transform: none !important; border-right: 0 !important; }
+.sk .sk-actions.sk-row .sk-act + .sk-act { margin: 0 !important; }
+.sk .sk-actions.sk-row .sk-lab { font-size: 12.5px !important; font-weight: 800 !important; white-space: nowrap; letter-spacing: -.04em; line-height: 1.15; }
+.sk .sk-actions.sk-row .sk-meta { display: none !important; }
+.sk .sk-actions.sk-row .sk-ico { width: 30px !important; height: 30px !important; }
+.sk .sk-actions.sk-row .sk-ico svg { width: 20px !important; height: 20px !important; }
+.sk .sk-actions.sk-row .sk-wide { grid-column: auto !important; }

@@ -111,6 +111,15 @@
       padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; white-space: nowrap;
     }
     .inds button[aria-pressed="true"] { border-color: #B3132B; background: #B3132B; color: #fff; }
+    /* 업종 고르기: 동그라미로 한눈에 */
+    .inds.circ { display: block; overflow: visible; padding-bottom: 0; }
+    .ind-gh { margin: 6px 2px 4px; font-size: 13.5px; font-weight: 800; color: var(--muted); }
+    .ind-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 4px; margin-bottom: 8px; }
+    .inds.circ .ind-grid button { display: grid; justify-items: center; gap: 6px; padding: 4px 0; border: 0; border-radius: 0; background: none; color: var(--text); font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.25; white-space: normal; word-break: keep-all; text-align: center; cursor: pointer; }
+    .inds.circ .ind-grid button i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 27px; background: var(--tint, #F2F2F4); box-shadow: inset 0 0 0 2px transparent; }
+    .inds.circ .ind-grid button[aria-pressed="true"] { background: none; color: #B3132B; font-weight: 900; }
+    .inds.circ .ind-grid button[aria-pressed="true"] i { box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px #B3132B; }
+    .inds.circ .ind-grid button:focus-visible { outline: 3px solid #B3132B; outline-offset: 2px; border-radius: 12px; }
     .gallery { display: grid; grid-auto-flow: column; grid-auto-columns: 118px; gap: 12px; overflow-x: auto; padding: 6px 6px 14px; margin-bottom: 12px; scrollbar-width: none; }
     .gallery::-webkit-scrollbar { display: none; }
     @media (min-width: 860px) { .inds { flex-wrap: wrap; overflow: visible; } }
@@ -688,29 +697,36 @@
 
   // ---------- 업종 · 디자인 고르기 ----------
   var curGroup = null;
+  // 업종마다 또렷이 구분되는 파스텔 바탕 (홈과 같은 색)
+  var IND_TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', insurance: '#E3E8F0', newcar: '#E3E8F0', usedcar: '#E3E8F0', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
+    cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
+    arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
+    greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
+  // 1. 업종 고르기 — 묶음 탭 없이 모든 업종을 동그라미로 한눈에
   function renderIndustries() {
-    var box = $('inds'); box.innerHTML = '';
+    var box = $('inds'); box.innerHTML = ''; box.className = 'inds circ';
     var groups = D.GROUPS || [];
     if (!curGroup) curGroup = (D.groupOf ? D.groupOf(industry) : groups[0] || {}).id;
-    if (groups.length) {
-      var tabs = $('grps');
-      if (!tabs) { tabs = document.createElement('div'); tabs.id = 'grps'; tabs.className = 'grps'; tabs.setAttribute('role', 'group'); tabs.setAttribute('aria-label', '업종 묶음'); box.parentNode.insertBefore(tabs, box); }
-      tabs.innerHTML = '';
-      groups.forEach(function (g) {
-        var t = document.createElement('button'); t.type = 'button'; t.textContent = g.emoji + ' ' + g.label;
-        t.setAttribute('aria-pressed', g.id === curGroup ? 'true' : 'false');
-        t.addEventListener('click', function () { curGroup = g.id; renderIndustries(); var first = D.industry(g.ids[0]); if (first && g.ids.indexOf(industry) < 0) setIndustry(first.id, true); });
-        tabs.appendChild(t);
+    var old = $('grps'); if (old) old.remove();
+    var list = groups.length ? groups : [{ label: '', ids: D.INDUSTRIES.filter(function (x) { return !D.isOpen || D.isOpen(x.id); }).map(function (x) { return x.id; }) }];
+    // 업종이 12개 이하(1차 공개)면 묶음 제목 없이 한 판에
+    var total = list.reduce(function (n, g) { return n + g.ids.length; }, 0);
+    if (total <= 12) list = [{ label: '', ids: list.reduce(function (a, g) { return a.concat(g.ids); }, []) }];
+    list.forEach(function (g) {
+      if (g.label && list.length > 1) { var h = document.createElement('div'); h.className = 'ind-gh'; h.textContent = (g.emoji ? g.emoji + ' ' : '') + g.label; box.appendChild(h); }
+      var grid = document.createElement('div'); grid.className = 'ind-grid';
+      g.ids.forEach(function (id) {
+        var ind = D.industry(id); if (!ind) return;
+        var b = document.createElement('button');
+        b.type = 'button'; b.dataset.ind = ind.id;
+        var i = document.createElement('i'); i.setAttribute('aria-hidden', 'true'); i.textContent = ind.emoji;
+        if (IND_TINT[ind.id]) i.style.setProperty('--tint', IND_TINT[ind.id]);
+        b.appendChild(i); b.appendChild(document.createTextNode(ind.label));
+        b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
+        b.addEventListener('click', function () { setIndustry(ind.id, true); });
+        grid.appendChild(b);
       });
-    }
-    var cg = groups.filter(function (g) { return g.id === curGroup; })[0];
-    (cg ? cg.ids.map(function (id) { return D.industry(id); }).filter(Boolean) : D.INDUSTRIES.filter(function (x) { return !D.isOpen || D.isOpen(x.id); })).forEach(function (ind) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.dataset.ind = ind.id;
-      b.textContent = ind.emoji + ' ' + ind.label;
-      b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
-      b.addEventListener('click', function () { setIndustry(ind.id, true); });
-      box.appendChild(b);
+      box.appendChild(grid);
     });
   }
   function thumb(d, ex) {
@@ -830,7 +846,7 @@
     var prevInd = industry;
     industry = ind.id;
     mood = '';
-    if (D.groupOf && D.groupOf(industry).id !== curGroup) { curGroup = D.groupOf(industry).id; renderIndustries(); }
+    if (D.groupOf) curGroup = D.groupOf(industry).id;
     if (!/^ph-/.test(design) && (!D.get(design) || D.get(design).industry !== industry)) design = D.list(industry)[0].id;
     document.querySelectorAll('.inds button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.ind === industry ? 'true' : 'false');
@@ -843,7 +859,7 @@
     renderGallery();
     if (userPicked) {
       var on = document.querySelector('.inds button[aria-pressed="true"]');
-      if (on && on.scrollIntoView) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      if (on && on.scrollIntoView && !$('inds').classList.contains('circ')) on.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
     }
   }
 

@@ -188,7 +188,7 @@
     { id: 'toefl', label: '토플·어학원', emoji: '🌍', type: 'shop', styles: ['magazine', 'cinema', 'glass'], world: true,
       L: { body: '강사 이력 · 성과 · 특강 소식 (한 줄에 하나씩)', menu: '강좌와 수강료 (한 줄에 하나, 선택)', menuHint: '"강좌 이름 수강료" 순서로 적으면 상담 예약 때 관심 강좌를 고를 수 있어요.', resv: '학생·학부모가 카드에서 바로 상담 예약할 수 있게 하기' },
       res: { label: '상담 예약', word: '강좌', people: false, deposit: false },
-      ex: { title: '족집게어학원', subtitle: 'TOEFL · SAT · IELTS · 듀오링고 전문', name: '족집게어학원', phone: '0507-1469-0583', body: '소수정예 선착순 모집: 가을특강\n2026 개정 TOEFL 맞춤 리딩 · 리스닝 · 스피킹 · 라이팅\n선릉역 1번 출구 483m · 22:00까지', copyLabel: '주소 복사', copyValue: '서울 강남구 역삼로63길 6 4층', place: '족집게어학원', menu: '개정 TOEFL (신토플)\nSAT 기초 & 실전\nIELTS\n듀오링고\n기초 토익\n중고등 내신·수능영어' } },
+      ex: { title: '족집게어학원', subtitle: 'TOEFL · SAT · IELTS · 듀오링고 전문', name: '족집게어학원', phone: '0507-1469-0583', image: 'https://sava.kr/img/ex/jok-building.jpg', galUrls: 'https://sava.kr/img/ex/jok-logo.jpg\nhttps://sava.kr/img/ex/jok-class.jpg\nhttps://sava.kr/img/ex/jok-books.jpg\nhttps://sava.kr/img/ex/jok-lounge.jpg\nhttps://sava.kr/img/ex/jok-room.jpg\nhttps://sava.kr/img/ex/jok-sign.jpg', body: '소수정예 선착순 모집: 가을특강\nEBS 저자 · 메가스터디 강사 직강\n2026 개정 TOEFL 맞춤 리딩 · 리스닝 · 스피킹 · 라이팅\n1관 4층 · 2관 5층 · 선릉역 1번 출구 483m · 22:00까지', copyLabel: '주소 복사', copyValue: '서울 강남구 역삼로63길 6 4층', place: '족집게어학원', menu: '개정 TOEFL (신토플)\nSAT 기초 & 실전\nIELTS\n듀오링고\n기초 토익\n중고등 내신·수능영어' } },
     { id: 'bigacademy', label: '대형 어학원', emoji: '🏫', type: 'shop', styles: ['poster', 'magazine', 'glass'],
       L: { body: '레벨 · 셔틀 · 이번 학기 소식 (한 줄에 하나씩)', menu: '과정 (한 줄에 하나, 선택)', menuHint: '과정 이름을 적으면 상담 예약 때 고를 수 있어요.', resv: '학부모가 카드에서 바로 레벨 테스트·상담을 예약할 수 있게 하기' },
       res: { label: '레벨 테스트 예약', word: '과정', people: false, deposit: false },

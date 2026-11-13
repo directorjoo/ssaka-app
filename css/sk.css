@@ -549,3 +549,8 @@
 .sk .sk-title.sk-t-l { font-size: min(46px, 9.5vw) !important; overflow-wrap: normal; }
 .sk .sk-title.sk-t-xl { font-size: min(42px, 8.4vw) !important; overflow-wrap: normal; }
 .sk-thumb .sk-title.sk-t-l, .sk-thumb .sk-title.sk-t-xl { font-size: 30px !important; }
+
+/* 내용 중 인사말 문장: 글머리표 없이 */
+.sk .sk-list li.sk-p { padding-left: 0 !important; list-style: none; }
+.sk .sk-list li.sk-p::before { display: none !important; content: none !important; }
+.sk .sk-list li.sk-p + li:not(.sk-p) { margin-top: 10px; }

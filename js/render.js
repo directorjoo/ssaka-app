@@ -135,7 +135,8 @@
 
     if (card.body && card.body.length) {
       var ul = el('ul', 'sk-list');
-      card.body.forEach(function (line) { ul.appendChild(el('li', '', line)); });
+      // 인사말처럼 문장으로 끝나는 줄(…니다. …요.)은 글머리표 없이 문단으로
+      card.body.forEach(function (line) { ul.appendChild(el('li', /(니다|니까|어요|아요|해요|세요|네요|군요|에요|이요|요)[.!?]?$/.test(line) && !/^[^:：]{1,8}[:：]/.test(line) ? 'sk-p' : '', line)); });
       main.appendChild(ul);
     }
     wrap.appendChild(main);

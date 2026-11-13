@@ -18,7 +18,7 @@
     var m = s.match(/^([가-힣A-Za-z0-9]+?)(역|터미널|정류장|주차장|광장)/);
     return m ? m[1] : s.split(/\s+/)[0] || '';
   }
-  function line(x, i) { return pad(i) + '.' + x.n + (x.g ? x.g : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + shortStop(x.s) : ''); }
+  function line(x, i) { return pad(i) + '.' + x.n + (x.g ? x.g : '') + (x.fam ? '(가족)' : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + shortStop(x.s) : ''); }
   function smsHref(phone, body) {
     var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
     return 'sms:' + String(phone).replace(/[^\d+]/g, '') + (ios ? '&' : '?') + 'body=' + encodeURIComponent(body);
@@ -29,6 +29,16 @@
     var R = card.roster; if (!R || !/^[a-z0-9]{8,16}$/.test(R.id || '')) return;
     toast = toast || function (m) { try { alert(m); } catch (e) {} };
     var tok = tokOf(R.id), stops = (R.st || []).filter(Boolean).slice(0, 8), list = [], live = window.self === window.top;
+    // 카톡방에서 이미 받은 명단(총무가 붙여넣은 것)을 앞에 두고, 싸바로 신청한 사람을 뒤에 이어 붙임
+    var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1 }; });
+    function merge(srv) {
+      var used = {}, outL = pre.map(function (x) {
+        for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; return srv[k]; }
+        return x;
+      });
+      srv.forEach(function (x, k) { if (!used[k]) outL.push(x); });
+      return outL;
+    }
     var box = el('section', 'sk-roster'); box.setAttribute('aria-label', '참석 명단');
     var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 명단'), cnt = el('span', 'sk-ro-cnt', '불러오는 중…');
     head.appendChild(ttl); head.appendChild(cnt); box.appendChild(head);
@@ -44,7 +54,7 @@
       join.textContent = mine ? '✏️ 내 신청 고치기 · 취소' : '🙋 참석 신청하기';
       byStop.innerHTML = '';
       if (stops.length && list.length) stops.forEach(function (s) {
-        var n = people(list.filter(function (x) { return x.s === s; }));
+        var n = people(list.filter(function (x) { return x.s && shortStop(x.s) === shortStop(s); }));
         var c = el('span', '', shortStop(s) + ' ' + n + '명'); byStop.appendChild(c);
       });
       ol.innerHTML = '';
@@ -52,13 +62,13 @@
       copy.hidden = !list.length;
     }
     function load() {
-      return fetch(API + R.id + '?tok=' + tok).then(function (r) { return r.json(); }).then(function (j) { list = j.list || []; draw(); })
+      return fetch(API + R.id + '?tok=' + tok).then(function (r) { return r.json(); }).then(function (j) { list = merge(j.list || []); draw(); })
         .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
     }
     function send(o) {
       if (!live) { toast('미리보기에선 신청되지 않아요'); return Promise.resolve(); }
       return fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ tok: tok }, o)) })
-        .then(function (r) { return r.json(); }).then(function (j) { if (j.list) { list = j.list; draw(); } else throw new Error(j.error); });
+        .then(function (r) { return r.json(); }).then(function (j) { if (j.list) { list = merge(j.list); draw(); } else throw new Error(j.error); });
     }
     copy.addEventListener('click', function () {
       var t = [card.title || '참석 명단', '—참석자명단'].concat(list.map(line)).join('\n') + '\n(싸바에서 자동 정리 · 총 ' + people(list) + '명)';

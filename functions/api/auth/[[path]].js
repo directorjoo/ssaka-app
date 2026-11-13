@@ -148,6 +148,10 @@ export async function onRequest({ request, env, params }) {
     }
     await db.prepare('DELETE FROM sessions WHERE uid = ?').bind(u.id).run();
     await db.prepare('DELETE FROM users WHERE id = ?').bind(u.id).run();
+    // 탈퇴: 계정에 묶인 블로그 글은 지우고, 카드·참석 명단의 계정 연결은 끊음 (기기 열쇠로만 고칠 수 있게 남음)
+    for (const q of ['DELETE FROM blog_posts WHERE uid = ?', 'UPDATE card_owner SET uid = NULL WHERE uid = ?', 'UPDATE roster_meta SET uid = NULL WHERE uid = ?']) {
+      try { await db.prepare(q).bind(String(u.id)).run(); } catch (e) {}
+    }
     return json({ ok: true }, 200, [['set-cookie', setCookie('sava_sid', '', 0)]]);
   }
 

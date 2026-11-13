@@ -109,7 +109,10 @@
     b.tabIndex = -1; b.style.outline = 'none'; b.focus();
   }
 
+  // 1차(조용히) 공개 동안은 일반 손님에게 설치 안내를 보이지 않음 (주소에 ?all=1 로 들어온 휴대폰은 보임)
+  function quiet() { try { return window.SAVA_QUIET && localStorage.getItem('sava-all') !== '1' && !/[?&]all=1/.test(location.search); } catch (e) { return !!window.SAVA_QUIET; } }
   function chip(parent, text) {
+    if (quiet()) return null;
     if (standalone() || !parent) return null;
     addCss();
     var c = el('button', 'si-chip', '<img src="' + ICON + '" alt=""><div><b>' + (text || '싸바 홈 화면에 추가') + '</b><span>다음엔 아이콘 한 번에 열려요</span></div><em>설치 ›</em>');
@@ -160,7 +163,8 @@
   document.addEventListener('visibilitychange', function () { if (!document.hidden) checkUpdate(); });
   setTimeout(checkUpdate, 1500);
   window.SsakaInstall = { open: open, chip: chip, standalone: standalone, update: hardUpdate, version: VER };
-  if (/[?&]install=1/.test(location.search)) {
+  window.SsakaInstall.quiet = quiet;
+  if (/[?&]install=1/.test(location.search) && !quiet()) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', open); else open();
   }
 })();

@@ -225,7 +225,8 @@
   <div class="in">© 2026 싸바 SAVA · sava.kr<br>싸바? 어디야? 싸바! 여기야!<br><a href="privacy/" style="color:inherit">개인정보처리방침</a> · <a href="terms/" style="color:inherit">이용약관</a></div>
 </footer>
 
-<script src="js/install.js"></script>
+<script src="js/launch.js?v=1"></script>
+<script src="js/install.js?v=2"></script>
 <script>
 (function () {
   // ===== 사업 제휴 연락처 — 값을 넣으면 버튼이 나타나요 (비워 두면 숨김) =====
@@ -244,6 +245,8 @@
   if (CONTACT.email) add('mailto:' + CONTACT.email + '?subject=' + encodeURIComponent('[싸바 제휴 문의]'), '✉️', '제휴 문의', CONTACT.email);
 
   var ib = document.getElementById('installBtn');
+  // 1차(조용히) 공개 중에는 설치 단추 대신 '어디야?' 하나만
+  if (window.SsakaInstall && SsakaInstall.quiet && SsakaInstall.quiet()) { ib.remove(); return; }
   var done = window.SsakaInstall && SsakaInstall.standalone();
   if (done) ib.textContent = '🍒 싸바 홈으로';
   ib.addEventListener('click', function () { if (done) location.href = 'app/'; else if (window.SsakaInstall) SsakaInstall.open(); });

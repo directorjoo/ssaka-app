@@ -135,7 +135,13 @@
     var longW = Math.max.apply(0, String(card.title || '').split(/\s+/).map(function (w) { return w.length; }));
     if (longW >= 9) h1.classList.add(longW >= 12 ? 'sk-t-xl' : 'sk-t-l');
     titles.appendChild(h1);
-    if (card.subtitle) titles.appendChild(el('p', 'sk-sub', card.subtitle));
+    if (card.subtitle) {
+      // '12:00–18:00' 같은 시간은 중간에서 줄이 끊기지 않게 한 덩어리로
+      var sub = el('p', 'sk-sub'), rest = String(card.subtitle), tm, re = /\d{1,2}[:：]\d{2}(?:\s*[~\-–—]\s*\d{1,2}[:：]\d{2})?/g, at = 0;
+      while ((tm = re.exec(rest))) { sub.appendChild(document.createTextNode(rest.slice(at, tm.index))); sub.appendChild(el('span', 'sk-nw', tm[0])); at = tm.index + tm[0].length; }
+      sub.appendChild(document.createTextNode(rest.slice(at)));
+      titles.appendChild(sub);
+    }
     hero.appendChild(titles);
     if (card.season && SEASON[card.season]) {
       var rib = el('div', 'sk-ribbon', SEASON[card.season]);

@@ -225,6 +225,7 @@
       if (PE) {
         root.classList.add('sk-pe');
         // 만들기 화면의 [✏️ 수정하기] 를 누르면 고칠 수 있는 곳을 점선으로 보여 줌 (다시 그려도 유지)
+        var el2 = function (t, c) { var x = document.createElement(t); x.className = c; return x; };
         window.SavaPreviewMode = function (on) { root.classList.toggle('sk-pe-on', !!on); };
         try { if (window.parent.SavaEditOn && window.parent.SavaEditOn()) root.classList.add('sk-pe-on'); } catch (e) {}
         root.addEventListener('click', function (e) {
@@ -242,7 +243,16 @@
             var done = h('button', { type: 'button', class: 'sk-edok', text: '✓ 다 고쳤어요' });
             ta.insertAdjacentElement('afterend', done);
             done.addEventListener('mousedown', function (x) { x.preventDefault(); ta.blur(); });
-            ta.addEventListener('blur', function () { done.remove(); PE('bodyAll', -1, 'all', ta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).join('\n')); }, { once: true });
+            ta.addEventListener('blur', function () {
+              done.remove();
+              var lines = ta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+              // 미리보기를 새로 불러오지 않고 그 자리에서 다시 그림 → 화면이 위로 튀지 않음
+              pristine.body = lines;
+              var tmp = SsakaRender.build(Object.assign({}, card, { body: lines }), design, ctx);
+              var nl = tmp.querySelector('.sk-list') || el2('ul', 'sk-list');
+              ta.replaceWith(nl);
+              PE('bodyAll', -1, 'all', lines.join('\n'));
+            }, { once: true });
             return;
           }
           if (li) {

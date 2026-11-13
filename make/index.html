@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=83">
+  <link rel="stylesheet" href="../css/sk.css?v=84">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -675,7 +675,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=83"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=80"></script>
+<script src="../js/render.js?v=81"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1049,12 +1049,13 @@
     return { card: card, isExample: isEmpty };
   }
 
-  var timer = null, lastSrc = '';
+  var timer = null, lastSrc = '', keepPv = false;
   function update() {
     clearTimeout(timer);
     timer = setTimeout(function () {
       var r = buildCard();
       var url = viewer + '?d=' + SsakaCodec.encode(r.card);
+      if (url !== lastSrc && keepPv) { lastSrc = url; keepPv = false; } // 미리보기에서 직접 고친 건 이미 화면에 있음 → 새로 안 불러옴
       if (url !== lastSrc) {
         // 미리보기를 다시 그려도 보던 자리 그대로 (고치다가 맨 위로 튀지 않게)
         var fr = $('frame'), y = 0;
@@ -1191,7 +1192,6 @@
   // ---------- 미리보기에서 글자 눌러 바로 고치기 (c/ 미리보기가 불러 줌) ----------
   window.SavaPreviewEdit = function (key, idx, part, text) {
     remember();
-    if (key !== 'bodyAll') text = text.replace(/\s*❓\s*/g, ' ').trim(); // 손으로 고친 줄은 확인한 것으로 봄
     if (key === 'kick') {
       $('kick').value = text.slice(0, 20) || '없음';
     } else if (key === 'title' || key === 'subtitle') {
@@ -1212,6 +1212,7 @@
       if (line) raw[at] = line; else raw.splice(at, 1);
       $('body').value = raw.join('\n');
     }
+    keepPv = true;
     update();
     toast('✏️ 고쳤어요');
   };
@@ -1438,6 +1439,37 @@
   }
   var autoFix = true;
   try { autoFix = localStorage.getItem('sava-autofix') !== '0'; } catch (e) {}
+  // 사진 둘레의 한 가지 색 띠(노란 테두리·흰 여백 등)를 잘라 냄 → 꽉 채우기에서 한쪽만 두껍게 보이는 일 없게
+  function trimBorders(cv) {
+    try {
+      var W = cv.width, H = cv.height, d = cv.getContext('2d').getImageData(0, 0, W, H).data;
+      function px(x, y) { var i = (y * W + x) * 4; return [d[i], d[i + 1], d[i + 2]]; }
+      function line(isCol, k) { // 한 줄(열/행)의 평균색과 흩어진 정도
+        var n = isCol ? H : W, st = Math.max(1, Math.floor(n / 80)), r = 0, g = 0, b = 0, c = 0, all = [];
+        for (var t = 0; t < n; t += st) { var p = isCol ? px(k, t) : px(t, k); r += p[0]; g += p[1]; b += p[2]; c++; all.push(p); }
+        r /= c; g /= c; b /= c; var v = 0;
+        all.forEach(function (p) { v += Math.abs(p[0] - r) + Math.abs(p[1] - g) + Math.abs(p[2] - b); });
+        return { m: [r, g, b], v: v / c };
+      }
+      function far(a, b) { return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]); }
+      function band(isCol, from, dir, lim) {
+        var first = line(isCol, from); if (first.v > 18) return 0;
+        var k = 0, last = first;
+        while (k < lim) { var L = line(isCol, from + dir * (k + 1)); if (L.v > 18 || far(L.m, first.m) > 30) break; last = L; k++; }
+        if (k < 2) return 0;
+        // 하늘처럼 서서히 바뀌는 건 띠가 아님: 띠 바로 다음(2줄 안)에서 색이 확 달라져야 테두리로 봄
+        var nx = line(isCol, from + dir * Math.min(k + 3, lim + 3));
+        return far(nx.m, last.m) > 70 || nx.v > 60 ? k + 2 : 0;
+      }
+      var lx = Math.floor(W * 0.15), ly = Math.floor(H * 0.15);
+      var L = band(true, 0, 1, lx), R = band(true, W - 1, -1, lx), T = band(false, 0, 1, ly), B = band(false, H - 1, -1, ly);
+      if (!(L || R || T || B)) return cv;
+      var nw = W - L - R, nh = H - T - B; if (nw < W * 0.6 || nh < H * 0.6) return cv;
+      var o = document.createElement('canvas'); o.width = nw; o.height = nh;
+      o.getContext('2d').drawImage(cv, L, T, nw, nh, 0, 0, nw, nh);
+      return o;
+    } catch (e) { return cv; }
+  }
   function resize(file, max, fix) {
     return new Promise(function (resolve) {
       var img = new Image(), u = URL.createObjectURL(file);
@@ -1446,6 +1478,7 @@
         var cv = document.createElement('canvas');
         cv.width = Math.round(img.width * r); cv.height = Math.round(img.height * r);
         cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        cv = trimBorders(cv);
         if (fix) enhance(cv);
         URL.revokeObjectURL(u);
         cv.toBlob(function (b) { resolve(b ? new File([b], 'ssaka.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.85);

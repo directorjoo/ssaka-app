@@ -430,6 +430,10 @@
       <fieldset>
         <legend>내용</legend>
         <label for="body" data-l="body">한 줄에 하나씩</label>
+        <div id="invBox" hidden>
+          <div class="hint" style="margin:0 0 6px">✉️ 초대의 글을 고르면 아래 칸에 들어가요. 그다음 고쳐 쓰세요.</div>
+          <div class="moods" id="invPick" style="margin-bottom:8px"><button type="button" data-k="0">정중하게</button><button type="button" data-k="1">행사·포럼</button><button type="button" data-k="2">친근하게</button></div>
+        </div>
         <textarea id="body" maxlength="1500"></textarea>
         <div data-for="profile">
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
@@ -854,6 +858,7 @@
     $('depBox').hidden = res.deposit === false;
     $('bizNote').hidden = ind.id !== 'insurance';
     $('castGo').hidden = ind.id !== 'actor';
+    $('invBox').hidden = ind.id !== 'event';
     var hl = $('hLinks'); hl.innerHTML = '';
     if (window.SsakaLinks && (type === 'profile' || type === 'shop')) {
       var head = document.createElement('b'); head.textContent = '쓸모 있는 곳'; hl.appendChild(head);
@@ -1085,7 +1090,30 @@
     $('toast').classList.remove('show');
     $('doneModal').hidden = false;
   }
+  var INV = [
+    '바쁘신 중에도 귀한 걸음 하시어\n자리를 빛내 주시면 감사하겠습니다.',
+    '{t}에 여러분을 초대합니다.\n함께 이야기 나누고 새로운 인연을 만드는 자리가 되기를 바랍니다.\n귀한 걸음으로 자리를 빛내 주시기 바랍니다.',
+    '좋은 분들과 함께하고 싶어 초대장을 보냅니다.\n꼭 오셔서 자리를 빛내 주세요!'
+  ];
+  function invText(k) {
+    var t = v('title'), lines = INV[k].replace('{t}', t ? '"' + t + '"' : '이번 행사').split('\n');
+    if (v('subtitle')) lines.push('일시: ' + v('subtitle'));
+    if (v('place')) lines.push('장소: ' + v('place'));
+    return lines.join('\n');
+  }
+  $('invPick').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var cur = v('body');
+    $('body').value = invText(+b.dataset.k) + (cur && !/^(바쁘신|좋은 분들|"|이번 행사)/.test(cur) ? '\n' + cur : '');
+    update(); toast('초대의 글을 넣었어요. 고쳐 쓰셔도 돼요');
+  });
   $('finish').addEventListener('click', function () {
+    if (industry === 'event' && !v('body')) {
+      $('body').value = invText(0); update();
+      $('body').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      toast('초대의 글이 비어 있어 기본 문구를 넣었어요. 확인 후 다시 [완료]를 눌러 주세요');
+      return;
+    }
     var miss = missingFields();
     if (miss.length) {
       miss.forEach(function (f) { $(f).classList.add('missing'); });

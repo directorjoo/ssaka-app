@@ -60,6 +60,12 @@
     .pbtn { min-height: 52px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
     .pbtn.on { border-color: var(--ssaka); color: var(--ssaka-deep); background: var(--ssaka-soft); }
     .note { font-size: 12.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.5; }
+    .mapw { position: relative; margin-top: 10px; }
+    .mapw .map { height: min(62vh, 500px); min-height: 320px; margin-top: 0; }
+    .mapw .fsb { position: absolute; right: 10px; bottom: 10px; z-index: 2; min-height: 40px; padding: 0 13px; border: 0; border-radius: 999px; background: rgba(255,255,255,.96); color: #1a1a1a; font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 2px 10px rgba(0,0,0,.2); cursor: pointer; }
+    .mapw.fs { position: fixed; inset: 0; z-index: 9995; margin: 0; background: #fff; }
+    .mapw.fs .map { height: 100%; min-height: 0; border-radius: 0; }
+    .mapw.fs .fsb { bottom: calc(16px + env(safe-area-inset-bottom)); }
     .map { width: 100%; height: 190px; border: 0; border-radius: 16px; display: block; background: #e9e9e9; margin-top: 8px; }
 
     .send { display: grid; gap: 10px; margin-top: 16px; }
@@ -116,7 +122,7 @@
     .or button { flex: none; min-height: 50px; padding: 0 16px; border-radius: 14px; border: 0; background: var(--ink); color: #fff; font-weight: 800; cursor: pointer; }
     .mk { display: block; text-align: center; margin-top: 26px; font-size: 14px; font-weight: 700; color: var(--ink-2); text-decoration: none; }
     .mk b { color: var(--ssaka-deep); }
-    .replay { position: fixed; right: 14px; top: calc(14px + env(safe-area-inset-top)); width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--bg-2); display: grid; place-items: center; cursor: pointer; }
+    .replay { position: fixed; right: 12px; top: calc(58px + env(safe-area-inset-top)); z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,.12); width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--bg-2); display: grid; place-items: center; cursor: pointer; }
     .replay svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
     .tap { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); text-align: center; cursor: pointer; }
     .tap b { display: block; font-size: 56px; font-weight: 900; color: var(--ssaka); letter-spacing: -0.05em; }
@@ -245,7 +251,7 @@
     <p class="place" id="cPlace"></p>
     <div class="when" id="cWhen" hidden></div>
     <div class="memo" id="cMemo" hidden></div>
-    <iframe class="map" id="cMap" title="약속 장소 지도" hidden loading="lazy"></iframe>
+    <div class="mapw" id="cMapW" hidden><iframe class="map" id="cMap" title="약속 장소 지도" loading="lazy"></iframe><button type="button" class="fsb" data-fs="cMapW">⛶ 크게 보기</button></div>
     <div class="nav">
       <a class="big red" id="cKakaoMap" style="font-size:16px">카카오맵 길찾기</a>
       <a class="big ghost" id="cNaver" style="font-size:16px">네이버 길찾기</a>
@@ -268,7 +274,7 @@
     <p class="pact" id="pAct" style="text-align:center"></p>
     <div class="when" id="pWhen" hidden></div>
     <p class="place" id="pPlace" hidden style="margin-top:10px"></p>
-    <iframe class="map" id="pMap" title="모이는 곳 지도" hidden loading="lazy"></iframe>
+    <div class="mapw" id="pMapW" hidden><iframe class="map" id="pMap" title="모이는 곳 지도" loading="lazy"></iframe><button type="button" class="fsb" data-fs="pMapW">⛶ 크게 보기</button></div>
     <div class="nav" id="pNav" hidden>
       <a class="big ghost" id="pKakaoMap" style="font-size:16px">카카오맵 길찾기</a>
       <a class="big ghost" id="pNaver" style="font-size:16px">네이버 길찾기</a>
@@ -330,10 +336,19 @@
     var to = String(phone || '').replace(/[^\d+]/g, '');
     return 'sms:' + to + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body);
   }
-  function osm(lat, lng) {
-    var d = 0.004;
-    return 'https://www.openstreetmap.org/export/embed.html?bbox=' + (lng - d) + ',' + (lat - d * 0.7) + ',' + (lng + d) + ',' + (lat + d * 0.7) + '&layer=mapnik&marker=' + lat + ',' + lng;
+  function osm(lat, lng, tall) {
+    lat = parseFloat(lat); lng = parseFloat(lng);
+    var d = tall ? 0.0035 : 0.004, r = tall ? 1.15 : 0.7; // 큰 지도는 세로로 길게, 골목이 보이게
+    return 'https://www.openstreetmap.org/export/embed.html?bbox=' + (lng - d) + ',' + (lat - d * r) + ',' + (lng + d) + ',' + (lat + d * r) + '&layer=mapnik&marker=' + lat + ',' + lng;
   }
+  // 받는 화면 지도: ⛶ 크게 보기 ↔ ✕ 닫기
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.fsb'); if (!b) return;
+    var w = document.getElementById(b.getAttribute('data-fs')); if (!w) return;
+    var on = !w.classList.contains('fs');
+    w.classList.toggle('fs', on); b.textContent = on ? '✕ 닫기' : '⛶ 크게 보기';
+    document.body.style.overflow = on ? 'hidden' : '';
+  });
   function hasXY(p) { return p && isFinite(parseFloat(p.lat)) && isFinite(parseFloat(p.lng)); }
   function clockText(ts) {
     var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
@@ -452,7 +467,7 @@
         $('pNav').hidden = false;
         var pn = pp.name || '모이는 곳';
         if (hasXY(pp)) {
-          $('pMap').hidden = false; $('pMap').src = osm(pp.lat, pp.lng);
+          $('pMapW').hidden = false; $('pMap').src = osm(pp.lat, pp.lng, 1);
           $('pKakaoMap').href = 'https://map.kakao.com/link/to/' + encodeURIComponent(pn) + ',' + pp.lat + ',' + pp.lng;
           $('pNaver').href = 'https://map.naver.com/p/directions/-/' + pp.lng + ',' + pp.lat + ',' + encodeURIComponent(pn) + '/-/transit';
         } else {
@@ -499,7 +514,7 @@
       if (card.memo) { $('cMemo').hidden = false; $('cMemo').textContent = '💬 ' + card.memo; }
       var name = p.name || '약속 장소';
       if (hasXY(p)) {
-        $('cMap').hidden = false; $('cMap').src = osm(p.lat, p.lng);
+        $('cMapW').hidden = false; $('cMap').src = osm(p.lat, p.lng, 1);
         $('cKakaoMap').href = 'https://map.kakao.com/link/to/' + encodeURIComponent(name) + ',' + p.lat + ',' + p.lng;
         $('cNaver').href = 'https://map.naver.com/p/directions/-/' + p.lng + ',' + p.lat + ',' + encodeURIComponent(name) + '/-/transit';
       } else {

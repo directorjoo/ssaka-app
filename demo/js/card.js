@@ -264,7 +264,7 @@
         var mk = new URL('../make/', location.href).href;
         var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 바로 고치기';
         e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
-        var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq); e1.textContent = '📝 입력칸';
+        var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : ''); e1.textContent = '📝 입력칸';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
         bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
         document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
@@ -383,19 +383,21 @@
       if (kk !== null) nc.kick = kk.slice(0, 20);
       nc.body = lines;
       bOk.disabled = true; bOk.textContent = '저장하는 중…';
-      var d = SsakaCodec.encode(nc);
-      fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
-        .then(function (r) { return r.json(); })
+      var d = SsakaCodec.encode(nc), api = new URL('../api/card', location.href).href;
+      var k = window.SsakaStore ? SsakaStore.ownerKey() : '', sid = new URLSearchParams(location.search).get('s');
+      var post = function (o) { return fetch(api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(o) }).then(function (r) { return r.json(); }); };
+      // 1) 짧은 링크이고 내가 주인이면: 같은 링크 내용을 바꿈 (이미 보낸 링크도 바뀜)
+      // 2) 아니면: 새 링크를 만듦
+      (sid ? post({ op: 'update', id: sid, k: k, d: d }).catch(function () { return {}; }) : Promise.resolve({}))
+        .then(function (j) { return j && j.updated ? j : post({ d: d, k: k }); })
         .then(function (j) {
           if (!j || !j.id) throw new Error(j && j.error || 'x');
-          var url = new URL('?s=' + j.id, location.href).href;
-          try {
-            var long = new URL('?d=' + d, location.href).href;
-            if (window.SsakaStore) SsakaStore.saveMine(nc, long);
-          } catch (e) {}
+          var same = !!j.updated;
+          try { if (window.SsakaStore) SsakaStore.saveMine(nc, new URL('?d=' + d, location.href).href); } catch (e) {}
           done();
-          toast('저장했어요! 새 링크로 바뀌었어요');
-          setTimeout(function () { location.replace(url); }, 700);
+          toast(same ? '저장했어요! 이미 보낸 링크에도 바로 반영돼요' : '저장했어요! 새 링크로 바뀌었어요');
+          var url = new URL('?s=' + j.id, location.href).href;
+          setTimeout(function () { if (same) location.reload(); else location.replace(url); }, 900);
         })
         .catch(function (e) { bOk.disabled = false; bOk.textContent = '💾 저장'; toast(String(e.message) === 'bad-content' ? '보낼 수 없는 내용이 있어요' : '저장하지 못했어요. 다시 눌러 주세요'); });
     });
@@ -496,7 +498,7 @@
     var data = params.get('d');
     var sid = params.get('s');
     if (!data && sid) {
-      fetch(new URL('../api/card/' + encodeURIComponent(sid), location.href).href)
+      fetch(new URL('../api/card/' + encodeURIComponent(sid), location.href).href, { cache: 'no-cache' })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function (j) {
           var card = j && j.d && window.SsakaCodec && SsakaCodec.decode(j.d);

@@ -18,6 +18,7 @@ async function isBlocked(db, cid) { try { await db.prepare('CREATE TABLE IF NOT 
 function json(o, status) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': status && status !== 200 ? 'no-store' : 'public, max-age=300' } });
 }
+async function keyHash(k) { const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('sava-owner|' + k))); return [...h].map(x => x.toString(16).padStart(2, '0')).join(''); }
 const ABC = '0123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
 async function idOf(d) {
   const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(d)));
@@ -34,7 +35,8 @@ export async function onRequest({ request, env, params }) {
     if (!id) return json({ error: 'bad' }, 400);
     if (await isBlocked(db, id)) return json({ error: 'blocked' }, 451);
     const row = await db.prepare('SELECT d FROM cards WHERE id = ?').bind(id).first();
-    return row ? json({ d: row.d }) : json({ error: 'gone' }, 404);
+    // 만든 사람이 고칠 수 있어서 오래 담아 두지 않음
+    return row ? new Response(JSON.stringify({ d: row.d }), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=15' } }) : json({ error: 'gone' }, 404);
   }
   if (request.method !== 'POST') return json({ error: 'bad' }, 400);
   let b;
@@ -44,8 +46,27 @@ export async function onRequest({ request, env, params }) {
   if (!d || !/^[A-Za-z0-9_-]+$/.test(d)) return json({ error: 'bad' }, 400);
   if (await tooMany(db, await ipKey(request, 'card'), 300, 86400)) return json({ error: 'slow' }, 429);
   try { let b64 = d.replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '='; const o = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)))); if (isBad(o)) return json({ error: 'bad-content' }, 422); } catch (e) { return json({ error: 'bad' }, 400); }
+  // 만든 사람 열쇠: 기기에만 있는 비밀값 k 의 해시만 저장. 같은 링크 내용을 고칠 때 확인
+  await db.prepare('CREATE TABLE IF NOT EXISTS card_owner (id TEXT PRIMARY KEY, kh TEXT NOT NULL)').run();
+  const k = /^[a-f0-9]{24,64}$/.test(String(b.k || '')) ? String(b.k) : '';
+  const kh = k ? await keyHash(k) : '';
+  if (b.op === 'update') {
+    if (!id || !kh) return json({ error: 'bad' }, 400);
+    const own = await db.prepare('SELECT kh FROM card_owner WHERE id = ?').bind(id).first();
+    if (!own || own.kh !== kh) return json({ error: 'not-owner' }, 403);
+    if (await isBlocked(db, id)) return json({ error: 'blocked' }, 451);
+    if (await tooMany(db, await ipKey(request, 'cardup'), 100, 86400)) return json({ error: 'slow' }, 429);
+    await db.prepare('UPDATE cards SET d = ? WHERE id = ?').bind(d, id).run();
+    return json({ id, updated: 1 });
+  }
   const nid = await idOf(d);
   if (await isBlocked(db, nid)) return json({ error: 'blocked' }, 451);
-  await db.prepare('INSERT OR IGNORE INTO cards (id, d, created) VALUES (?, ?, ?)').bind(nid, d, Date.now()).run();
-  return json({ id: nid });
+  const ins = await db.prepare('INSERT OR IGNORE INTO cards (id, d, created) VALUES (?, ?, ?)').bind(nid, d, Date.now()).run();
+  // 새로 생긴 링크일 때만 주인을 정함 (남의 카드를 가로채지 못하게)
+  let owner = 0;
+  if (kh) {
+    if (ins.meta && ins.meta.changes) { await db.prepare('INSERT OR IGNORE INTO card_owner (id, kh) VALUES (?, ?)').bind(nid, kh).run(); owner = 1; }
+    else { const own = await db.prepare('SELECT kh FROM card_owner WHERE id = ?').bind(nid).first(); owner = own && own.kh === kh ? 1 : 0; }
+  }
+  return json({ id: nid, owner });
 }

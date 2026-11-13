@@ -33,6 +33,14 @@
     cancelReservation: function (code) {
       set(K.resv, get(K.resv).map(function (x) { if (x.code === code) x.status = 'canceled'; return x; }));
     },
+    // 만든 사람 열쇠: 이 기기에만 있는 비밀값. 짧은 링크를 만들 때 같이 보내면, 나중에 같은 링크 내용을 고칠 수 있음
+    ownerKey: function () {
+      try {
+        var k = localStorage.getItem('sava-owner-key');
+        if (!k) { var a = new Uint8Array(20); crypto.getRandomValues(a); k = Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join(''); localStorage.setItem('sava-owner-key', k); }
+        return k;
+      } catch (e) { return ''; }
+    },
     clearAll: function () { Object.keys(K).forEach(function (k) { try { localStorage.removeItem(K[k]); } catch (e) {} }); }
   };
   global.SsakaStore = api;

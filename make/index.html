@@ -674,7 +674,7 @@
 <script src="../js/render.js?v=80"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
-<script src="../js/store.js"></script>
+<script src="../js/store.js?v=2"></script>
 <script src="../js/share.js"></script>
 <script src="../js/export.js?v=80"></script>
 <script src="../js/links.js"></script>
@@ -1113,10 +1113,19 @@
   function ensureShort(c) {
     var d = dOf(c.url);
     if (!d || SHORT[d]) return Promise.resolve(link(c));
-    return fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
+    var api = new URL('../api/card', location.href).href, k = window.SsakaStore ? SsakaStore.ownerKey() : '';
+    // 내 카드를 '입력칸'으로 고치는 중이면: 이미 보낸 같은 링크의 내용을 바꿈
+    var esid = (new URLSearchParams(location.search).get('s') || '').replace(/[^0-9A-Za-z]/g, '');
+    var up = esid && new URLSearchParams(location.search).get('edit')
+      ? fetch(api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'update', id: esid, k: k, d: d }) }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      : Promise.resolve(null);
+    return up.then(function (u) {
+      if (u && u.updated) { SHORT[d] = viewer + '?s=' + esid; toast('이미 보낸 링크에도 고친 내용이 반영됐어요'); return link(c); }
+      return fetch(api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d, k: k }) })
       .then(function (r) { if (r.status === 422 || r.status === 451) { toast('이용 규칙에 맞지 않는 내용(도박·불법 대출 등)이 있어 보낼 수 없어요'); throw new Error('bad'); } return r.ok ? r.json() : null; })
       .then(function (j) { if (j && j.id) SHORT[d] = viewer + '?s=' + j.id; return link(c); })
       .catch(function (e) { return e && e.message === 'bad' ? null : c.url; });
+    });
   }
   // 새 창에서 열기: 짧은 링크를 받아서 열기 (휴대폰이 팝업을 막지 않게 창을 먼저 연 뒤 주소를 넣음)
   $('open').addEventListener('click', function (e) {

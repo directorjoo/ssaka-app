@@ -219,9 +219,11 @@
     more.appendChild(band); more.appendChild(cp);
     wrap.appendChild(more);
 
-    var make = el(live ? 'a' : 'div', 'sk-make', '나도 10초 만에 싸바카드 만들기');
-    if (live) make.href = ctx.makeHref;
-    wrap.appendChild(make);
+    if (!(live && window.SAVA_QUIET)) { // 1차(조용히)에는 받은 카드에서 숨김
+      var make = el(live ? 'a' : 'div', 'sk-make', '나도 10초 만에 싸바카드 만들기');
+      if (live) make.href = ctx.makeHref;
+      wrap.appendChild(make);
+    }
 
     root.appendChild(wrap);
     return root;

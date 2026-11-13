@@ -157,6 +157,7 @@
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(10px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); z-index: 40; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+<script src="/js/launch.js?v=1"></script>
 </head>
 <body>
 <div class="wrap">
@@ -474,7 +475,8 @@
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide || o.nb, installUrl: BASE + '?install=1' });
     }
-    if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
+    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk').forEach(function (a) { a.style.display = 'none'; });
+    else if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
     if (card.m === 'play') {
       $('viewPlay').hidden = false;
@@ -509,7 +511,7 @@
       document.querySelectorAll('#viewPlay .pbig button').forEach(function (b) {
         b.addEventListener('click', function () {
           var yes = b.classList.contains('yes');
-          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
+          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes && !window.SAVA_QUIET ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
         });
       });
       playSound(card.sound || 'play');

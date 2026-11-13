@@ -98,9 +98,10 @@
         objectType: 'feed',
         content: content,
         buttons: [
-          { title: (extra && extra.buttonTitle) || '카드 열기', link: { mobileWebUrl: c.url, webUrl: c.url } },
+          { title: (extra && extra.buttonTitle) || '카드 열기', link: { mobileWebUrl: c.url, webUrl: c.url } }
+        ].concat(window.SAVA_QUIET ? [] : [
           { title: (extra && extra.installTitle) || '싸바카드 설치하기', link: { mobileWebUrl: (extra && extra.installUrl) || INSTALL_URL, webUrl: (extra && extra.installUrl) || INSTALL_URL } }
-        ]
+        ])
       });
     }).catch(function () { nativeShare(c); });
   }

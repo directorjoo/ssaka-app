@@ -28,6 +28,7 @@
     .msg { padding: 30px 16px; border-radius: 18px; background: #f5f5f7; text-align: center; font-size: 16px; font-weight: 700; color: var(--ink-2); word-break: keep-all; }
     .go { display: block; margin-top: 18px; min-height: 58px; line-height: 58px; border-radius: 18px; background: var(--ssaka); color: #fff; text-align: center; font-size: 18px; font-weight: 900; text-decoration: none; }
   </style>
+<script src="/js/launch.js?v=1"></script>
 </head>
 <body>
 <div class="w">
@@ -35,7 +36,8 @@
   <h1 id="h">📷 사진이 왔어요</h1>
   <p class="tip">사진을 꾹 누르면 내 폰에 저장할 수 있어요.</p>
   <div class="list" id="list"><div class="msg">불러오는 중…</div></div>
-  <a class="go" href="../eodiya/">💬 나도 싸바? 보내기</a>
+  <a class="go" id="goMk" href="../eodiya/">💬 나도 싸바? 보내기</a>
+  <script>if (window.SAVA_QUIET) document.getElementById('goMk').style.display = 'none';</script>
 </div>
 <script src="../js/codec.js"></script>
 <script src="../js/kback.js?v=44"></script>

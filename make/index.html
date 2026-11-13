@@ -1148,7 +1148,7 @@
     var w = inApp ? null : window.open('about:blank', '_blank');
     ensureShort(c).then(function (u) { u = u || c.url; if (w) w.location.href = u; else location.href = u; });
   });
-  function openDone() { try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
+  function openDone() { try { if (window.SavaCherry) SavaCherry.rain({ text: '🎉 카드 완성!' }); } catch (e) {} try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) { $('open2').href = u; });
     // 비공개 명단: 주최자에게 따로 보낼 '명단 보기' 링크 (명단을 비공개로 잠금)
@@ -1873,7 +1873,7 @@
           return;
         }
         blogPost = x.j;
-        paintEditor(blogPost); $('blogActs').hidden = false;
+        paintEditor(blogPost); $('blogActs').hidden = false; if (window.SavaCherry) SavaCherry.rain({ text: '✍️ 블로그 글 완성!' });
         $('blogStatus').textContent = '다 썼어요! 아래에서 고친 다음 ①②③ 순서대로 눌러 네이버 블로그에 붙여넣으세요.';
         ['blogT', 'blogB'].forEach(function (id) { $(id).disabled = false; });
         $('blogAgain').hidden = false;
@@ -2178,5 +2178,6 @@
 })();
 </script>
 <script src="/js/home.js?v=5" defer data-shift=".bar"></script>
+<script src="../js/cherry.js?v=1"></script>
 </body>
 </html>

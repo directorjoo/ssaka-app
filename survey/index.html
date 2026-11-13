@@ -79,6 +79,10 @@
     .post .pb:focus { background: #fffbf3; }
     .post .tg { font-size: 13px; color: #8A7660; margin-top: 8px; word-break: break-all; }
     .post .row2 { margin-top: 12px; }
+    .post .row2.r3 { grid-template-columns: 1fr 1fr 1.1fr; }
+    .post .row2.r3 .btn { font-size: 14px; padding-left: 4px; padding-right: 4px; white-space: nowrap; }
+    .post .c4:disabled { opacity: .45; }
+    .post .c4:not(:disabled) { color: #B3132B; border-color: #B3132B; }
     .warn { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.55; }
     .bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(251,247,241,.96); backdrop-filter: blur(8px); border-top: 1px solid #ece4d8; z-index: 5; }
     .bar .in { max-width: 620px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
@@ -175,7 +179,32 @@
   if (qp.get('ind') && S.BY[qp.get('ind')]) st.ind = qp.get('ind');
   if (!S.IND.some(function (g) { return g.list.some(function (x) { return x.id === st.ind; }); })) st.ind = S.IND[0].list[0].id;
   var posts = {}, PK = 'sava-survey-posts';
-  function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} postBtns(); }
+  function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} postBtns(); pushSoon(); }
+  // 로그인했으면 계정에도 저장 → 아이폰·안드로이드·노트북·맥북 어디서든 같은 글
+  var sent = {}, pushT = 0, logged = false;
+  function sig(p) { return p ? JSON.stringify([p.title, p.edited, p.etags, (p.blocks || []).length]) : 'x'; }
+  function pushSoon() { if (!logged) return; clearTimeout(pushT); pushT = setTimeout(pushNow, 1200); }
+  function pushNow() {
+    var out = {}, any = false;
+    Object.keys(posts).forEach(function (n) { var g = sig(posts[n]); if (sent[n] !== g) { out[n] = posts[n]; sent[n] = g; any = true; } });
+    Object.keys(sent).forEach(function (n) { if (!posts[n]) { out[n] = null; delete sent[n]; any = true; } });
+    if (any) fetch('../api/posts', { method: 'PUT', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ind: st.ind, posts: out }) }).catch(function () {});
+  }
+  function pullPosts() {
+    sent = {};
+    fetch('../api/posts?ind=' + encodeURIComponent(st.ind), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j || !j.login) return;
+      logged = true;
+      var srv = j.posts || {}, changed = false;
+      Object.keys(srv).forEach(function (n) {
+        var mine = posts[n];
+        if (!mine || (+srv[n].at || 0) > (+mine.at || 0)) { posts[n] = srv[n]; changed = true; paintPost(+n); }
+        sent[n] = sig(posts[n]);
+      });
+      if (changed) { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} postBtns(); toast('☁️ 다른 기기에서 쓴 글도 불러왔어요'); }
+      pushNow(); // 이 기기에만 있던 글은 계정으로 올림
+    }).catch(function () {});
+  }
   function postBtns() {
     var n = Object.keys(posts).length;
     $('seePosts').hidden = !n; $('seePosts').textContent = '📚 내가 쓴 블로그 글 ' + n + '편 보기';
@@ -329,7 +358,7 @@
           setTy(n, '', e === 'limit' ? '오늘은 다 썼어요. 내일 다시!' : e === 'busy' ? '오늘 요청이 많아요. 내일 다시!' : e === 'no-key' ? '준비 중이에요' : e === 'few' ? '답이 더 필요해요' : '다시 눌러 주세요');
           return;
         }
-        posts[n] = x.j; savePosts(); paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
+        posts[n] = Object.assign(x.j, { at: Date.now() }); savePosts(); paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
       }).catch(function () { lastErr = '인터넷이 끊겼거나 시간이 너무 걸렸어요'; setTy(n, '', '인터넷 확인 후 다시'); });
   }
   function run(list) {
@@ -352,7 +381,7 @@
     prog(false); $p('prog').scrollIntoView({ behavior: 'smooth', block: 'center' });
     return new Promise(function (done) {
       function next() {
-        if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) { prog(true); done(); } return; }
+        if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) { prog(true); if (Object.keys(posts).length - ok0 > 0 && window.SavaCherry) SavaCherry.rain({ text: '✍️ 블로그 글 ' + (Object.keys(posts).length - ok0) + '편 완성!' }); done(); } return; }
         var n = q.shift(); live++;
         one(n).then(function () { live--; fin++; prog(false); next(); });
       }
@@ -377,7 +406,7 @@
   function paintPost(n) {
     var p = posts[n], ty = n > 100 ? { name: QT[n - 101] } : S.types(st.ind)[n - 1], old = $('post' + n);
     var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
-    el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2"><button type="button" class="btn gh c3">🔄 이 형 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 네이버 블로그 열기</a></div>';
+    el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2 r3"><button type="button" class="btn gh c4" disabled>↩ 되돌리기</button><button type="button" class="btn gh c3">🔄 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 블로그 열기</a></div>';
     el.querySelector('.ty2').textContent = n > 100 ? '⚡ 상위글 틀 · ' + ty.name : n + '형 · ' + ty.name;
     el.querySelector('.pt').value = p.title;
     var txt = p.blocks.map(function (b) { return b.t === 'img' ? '[사진 ' + b.n + (b.hint ? ' · ' + b.hint : '') + ']' : b.text; }).join('\n\n');
@@ -386,7 +415,23 @@
     el.querySelector('.c1').addEventListener('click', function () { copy(el.querySelector('.pt').value, '제목을 복사했어요'); });
     el.querySelector('.c2').addEventListener('click', function () { copy(postText(n, el), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
     el.querySelector('.c3').addEventListener('click', function () { delete posts[n]; savePosts(); run([n]); });
-    el.addEventListener('input', function () { posts[n] = Object.assign({}, posts[n], { title: el.querySelector('.pt').value, edited: el.querySelector('.pb').innerText, etags: el.querySelector('.tg').innerText }); savePosts(); });
+    // 되돌리기: 고칠 때마다(잠깐 멈추면) 그 전 모습을 기억
+    var H = [], hT = 0, un = el.querySelector('.c4');
+    function snapP() { return { t: el.querySelector('.pt').value, b: el.querySelector('.pb').innerText, g: el.querySelector('.tg').innerText }; }
+    H.push(snapP());
+    function keep() { var x = snapP(), l = H[H.length - 1]; if (!l || l.t !== x.t || l.b !== x.b || l.g !== x.g) { H.push(x); if (H.length > 80) H.shift(); } un.disabled = H.length < 2; }
+    un.addEventListener('click', function () {
+      clearTimeout(hT); keep();
+      if (H.length < 2) return;
+      H.pop(); var d = H[H.length - 1];
+      el.querySelector('.pt').value = d.t; el.querySelector('.pb').innerText = d.b; el.querySelector('.tg').innerText = d.g;
+      posts[n] = Object.assign({}, posts[n], { title: d.t, edited: d.b, etags: d.g, at: Date.now() }); savePosts();
+      un.disabled = H.length < 2; toast('↩ 한 단계 되돌렸어요');
+    });
+    el.addEventListener('input', function () {
+      posts[n] = Object.assign({}, posts[n], { title: el.querySelector('.pt').value, edited: el.querySelector('.pb').innerText, etags: el.querySelector('.tg').innerText, at: Date.now() }); savePosts();
+      un.disabled = false; clearTimeout(hT); hT = setTimeout(keep, 700);
+    });
     var out = $('out');
     if (old) old.replaceWith(el);
     else { var after = null; out.querySelectorAll('.post').forEach(function (x) { if (+x.id.slice(4) > n && !after) after = x; }); out.insertBefore(el, after); }
@@ -427,7 +472,7 @@
     posts = loadPosts(); $('out').innerHTML = '';
     paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved();
     Object.keys(posts).map(Number).sort(function (a, b) { return a - b; }).forEach(paintPost);
-    postBtns();
+    postBtns(); pullPosts();
   }
   var m = /#s=([0-9A-Za-z]{6,16})\.([0-9A-Za-z]{16,40})/.exec(location.hash);
   if (m && (m[1] !== st.sid || m[2] !== st.key)) {
@@ -452,5 +497,6 @@
 })();
 </script>
 <script src="/js/home.js?v=5" defer data-shift=".bar"></script>
+<script src="../js/cherry.js?v=1"></script>
 </body>
 </html>

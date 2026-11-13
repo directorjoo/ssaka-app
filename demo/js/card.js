@@ -462,9 +462,10 @@
           var same = !!j.updated;
           try { if (window.SsakaStore) SsakaStore.saveMine(nc, new URL('?d=' + d, location.href).href); } catch (e) {}
           done();
+          if (window.SavaCherry) SavaCherry.rain({ text: same ? '✅ 수정 완료!' : '✅ 저장 완료!' });
           toast(same ? '저장했어요! 이미 보낸 링크에도 바로 반영돼요' : '저장했어요! 새 링크로 바뀌었어요');
           var url = new URL('?s=' + j.id, location.href).href;
-          setTimeout(function () { if (same) location.reload(); else location.replace(url); }, 900);
+          setTimeout(function () { if (same) location.reload(); else location.replace(url); }, 2200);
         })
         .catch(function (e) { bOk.disabled = false; bOk.textContent = '💾 저장'; toast(String(e.message) === 'bad-content' ? '보낼 수 없는 내용이 있어요' : '저장하지 못했어요. 다시 눌러 주세요'); });
     });

@@ -194,7 +194,7 @@
     ctx.font = (weight || 700) + ' ' + size + 'px ' + (family || FONT); ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     var s2 = String(str || ''); while (max && ctx.measureText(s2).width > max && s2.length > 2) s2 = s2.slice(0, -1);
     if (s2 !== String(str || '')) s2 = s2.slice(0, -1) + '…';
-    ctx.fillText(s2, 540, y); ctx.textAlign = 'left'; return y + size * 1.3;
+    ctx.fillText(s2, ctx.__cx != null ? ctx.__cx : ctx.canvas.width / 2, y); ctx.textAlign = 'left'; return y + size * 1.3;
   }
   function fitFont(ctx, str, max, start, weight, family) { var sz = start; do { ctx.font = weight + ' ' + sz + 'px ' + family; if (ctx.measureText(str).width <= max) break; sz -= 4; } while (sz > 40); return sz; }
   function mark(ctx, w, h, dark) { ctx.font = '500 18px ' + FONT; ctx.fillStyle = dark ? 'rgba(27,19,12,.35)' : 'rgba(245,235,217,.45)'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('sava.kr', w - 34, h - 26); ctx.textAlign = 'left'; }
@@ -494,12 +494,123 @@
       img = usable(img) ? img : null;
       card = Object.assign({}, card, { __main: card.image ? img : null });
       var items = frameMenu(card, opts);
-      var list = FRAME_SIZES.map(function (sz) { return { name: '액자-' + pal.label.replace(/·/g, '') + '-' + sz.id, label: '액자 메뉴판 · ' + sz.label, c: drawFrame(card, img, pal, sz, items) }; });
+      var lay = LAYOUTS.filter(function (l) { return l.id === opts.layout; })[0] || LAYOUTS[0];
+      if (!layoutOk(card, lay.id)) return [];
+      var draw = { frame: function (sz) { return drawFrame(card, img, pal, sz, items); }, poster: function (sz) { return drawPoster(card, img, pal, sz); },
+        chalk: function (sz) { return drawChalk(card, img, pal, sz, items); }, coupon: function (sz) { return drawCoupon(card, img, pal, sz); } }[lay.id];
+      var list = FRAME_SIZES.map(function (sz) { return { name: lay.label.replace(/[·\s]/g, '') + '-' + pal.label.replace(/·/g, '') + '-' + sz.id, label: lay.label + ' · ' + sz.label, c: draw(sz) }; });
       return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
         return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, blob: blobs[i], w: x.c.width, h: x.c.height }; });
       });
     });
   }
+
+  // ---------- 배치 3종 더: 사진 포스터 · 오늘의 메뉴 칠판 · 할인 쿠폰 (캔바 시안을 싸바가 직접 그림) ----------
+  function isLight(c) { return lumOf(c) > 0.5; }
+  function drawPoster(card, img, pal, size) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), wide = size.id === 'wide';
+    var dark = isLight(pal.paper) ? '#16120F' : pal.paper, band = isLight(pal.paper) ? pal.accent : pal.line;
+    ctx.fillStyle = dark; ctx.fillRect(0, 0, W, H);
+    var bandH = wide ? 64 : Math.round(H * 0.065), title = String(card.title || '').trim();
+    var tag = pick(card, /^(한 ?줄|소개)\s*[:：]/) || pick(card, /^인기\s*[:：]/) || '';
+    var foot = [card.contact && card.contact.phone ? '전화 ' + card.contact.phone : '', frameAddr(card)].filter(Boolean).join('  ·  ');
+    if (wide) {
+      if (img) cover(ctx, img, 0, 0, W, H - bandH, card.__main === img ? card.ip : null);
+      ctx.fillStyle = grad(ctx, 0, 0, W * 0.75, 0, [[0, 'rgba(0,0,0,.82)'], [0.6, 'rgba(0,0,0,.35)'], [1, 'rgba(0,0,0,0)']]); ctx.fillRect(0, 0, W, H - bandH);
+      var ts = fitFont(ctx, title, W * 0.55, 110, 900, FONT);
+      ctx.font = '900 ' + ts + 'px ' + FONT; ctx.fillStyle = '#fff'; ctx.textBaseline = 'top'; ctx.fillText(title, 70, H * 0.3);
+      if (tag) text(ctx, tag, 72, H * 0.3 + ts * 1.25, 40, '#fff', 700, W * 0.55, 1);
+    } else {
+      var ph = Math.round(H * (size.id === 'sq' ? 0.66 : size.id === 'story' ? 0.6 : 0.72));
+      if (img) cover(ctx, img, 0, 0, W, ph, card.__main === img ? card.ip : null);
+      fade(ctx, W, H, ph - Math.round(H * 0.22), ph, dark);
+      var y = ph - Math.round(H * (size.id === 'story' ? 0.06 : 0.1));
+      var ts2 = fitFont(ctx, title, W - 140, size.id === 'story' ? 170 : size.id === 'sq' ? 130 : 150, 900, FONT);
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 24;
+      y = centerText(ctx, title, y, ts2, '#ffffff', 900, FONT) + 14; ctx.restore();
+      if (tag) centerText(ctx, tag, y, size.id === 'sq' ? 46 : 56, '#ffffff', 700, FONT, W - 140);
+      ctx.fillStyle = band; ctx.fillRect(0, H - bandH - (size.id === 'story' ? 260 : 0), W, bandH);
+    }
+    var by = wide ? H - bandH : H - bandH - (size.id === 'story' ? 260 : 0);
+    if (wide) { ctx.fillStyle = band; ctx.fillRect(0, by, W, bandH); }
+    if (foot) centerText(ctx, foot, by + bandH / 2 - (wide ? 15 : bandH * 0.22), wide ? 30 : Math.round(bandH * 0.42), isLight(band) ? '#1b130c' : '#ffffff', 600, FONT, W - 80);
+    return c;
+  }
+  function drawChalk(card, img, pal, size, items) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), wide = size.id === 'wide', sq = size.id === 'sq', story = size.id === 'story';
+    var board = isLight(pal.paper) ? '#23412F' : pal.paper, chalk = '#EFE6D2', gold = isLight(pal.paper) ? '#D9B85C' : pal.accent;
+    ctx.fillStyle = '#6B4A2B'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = board; ctx.fillRect(22, 22, W - 44, H - 44);
+    for (var i = 0; i < 120; i++) { ctx.fillStyle = 'rgba(255,255,255,' + (0.015 + (i % 5) * 0.006) + ')'; ctx.beginPath(); ctx.arc((i * 397) % W, (i * 211) % H, 30 + (i % 7) * 18, 0, Math.PI * 2); ctx.fill(); }
+    var menu = items.slice(0, wide ? 4 : sq ? 3 : story ? 6 : 4), title = String(card.title || '').trim();
+    var mx = 90, mw = wide ? W * 0.5 : W - 180, y = wide ? 70 : story ? 170 : 90;
+    var hs = wide ? 88 : story ? 150 : sq ? 104 : 124;
+    if (wide) { ctx.font = '800 ' + hs + 'px ' + SERIF; ctx.fillStyle = chalk; ctx.textBaseline = 'top'; ctx.fillText('오늘의 메뉴', mx, y); y += hs * 1.2; }
+    else y = centerText(ctx, '오늘의 메뉴', y, hs, chalk, 800, SERIF) + 6;
+    var ts = fitFont(ctx, title, mw, wide ? 46 : story ? 72 : sq ? 54 : 62, 800, SERIF);
+    if (wide) { ctx.font = '800 ' + ts + 'px ' + SERIF; ctx.fillStyle = gold; ctx.fillText(title, mx, y); y += ts * 1.5; }
+    else { y = centerText(ctx, title, y, ts, gold, 800, SERIF) + 14; ctx.fillStyle = gold; ctx.fillRect(W / 2 - 180, y, 360, 3); y += sq ? 34 : 50; }
+    var fs = wide ? 38 : story ? 58 : sq ? 44 : 50, rowH = wide ? 66 : story ? 120 : sq ? 76 : 96;
+    menu.forEach(function (m) {
+      ctx.font = '700 ' + fs + 'px ' + FONT; ctx.fillStyle = chalk; ctx.textBaseline = 'top';
+      var pr = m.p || '', pw = ctx.measureText(pr).width, nm = m.n;
+      while (ctx.measureText(nm).width > mw - pw - 80 && nm.length > 2) nm = nm.slice(0, -1);
+      ctx.fillText(nm, mx, y); var nw = ctx.measureText(nm).width;
+      if (pr) { ctx.textAlign = 'right'; ctx.fillText(pr, mx + mw, y); ctx.textAlign = 'left';
+        ctx.strokeStyle = 'rgba(239,230,210,.55)'; ctx.setLineDash([10, 10]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(mx + nw + 20, y + fs * 0.6); ctx.lineTo(mx + mw - pw - 20, y + fs * 0.6); ctx.stroke(); ctx.setLineDash([]); }
+      ctx.fillStyle = 'rgba(239,230,210,.18)'; ctx.fillRect(mx, y + rowH - 18, mw, 2);
+      y += rowH;
+    });
+    // 폴라로이드 사진
+    var pw2 = wide ? W * 0.3 : W * (sq ? 0.3 : 0.36), ph2 = pw2 * 0.78;
+    var px = wide ? W - pw2 - 90 : W - pw2 - 80, py = wide ? (H - ph2) / 2 - 30 : Math.max(y + 10, H - ph2 - (story ? 560 : sq ? 150 : 190));
+    if (img) {
+      ctx.save(); ctx.translate(px + pw2 / 2, py + ph2 / 2); ctx.rotate(-0.06);
+      ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 24; ctx.fillStyle = '#FBF8F1'; ctx.fillRect(-pw2 / 2 - 18, -ph2 / 2 - 18, pw2 + 36, ph2 + 70); ctx.shadowBlur = 0;
+      cover(ctx, img, -pw2 / 2, -ph2 / 2, pw2, ph2);
+      ctx.fillStyle = 'rgba(240,220,160,.75)'; ctx.fillRect(-50, -ph2 / 2 - 36, 100, 34);
+      ctx.restore();
+    }
+    var foot = [card.subtitle ? String(card.subtitle).split('(')[0].trim() : '', card.contact && card.contact.phone ? '전화 ' + card.contact.phone : ''].filter(Boolean).join('  ·  ');
+    if (foot) { ctx.font = '600 ' + (wide ? 26 : story ? 38 : 32) + 'px ' + FONT; ctx.fillStyle = chalk; ctx.textBaseline = 'alphabetic';
+      var f2 = foot, fmax = wide ? W * 0.5 : W - 180; while (ctx.measureText(f2).width > fmax && f2.length > 4) f2 = f2.slice(0, -1);
+      ctx.fillText(f2, mx, H - (story ? 300 : wide ? 60 : 60)); }
+    return c;
+  }
+  function couponLine(card) { return (card.body || []).filter(function (l) { return /할인|쿠폰|이벤트|증정|무료|서비스|%|1\+1/.test(l); })[0] || ''; }
+  function drawCoupon(card, img, pal, size) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), wide = size.id === 'wide', sq = size.id === 'sq', story = size.id === 'story';
+    var red = isLight(pal.paper) ? pal.accent : pal.line, paper = isLight(pal.paper) ? pal.paper : '#FBF4E6', ink = '#2B2320';
+    ctx.fillStyle = red; ctx.fillRect(0, 0, W, H);
+    var line = couponLine(card), m = line.match(/^(.*?)[:：]\s*(.+)$/), head = (m ? m[2] : line).trim(), sub = m ? m[1].trim() : '';
+    var bx, by, bw, bh;
+    if (wide) { if (img) cover(ctx, img, 0, 0, W * 0.45, H); bx = W * 0.45 + 40; by = 40; bw = W - bx - 40; bh = H - 80; }
+    else { var ph = Math.round(H * (story ? 0.4 : sq ? 0.42 : 0.47)); if (img) cover(ctx, img, 0, 0, W, ph); bx = 50; by = ph - 50; bw = W - 100; bh = H - by - (story ? 300 : 50); }
+    ctx.fillStyle = paper; round(ctx, bx, by, bw, bh, 26); ctx.fill();
+    var cut = by + bh * 0.62;
+    ctx.fillStyle = red; [bx, bx + bw].forEach(function (x) { ctx.beginPath(); ctx.arc(x, cut, 30, 0, Math.PI * 2); ctx.fill(); });
+    ctx.strokeStyle = red; ctx.globalAlpha = .55; ctx.setLineDash([12, 12]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(bx + 50, cut); ctx.lineTo(bx + bw - 50, cut); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    var cx = bx + bw / 2, top = by + bh * (wide ? 0.1 : 0.08), room = cut - top - 20;
+    ctx.__cx = cx;
+    var hs = fitFont(ctx, head, bw - 80, Math.min(wide ? 110 : story ? 170 : sq ? 120 : 150, room * 0.55), 900, FONT);
+    ctx.font = '900 ' + hs + 'px ' + FONT;
+    var lines = wrap(ctx, head, bw - 80, 2); if (lines.length > 1) { hs = Math.round(hs * 0.8); ctx.font = '900 ' + hs + 'px ' + FONT; lines = wrap(ctx, head, bw - 80, 2); }
+    var y = top + (room - (lines.length * hs * 1.15 + (sub ? hs * 0.6 : 0))) / 2;
+    lines.forEach(function (l) { centerText(ctx, l, y, hs, red, 900, FONT); y += hs * 1.15; });
+    if (sub) centerText(ctx, sub, y + 6, Math.round(hs * 0.42), ink, 700, FONT, bw - 80);
+    var ly = cut + (by + bh - cut) * 0.5 - (wide ? 30 : 40), title = String(card.title || '').trim();
+    centerText(ctx, title, ly, wide ? 44 : story ? 64 : sq ? 48 : 56, red, 900, FONT, bw - 80);
+    if (card.contact && card.contact.phone) centerText(ctx, '전화 ' + card.contact.phone, ly + (wide ? 56 : story ? 84 : sq ? 60 : 72), wide ? 30 : story ? 40 : 34, ink, 700, FONT, bw - 80);
+    ctx.__cx = null;
+    return c;
+  }
+  var LAYOUTS = [
+    { id: 'frame', label: '액자 메뉴판' },
+    { id: 'poster', label: '사진 포스터' },
+    { id: 'chalk', label: '오늘의 메뉴 칠판' },
+    { id: 'coupon', label: '할인·이벤트 쿠폰', need: '본문에 "할인"이나 "이벤트" 줄을 적으면 쿠폰이 만들어져요' }
+  ];
+  function layoutOk(card, id) { return id !== 'coupon' || !!couponLine(card); }
 
   function build(card, design, opts) {
     if (card && card.template === 'shop' && !(opts && opts.classic)) return buildShop(card, design, opts);
@@ -543,5 +654,5 @@
     return lines.join('\n');
   }
 
-  global.SsakaExport = { build: build, text: postText, frame: buildFrame, framePals: FRAME_PALS, frameSizes: FRAME_SIZES };
+  global.SsakaExport = { build: build, text: postText, frame: buildFrame, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk };
 })(typeof window !== 'undefined' ? window : globalThis);

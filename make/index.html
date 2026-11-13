@@ -204,6 +204,7 @@
     .exp-pals button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
     .exp-pals button[aria-pressed="true"] { border-color: #B3132B; color: #B3132B; }
     #expGrid2 img { object-fit: contain; background: #f2f2f2; }
+    #expLays button { padding: 0 14px; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
     .exp-grid figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; }
     .exp-grid a { color: inherit; text-decoration: none; }
@@ -558,8 +559,9 @@
     <p class="done-sub" id="expStatus">이미지를 만드는 중이에요…</p>
     <div class="exp-grid" id="expGrid"></div>
     <div id="expFrame" hidden>
-      <p class="exp-sec"><b>🖼️ 액자 메뉴판 템플릿</b><small>색을 고르면 인스타 피드·정사각·스토리·블로그 썸네일 4가지 크기로 만들어요</small></p>
-      <div class="exp-pals" id="expPals" role="group" aria-label="액자 메뉴판 색"></div>
+      <p class="exp-sec"><b>🖼️ SNS 템플릿</b><small>디자인과 색을 고르면 인스타 피드·정사각·스토리·블로그 썸네일 4가지 크기로 만들어요</small></p>
+      <div class="exp-pals" id="expLays" role="group" aria-label="SNS 템플릿 디자인"></div>
+      <div class="exp-pals" id="expPals" role="group" aria-label="SNS 템플릿 색" style="margin-top:6px"></div>
       <div class="exp-grid" id="expGrid2"></div>
     </div>
     <button type="button" class="kakao big" id="expSave" disabled>📥 사진 앱에 저장하기</button>
@@ -596,7 +598,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=77"></script>
+<script src="../js/export.js?v=78"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -1520,7 +1522,7 @@
   $('blogClose').addEventListener('click', function () { $('blogModal').hidden = true; });
   $('blogModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   // ---------- 카톡 채널 · 인스타용 이미지 ----------
-  var expFiles = [], expCard = null, expUrl = '', frameFiles = [], framePal = 'cream', frameJob = 0;
+  var expFiles = [], expCard = null, expUrl = '', frameFiles = [], framePal = 'cream', frameLay = 'frame', frameJob = 0;
   function figs(box, list) {
     box.innerHTML = '';
     list.forEach(function (x) {
@@ -1528,7 +1530,7 @@
       var a = document.createElement('a'); a.href = u; a.download = x.name;
       var im = document.createElement('img'); im.src = u; im.alt = x.label;
       a.appendChild(im); f.appendChild(a);
-      var cap = document.createElement('figcaption'); cap.textContent = x.label.replace(/^액자 메뉴판 · /, ''); f.appendChild(cap);
+      var cap = document.createElement('figcaption'); cap.textContent = x.label.replace(/^.*? · /, ''); f.appendChild(cap);
       box.appendChild(f);
     });
   }
@@ -1546,8 +1548,17 @@
       pb.appendChild(b);
     });
     Array.prototype.forEach.call(pb.children, function (b) { b.setAttribute('aria-pressed', b.dataset.pal === framePal ? 'true' : 'false'); });
+    var lb = $('expLays');
+    if (!lb.children.length && X.layouts) X.layouts.forEach(function (l) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.lay = l.id; b.textContent = l.label;
+      b.addEventListener('click', function () { frameLay = l.id; var cc = current(); if (cc) makeFrames(cc); });
+      lb.appendChild(b);
+    });
+    Array.prototype.forEach.call(lb.children, function (b) { b.setAttribute('aria-pressed', b.dataset.lay === frameLay ? 'true' : 'false'); });
+    var lay = (X.layouts || []).filter(function (l) { return l.id === frameLay; })[0];
+    if (lay && X.layoutOk && !X.layoutOk(c.card, lay.id)) { frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">' + (lay.need || '이 디자인에 필요한 내용이 없어요') + '</p>'; return; }
     var job = ++frameJob; frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">만드는 중…</p>';
-    X.frame(c.card, curDesign(), { pics: localPics, pal: framePal, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
+    X.frame(c.card, curDesign(), { pics: localPics, pal: framePal, layout: frameLay, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
       if (job !== frameJob) return;
       frameFiles = list; figs($('expGrid2'), list);
     }).catch(function () { if (job === frameJob) $('expGrid2').innerHTML = '<p class="done-sub">액자 메뉴판을 만들지 못했어요.</p>'; });

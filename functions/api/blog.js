@@ -137,8 +137,8 @@ async function survey(b, request, env, key) {
 export async function onRequest({ request, env }) {
   // 연결 점검: GET /api/blog?check=1 → AI 연결 상태만 알려 줌 (키 값은 절대 안 보여 줌)
   if (request.method === 'GET' && new URL(request.url).searchParams.get('check')) {
-    const k = env.ANTHROPIC_API_KEY || '';
-    const info = { key: !!k, keyKind: k ? k.slice(0, 7) + '…' : '', model: env.BLOG_MODEL || MODEL_DEFAULT, db: !!env.DB };
+    const k = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY || '';
+    const info = { key: !!k, from: env.BLOG_AI_KEY ? 'BLOG_AI_KEY' : 'ANTHROPIC_API_KEY', keyKind: k ? k.slice(0, 7) + '…' : '', model: env.BLOG_MODEL || MODEL_DEFAULT, db: !!env.DB };
     if (!k) return json(info);
     if (env.DB) { const e = await overLimit(env.DB, [['chk', 40]]); if (e) return json(Object.assign(info, { ai: 'skip' })); }
     try {
@@ -151,7 +151,7 @@ export async function onRequest({ request, env }) {
     return json(info);
   }
   if (request.method !== 'POST') return json({ error: 'bad' }, 400);
-  const key = env.ANTHROPIC_API_KEY;
+  const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY; // BLOG_AI_KEY 가 있으면 그걸 먼저 씀
   if (!key) return json({ error: 'no-key' }, 503);
   let b;
   try { const t = await request.text(); if (t.length > 60000) return json({ error: 'big' }, 413); b = JSON.parse(t); }

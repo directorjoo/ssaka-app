@@ -375,8 +375,13 @@
     { id: 'green', label: '진녹·금', paper: '#17382E', ink: '#F3E7C9', line: '#C8A55A', accent: '#E5C27A', sub: '#CFC3A3' },
     { id: 'navy', label: '남색·금', paper: '#16213A', ink: '#F1E6CC', line: '#C2A15A', accent: '#E8C47C', sub: '#C9BFA8' },
     { id: 'black', label: '먹·금', paper: '#161412', ink: '#F2E8D2', line: '#B8955A', accent: '#E2BC72', sub: '#BDB3A0' },
-    { id: 'white', label: '흰·체리', paper: '#FFFFFF', ink: '#222222', line: '#E3B9BF', accent: '#B3132B', sub: '#666666' }
+    { id: 'white', label: '흰·체리', paper: '#FFFFFF', ink: '#222222', line: '#E3B9BF', accent: '#B3132B', sub: '#666666' },
+    { id: 'pink', label: '분홍·코랄', paper: '#FCEFEF', ink: '#3A2228', line: '#E7A6B0', accent: '#D94F6B', sub: '#86636B' },
+    { id: 'sky', label: '하늘·남색', paper: '#EAF3FB', ink: '#16263D', line: '#9DBAD8', accent: '#1F4E8C', sub: '#56677D' }
   ];
+  // 업종별 칠판 머리말 · 처음 고를 색
+  var IND_HEAD = { restaurant: '오늘의 메뉴', cafe: '오늘의 메뉴', beauty: '시술 가격표', toefl: '수강 안내', bigacademy: '수강 안내', academy: '수강 안내', entrance: '수강 안내', arts: '수강 안내', fitness: '이용 요금', flower: '오늘의 꽃', stay: '객실 요금', realty: '추천 매물' };
+  var IND_PAL = { beauty: 'pink', toefl: 'sky', bigacademy: 'sky', academy: 'sky', entrance: 'navy', arts: 'sky', fitness: 'black', stay: 'navy', flower: 'pink', cafe: 'cream', realty: 'navy' };
   var FRAME_SIZES = [
     { id: 'feed', label: '인스타 피드 4:5', w: 1080, h: 1350, menu: 4 },
     { id: 'sq', label: '정사각 1:1 (플레이스·당근·카톡)', w: 1080, h: 1080, menu: 3 },
@@ -386,7 +391,9 @@
   function frameMenu(card, opts) {
     var m = (card.reserve && card.reserve.menu && card.reserve.menu.length ? card.reserve.menu : (opts && opts.menu) || []);
     var priced = m.filter(function (x) { return x.p; });
-    if (priced.length) return priced.map(function (x) { var mm = String(x.n).match(/^(.*?)\s*\((.*?)\)\s*$/); return { n: mm ? mm[1] : x.n, note: mm ? mm[2] : '', p: won(x.p) + '원' }; });
+    var split = function (x) { var mm = String(x.n).match(/^(.*?)\s*\((.*?)\)\s*$/); return { n: mm ? mm[1] : x.n, note: mm ? mm[2] : '', p: x.p ? won(x.p) + '원' : '' }; };
+    if (priced.length) return priced.map(split);
+    if (m.length) return m.map(split); // 학원 강좌처럼 가격 없이 이름만 있는 목록
     return (card.body || []).map(function (l) { return { n: String(l), note: '', p: '' }; });
   }
   function frameAddr(card) {
@@ -486,13 +493,13 @@
   // 한 가지 색으로 4가지 크기를 한 번에
   function buildFrame(card, design, opts) {
     opts = opts || {};
-    var pal = FRAME_PALS.filter(function (p) { return p.id === opts.pal; })[0] || FRAME_PALS[0];
+    var pal = FRAME_PALS.filter(function (p) { return p.id === (opts.pal || IND_PAL[opts.industry]); })[0] || FRAME_PALS[0];
     var pics = opts.pics || {}, src = card.image || (card.gallery || [])[0];
     return Promise.all([(document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function () {}) : null, loadSerif()]).then(function () {
       return src ? loadImg(src, pics[src]) : null;
     }).then(function (img) {
       img = usable(img) ? img : null;
-      card = Object.assign({}, card, { __main: card.image ? img : null });
+      card = Object.assign({}, card, { __main: card.image ? img : null, __head: IND_HEAD[opts.industry] || '오늘의 안내' });
       var items = frameMenu(card, opts);
       var lay = LAYOUTS.filter(function (l) { return l.id === opts.layout; })[0] || LAYOUTS[0];
       if (!layoutOk(card, lay.id)) return [];
@@ -523,6 +530,11 @@
     } else {
       var ph = Math.round(H * (size.id === 'sq' ? 0.66 : size.id === 'story' ? 0.6 : 0.72));
       if (img) cover(ctx, img, 0, 0, W, ph, card.__main === img ? card.ip : null);
+      else { // 사진이 없으면 색 바탕에 큰 첫 글자
+        ctx.fillStyle = grad(ctx, 0, 0, W, ph, [[0, band], [1, dark]]); ctx.fillRect(0, 0, W, ph);
+        ctx.globalAlpha = .18; ctx.font = '900 ' + Math.round(ph * 0.7) + 'px ' + SERIF; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(title.charAt(0), W / 2, ph * 0.42); ctx.globalAlpha = 1; ctx.textAlign = 'left';
+      }
       fade(ctx, W, H, ph - Math.round(H * 0.22), ph, dark);
       var y = ph - Math.round(H * (size.id === 'story' ? 0.06 : 0.1));
       var ts2 = fitFont(ctx, title, W - 140, size.id === 'story' ? 170 : size.id === 'sq' ? 130 : 150, 900, FONT);
@@ -545,8 +557,9 @@
     var menu = items.slice(0, wide ? 4 : sq ? 3 : story ? 6 : 4), title = String(card.title || '').trim();
     var mx = 90, mw = wide ? W * 0.5 : W - 180, y = wide ? 70 : story ? 170 : 90;
     var hs = wide ? 88 : story ? 150 : sq ? 104 : 124;
-    if (wide) { ctx.font = '800 ' + hs + 'px ' + SERIF; ctx.fillStyle = chalk; ctx.textBaseline = 'top'; ctx.fillText('오늘의 메뉴', mx, y); y += hs * 1.2; }
-    else y = centerText(ctx, '오늘의 메뉴', y, hs, chalk, 800, SERIF) + 6;
+    var headT = card.__head || '오늘의 메뉴';
+    if (wide) { ctx.font = '800 ' + hs + 'px ' + SERIF; ctx.fillStyle = chalk; ctx.textBaseline = 'top'; ctx.fillText(headT, mx, y); y += hs * 1.2; }
+    else y = centerText(ctx, headT, y, hs, chalk, 800, SERIF) + 6;
     var ts = fitFont(ctx, title, mw, wide ? 46 : story ? 72 : sq ? 54 : 62, 800, SERIF);
     if (wide) { ctx.font = '800 ' + ts + 'px ' + SERIF; ctx.fillStyle = gold; ctx.fillText(title, mx, y); y += ts * 1.5; }
     else { y = centerText(ctx, title, y, ts, gold, 800, SERIF) + 14; ctx.fillStyle = gold; ctx.fillRect(W / 2 - 180, y, 360, 3); y += sq ? 34 : 50; }
@@ -605,9 +618,9 @@
     return c;
   }
   var LAYOUTS = [
-    { id: 'frame', label: '액자 메뉴판' },
+    { id: 'frame', label: '액자형' },
     { id: 'poster', label: '사진 포스터' },
-    { id: 'chalk', label: '오늘의 메뉴 칠판' },
+    { id: 'chalk', label: '칠판형' },
     { id: 'coupon', label: '할인·이벤트 쿠폰', need: '본문에 "할인"이나 "이벤트" 줄을 적으면 쿠폰이 만들어져요' }
   ];
   function layoutOk(card, id) { return id !== 'coupon' || !!couponLine(card); }
@@ -654,5 +667,5 @@
     return lines.join('\n');
   }
 
-  global.SsakaExport = { build: build, text: postText, frame: buildFrame, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk };
+  global.SsakaExport = { build: build, text: postText, frame: buildFrame, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

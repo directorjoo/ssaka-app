@@ -598,7 +598,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=78"></script>
+<script src="../js/export.js?v=79"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -1522,7 +1522,7 @@
   $('blogClose').addEventListener('click', function () { $('blogModal').hidden = true; });
   $('blogModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   // ---------- 카톡 채널 · 인스타용 이미지 ----------
-  var expFiles = [], expCard = null, expUrl = '', frameFiles = [], framePal = 'cream', frameLay = 'frame', frameJob = 0;
+  var expFiles = [], expCard = null, expUrl = '', frameFiles = [], framePal = '', frameInd = '', frameLay = 'frame', frameJob = 0;
   function figs(box, list) {
     box.innerHTML = '';
     list.forEach(function (x) {
@@ -1539,6 +1539,7 @@
     var X = window.SsakaExport, box = $('expFrame');
     if (!X.frame || c.card.template !== 'shop') { box.hidden = true; frameFiles = []; return; }
     box.hidden = false;
+    if (frameInd !== industry || !framePal) { frameInd = industry; framePal = (X.indPal && X.indPal[industry]) || 'cream'; }
     var pb = $('expPals');
     if (!pb.children.length) X.framePals.forEach(function (p) {
       var b = document.createElement('button'); b.type = 'button'; b.dataset.pal = p.id;
@@ -1558,7 +1559,7 @@
     var lay = (X.layouts || []).filter(function (l) { return l.id === frameLay; })[0];
     if (lay && X.layoutOk && !X.layoutOk(c.card, lay.id)) { frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">' + (lay.need || '이 디자인에 필요한 내용이 없어요') + '</p>'; return; }
     var job = ++frameJob; frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">만드는 중…</p>';
-    X.frame(c.card, curDesign(), { pics: localPics, pal: framePal, layout: frameLay, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
+    X.frame(c.card, curDesign(), { pics: localPics, pal: framePal, layout: frameLay, industry: industry, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
       if (job !== frameJob) return;
       frameFiles = list; figs($('expGrid2'), list);
     }).catch(function () { if (job === frameJob) $('expGrid2').innerHTML = '<p class="done-sub">액자 메뉴판을 만들지 못했어요.</p>'; });

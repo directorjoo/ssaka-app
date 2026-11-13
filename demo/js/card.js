@@ -229,6 +229,20 @@
           if (!t || t.isContentEditable) return;
           var li = t.closest('.sk-list li'), key, idx = -1, part = 'all';
           if (li) {
+            // 내용은 한 칸에서 여러 줄을 한꺼번에 고침 (줄 추가·삭제·이어서 고치기)
+            e.preventDefault(); e.stopPropagation();
+            var ul = li.parentNode, ta = document.createElement('textarea'); ta.className = 'sk-edta';
+            ta.value = (pristine.body || []).join('\n');
+            ul.replaceWith(ta);
+            var fit = function () { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 4) + 'px'; };
+            ta.addEventListener('input', fit); fit(); ta.focus({ preventScroll: true });
+            var done = h('button', { type: 'button', class: 'sk-edok', text: '✓ 다 고쳤어요' });
+            ta.insertAdjacentElement('afterend', done);
+            done.addEventListener('mousedown', function (x) { x.preventDefault(); ta.blur(); });
+            ta.addEventListener('blur', function () { done.remove(); PE('bodyAll', -1, 'all', ta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean).join('\n')); }, { once: true });
+            return;
+          }
+          if (li) {
             key = 'body'; idx = Array.prototype.indexOf.call(li.parentNode.children, li);
             if (t === li && li.querySelector('span:last-child')) t = li.querySelector('span:last-child');
             if (t !== li) part = 'val';

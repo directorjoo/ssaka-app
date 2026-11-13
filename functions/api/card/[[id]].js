@@ -51,6 +51,23 @@ export async function onRequest({ request, env, params }) {
   const id = String((params.id || [])[0] || '').replace(/[^0-9A-Za-z]/g, '').slice(0, 16);
 
   if (request.method === 'GET') {
+    // 로그인한 사람의 내 카드 목록: GET /api/card?mine=1 (어느 폰에서든 같은 목록)
+    if (!id && new URL(request.url).searchParams.get('mine')) {
+      const me = await currentUser(request, db).catch(() => null);
+      const nc = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'private, no-store' };
+      if (!me) return new Response(JSON.stringify({ login: 0, items: [] }), { headers: nc });
+      await ensureOwner(db);
+      const rs = await db.prepare('SELECT c.id, c.d, c.created FROM card_owner o JOIN cards c ON c.id = o.id WHERE o.uid = ? ORDER BY c.created DESC LIMIT 60').bind(String(me.id)).all();
+      const items = [];
+      for (const r of rs.results || []) {
+        try {
+          let b64 = r.d.replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '=';
+          const o = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), ch => ch.charCodeAt(0))));
+          items.push({ id: r.id, title: String(o.title || '').slice(0, 60), subtitle: String(o.subtitle || '').slice(0, 80), image: String(o.image || '').slice(0, 300), design: String(o.design || '').slice(0, 40), at: r.created });
+        } catch (e) {}
+      }
+      return new Response(JSON.stringify({ login: 1, items }), { headers: nc });
+    }
     if (!id) return json({ error: 'bad' }, 400);
     // 내 카드인지 확인: GET /api/card/<id>?own=1 (+ 헤더 x-sava-k: 기기 열쇠, 로그인 쿠키)
     if (new URL(request.url).searchParams.get('own')) {

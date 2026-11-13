@@ -33,6 +33,19 @@
     cancelReservation: function (code) {
       set(K.resv, get(K.resv).map(function (x) { if (x.code === code) x.status = 'canceled'; return x; }));
     },
+    // 로그인 계정의 내 카드 목록을 이 폰 목록에 합침 (이미 있는 건 그대로)
+    mergeMine: function (items) {
+      var list = get(K.mine), n = 0;
+      (items || []).forEach(function (it) {
+        if (!it || !it.id) return;
+        var url = location.origin + '/c/?s=' + it.id;
+        if (list.some(function (x) { return x.url === url || x.sid === it.id; })) return;
+        list.push({ title: it.title || '', subtitle: it.subtitle || '', image: it.image || '', design: it.design || '', url: url, sid: it.id, at: it.at || Date.now() });
+        n++;
+      });
+      if (n) set(K.mine, list.slice(-100));
+      return n;
+    },
     // 만든 사람 열쇠: 이 기기에만 있는 비밀값. 짧은 링크를 만들 때 같이 보내면, 나중에 같은 링크 내용을 고칠 수 있음
     ownerKey: function () {
       try {

@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=80">
+  <link rel="stylesheet" href="../css/sk.css?v=81">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -674,7 +674,7 @@
 <script src="../js/render.js?v=80"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
-<script src="../js/store.js?v=2"></script>
+<script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
 <script src="../js/export.js?v=80"></script>
 <script src="../js/links.js"></script>
@@ -1051,7 +1051,13 @@
     timer = setTimeout(function () {
       var r = buildCard();
       var url = viewer + '?d=' + SsakaCodec.encode(r.card);
-      if (url !== lastSrc) { $('frame').src = url; lastSrc = url; }
+      if (url !== lastSrc) {
+        // 미리보기를 다시 그려도 보던 자리 그대로 (고치다가 맨 위로 튀지 않게)
+        var fr = $('frame'), y = 0;
+        try { y = fr.contentWindow.scrollY || 0; } catch (e) {}
+        fr.onload = function () { if (!y) return; var go = function () { try { fr.contentWindow.scrollTo(0, y); } catch (e) {} }; go(); setTimeout(go, 120); setTimeout(go, 400); };
+        fr.src = url; lastSrc = url;
+      }
       // 긴 링크는 화면에 보이지 않게 (보낼 때·열어 볼 때 짧은 링크로 바뀜)
       $('link').textContent = r.isExample ? '예시 카드예요. 내용을 적으면 내 카드 링크가 생겨요.' : '🔗 보낼 때 sava.kr 짧은 링크로 바뀌어요';
       $('open').href = url;
@@ -1179,9 +1185,11 @@
   // ---------- 미리보기에서 글자 눌러 바로 고치기 (c/ 미리보기가 불러 줌) ----------
   window.SavaPreviewEdit = function (key, idx, part, text) {
     remember();
-    text = text.replace(/\s*❓\s*/g, ' ').trim(); // 손으로 고친 줄은 확인한 것으로 봄
+    if (key !== 'bodyAll') text = text.replace(/\s*❓\s*/g, ' ').trim(); // 손으로 고친 줄은 확인한 것으로 봄
     if (key === 'title' || key === 'subtitle') {
       $(key).value = text.slice(0, key === 'title' ? 40 : 60); $(key).classList.remove('missing');
+    } else if (key === 'bodyAll') {
+      $('body').value = text;
     } else if (key === 'body') {
       var raw = v('body') ? $('body').value.split('\n') : String(EX().body || '').split('\n');
       var n = -1, at = -1;

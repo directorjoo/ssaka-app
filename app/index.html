@@ -256,7 +256,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="../js/designs.js?v=83"></script>
-<script src="../js/store.js?v=2"></script>
+<script src="../js/store.js?v=3"></script>
 <script src="../js/install.js?v=2"></script>
 <script src="../js/share.js"></script>
 <script>
@@ -666,6 +666,10 @@
   var current = (location.hash || '').slice(1);
   if (!TITLES[current]) current = 'home';
   renderAll();
+  // 로그인했으면: 다른 폰에서 만든 내 카드도 목록에 가져오기
+  fetch('/api/card?mine=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+    if (j && j.items && S.mergeMine && S.mergeMine(j.items) && (current === 'home' || current === 'alim')) renderAll();
+  }).catch(function () {});
   // 화면 안의 #alim 같은 링크로도 화면 바꾸기
   window.addEventListener('hashchange', function () { var h = (location.hash || '').slice(1); if (TITLES[h] && h !== current) { current = h; show(current); } });
 

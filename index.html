@@ -113,8 +113,11 @@
     a:focus-visible, button:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
     footer { padding: 28px 0 calc(34px + env(safe-area-inset-bottom)); text-align: center; font-size: 12.5px; color: #8a8a8a; line-height: 1.8; }
   </style>
+<script src="js/launch.js?v=1"></script>
 </head>
 <body>
+<script>try{if(window.SAVA_QUIET&&localStorage.getItem('sava-all')!=='1'&&!/[?&]all=1/.test(location.search))document.documentElement.classList.add('quiet')}catch(e){}</script>
+<style>.quiet a[href="app/"]{display:none!important}</style>
 
 <div class="topbar"><b><img src="img/cherry.svg" alt="">싸바</b><a href="app/">싸바 시작하기 →</a></div>
 
@@ -225,7 +228,6 @@
   <div class="in">© 2026 싸바 SAVA · sava.kr<br>싸바? 어디야? 싸바! 여기야!<br><a href="privacy/" style="color:inherit">개인정보처리방침</a> · <a href="terms/" style="color:inherit">이용약관</a></div>
 </footer>
 
-<script src="js/launch.js?v=1"></script>
 <script src="js/install.js?v=2"></script>
 <script>
 (function () {
@@ -246,7 +248,12 @@
 
   var ib = document.getElementById('installBtn');
   // 1차(조용히) 공개 중에는 설치 단추 대신 '어디야?' 하나만
-  if (window.SsakaInstall && SsakaInstall.quiet && SsakaInstall.quiet()) { ib.remove(); return; }
+  if (window.SsakaInstall && SsakaInstall.quiet && SsakaInstall.quiet()) {
+    ib.remove();
+    // 1차 공개: 첫 화면에서 '싸바 시작하기'도 숨김 (만드는 사람은 sava.kr/app 으로 바로 들어감)
+    document.querySelectorAll('a[href="app/"]').forEach(function (a) { a.remove(); });
+    return;
+  }
   var done = window.SsakaInstall && SsakaInstall.standalone();
   if (done) ib.textContent = '🍒 싸바 홈으로';
   ib.addEventListener('click', function () { if (done) location.href = 'app/'; else if (window.SsakaInstall) SsakaInstall.open(); });

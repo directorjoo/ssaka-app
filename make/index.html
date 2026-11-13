@@ -480,6 +480,7 @@
           <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
           <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
           <label class="switch"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
+          <label class="switch"><input type="checkbox" id="privOn"> <span>🔒 참석자 이름은 주최자만 보기 (받는 사람은 인원 수와 내 신청만 봐요)</span></label>
           <label for="pre">카톡방에서 이미 받은 참석자 (한 줄에 한 명, 선택)</label>
           <textarea id="pre" maxlength="3000" placeholder="정병회34 교대&#10;이호영36+1 당산"></textarea>
           <div class="hint">여기 적은 사람이 명단 맨 앞에 먼저 들어가고, 싸바로 신청한 사람이 그 뒤로 번호가 이어져요.</div>
@@ -539,6 +540,7 @@
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
     <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
     <button type="button" class="ghost big" id="blog2">📝 네이버 블로그 글 만들기 (AI가 써줘요)</button>
+    <button type="button" class="ghost big" id="rkLink" hidden>🔒 주최자용 명단 보기 링크 복사</button>
     <button type="button" class="ghost big" id="exp2">📸 인스타용 사진 세트 만들기 (피드·스토리·정사각)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
@@ -960,6 +962,11 @@
       try { rmap = JSON.parse(localStorage.getItem(rkey) || '{}'); } catch (e) {}
       if (!rmap[rt]) { var ra = 'abcdefghjkmnpqrstuvwxyz23456789', rb = crypto.getRandomValues(new Uint8Array(10)), rs = ''; for (var ri = 0; ri < 10; ri++) rs += ra[rb[ri] % ra.length]; rmap[rt] = rs; if (!isEmpty) try { localStorage.setItem(rkey, JSON.stringify(rmap)); } catch (e) {} }
       card.roster = { id: rmap[rt], st: g('stops').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8), g: $('gisuOn').checked ? 1 : 0 };
+      if ($('privOn').checked) {
+        card.roster.priv = 1;
+        var kk = 'sava-roster-key-' + rmap[rt];
+        try { if (!localStorage.getItem(kk) && !isEmpty) { var ka = 'abcdefghjkmnpqrstuvwxyz23456789', kb = crypto.getRandomValues(new Uint8Array(20)), ks = ''; for (var ki = 0; ki < 20; ki++) ks += ka[kb[ki] % ka.length]; localStorage.setItem(kk, ks); } } catch (e) {}
+      }
       if (v('pre') && window.SsakaNotice) card.roster.pre = SsakaNotice.preParse(v('pre')).map(function (x) { return { n: x.n, g: x.g || undefined, s: x.s || undefined, p: x.p || undefined, fam: x.fam || undefined }; });
     }
     if ($('sound').value) card.sound = $('sound').value;
@@ -1054,6 +1061,18 @@
   function openDone() { try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) { $('open2').href = u; });
+    // 비공개 명단: 주최자에게 따로 보낼 '명단 보기' 링크 (명단을 비공개로 잠금)
+    var R = c.card.roster, rk = '';
+    try { rk = R && R.priv ? localStorage.getItem('sava-roster-key-' + R.id) || '' : ''; } catch (e) {}
+    $('rkLink').hidden = !rk;
+    if (rk) fetch(new URL('../api/roster/' + R.id, location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: rk }) }).catch(function () {});
+    $('rkLink').onclick = function () {
+      ensureShort(c).then(function (u) {
+        var t = (c.card.title || '참석 명단') + ' — 주최자용 참석 명단 (이 링크는 다른 분께 보내지 마세요)\n' + (u || c.url) + (/\?/.test(u || c.url) ? '&' : '?') + 'rk=' + rk;
+        var done = function () { toast('주최자용 링크를 복사했어요. 주최하는 분께만 보내 주세요'); };
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('복사하세요', t); }); else prompt('복사하세요', t);
+      });
+    };
     $('open2').href = c.url;
     if (window.SsakaStore) SsakaStore.saveMine(c.card, c.url);
     $('toast').classList.remove('show');
@@ -1461,6 +1480,7 @@
     } else toast('채웠어요: ' + got.join(' · ') + ' — 완료를 누르세요!');
   });
   $('gisuOn').addEventListener('change', function () { update(); });
+  $('privOn').addEventListener('change', function () { update(); });
   // ---------- 네이버 블로그 글 (AI) ----------
   var blogPost = null, blogCard = null, blogUrl = '', blogImgs = [];
   function devId() {

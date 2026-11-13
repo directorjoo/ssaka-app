@@ -28,10 +28,14 @@
   function mount(card, root, toast) {
     var R = card.roster; if (!R || !/^[a-z0-9]{8,16}$/.test(R.id || '')) return;
     toast = toast || function (m) { try { alert(m); } catch (e) {} };
+    // 비공개 명단: 주최자 열쇠(rk)는 링크 끝 &rk=… 이나 이 휴대폰에 저장된 것
+    var hk = '', priv = !!R.priv, isOwner = false, srvCount = 0, srvPeople = 0;
+    try { var qk = new URLSearchParams(location.search).get('rk'); if (qk && /^[a-z0-9]{16,32}$/.test(qk)) localStorage.setItem('sava-roster-key-' + R.id, qk); hk = localStorage.getItem('sava-roster-key-' + R.id) || ''; } catch (e) {}
     var tok = tokOf(R.id), stops = (R.st || []).filter(Boolean).slice(0, 8), list = [], live = window.self === window.top;
     // 카톡방에서 이미 받은 명단(총무가 붙여넣은 것)을 앞에 두고, 싸바로 신청한 사람을 뒤에 이어 붙임
     var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1 }; });
     function merge(srv) {
+      if (priv && !isOwner) return srv; // 남의 이름은 보이지 않게 (내 신청만)
       var used = {}, outL = pre.map(function (x) {
         for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; return srv[k]; }
         return x;
@@ -43,6 +47,7 @@
     var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 명단'), cnt = el('span', 'sk-ro-cnt', '불러오는 중…');
     head.appendChild(ttl); head.appendChild(cnt); box.appendChild(head);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
+    var privNote = el('p', 'sk-fine', '🔒 참석자 이름은 주최하는 분만 볼 수 있어요. 내 신청만 보여요.'); privNote.hidden = true; box.appendChild(privNote);
     var ol = el('ol', 'sk-ro-list'); box.appendChild(ol);
     var join = el('button', 'sk-ro-join', '🙋 참석 신청하기'); join.type = 'button'; box.appendChild(join);
     var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사'); copy.type = 'button'; box.appendChild(copy);
@@ -50,25 +55,30 @@
 
     function draw() {
       var mine = list.filter(function (x) { return x.me; })[0];
-      cnt.textContent = list.length ? list.length + '명 신청 · 총 ' + people(list) + '명' : '아직 신청한 사람이 없어요';
+      var shown = priv && !isOwner;
+      var nN = shown ? srvCount + pre.length : list.length, nP = shown ? srvPeople + people(pre) : people(list);
+      cnt.textContent = nN ? nN + '명 신청 · 총 ' + nP + '명' : '아직 신청한 사람이 없어요';
+      ttl.textContent = priv ? (isOwner ? '🔒 참석 명단 (주최자만 보여요)' : '🙋 참석 신청') : '🙋 참석 명단';
+      privNote.hidden = !shown;
       join.textContent = mine ? '✏️ 내 신청 고치기 · 취소' : '🙋 참석 신청하기';
       byStop.innerHTML = '';
-      if (stops.length && list.length) stops.forEach(function (s) {
+      if (stops.length && list.length && !shown) stops.forEach(function (s) {
         var n = people(list.filter(function (x) { return x.s && shortStop(x.s) === shortStop(s); }));
         var c = el('span', '', shortStop(s) + ' ' + n + '명'); byStop.appendChild(c);
       });
       ol.innerHTML = '';
-      list.forEach(function (x, i) { var li = el('li', x.me ? 'me' : '', line(x, i)); ol.appendChild(li); });
-      copy.hidden = !list.length;
+      list.forEach(function (x, i) { var li = el('li', x.me ? 'me' : '', shown ? '✅ 내 신청: ' + line(x, 0).replace(/^\d+\./, '') : line(x, i)); ol.appendChild(li); });
+      copy.hidden = !list.length || shown;
     }
+    function take(j) { isOwner = !!j.owner || (priv && !j.priv && !!hk); srvCount = j.count || 0; srvPeople = j.people || 0; list = merge(j.list || []); draw(); }
     function load() {
-      return fetch(API + R.id + '?tok=' + tok).then(function (r) { return r.json(); }).then(function (j) { list = merge(j.list || []); draw(); })
+      return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
         .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
     }
     function send(o) {
       if (!live) { toast('미리보기에선 신청되지 않아요'); return Promise.resolve(); }
-      return fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ tok: tok }, o)) })
-        .then(function (r) { return r.json(); }).then(function (j) { if (j.list) { list = merge(j.list); draw(); } else throw new Error(j.error); });
+      return fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ tok: tok, hk: hk || undefined }, o)) })
+        .then(function (r) { return r.json(); }).then(function (j) { if (j.list) take(j); else throw new Error(j.error); });
     }
     copy.addEventListener('click', function () {
       var t = [card.title || '참석 명단', '—참석자명단'].concat(list.map(line)).join('\n') + '\n(싸바에서 자동 정리 · 총 ' + people(list) + '명)';
@@ -125,7 +135,7 @@
           shut(); toast(mine.n ? '고쳤어요' : '참석 신청했어요! 싸바 🙌');
           if (smsOn && smsOn.checked && live) {
             var me = list.map(function (x, i) { return x.me ? line(x, i) : null; }).filter(Boolean)[0] || n;
-            setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '참석') + ']\n' + me + ' ' + (mine.n ? '신청 내용 고쳤어요' : '참석합니다') + '\n(지금 ' + list.length + '명 신청 · 총 ' + people(list) + '명)\n싸바!'); }, 600);
+            setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '참석') + ']\n' + me + ' ' + (mine.n ? '신청 내용 고쳤어요' : '참석합니다') + (priv && !isOwner ? '' : '\n(지금 ' + list.length + '명 신청 · 총 ' + people(list) + '명)') + '\n싸바!'); }, 600);
           }
         })
           .catch(function () { ok.disabled = false; toast('잠시 뒤 다시 눌러 주세요'); });
@@ -139,7 +149,7 @@
 
     var anchor = root.querySelector('.sk-actions') || root.querySelector('.sk-wrap') || root;
     if (anchor === root || anchor.classList.contains('sk-wrap')) anchor.appendChild(box); else anchor.insertAdjacentElement('afterend', box);
-    load();
+    if (priv && hk && live) fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok }) }).then(load, load); else load();
     // 다른 사람이 신청한 것도 보이게, 화면을 다시 볼 때마다 새로 불러옴
     document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
   }

@@ -80,11 +80,15 @@
       var where = KV['장소'] || KV['위치'] || KV['주소'];
       if (where) { out.place = where.slice(0, 60); out.stops = []; }
       var bd = [];
+      // 초대 인사말: 제목 다음부터 정보표(행사명·일시·INFORMATION) 앞까지의 글
+      var stopI = lines.findIndex(function (l) { return kre.test(l) || /^(INFORMATION|TIMETABLE|안내|일정표|\d{1,2}:\d{2})/i.test(l); });
+      lines.slice(0, stopI < 0 ? lines.length : stopI).forEach(function (l) { if (l !== out.title && !/^(Filmmakers|THE COLLABORATION)/i.test(l) && l !== tt2) bd.push(l); });
+      if (bd.length) bd.push('');
       ['프로그램', '참여감독', '대상', '참가비', '회비', '드레스코드', '준비물', '주최', '주관', '파트너', '후원', '문의'].forEach(function (k) { if (KV[k]) bd.push((k === '참여감독' ? '참여 감독' : k) + ': ' + KV[k]); });
       // 시간표: "12:00 - 12:26 오프닝"
-      lines.forEach(function (l) { var tl = l.match(/^(\d{1,2}:\d{2})\s*(?:[-–~]\s*\d{1,2}:\d{2})?\s+(.+)$/); if (tl && bd.length < 14) bd.push(tl[1] + ' ' + tl[2]); });
+      lines.forEach(function (l) { var tl = l.match(/^(\d{1,2}:\d{2})\s*(?:[-–~]\s*\d{1,2}:\d{2})?\s+(.+)$/); if (tl && bd.length < 30) bd.push(tl[1] + ' ' + tl[2]); });
       if (where && /관|홀|층|호/.test(where)) bd.push('장소: ' + where);
-      out.body = bd.map(function (x) { return x.slice(0, 80); });
+      out.body = bd.map(function (x) { return x.slice(0, 160); });
       if (KV['참가비'] || KV['회비']) out.fee = KV['참가비'] || KV['회비'];
     }
     return out;

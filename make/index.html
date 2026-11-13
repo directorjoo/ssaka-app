@@ -195,6 +195,15 @@
     .blog-ed .hint { font-size: 12.5px; color: #999; margin: -4px 0 12px; }
     .exp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0 14px; }
     .exp-grid figure { margin: 0; }
+    .exp-sec { margin: 4px 0 6px; font-size: 15px; text-align: left; }
+    .exp-sec small { display: block; color: #777; font-size: 13px; margin-top: 2px; }
+    #expFrame { min-width: 0; max-width: 100%; }
+    .exp-pals { display: flex; gap: 6px; max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+    .exp-pals::-webkit-scrollbar { display: none; }
+    .exp-pals button { flex: none; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px 0 8px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 700; color: #333; }
+    .exp-pals button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+    .exp-pals button[aria-pressed="true"] { border-color: #B3132B; color: #B3132B; }
+    #expGrid2 img { object-fit: contain; background: #f2f2f2; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
     .exp-grid figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; }
     .exp-grid a { color: inherit; text-decoration: none; }
@@ -548,6 +557,11 @@
     <div class="modal-head"><b>카톡 채널 · 인스타용 이미지</b><button type="button" class="mini" id="expClose">닫기</button></div>
     <p class="done-sub" id="expStatus">이미지를 만드는 중이에요…</p>
     <div class="exp-grid" id="expGrid"></div>
+    <div id="expFrame" hidden>
+      <p class="exp-sec"><b>🖼️ 액자 메뉴판 템플릿</b><small>색을 고르면 인스타 피드·정사각·스토리·블로그 썸네일 4가지 크기로 만들어요</small></p>
+      <div class="exp-pals" id="expPals" role="group" aria-label="액자 메뉴판 색"></div>
+      <div class="exp-grid" id="expGrid2"></div>
+    </div>
     <button type="button" class="kakao big" id="expSave" disabled>📥 사진 앱에 저장하기</button>
     <button type="button" class="ghost big" id="expText">📝 소식 글 복사하기 (링크 포함)</button>
     <ol class="exp-how">
@@ -582,7 +596,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=76"></script>
+<script src="../js/export.js?v=77"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -1506,7 +1520,38 @@
   $('blogClose').addEventListener('click', function () { $('blogModal').hidden = true; });
   $('blogModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   // ---------- 카톡 채널 · 인스타용 이미지 ----------
-  var expFiles = [], expCard = null, expUrl = '';
+  var expFiles = [], expCard = null, expUrl = '', frameFiles = [], framePal = 'cream', frameJob = 0;
+  function figs(box, list) {
+    box.innerHTML = '';
+    list.forEach(function (x) {
+      var u = URL.createObjectURL(x.blob), f = document.createElement('figure');
+      var a = document.createElement('a'); a.href = u; a.download = x.name;
+      var im = document.createElement('img'); im.src = u; im.alt = x.label;
+      a.appendChild(im); f.appendChild(a);
+      var cap = document.createElement('figcaption'); cap.textContent = x.label.replace(/^액자 메뉴판 · /, ''); f.appendChild(cap);
+      box.appendChild(f);
+    });
+  }
+  // 액자 메뉴판: 색을 고르면 4가지 크기로 다시 그림
+  function makeFrames(c) {
+    var X = window.SsakaExport, box = $('expFrame');
+    if (!X.frame || c.card.template !== 'shop') { box.hidden = true; frameFiles = []; return; }
+    box.hidden = false;
+    var pb = $('expPals');
+    if (!pb.children.length) X.framePals.forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.pal = p.id;
+      var i = document.createElement('i'); i.style.background = 'linear-gradient(135deg,' + p.paper + ' 55%,' + p.accent + ' 55%)';
+      b.appendChild(i); b.appendChild(document.createTextNode(p.label));
+      b.addEventListener('click', function () { framePal = p.id; var cc = current(); if (cc) makeFrames(cc); });
+      pb.appendChild(b);
+    });
+    Array.prototype.forEach.call(pb.children, function (b) { b.setAttribute('aria-pressed', b.dataset.pal === framePal ? 'true' : 'false'); });
+    var job = ++frameJob; frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">만드는 중…</p>';
+    X.frame(c.card, curDesign(), { pics: localPics, pal: framePal, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
+      if (job !== frameJob) return;
+      frameFiles = list; figs($('expGrid2'), list);
+    }).catch(function () { if (job === frameJob) $('expGrid2').innerHTML = '<p class="done-sub">액자 메뉴판을 만들지 못했어요.</p>'; });
+  }
   $('exp2').addEventListener('click', function () {
     var c = current(); if (!c) return;
     expCard = c.card; expUrl = link(c); expFiles = [];
@@ -1514,6 +1559,7 @@
     $('expModal').hidden = false;
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
     $('expStatus').textContent = '이미지를 만드는 중이에요…';
+    makeFrames(c);
     window.SsakaExport.build(c.card, curDesign(), { pics: localPics, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
       expFiles = list;
       list.forEach(function (x) {
@@ -1531,7 +1577,7 @@
   });
   $('expSave').addEventListener('click', function () {
     if (!expFiles.length) return;
-    var files = expFiles.map(function (x) { return new File([x.blob], x.name, { type: 'image/jpeg' }); });
+    var files = expFiles.concat(frameFiles).map(function (x) { return new File([x.blob], x.name, { type: 'image/jpeg' }); });
     if (navigator.canShare && navigator.canShare({ files: files })) {
       navigator.share({ files: files }).catch(function () {});
       return;

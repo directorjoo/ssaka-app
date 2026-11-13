@@ -39,13 +39,20 @@
     n.className = 'sava-nav'; n.setAttribute('aria-label', '이동');
     n.innerHTML = '<button type="button" class="p" aria-label="이전 화면으로"><b aria-hidden="true">‹</b>이전</button>' +
       '<a class="h" href="/app/" aria-label="싸바 홈으로"><b aria-hidden="true">🏠</b>홈</a>' +
+      '<button type="button" class="t notranslate" translate="no" aria-label="Language 언어"><b aria-hidden="true">🌐</b></button>' +
       '<button type="button" class="k" aria-label="카카오톡 대화창으로"><b aria-hidden="true">💬</b>카톡</button>';
     n.querySelector('.p').addEventListener('click', goBack);
     n.querySelector('.k').addEventListener('click', goKakao);
+    n.querySelector('.t').addEventListener('click', function () { if (window.SavaTr) SavaTr.open(); });
     var v = pos.charAt(0) === 't' ? 'top' : 'bottom', h = pos.charAt(1) === 'l' ? 'left' : 'right';
     n.style[v] = 'calc(' + top + 'px + env(safe-area-inset-' + v + '))';
     n.style[h] = 'calc(10px + env(safe-area-inset-' + h + '))';
     document.body.appendChild(n);
+  }
+  // 🌐 번역 기능 붙이기 (다른 화면에서 고른 말 이어서)
+  if (!document.querySelector('script[src*="translate.js"]')) {
+    var tr = document.createElement('script'); tr.src = '/js/translate.js?v=1'; tr.defer = true; tr.setAttribute('data-btn', '0');
+    document.head.appendChild(tr);
   }
   if (ds.bar === '0') return; // 단추 없이 기능만 (만들기·홈 화면은 자체 단추 사용)
   if (document.body) add(); else document.addEventListener('DOMContentLoaded', add);

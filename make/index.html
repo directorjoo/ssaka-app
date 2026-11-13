@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=76">
+  <link rel="stylesheet" href="../css/sk.css?v=77">
   <link rel="stylesheet" href="../css/sk-world.css?v=3">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -103,6 +103,10 @@
     .moods::-webkit-scrollbar { display: none; }
     .moods button { flex: none; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
     .moods button[aria-pressed="true"] { background: #1a1a1a; border-color: #1a1a1a; color: #fff; }
+    .clipbox { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+    .clipbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 16px; border-radius: 14px; background: #1a1a1a; color: #fff; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .clipbtn small { font-weight: 600; opacity: .75; font-size: 12px; }
+    .clipst { font-size: 14px; font-weight: 700; flex-basis: 100%; }
     .grps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
     .grps button { min-height: 46px; padding: 4px 4px; border-radius: 12px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 13.5px; font-weight: 800; line-height: 1.25; cursor: pointer; word-break: keep-all; }
     .grps button[aria-pressed="true"] { background: #D9C3A1; border-color: #B89870; color: #3B2B1B; }
@@ -526,6 +530,14 @@
           <option value="cherry">🍒 체리가 톡톡 떨어지기</option>
         </select>
         <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
+        <div class="clipbox">
+          <label class="clipbtn" for="clipFile">📹 내 영상 넣기 <small>15초 · 30MB까지</small></label>
+          <input type="file" id="clipFile" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
+          <input type="hidden" id="clip">
+          <div class="clipst" id="clipSt" role="status"></div>
+          <button type="button" class="ghost" id="clipDel" hidden>영상 빼기</button>
+        </div>
+        <div class="hint">대표 사진 자리에서 영상이 소리 없이 반복돼요(눌러서 소리 켜기). 카톡 말풍선에는 대표 사진이 보이니 사진도 함께 넣어 주세요.</div>
       </fieldset>
 
       <fieldset>
@@ -645,7 +657,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=83"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=77"></script>
+<script src="../js/render.js?v=78"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -682,7 +694,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -753,7 +765,7 @@
       body: String(ex.body || '').split('\n').filter(Boolean),
       contact: { name: ex.name || '이름', phone: '010-0000-0000' },
       place: (ex.place && cardType.buttons.indexOf('map') >= 0) ? { name: ex.place } : null,
-      gallery: galList().slice(0, 4), season: v('season') || undefined, motion: v('motion') || undefined,
+      gallery: galList().slice(0, 4), season: v('season') || undefined, motion: v('motion') || undefined, clip: v('clip') || undefined,
       copy: ex.copyValue ? { label: ex.copyLabel || '복사', value: ex.copyValue } : null,
       buttons: cardType.buttons.slice(), sos: !!cardType.sos, sosLabel: ex.sosLabel
     };
@@ -982,6 +994,7 @@
     else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
     if (v('season')) card.season = v('season');
     if (v('motion')) card.motion = v('motion');
+    if (v('clip')) card.clip = v('clip');
     if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
     if (type === 'shop' && $('resvOn').checked) {
       var ires = (D.industry(industry) || {}).res || {};
@@ -1459,6 +1472,34 @@
   });
   $('season').addEventListener('change', function () { seasonTouched = true; update(); renderGallery(); });
   $('motion').addEventListener('change', function () { update(); });
+  // ---------- 내 영상 넣기 (15초 · 30MB, 싸바 영상 저장소에 올림) ----------
+  window.__clipUi = function () { var has = !!$('clip').value; $('clipDel').hidden = !has; $('clipSt').textContent = has ? '✅ 영상이 들어갔어요' : ''; };
+  $('clipDel').addEventListener('click', function () { $('clip').value = ''; __clipUi(); update(); try { saveDraft(); } catch (e) {} });
+  $('clipFile').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    var st = $('clipSt');
+    if (f.size > 30 * 1024 * 1024) { st.textContent = '❌ 영상이 너무 커요 (30MB까지). 15초 안으로 잘라 주세요'; return; }
+    var type = f.type || (/\.mov$/i.test(f.name) ? 'video/quicktime' : /\.webm$/i.test(f.name) ? 'video/webm' : 'video/mp4');
+    // 길이 확인 (20초 넘으면 안내)
+    var probe = document.createElement('video'); probe.preload = 'metadata'; probe.muted = true;
+    var url = URL.createObjectURL(f);
+    probe.onloadedmetadata = function () { URL.revokeObjectURL(url); if (probe.duration > 20.5) { st.textContent = '❌ ' + Math.round(probe.duration) + '초 영상이에요. 15초 안으로 잘라서 올려 주세요 (사진 앱 → 편집에서 자르기)'; return; } send(); };
+    probe.onerror = function () { URL.revokeObjectURL(url); send(); };
+    probe.src = url;
+    function send() {
+      st.textContent = '⏫ 영상 올리는 중… 0%';
+      var x = new XMLHttpRequest(); x.open('POST', '/api/video'); x.setRequestHeader('content-type', type);
+      x.upload.onprogress = function (e) { if (e.lengthComputable) st.textContent = '⏫ 영상 올리는 중… ' + Math.round(e.loaded / e.total * 100) + '%'; };
+      x.onload = function () {
+        var j = {}; try { j = JSON.parse(x.responseText); } catch (e) {}
+        if (x.status === 200 && j.url) { $('clip').value = j.url; __clipUi(); update(); try { saveDraft(); } catch (e) {} toast('영상이 들어갔어요 🎬'); }
+        else st.textContent = '❌ ' + (j.error || '영상을 못 올렸어요. 잠시 뒤 다시 해 주세요');
+      };
+      x.onerror = function () { st.textContent = '❌ 인터넷이 끊겼어요. 다시 해 주세요'; };
+      x.send(f);
+    }
+  });
+  __clipUi();
 
   $('photoRemove').addEventListener('click', function () {
     $('image').value = ''; IP = { z: 100, x: 50, y: 50, f: 0 }; showThumb(''); $('photoStatus').textContent = '사진을 뺐어요.'; update();
@@ -1918,7 +1959,7 @@
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
     set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
     IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
-    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || ''); set('motion', c.motion || '');
+    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || ''); set('motion', c.motion || ''); set('clip', c.clip || ''); if (window.__clipUi) __clipUi();
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));

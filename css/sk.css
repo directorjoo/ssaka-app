@@ -596,3 +596,8 @@
 .sk-thumb.sk-mo * { animation: none !important; }
 .sk-thumb .sk-mofall i:nth-child(odd) { top: 20%; } .sk-thumb .sk-mofall i:nth-child(even) { top: 60%; }
 @media (prefers-reduced-motion: reduce) { .sk-mo * { animation: none !important; } .sk-mofall { display: none; } }
+
+/* 내 영상 (대표 사진 자리에서 반복) */
+.sk-photo .sk-clip { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; background: #000; }
+.sk-clip-snd { position: absolute; right: 10px; bottom: 10px; z-index: 4; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+.sk-clip-snd:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }

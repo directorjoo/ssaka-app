@@ -108,6 +108,20 @@
     } else {
       photo.appendChild(el('span', 'sk-mono', (card.title || '싸').trim().charAt(0)));
     }
+    // 내 영상: 싸바 영상 저장소의 영상만, 대표 사진 자리에서 소리 없이 반복 (작은 그림에서는 사진만)
+    var clip = typeof card.clip === 'string' && /^https:\/\/sava\.kr\/api\/video\/[a-f0-9]{24}\.(mp4|mov|webm)$/.test(card.clip) ? card.clip : '';
+    if (clip && live && !card.sos) {
+      if (!card.image) { photo.className = 'sk-photo'; }
+      var vd = el('video', 'sk-clip');
+      vd.src = /^https:\/\/sava\.kr\//.test(location.href) ? clip.replace('https://sava.kr', '') : clip;
+      vd.muted = true; vd.loop = true; vd.autoplay = true; vd.playsInline = true; vd.setAttribute('playsinline', ''); vd.setAttribute('muted', ''); vd.preload = 'auto';
+      if (card.image) vd.poster = card.image;
+      photo.appendChild(vd);
+      var snd = el('button', 'sk-clip-snd', '🔇'); snd.type = 'button'; snd.setAttribute('aria-label', '영상 소리 켜기');
+      snd.addEventListener('click', function (e) { e.stopPropagation(); vd.muted = !vd.muted; snd.textContent = vd.muted ? '🔇' : '🔊'; snd.setAttribute('aria-label', vd.muted ? '영상 소리 켜기' : '영상 소리 끄기'); if (vd.paused) vd.play(); });
+      photo.appendChild(snd);
+      setTimeout(function () { var p = vd.play(); if (p && p.catch) p.catch(function () {}); }, 0);
+    }
     if (card.image && !card.sos && (motion === 'steam' || motion === 'shine')) {
       var fx = el('div', 'sk-mofx'); fx.setAttribute('aria-hidden', 'true');
       for (var mf = 0; mf < (motion === 'steam' ? 5 : 9); mf++) fx.appendChild(el('i'));

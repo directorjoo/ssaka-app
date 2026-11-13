@@ -51,6 +51,7 @@ export async function onRequest({ request, env, params }) {
   const k = /^[a-f0-9]{24,64}$/.test(String(b.k || '')) ? String(b.k) : '';
   const kh = k ? await keyHash(k) : '';
   if (b.op === 'update') {
+    const id = String(b.id || '').replace(/[^0-9A-Za-z]/g, '').slice(0, 16);
     if (!id || !kh) return json({ error: 'bad' }, 400);
     const own = await db.prepare('SELECT kh FROM card_owner WHERE id = ?').bind(id).first();
     if (!own || own.kh !== kh) return json({ error: 'not-owner' }, 403);

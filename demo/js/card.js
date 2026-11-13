@@ -224,8 +224,11 @@
       var PE = window.self !== window.top && window.parent.SavaPreviewEdit;
       if (PE) {
         root.classList.add('sk-pe');
+        // 만들기 화면의 [✏️ 수정하기] 를 누르면 고칠 수 있는 곳을 점선으로 보여 줌 (다시 그려도 유지)
+        window.SavaPreviewMode = function (on) { root.classList.toggle('sk-pe-on', !!on); };
+        try { if (window.parent.SavaEditOn && window.parent.SavaEditOn()) root.classList.add('sk-pe-on'); } catch (e) {}
         root.addEventListener('click', function (e) {
-          var t = e.target.closest('.sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li');
+          var t = e.target.closest('.sk-kick, .sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li');
           if (!t || t.isContentEditable) return;
           var li = t.closest('.sk-list li'), key, idx = -1, part = 'all';
           if (li) {
@@ -246,7 +249,7 @@
             key = 'body'; idx = Array.prototype.indexOf.call(li.parentNode.children, li);
             if (t === li && li.querySelector('span:last-child')) t = li.querySelector('span:last-child');
             if (t !== li) part = 'val';
-          } else key = t.classList.contains('sk-title') ? 'title' : 'subtitle';
+          } else key = t.classList.contains('sk-title') ? 'title' : t.classList.contains('sk-kick') ? 'kick' : 'subtitle';
           e.preventDefault(); e.stopPropagation();
           t.contentEditable = 'true'; t.focus();
           try { var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); } catch (x) {}

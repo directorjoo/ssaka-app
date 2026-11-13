@@ -651,3 +651,4 @@
 .sk-ro-mine { margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,.05); font-weight: 700; font-size: 15px; }
 .sk-ro-ph { margin-left: 4px; font-size: .92em; font-weight: 700; color: var(--accent-line, var(--accent)); text-decoration: none; white-space: nowrap; }
 .sk-roster.host .sk-ro-head b { color: var(--accent-line, inherit); }
+.sk-pe-on .sk-title, .sk-pe-on .sk-sub, .sk-pe-on .sk-kick, .sk-pe-on .sk-list { outline: 2px dashed #B3132B; outline-offset: 4px; border-radius: 6px; }

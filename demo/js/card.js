@@ -99,6 +99,7 @@
   }
 
   function render(card) {
+    var pristine = JSON.parse(JSON.stringify(card));
     var c = card.contact || {};
     card.image = safeUrl(card.image);
     card.video = safeUrl(card.video);
@@ -261,9 +262,11 @@
           var tot = document.createElement('small'); tot.textContent = '처음부터 지금까지 열어 본 횟수 ' + (t.view || 0) + '번 · 같은 사람은 하루 한 번만 세요'; st.appendChild(tot);
         }).catch(function () { st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
         var mk = new URL('../make/', location.href).href;
-        var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq); e1.textContent = '✏️ 수정하기';
-        var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사해서 새로';
-        bar.appendChild(e1); bar.appendChild(e2);
+        var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 바로 고치기';
+        e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
+        var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq); e1.textContent = '📝 입력칸';
+        var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
+        bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
         document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
       }
     } catch (e) {}
@@ -321,6 +324,82 @@
     }
   }
 
+  // ---------- 내 카드: 완성된 카드 화면에서 바로 고치기 ----------
+  function startEdit(orig, card, design, ctx, root, bar, st) {
+    if (root.classList.contains('sk-editing')) return;
+    root.classList.add('sk-editing');
+    bar.style.display = 'none'; if (st) st.style.display = 'none';
+    var addr = (card.body || []).length > (orig.body || []).length ? card.body.slice((orig.body || []).length) : [];
+    var lines = (orig.body || []).slice();
+    var tip = h('div', { class: 'sk-edtip', text: '✏️ 고칠 글자를 누르세요 · 내용은 줄바꿈까지 자유롭게' });
+    var foot = h('div', { class: 'sk-edbar' });
+    var bNo = h('button', { type: 'button', class: 'no', text: '취소' });
+    var bOk = h('button', { type: 'button', class: 'ok', text: '💾 저장' });
+    foot.appendChild(bNo); foot.appendChild(bOk);
+    document.body.appendChild(tip); document.body.appendChild(foot);
+    var tipT = setTimeout(function () { tip.style.opacity = '0'; }, 3500);
+    // 제목·한 줄 소개·맨 위 한마디
+    ['.sk-kick', '.sk-title', '.sk-sub'].forEach(function (sel) {
+      var e = root.querySelector(sel); if (!e) return;
+      e.contentEditable = 'true'; e.classList.add('sk-edf');
+      e.addEventListener('keydown', function (k) { if (k.key === 'Enter') { k.preventDefault(); e.blur(); } });
+    });
+    // 내용: 누르면 줄 단위로 고치는 칸으로 바뀜
+    function list() { return root.querySelector('.sk-list'); }
+    function openBody(ev) {
+      var ul = list(); if (!ul || ev && !ul.contains(ev.target)) return;
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      var ta = document.createElement('textarea'); ta.className = 'sk-edta'; ta.value = lines.join('\n');
+      ul.replaceWith(ta);
+      var fit = function () { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 4) + 'px'; };
+      ta.addEventListener('input', fit); fit(); ta.focus();
+      tip.textContent = '한 줄 = 한 항목 · ■로 시작하면 묶음 제목'; clearTimeout(tipT); tip.style.opacity = '1';
+      ta.addEventListener('blur', function () {
+        lines = ta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+        var tmp = SsakaRender.build(Object.assign({}, card, { body: lines.concat(addr) }), design, ctx);
+        var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' });
+        ta.replaceWith(nl);
+        tip.style.opacity = '0';
+      }, { once: true });
+    }
+    root.addEventListener('click', openBody, true);
+    if (!list() && !lines.length) {
+      // 내용이 비어 있던 카드: 제목 아래에 빈 칸을 하나 만들어 둠
+      var sub = root.querySelector('.sk-sub') || root.querySelector('.sk-title');
+      if (sub) { var ph = h('ul', { class: 'sk-list' }); ph.appendChild(h('li', { class: 'sk-p', text: '여기를 눌러 내용을 쓰세요' })); (sub.parentNode.parentNode || sub.parentNode).appendChild(ph); }
+    }
+    function done() {
+      root.removeEventListener('click', openBody, true);
+      tip.remove(); foot.remove();
+    }
+    bNo.addEventListener('click', function () { done(); location.reload(); });
+    bOk.addEventListener('click', function () {
+      var ta = root.querySelector('.sk-edta'); if (ta) ta.blur();
+      var nc = JSON.parse(JSON.stringify(orig));
+      var g = function (sel) { var e = root.querySelector(sel); return e ? e.textContent.replace(/\s+/g, ' ').trim() : null; };
+      var t = g('.sk-title'), su = g('.sk-sub'), kk = g('.sk-kick');
+      if (t !== null && t) nc.title = t.slice(0, 40);
+      if (su !== null) nc.subtitle = su.slice(0, 60);
+      if (kk !== null) nc.kick = kk.slice(0, 20);
+      nc.body = lines;
+      bOk.disabled = true; bOk.textContent = '저장하는 중…';
+      var d = SsakaCodec.encode(nc);
+      fetch(new URL('../api/card', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ d: d }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j || !j.id) throw new Error(j && j.error || 'x');
+          var url = new URL('?s=' + j.id, location.href).href;
+          try {
+            var long = new URL('?d=' + d, location.href).href;
+            if (window.SsakaStore) SsakaStore.saveMine(nc, long);
+          } catch (e) {}
+          done();
+          toast('저장했어요! 새 링크로 바뀌었어요');
+          setTimeout(function () { location.replace(url); }, 700);
+        })
+        .catch(function (e) { bOk.disabled = false; bOk.textContent = '💾 저장'; toast(String(e.message) === 'bad-content' ? '보낼 수 없는 내용이 있어요' : '저장하지 못했어요. 다시 눌러 주세요'); });
+    });
+  }
   // 모임 참석 답장: 보낸 사람에게 정리된 문자를 보냄 (서버 없음)
   function openRsvp(card, root) {
     var c = card.contact || {};

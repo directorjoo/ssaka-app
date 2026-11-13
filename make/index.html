@@ -10,7 +10,7 @@
   <link rel="icon" href="../img/favicon.png?v=2">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=72">
+  <link rel="stylesheet" href="../css/sk.css?v=73">
   <link rel="stylesheet" href="../css/sk-world.css">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -617,7 +617,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=81"></script>
 <script src="../js/notice.js?v=3"></script>
-<script src="../js/render.js?v=73"></script>
+<script src="../js/render.js?v=74"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js"></script>
@@ -829,7 +829,8 @@
     setType(ind.type, prevInd, industry);
     applyIndustry(ind);
     bizBtn(ind);
-    if (!seasonTouched) $('season').value = ind.season || '';
+    // 업종이 바뀌면 시즌 테마도 그 업종 기본값으로 (초대장에 '첫눈 오는 날'이 따라오지 않게)
+    if (!seasonTouched || (prevInd && prevInd !== industry)) { $('season').value = ind.season || ''; if (prevInd && prevInd !== industry) seasonTouched = false; }
     renderGallery();
     if (userPicked) {
       var on = document.querySelector('.inds button[aria-pressed="true"]');

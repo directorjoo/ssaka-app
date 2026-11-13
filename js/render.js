@@ -94,7 +94,11 @@
     }
     if (!card.sos) hero.appendChild(photo);
     var titles = el('div', 'sk-titles');
-    titles.appendChild(el('h1', 'sk-title', card.title || ''));
+    var h1 = el('h1', 'sk-title', card.title || '');
+    // 영어처럼 띄어쓰기 없는 긴 낱말이 있으면 글자를 줄여 낱말 중간에서 줄이 끊기지 않게
+    var longW = Math.max.apply(0, String(card.title || '').split(/\s+/).map(function (w) { return w.length; }));
+    if (longW >= 9) h1.classList.add(longW >= 12 ? 'sk-t-xl' : 'sk-t-l');
+    titles.appendChild(h1);
     if (card.subtitle) titles.appendChild(el('p', 'sk-sub', card.subtitle));
     hero.appendChild(titles);
     if (card.season && SEASON[card.season]) {

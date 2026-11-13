@@ -544,3 +544,8 @@
 .sk-ro-sms { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; }
 .sk-rform .sk-ro-sms input { width: 22px; height: 22px; min-height: 0; padding: 0; flex: none; -webkit-appearance: auto; appearance: auto; accent-color: var(--accent); }
 .sk-roster .sk-fine { margin: 10px 0 0; font-size: 12.5px; color: var(--sub); }
+
+/* 긴 영어 낱말 제목: 낱말 중간에서 끊기지 않게 글자 크기를 줄임 */
+.sk .sk-title.sk-t-l { font-size: min(46px, 9.5vw) !important; overflow-wrap: normal; }
+.sk .sk-title.sk-t-xl { font-size: min(42px, 8.4vw) !important; overflow-wrap: normal; }
+.sk-thumb .sk-title.sk-t-l, .sk-thumb .sk-title.sk-t-xl { font-size: 30px !important; }

@@ -33,7 +33,7 @@
     .mhome { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 18px; }
     .mhome svg { width: 32px; height: 32px; }
     .mprev { min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px 0 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 15px; font-weight: 800; }
-    .mtop .mhome { margin-right: auto; margin-left: 8px; }
+    .mtop .mhome { margin-right: auto; margin-left: 0; }
     .mhomebtn { margin-left: 6px; }
     .mkakao { background: #FEE500; border-color: #F2D900; color: #3A1D1D; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
     @media (max-width: 380px) { .mtop .mhome { font-size: 0; gap: 0; } }
@@ -284,13 +284,10 @@
 <div class="wrap">
   <header>
     <div class="mtop">
-      <a class="mprev" id="prevPage" href="../app/" aria-label="이전 화면으로">‹ 이전</a>
-      <a class="mback mhomebtn" href="../app/" aria-label="싸바 홈으로">🏠 홈</a>
       <a class="mhome" href="../app/" aria-label="싸바 홈">
         <img src="../img/cherry.svg" alt="" width="32" height="32" style="display:block">
         싸바
       </a>
-      <button type="button" class="mback mkakao" onclick="window.SavaNav && SavaNav.kakao()" aria-label="카카오톡 대화창으로">💬 카톡</button>
     </div>
     <h1>10초 만에 카드 만들기</h1>
     <p>적으면 오른쪽(아래)에 바로 보여요. 다 되면 카톡으로 보내기를 누르세요.</p>
@@ -544,7 +541,7 @@
 <div class="bar" id="bar">
   <div class="bar-in">
     <div class="prog"><b id="progText">필수 0/3</b><span class="track"><i id="progFill"></i></span></div>
-    <button type="button" class="bar-undo" id="undo" disabled aria-label="이전으로 되돌리기">↩ 이전</button>
+    <button type="button" class="bar-undo" id="undo" disabled aria-label="방금 고친 것 되돌리기">↩ 되돌리기</button>
     <button type="button" class="bar-pv" id="goPreview">👀 미리보기</button>
     <button type="button" class="bar-done" id="finish">✅ 완료</button>
   </div>
@@ -682,12 +679,13 @@
   // 카톡에 등록된 주소(sava.kr)로만 링크를 만듦 — pages.dev 등 다른 주소로 열어도 카톡 공유가 실패하지 않게
   var viewer = /(^|\.)sava\.kr$|pages\.dev$/.test(location.hostname) ? 'https://sava.kr/c/' : new URL('../c/', location.href).href;
   var DRAFT = 'ssaka-draft-v1';
-  // ‹ 이전: 들어온 화면으로 돌아가기 (쓰던 내용은 이 폰에 자동 저장돼 있어서 다시 오면 그대로 있어요)
-  document.getElementById('prevPage').addEventListener('click', function (e) {
+  // 아래 [이전][홈][카톡]을 누르면: 쓰던 내용을 저장하고 알려 준 뒤 이동 (다시 오면 그대로 있어요)
+  window.SavaNav = window.SavaNav || {};
+  window.SavaNav.onLeave = function () {
     try { saveDraft(); } catch (x) {}
-    var ref = document.referrer, same = ref && ref.indexOf(location.origin) === 0;
-    if (same && history.length > 1) { e.preventDefault(); history.back(); }
-  });
+    var typed = ['title', 'name', 'phone', 'subtitle'].some(function (k) { var e = document.getElementById(k); return e && e.value.trim(); });
+    return typed ? '쓰던 카드는 저장해 뒀어요 🍒' : null;
+  };
 
   function toast(m) {
     var t = $('toast'); t.textContent = m; t.classList.add('show');
@@ -1962,6 +1960,6 @@
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();
 </script>
-<script src="/js/home.js?v=3" defer data-bar="0"></script>
+<script src="/js/home.js?v=4" defer data-shift=".bar"></script>
 </body>
 </html>

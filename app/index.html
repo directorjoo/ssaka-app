@@ -184,6 +184,8 @@
     .tab-make i { width: 48px; height: 48px; border-radius: 17px; background: var(--ssaka); color: #fff; display: grid; place-items: center; box-shadow: 0 8px 18px -8px rgba(179,19,43,.8); margin-top: -10px; }
     .tab-make i svg { stroke-width: 2.4; }
     .tab-make { color: var(--ink); }
+    .tab-kk { color: #3A1D1D; }
+    .tab-kk i { font-style: normal; width: 34px; height: 26px; border-radius: 10px; background: #FEE500; display: grid; place-items: center; font-size: 15px; line-height: 1; }
     .icon-btn:focus-visible, .tab:focus-visible, .row:focus-visible, .ind:focus-visible, .row-act:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
 
     /* 싸바알림 화면 (캔바처럼: 찾기 → 이어서 만들기 → 무엇을 만들까요 → 인기 카드 → 업종별) */
@@ -221,8 +223,6 @@
       </div>
       <div class="top-act">
         <button type="button" class="tr-btn notranslate" translate="no" onclick="window.SavaTr && SavaTr.open()" aria-label="Language 언어">🌐</button>
-        <button type="button" class="kk-btn" onclick="window.SavaNav && SavaNav.kakao()" aria-label="카카오톡 대화창으로">💬 카톡</button>
-        <a class="icon-btn" href="../make/" aria-label="새 카드 만들기"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 9v6M9 12h6"/></svg></a>
       </div>
     </div>
   </header>
@@ -242,9 +242,9 @@
 <nav class="tabs" aria-label="메뉴">
   <div class="tabs-in" role="tablist">
     <button class="tab" role="tab" data-v="home" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>홈</button>
-    <button class="tab" role="tab" data-v="inbox" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>받은 카드</button>
+    <a class="tab" href="../eodiya/"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>어디야</a>
     <button class="tab tab-make" role="tab" data-v="alim" aria-selected="false"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i>만들기</button>
-    <button class="tab" role="tab" data-v="resv" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>예약</button>
+    <button class="tab tab-kk" type="button" onclick="window.SavaNav && SavaNav.kakao()" aria-label="카카오톡 대화창으로"><i aria-hidden="true">💬</i>카톡</button>
     <button class="tab" role="tab" data-v="more" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>더보기</button>
   </div>
 </nav>
@@ -604,6 +604,11 @@
     tip.appendChild(document.createElement('br')); tip.appendChild(ib);
     v.appendChild(tip);
     var m = el('div', 'more');
+    // 받은 카드 · 예약 (아래 탭에서 옮겨 옴)
+    var nIn = S.inbox().length, nNew = S.unread(), nRv = S.reservations().length;
+    [['💌 받은 카드', '#inbox', nNew ? '새 카드 ' + nNew : (nIn ? nIn + '장' : '')], ['📅 내 예약', '#resv', nRv ? nRv + '건' : '']].forEach(function (x) {
+      var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
+    });
     // 회원: 로그인 상태에 따라 '회원가입' 또는 '내 정보'
     var acct = el('a', ''); acct.href = '../join/?next=' + encodeURIComponent('/app/');
     acct.appendChild(document.createTextNode('🍒 싸바 회원가입 · 로그인')); acct.appendChild(el('span', '', '카카오로 1초'));
@@ -630,7 +635,7 @@
   }
 
   function refreshDots() {
-    var tab = document.querySelector('.tab[data-v="inbox"]');
+    var tab = document.querySelector('.tab[data-v="more"]');
     var dot = tab.querySelector('.dot');
     var n = S.unread();
     if (n && !dot) { dot = el('span', 'dot'); dot.setAttribute('aria-label', '새 카드 ' + n + '개'); tab.appendChild(dot); }
@@ -638,7 +643,7 @@
   }
   function show(name) {
     document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + name; });
-    document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === name ? 'true' : 'false'); });
+    document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
     try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) {}
@@ -691,6 +696,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
-<script src="/js/home.js?v=3" defer data-bar="0"></script>
+<script src="/js/home.js?v=4" defer data-bar="0"></script>
 </body>
 </html>

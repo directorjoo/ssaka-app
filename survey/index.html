@@ -143,6 +143,9 @@
   var S = window.SavaSurvey, $ = function (id) { return document.getElementById(id); };
   // 블로그 글쓰기는 모든 업종 공개 (2026-11-13)
   var LS = 'sava-survey';
+  // 아래 [이전][홈][카톡]을 누르면: 답은 이미 저장돼 있으니 알려만 주고 이동
+  window.SavaNav = window.SavaNav || {};
+  window.SavaNav.onLeave = function () { return Object.keys(st.a || {}).length ? '쓰던 답은 저장해 뒀어요 🍒' : null; };
   var st = { ind: 'restaurant', mode: 'quick', a: {}, url: '', sid: '', key: '', at: 0 };
   try { Object.assign(st, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   var qp = new URLSearchParams(location.search);
@@ -392,6 +395,6 @@
   } else boot();
 })();
 </script>
-<script src="/js/home.js?v=3" defer></script>
+<script src="/js/home.js?v=4" defer data-shift=".bar"></script>
 </body>
 </html>

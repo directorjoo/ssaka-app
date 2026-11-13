@@ -124,7 +124,7 @@
 
     /* 게임 화면: 한 화면에 고정 (스크롤 없음) */
     body.game { overflow: hidden; height: 100%; }
-    body.game .wrap { height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+    body.game .wrap { height: calc(100vh - var(--sava-dock, 0px)); height: calc(100dvh - var(--sava-dock, 0px)); display: flex; flex-direction: column; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
     body.game .foot { display: none; }
     body.game .top { min-height: 34px; }
     body.game #vGame { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -882,6 +882,6 @@
   window.__pool = { balls: function () { return balls; }, strike: strike, step: step, score: score, R: R, W: W, H: H, state: function () { return { S: S, ME: ME, phase: phase, aim: aim, spinX: spinX, spinY: spinY, localSeq: localSeq }; }, setAim: function (x, y) { var l = Math.hypot(x, y); aim = { x: x / l, y: y / l }; thick = null; draw(); }, setSpin: function (x, y) { spinX = x; spinY = y; drawTip(); } };
 })();
 </script>
-<script src="/js/home.js?v=3" defer></script>
+<script src="/js/home.js?v=4" defer data-shift=".chat"></script>
 </body>
 </html>

@@ -61,8 +61,11 @@
       '.sava-dock{position:fixed;left:0;right:0;bottom:0;z-index:9980;height:var(--sava-dock);padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;background:rgba(255,255,255,.97);border-top:1px solid rgba(0,0,0,.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font:800 15px/1 ' + FONT + '}' +
       '.sava-dock-in{max-width:560px;height:' + DOCK + 'px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:8px 12px;box-sizing:border-box}' +
       '.sava-dock button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:14px;background:#F3F1EE;color:#1a1a1a;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
-      '.sava-dock button b{font-size:18px;line-height:1}.sava-dock .k{background:#FEE500;color:#3A1D1D}' +
-      '.sava-dock button:active{transform:scale(.97)}.sava-dock button:focus-visible{outline:3px solid #B3132B;outline-offset:2px}' +
+      '.sava-dock button b{font-size:18px;line-height:1}' +
+      '.sava-dock .p{background:#3B4250;color:#fff;box-shadow:0 3px 0 #252A33}' +
+      '.sava-dock .h{background:#B3132B;color:#fff;box-shadow:0 3px 0 #7E0C1E}' +
+      '.sava-dock .k{background:#FFCF00;color:#3A1D1D;box-shadow:0 3px 0 #D9A900}' +
+      '.sava-dock button:active{transform:translateY(2px);box-shadow:none}'+'.sava-dock button:focus-visible{outline:3px solid #B3132B;outline-offset:2px}' +
       '.sava-dock-sp{height:var(--sava-dock)}' +
       '.toast{bottom:calc(var(--sava-dock) + 18px) !important}' +
       (shift.length ? shift.join(',') + '{bottom:var(--sava-dock) !important}' : '') +

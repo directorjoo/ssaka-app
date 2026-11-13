@@ -113,6 +113,11 @@ async function overLimit(db, keys) {
   for (const [k] of keys) await db.prepare('INSERT INTO blog_use (k, day, n) VALUES (?, ?, 1) ON CONFLICT(k, day) DO UPDATE SET n = n + 1').bind(k, day).run();
   return '';
 }
+// 실패한 요청은 횟수에서 빼 줌 (못 쓴 글은 세지 않기)
+async function refund(db, keys) {
+  const day = kstDay();
+  for (const [k] of keys) await db.prepare('UPDATE blog_use SET n = MAX(0, n - 1) WHERE k = ? AND day = ?').bind(k, day).run();
+}
 
 // 대표님 설문 → 10가지 글 형 중 하나. 기기당 하루 25편, IP당 하루 40편.
 async function survey(b, request, env, key) {
@@ -120,16 +125,18 @@ async function survey(b, request, env, key) {
   if (!TYPE_RULES[type]) return json({ error: 'bad' }, 400);
   const sv = surveyText(b.survey || {}, type);
   if (sv.n < 5) return json({ error: 'few' }, 400);
+  let lim = null;
   if (env.DB) {
     const ip = request.headers.get('cf-connecting-ip') || 'x';
-    const e = await overLimit(env.DB, [['all', +(env.BLOG_DAILY_CAP || 300)], ['svip:' + await sha(ip), 40], ['svdev:' + clean(b.dev, 40), 25]]);
+    lim = [['all', +(env.BLOG_DAILY_CAP || 300)], ['sv2ip:' + await sha(ip), 40], ['sv2dev:' + clean(b.dev, 40), 25]];
+    const e = await overLimit(env.DB, lim);
     if (e) return json({ error: e }, 429);
   }
   const nImg = Math.max(2, Math.min(6, b.images | 0 || 4));
   const end = b.hasCard ? '\n마지막 문단에 \'예약·길찾기·전화는 아래 싸바카드에서 한 번에 할 수 있어요.\'라고 쓴다(링크는 프로그램이 붙임).' : '';
   const who = ['대표님', '원장님', '선생님', '감독님', '배우님'].includes(b.survey && b.survey.who) ? b.survey.who : '대표님';
   const x = await ask(env, key, (SURVEY_RULES + '\n\n[이번 글 형]\n' + type + '형 ' + TYPE_RULES[type] + end).replace(/\{님\}/g, who), `사진 개수 N=${nImg}\n\n${sv.text}`);
-  if (x.err) return x.err;
+  if (x.err) { if (lim) await refund(env.DB, lim); return x.err; }
   x.post.type = type;
   return json(x.post);
 }
@@ -165,11 +172,13 @@ export async function onRequest({ request, env }) {
 
   // 남용 막기 (D1 있으면)
   const db = env.DB, day = kstDay();
+  let cardLim = null;
   if (db) {
     await db.prepare('CREATE TABLE IF NOT EXISTS blog_use (k TEXT, day TEXT, n INTEGER, PRIMARY KEY (k, day))').run();
     await db.prepare('DELETE FROM blog_use WHERE day < ?').bind(day).run();
     const ip = request.headers.get('cf-connecting-ip') || 'x';
     const keys = [['all', +(env.BLOG_DAILY_CAP || 300)], ['ip:' + await sha(ip), 4], ['dev:' + clean(b.dev, 40), 2]];
+    cardLim = keys;
     for (const [k, lim] of keys) {
       const r = await db.prepare('SELECT n FROM blog_use WHERE k = ? AND day = ?').bind(k, day).first();
       if (r && r.n >= lim) return json({ error: k === 'all' ? 'busy' : 'limit' }, 429);
@@ -187,12 +196,12 @@ export async function onRequest({ request, env }) {
       messages: [{ role: 'user', content: `사진 개수 N=${nImg}\n` + (photos.length ? '[사진 목록]\n' + photos.map((x, i) => (i + 1) + '. ' + x).join('\n') + '\n' : '') + `\n[싸바카드]\n${cardText(card, b.industry)}` + (owner.length ? '\n\n[대표님 한마디]\n' + owner.map(x => '- ' + x).join('\n') : '') }]
     })
   });
-  if (!r.ok) return json({ error: 'ai', status: r.status }, 502);
+  if (!r.ok) { if (cardLim) await refund(db, cardLim); return json({ error: 'ai', status: r.status }, 502); }
   const out = await r.json();
   const text = (out.content || []).filter(x => x.type === 'text').map(x => x.text).join('');
   try {
     const post = parse(text);
     if (!post.title || !post.blocks.length) throw new Error('empty');
     return json(post);
-  } catch (e) { return json({ error: 'parse' }, 502); }
+  } catch (e) { if (cardLim) await refund(db, cardLim); return json({ error: 'parse' }, 502); }
 }

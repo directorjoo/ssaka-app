@@ -184,7 +184,7 @@
     { id: 'beauty', label: '미용·네일', emoji: '💅', type: 'shop', styles: ['glass', 'magazine', 'cinema'],
       L: { body: '이달의 이벤트 · 시술 소식 (한 줄에 하나씩)', menu: '시술 항목과 가격 (한 줄에 하나, 선택)', menuHint: '"시술 이름 가격" 순서로 적으면 손님이 시술을 고르고 예상 금액이 계산돼요.', resv: '손님이 카드에서 바로 시술 예약할 수 있게 하기' },
       res: { label: '시술 예약', word: '시술', people: false },
-      ex: { title: '비온비 성수점', subtitle: '사전 예약제 · 21:00까지 (마지막 예약 20시)', name: '비온비 성수점', phone: '0507-1385-2004', image: 'https://sava.kr/img/ex/bonb-lounge.jpg', galUrls: 'https://sava.kr/img/ex/bonb-room.jpg', body: '알림받기 고객: 시술 시 클리닉 50% 할인\n레이어드컷 · 레이어드펌 · 히피펌 · 애쉬브라운 염색\n뚝섬역 1번 출구 430m · 유료 주차 가능\nEnglish · 日本語 · 中文 OK', copyLabel: '주소 복사', copyValue: '서울 성동구 왕십리로16가길 24 JC빌딩 2층', place: '비온비 성수점', menu: '레이어드컷\n레이어드펌\n탈색모펌\n히피펌\n애쉬브라운 염색\n두피클리닉' } },
+      ex: { title: '비온비 성수점', subtitle: '사전 예약제 · 21:00까지 (마지막 예약 20시)', name: '비온비 성수점', phone: '0507-1385-2004', image: 'https://sava.kr/img/ex/bonb-lounge.jpg', galUrls: 'https://sava.kr/img/ex/bonb-room.jpg', body: '알림받기 고객: 시술 시 클리닉 50% 할인\n레이어드컷 · 레이어드펌 · 히피펌 · 애쉬브라운 염색\n뚝섬역 1번 출구 430m · 유료 주차 가능\nEnglish · 日本語 · 中文 OK', copyLabel: '주소 복사', copyValue: '서울 성동구 왕십리로16가길 24 JC빌딩 2층', place: '비온비 성수점', lkNv: 'https://m.place.naver.com/hairshop/1450549875/home', menu: '레이어드컷\n레이어드펌\n탈색모펌\n히피펌\n애쉬브라운 염색\n두피클리닉' } },
     { id: 'toefl', label: '토플·어학원', emoji: '🌍', type: 'shop', styles: ['magazine', 'cinema', 'glass'], world: true,
       L: { body: '강사 이력 · 성과 · 특강 소식 (한 줄에 하나씩)', menu: '강좌와 수강료 (한 줄에 하나, 선택)', menuHint: '"강좌 이름 수강료" 순서로 적으면 상담 예약 때 관심 강좌를 고를 수 있어요.', resv: '학생·학부모가 카드에서 바로 상담 예약할 수 있게 하기' },
       res: { label: '상담 예약', word: '강좌', people: false, deposit: false },

@@ -613,7 +613,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=80"></script>
+<script src="../js/designs.js?v=81"></script>
 <script src="../js/notice.js?v=1"></script>
 <script src="../js/render.js?v=73"></script>
 <script src="../js/reserve.js"></script>
@@ -816,6 +816,7 @@
   }
   function setIndustry(id, userPicked) {
     var ind = D.industry(id) || D.INDUSTRIES[0];
+    var prevInd = industry;
     industry = ind.id;
     mood = '';
     if (D.groupOf && D.groupOf(industry).id !== curGroup) { curGroup = D.groupOf(industry).id; renderIndustries(); }
@@ -823,7 +824,7 @@
     document.querySelectorAll('.inds button').forEach(function (b) {
       b.setAttribute('aria-pressed', b.dataset.ind === industry ? 'true' : 'false');
     });
-    setType(ind.type);
+    setType(ind.type, prevInd, industry);
     applyIndustry(ind);
     bizBtn(ind);
     if (!seasonTouched) $('season').value = ind.season || '';
@@ -863,8 +864,9 @@
   var localPics = {};   // 방금 올린 사진 원본 (채널용 이미지 만들 때 사용)
 
   // 업종 종류(가게·모임·프로필…)마다 적은 내용을 따로 보관 — 모임 제목이 가게 카드에 따라오지 않게
+  function TYPES_PERSON(t) { return t === 'profile' || t === 'club' || t === 'greet' ? t : '-'; }
   var byType = {}, KEEP_ALL = ['season', 'sound', 'resvMin', 'resvRate'];
-  function setType(t) {
+  function setType(t, fromInd, toInd) {
     (function () { // 복사 단추 안내를 종류에 맞게
       var C = { club: ['💰 회비 계좌 (누르면 복사돼요)', '받는 사람이 단추를 누르면 은행·계좌번호·이름이 한 번에 복사돼요. 은행 앱에 붙여넣기만 하면 돼요.', '회비 계좌', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'],
         shop: ['📋 주소·계좌 복사 단추 (선택)', '누르면 적은 내용이 그대로 복사돼요. 주소나 입금 계좌를 넣어 두면 좋아요.', '주소 복사', '복사될 내용', '예: 서울 강남구 신사동 609-1'],
@@ -872,10 +874,13 @@
       $('copyLeg').textContent = C[0]; $('copyHint').textContent = C[1]; $('copyValLab').textContent = C[3];
       $('copyLabel').placeholder = C[2] || '예: 인스타 링크'; $('copyValue').placeholder = C[4] || '복사될 글이나 링크';
     })();
-    if (type && t !== type) {
+    // 업종을 바꾸면 적던 내용을 업종별로 따로 보관 (어학원 강좌가 미용실 칸에 남지 않게)
+    if ((type && t !== type) || (fromInd && toInd && fromInd !== toInd)) {
       var cur = {}; FIELDS.forEach(function (f) { if ($(f) && KEEP_ALL.indexOf(f) < 0) { cur[f] = $(f).value; $(f).value = ''; } });
-      cur.ip = IP; byType[type] = cur;
-      var nx = byType[t] || {};
+      cur.ip = IP; byType[fromInd || type] = cur;
+      var nx = byType[toInd || t] || {};
+      // 내 이름·전화는 업종이 바뀌어도 그대로 (가게 이름이 아닌 사람 카드끼리만)
+      if (t === TYPES_PERSON(t) && !nx.name && cur.name) { nx.name = cur.name; nx.phone = cur.phone; nx.email = cur.email; }
       FIELDS.forEach(function (f) { if ($(f) && KEEP_ALL.indexOf(f) < 0 && typeof nx[f] === 'string') $(f).value = nx[f]; });
       IP = nx.ip || { z: 100, x: 50, y: 50, f: 0 };
       ['title', 'name', 'phone'].forEach(function (f) { $(f).classList.remove('missing'); });
@@ -973,7 +978,8 @@
       var r = buildCard();
       var url = viewer + '?d=' + SsakaCodec.encode(r.card);
       if (url !== lastSrc) { $('frame').src = url; lastSrc = url; }
-      $('link').textContent = r.isExample ? '예시 카드예요. 내용을 적으면 내 카드 링크가 생겨요.' : url;
+      // 긴 링크는 화면에 보이지 않게 (보낼 때·열어 볼 때 짧은 링크로 바뀜)
+      $('link').textContent = r.isExample ? '예시 카드예요. 내용을 적으면 내 카드 링크가 생겨요.' : '🔗 보낼 때 sava.kr 짧은 링크로 바뀌어요';
       $('open').href = url;
       saveDraft();
       refreshProgress();
@@ -1038,6 +1044,13 @@
       .then(function (j) { if (j && j.id) SHORT[d] = viewer + '?s=' + j.id; return link(c); })
       .catch(function (e) { return e && e.message === 'bad' ? null : c.url; });
   }
+  // 새 창에서 열기: 짧은 링크를 받아서 열기 (휴대폰이 팝업을 막지 않게 창을 먼저 연 뒤 주소를 넣음)
+  $('open').addEventListener('click', function (e) {
+    var c = current(); if (!c) { e.preventDefault(); return; }
+    e.preventDefault();
+    var w = window.open('about:blank', '_blank');
+    ensureShort(c).then(function (u) { u = u || c.url; if (w) w.location.href = u; else location.href = u; });
+  });
   function openDone() { try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) { $('open2').href = u; });

@@ -60,6 +60,12 @@
     .ty .s { font-size: 11.5px; font-weight: 800; margin-top: 5px; opacity: 1; }
     .ty.done { background: #fff; color: var(--ink); } .ty.work { background: rgba(255,255,255,.3); }
     .gen .btn.yel { margin-top: 4px; }
+    .prog { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff; color: var(--ink); }
+    .prog .pt2 { font-size: 16px; font-weight: 900; }
+    .prog i { display: block; height: 10px; border-radius: 9px; background: #eee3d6; margin: 10px 0 4px; overflow: hidden; }
+    .prog i b { display: block; height: 100%; width: 0; background: var(--ssaka); transition: width .4s; }
+    .prog .pe { margin-top: 8px; padding: 10px; border-radius: 10px; background: #fdecee; color: #8E0A1C; font-size: 14px; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+    .prog .btn { margin-top: 10px; }
     .out { margin-top: 18px; }
     .post { background: #fff; border-radius: 18px; margin: 12px 0; padding: 16px; box-shadow: 0 8px 26px -18px rgba(0,0,0,.35); }
     .post .ty2 { font-size: 12.5px; font-weight: 900; color: var(--ssaka); }
@@ -118,6 +124,7 @@
     <input id="cardUrl" inputmode="url" placeholder="싸바카드 링크가 있으면 붙여넣기 (글 끝에 붙어요)">
     <div class="types" id="types"></div>
     <button type="button" class="btn yel" id="allGo">⚡ 10가지 한 번에 쓰기</button>
+    <div class="prog" id="prog" hidden><div class="pt2" id="progT"></div><i><b id="progB"></b></i><div class="pe" id="progE" hidden></div><button type="button" class="btn yel" id="progSee" hidden>📚 쓴 글 보기</button></div>
     <p class="warn" style="color:#fff;opacity:.85" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 25편까지 써요.</p>
   </section>
 
@@ -279,7 +286,7 @@
   function setTy(n, cls, s) { var b = TY[n]; b.classList.remove('done', 'work'); if (cls) b.classList.add(cls); b.querySelector('.s').textContent = s || ''; }
   function cardLink() { var u = (st.url || '').trim(); return /^https?:\/\/(www\.)?sava\.kr\//.test(u) ? u : ''; }
   function qa() { return answered().map(function (q) { return [q.q, st.a[q.id].trim().slice(0, 400), q.t.join(',')]; }); }
-  var busy = 0, stopAll = false;
+  var busy = 0, stopAll = false, lastErr = '';
   function one(n) {
     setTy(n, 'work', '✍️ 쓰는 중… (30초쯤)');
     var ind = S.BY[st.ind];
@@ -289,32 +296,44 @@
       .then(function (x) {
         if (!x.ok) {
           var e = x.j && x.j.error;
-          if (e === 'limit' || e === 'busy' || e === 'no-key') stopAll = true;
+          if (e === 'limit' || e === 'busy' || e === 'no-key' || (e === 'ai' && /^(400|401|403|404)$/.test(x.j.status))) stopAll = true;
+          lastErr = e === 'ai' ? 'AI 연결 오류 (' + (x.j.status || '') + (x.j.type ? ' ' + x.j.type : '') + ')' : e === 'parse' ? '글 모양이 깨졌어요' : e === 'no-key' ? 'AI 열쇠가 아직 연결 안 됐어요' : e === 'limit' ? '오늘 쓸 수 있는 만큼 다 썼어요' : e === 'busy' ? '오늘 요청이 너무 많아요' : e === 'few' ? '답이 5개 넘게 필요해요' : '알 수 없는 오류 (' + (e || x.j.status || '') + ')';
           setTy(n, '', e === 'limit' ? '오늘은 다 썼어요. 내일 다시!' : e === 'busy' ? '오늘 요청이 많아요. 내일 다시!' : e === 'no-key' ? '준비 중이에요' : e === 'few' ? '답이 더 필요해요' : '다시 눌러 주세요');
           return;
         }
         posts[n] = x.j; savePosts(); paintPost(n); setTy(n, 'done', '✅ 다 썼어요 · 보기');
-      }).catch(function () { setTy(n, '', '인터넷 확인 후 다시'); });
+      }).catch(function () { lastErr = '인터넷이 끊겼거나 시간이 너무 걸렸어요'; setTy(n, '', '인터넷 확인 후 다시'); });
   }
   function run(list) {
     if (answered().length < 5) { toast('답을 5개 넘게 적어 주세요'); return; }
-    stopAll = false;
-    var q = list.slice(), live = 0;
+    stopAll = false; lastErr = '';
+    var q = list.slice(), live = 0, total = q.length, fin = 0, ok0 = Object.keys(posts).length;
     q.forEach(function (n) { setTy(n, 'work', '⏳ 차례 기다리는 중'); });
+    function prog(end) {
+      var okN = Object.keys(posts).length - ok0;
+      $('prog').hidden = false;
+      $('progT').textContent = end ? (okN ? '✅ ' + okN + '편 다 썼어요!' + (okN < total ? ' (' + (total - okN) + '편은 못 썼어요)' : '') : '❌ 글을 못 썼어요') : '✍️ 쓰는 중… ' + fin + ' / ' + total + '편 (1~2분 걸려요)';
+      $('progB').style.width = Math.round(fin / total * 100) + '%';
+      $('progE').hidden = !lastErr; $('progE').textContent = lastErr ? '이유: ' + lastErr + ' — 이 화면을 캡처해서 보내 주세요' : '';
+      $('progSee').hidden = !(end && Object.keys(posts).length);
+      $('progSee').textContent = '📚 쓴 글 ' + Object.keys(posts).length + '편 보기 ↓';
+    }
+    prog(false); $('prog').scrollIntoView({ behavior: 'smooth', block: 'center' });
     return new Promise(function (done) {
       function next() {
-        if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) done(); return; }
+        if (!q.length || stopAll) { q.forEach(function (n) { setTy(n, '', ''); }); q = []; if (!live) { prog(true); done(); } return; }
         var n = q.shift(); live++;
-        one(n).then(function () { live--; next(); });
+        one(n).then(function () { live--; fin++; prog(false); next(); });
       }
       for (var i = 0; i < 4; i++) next();
     });
   }
+
   $('allGo').addEventListener('click', function () {
     var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; });
     if (!list.length) { toast('10가지 다 썼어요!'); return; }
     var p = run(list);
-    if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편이 아래에 있어요 👇'); goPosts(); } });
+    if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편 · 노란 "쓴 글 보기"를 누르세요'); } });
   });
   function postText(n, el) {
     var lines = [], k = 0;
@@ -343,7 +362,7 @@
   }
 
   // ---- 링크로 열었을 때 (#s=번호.열쇠) ----
-  $('seePosts').addEventListener('click', goPosts); $('toPosts').addEventListener('click', goPosts);
+  $('seePosts').addEventListener('click', goPosts); $('progSee').addEventListener('click', goPosts); $('toPosts').addEventListener('click', goPosts);
   function boot() {
     posts = loadPosts(); $('out').innerHTML = '';
     paintInds(); setMode(st.mode === 'all' ? 'all' : 'quick'); paintTypes(); showSaved();

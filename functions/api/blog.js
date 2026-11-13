@@ -91,7 +91,7 @@ async function ask(env, key, system, content) {
     headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
     body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 3000, system, messages: [{ role: 'user', content }] })
   });
-  if (!r.ok) return { err: json({ error: 'ai', status: r.status }, 502) };
+  if (!r.ok) { let m = ''; try { m = ((await r.json()).error || {}).type || ''; } catch (e) {} return { err: json({ error: 'ai', status: r.status, type: m }, 502) }; }
   const out = await r.json();
   const text = (out.content || []).filter(x => x.type === 'text').map(x => x.text).join('');
   try {
@@ -135,6 +135,21 @@ async function survey(b, request, env, key) {
 }
 
 export async function onRequest({ request, env }) {
+  // 연결 점검: GET /api/blog?check=1 → AI 연결 상태만 알려 줌 (키 값은 절대 안 보여 줌)
+  if (request.method === 'GET' && new URL(request.url).searchParams.get('check')) {
+    const k = env.ANTHROPIC_API_KEY || '';
+    const info = { key: !!k, keyKind: k ? k.slice(0, 7) + '…' : '', model: env.BLOG_MODEL || MODEL_DEFAULT, db: !!env.DB };
+    if (!k) return json(info);
+    if (env.DB) { const e = await overLimit(env.DB, [['chk', 40]]); if (e) return json(Object.assign(info, { ai: 'skip' })); }
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST',
+        headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': k, 'authorization': 'Bearer ' + k, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+        body: JSON.stringify({ model: info.model, max_tokens: 5, messages: [{ role: 'user', content: '안녕' }] }) });
+      info.ai = r.status;
+      if (!r.ok) { const t = await r.text(); info.aiErr = t.slice(0, 300).replace(/sk-[A-Za-z0-9_-]+/g, '(key)'); }
+    } catch (e) { info.ai = 'fetch-fail'; }
+    return json(info);
+  }
   if (request.method !== 'POST') return json({ error: 'bad' }, 400);
   const key = env.ANTHROPIC_API_KEY;
   if (!key) return json({ error: 'no-key' }, 503);

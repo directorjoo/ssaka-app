@@ -230,7 +230,7 @@
 </nav>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="../js/designs.js?v=75"></script>
+<script src="../js/designs.js?v=77"></script>
 <script src="../js/store.js"></script>
 <script src="../js/install.js"></script>
 <script src="../js/share.js"></script>
@@ -317,6 +317,7 @@
     ];
     function key(md) { return md[0] * 100 + md[1]; }
     var today = m * 100 + d;
+    all = all.filter(function (c) { var mi = /ind=([a-z]+)/.exec(c.href); return !mi || !D.isOpen || D.isOpen(mi[1]); });
     var on = all.filter(function (c) {
       var a = key(c.from), b = key(c.to);
       return a <= b ? (today >= a && today <= b) : (today >= a || today <= b);
@@ -463,6 +464,7 @@
     ];
     var g = el('div', 'svc');
     SVC.forEach(function (x) {
+      var mi = x[3] && /make\/\?ind=([a-z]+)/.exec(x[3]); if (mi && D.isOpen && !D.isOpen(mi[1])) x = [x[0], x[1], x[2]];
       var soon = !x[3];
       var a = el(soon ? 'button' : 'a', soon ? 'soon' : '');
       if (soon) { a.type = 'button'; a.addEventListener('click', function () { toast(x[0] + '은(는) 곧 열려요!'); }); }

@@ -381,9 +381,24 @@
     { id: 'pro', label: '영업·전문직', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
     { id: 'meet', label: '모임·행사·안부', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event', 'greeting', 'kid', 'senior'] }
   ];
+  // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
+  // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
+  var OPEN = ['restaurant', 'party', 'club', 'alumni', 'event', 'greeting'];
+  var showAll = false;
+  try {
+    var qa = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('all') : null;
+    if (qa === '1') localStorage.setItem('sava-all', '1');
+    if (qa === '0') localStorage.removeItem('sava-all');
+    showAll = localStorage.getItem('sava-all') === '1';
+  } catch (e) {}
+  function isOpen(id) { return showAll || OPEN.indexOf(id) >= 0; }
+  var ALL_GROUPS = GROUPS;
+  GROUPS = GROUPS.map(function (g) { return { id: g.id, label: g.label, emoji: g.emoji, ids: g.ids.filter(isOpen) }; }).filter(function (g) { return g.ids.length; });
+  if (!showAll) { var mg = GROUPS.filter(function (g) { return g.id === 'meet'; })[0], sg = GROUPS.filter(function (g) { return g.id === 'shop'; })[0]; if (mg && sg) GROUPS = [mg, sg]; }
   function groupOf(id) { return GROUPS.filter(function (g) { return g.ids.indexOf(id) >= 0; })[0] || GROUPS[0]; }
   var api = {
-    FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, groupOf: groupOf, MOODS: MOODS,
+    FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, ALL_GROUPS: ALL_GROUPS, groupOf: groupOf, MOODS: MOODS,
+    isOpen: isOpen, OPEN: OPEN, showAll: showAll,
     get: function (id) { return BY_ID[id] || null; },
     list: function (industryId) { return BY_INDUSTRY[industryId] || []; },
     industry: function (id) { return INDUSTRIES.filter(function (x) { return x.id === id; })[0] || null; },

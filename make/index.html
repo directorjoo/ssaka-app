@@ -575,7 +575,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=76"></script>
+<script src="../js/designs.js?v=77"></script>
 <script src="../js/render.js?v=71"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
@@ -654,7 +654,7 @@
       });
     }
     var cg = groups.filter(function (g) { return g.id === curGroup; })[0];
-    (cg ? cg.ids.map(function (id) { return D.industry(id); }).filter(Boolean) : D.INDUSTRIES).forEach(function (ind) {
+    (cg ? cg.ids.map(function (id) { return D.industry(id); }).filter(Boolean) : D.INDUSTRIES.filter(function (x) { return !D.isOpen || D.isOpen(x.id); })).forEach(function (ind) {
       var b = document.createElement('button');
       b.type = 'button'; b.dataset.ind = ind.id;
       b.textContent = ind.emoji + ' ' + ind.label;
@@ -1714,7 +1714,10 @@
   // 이름·번호를 적으면 바로 기억 (다음 카드부터 자동으로 들어감)
   ['name', 'phone'].forEach(function (f) { $(f).addEventListener('change', function () { if ($('name').value.trim() && $('phone').value.trim()) saveMe(); }); });
   var qInd = new URLSearchParams(location.search).get('ind');
-  if (qInd && D.industry(qInd)) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
+  if (qInd && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
+  else if (qInd && D.isOpen && !D.isOpen(qInd)) setTimeout(function () { toast((D.industry(qInd) || {}).label + ' 카드는 곧 열려요! 지금은 모임·행사·안부와 음식점 카드를 만들 수 있어요'); }, 600);
+  // 1차 공개에 없는 업종이 남아 있으면(예전 초안) 첫 공개 업종으로 (단, 고치기 중인 카드는 그대로)
+  if (D.isOpen && !D.isOpen(industry) && !editCard) { industry = D.GROUPS[0].ids[0]; design = D.list(industry)[0].id; }
   var qSeason = new URLSearchParams(location.search).get('season');
   try { var dd = JSON.parse(localStorage.getItem(DRAFT) || '{}'); $('resvOn').checked = !!dd.resvOn; $('resvBox').hidden = !dd.resvOn; soundTouched = !!dd.soundTouched; seasonTouched = !!dd.seasonTouched; } catch (e) {}
   renderIndustries();

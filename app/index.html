@@ -162,6 +162,11 @@
     .inds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 6px; padding: 4px 12px 10px; }
     .ind { display: grid; justify-items: center; gap: 6px; padding: 10px 2px; border-radius: 14px; text-decoration: none; font-size: 15px; font-weight: 700; line-height: 1.25; color: var(--text, #1a1a1a); text-align: center; word-break: keep-all; }
     .ind:active { background: var(--bg-2); }
+    .ind { position: relative; font-size: 14px; }
+    .ind.soon i { filter: saturate(.55); opacity: .7; }
+    .ind.soon { color: var(--ink-2); }
+    .ind em { position: absolute; top: 2px; right: 6%; font-style: normal; font-size: 10.5px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: #3B4250; color: #fff; }
+    .grp small { margin-left: 4px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
     .ind i { font-style: normal; width: 56px; height: 56px; border-radius: 20px; background: var(--tint, var(--bg-2)); display: grid; place-items: center; font-size: 28px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.06); }
 
     .empty { padding: 48px 24px; text-align: center; color: var(--ink-2); }
@@ -360,15 +365,21 @@
     arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
     greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
   function indTile(ind) {
-    var a = el('a', 'ind'); a.href = '../make/?ind=' + ind.id;
+    var open = isOpen(ind.id);
+    var a = el('a', 'ind' + (open ? '' : ' soon')); a.href = '../make/?ind=' + ind.id;
     if (TINT[ind.id]) a.style.setProperty('--tint', TINT[ind.id]);
     a.appendChild(el('i', '', ind.emoji)); a.appendChild(document.createTextNode(ind.label));
+    if (!open) { a.appendChild(el('em', '', '준비 중')); a.setAttribute('aria-label', ind.label + ' (준비 중)'); }
     a.addEventListener('click', function (e) { e.preventDefault(); howSheet(ind.id); });
     return a;
   }
+  // 업종별로 바로 만들기 — 27개 업종을 모두 보여 줌 (아직 안 연 업종은 '준비 중')
   function industries(v) {
-    (D.GROUPS || [{ label: '', emoji: '', ids: D.INDUSTRIES.map(function (x) { return x.id; }) }]).forEach(function (grp) {
-      if (grp.label) v.appendChild(el('div', 'grp', grp.emoji + ' ' + grp.label));
+    var ORDER = ['meet', 'shop', 'edu', 'pro'];
+    var all = (D.ALL_GROUPS || D.GROUPS || []).slice().sort(function (a, b) { return ORDER.indexOf(a.id) - ORDER.indexOf(b.id); });
+    all.forEach(function (grp) {
+      var h = el('div', 'grp'); h.appendChild(document.createTextNode(grp.emoji + ' ' + grp.label + ' '));
+      h.appendChild(el('small', '', grp.ids.length + '')); v.appendChild(h);
       var g = el('div', 'inds');
       grp.ids.forEach(function (id) { var ind = D.industry(id); if (ind) g.appendChild(indTile(ind)); });
       v.appendChild(g);

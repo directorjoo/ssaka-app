@@ -104,6 +104,12 @@
     .si-pad { padding: 0 18px; }
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
+    .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
+    .wr:active { transform: scale(.985); }
+    .wr i { font-style: normal; font-size: 34px; line-height: 1; }
+    .wr b { display: block; font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
+    .wr span { display: block; font-size: 13px; opacity: .88; margin-top: 3px; line-height: 1.4; word-break: keep-all; }
+    .wr em { margin-left: auto; font-style: normal; flex: none; padding: 9px 12px; border-radius: 14px; background: #fff; color: #1B3F7A; font-size: 14px; font-weight: 900; }
     .mk p small { display: block; margin-top: 4px; font-size: 13px; opacity: .8; }
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { color: #F4E7C8; margin: 2px 0 0; font-size: 28px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
@@ -334,6 +340,10 @@
     mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><b class="w">오픈!</b></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>우리 가게 홍보하기</h2><p>카드 한 장 만들어 단골손님 카톡에 보내세요<br><small>모임 공지 · 초대장 · 명함도 OK</small></p>' +
       '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
+    // 블로그 글쓰기 — 카드 만들기 바로 아래
+    var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
+    wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
+    v.appendChild(wr);
     // 카드에 홍보 단어가 한 번 흔들릴 때마다 바뀜
     (function () { var W = ['오픈!', '할인', '신메뉴', '예약', '이벤트', '단골 모집'], i = 0, w = mk.querySelector('.w');
       if (!w || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;

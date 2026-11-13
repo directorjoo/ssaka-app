@@ -253,7 +253,9 @@
       transition: opacity .2s, transform .2s; max-width: calc(100% - 32px);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  </style>
+    .mwrite { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: #E7EFFB; color: #1B3F7A; font-size: 14.5px; text-decoration: none; font-weight: 700; }
+  .mwrite b { font-weight: 900; }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -264,10 +266,11 @@
         <img src="../img/cherry.svg" alt="" width="32" height="32" style="display:block">
         싸바
       </a>
-      <a class="mback" href="../app/">내 카드함</a>
+      <a class="mback" href="../app/" aria-label="싸바 홈으로">🏠 홈</a>
     </div>
     <h1>10초 만에 카드 만들기</h1>
     <p>적으면 오른쪽(아래)에 바로 보여요. 다 되면 카톡으로 보내기를 누르세요.</p>
+    <a class="mwrite" href="../survey/">✍️ <b>블로그 글쓰기</b> · 질문에 답하면 글 10가지 ›</a>
   </header>
 
   <div class="layout">

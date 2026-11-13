@@ -590,7 +590,7 @@
       ctx.fillText(f2, mx, H - (story ? 300 : wide ? 60 : 60)); }
     return c;
   }
-  function couponLine(card) { return (card.body || []).filter(function (l) { return /할인|쿠폰|이벤트|증정|무료|서비스|%|1\+1/.test(l); })[0] || ''; }
+  function couponLine(card) { return (card.body || []).filter(function (l) { return /할인|쿠폰|이벤트|증정|무료|서비스|선착순|특강|%|1\+1/.test(l); })[0] || ''; }
   function drawCoupon(card, img, pal, size) {
     var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), wide = size.id === 'wide', sq = size.id === 'sq', story = size.id === 'story';
     var red = isLight(pal.paper) ? pal.accent : pal.line, paper = isLight(pal.paper) ? pal.paper : '#FBF4E6', ink = '#2B2320';

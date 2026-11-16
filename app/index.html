@@ -428,6 +428,12 @@
     director: '감독 크리에이터 유튜버', beauty: '미용 네일 헤어', toefl: '토플 어학원 영어', academy: '학원 보습 내신', fitness: '헬스 필라테스 운동', flower: '꽃 공방', stay: '숙박 펜션' };
   function renderAlim() {
     var v = $('v-alim'); v.innerHTML = '';
+    // 특판상품은 싸바알림의 맨 위에서 바로 확인할 수 있게 배치
+    var sp = el('a', 'special-promo'); sp.href = '../special/';
+    sp.setAttribute('aria-label', '싸바랩 특판상품 보기');
+    sp.innerHTML = '<div class="sp-copy"><span class="sp-kicker">SAVA LAB · SPECIAL DEALS</span><b>싸바랩 특판상품</b><small>특별한 상품과 혜택을 한곳에서 확인하세요 ›</small></div>' +
+      '<svg class="sp-cart" viewBox="0 0 100 100" aria-hidden="true"><path d="M13 20h12l9 47h43l12-34H30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 43h40M42 55h31" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="79" r="6" fill="#fff"/><circle cx="72" cy="79" r="6" fill="#fff"/></svg>';
+    v.appendChild(sp);
     var sb = el('label', 'al-search');
     sb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" enterkeyhint="search" placeholder="어떤 카드를 만들까요? (송년회, 메뉴판…)" aria-label="만들 카드 찾기">';
     v.appendChild(sb);

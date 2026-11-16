@@ -37,7 +37,7 @@ const SUPABASE_URL = "SUPABASE_PROJECT_URL";
 const SUPABASE_ANON_KEY = "SUPABASE_PUBLISHABLE_OR_ANON_KEY";
 const $ = (id) => document.getElementById(id);
 const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("SUPABASE_PROJECT");
-let db = null, session = null;
+let db = null, session = null, realtimeChannel = null;
 if (configured && window.supabase) db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function message(text){$("loginMsg").textContent=text;}
@@ -47,7 +47,7 @@ async function login(){
  if(!db){message("관리자 연결 설정이 아직 완료되지 않았습니다.");return;}
  const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
  if(error){message("로그인 실패: "+error.message);return;}
- session=data.session; $("loginBox").hidden=true;$("dashboard").hidden=false; await loadOrders();
+ session=data.session; $("loginBox").hidden=true;$("dashboard").hidden=false; await loadOrders();\n if(!realtimeChannel){realtimeChannel=db.channel('kimchi-order-live').on('postgres_changes',{event:'*',schema:'public',table:'kimchi_orders'},()=>loadOrders()).subscribe();}
 }
 async function loadOrders(){
  const host=$("orders");host.replaceChildren(el("p","sub","주문 내역을 불러오는 중…"));
@@ -82,6 +82,6 @@ async function loadOrders(){
 }
 $("login").addEventListener("click",login);
 $("refresh").addEventListener("click",loadOrders);
-$("logout").addEventListener("click",async()=>{await db.auth.signOut();session=null;$("dashboard").hidden=true;$("loginBox").hidden=false;});
+$("logout").addEventListener("click",async()=>{if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null;}await db.auth.signOut();session=null;$("dashboard").hidden=true;$("loginBox").hidden=false;});
 if(!configured)message("Supabase 프로젝트 연결값 입력 대기 중입니다.");
 </script></body></html>

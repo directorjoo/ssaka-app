@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#7f1d1d">
+<title>여수언니 김치 주문 관리</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f5f2;color:#29231f;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+main{max-width:900px;margin:auto;padding:22px 16px 50px}h1{font-size:24px;margin:6px 0}.sub{color:#766d66;font-size:13px;line-height:1.6}
+.card{background:#fff;border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 2px 12px #24170d0a}
+input,select,button{font:inherit;border-radius:10px;padding:12px;border:1px solid #ddd;width:100%;margin:5px 0}
+button{background:#7f1d1d;color:#fff;border:0;font-weight:800;cursor:pointer}.secondary{background:#eee;color:#29231f}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#fff8f4;border-radius:12px;padding:12px}.stat b{display:block;font-size:20px}
+.order{border-top:1px solid #eee;padding:14px 0}.order:first-child{border:0}.order h3{margin:0 0 6px;font-size:16px}.meta{font-size:13px;line-height:1.7;color:#554b44;overflow-wrap:anywhere}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.notice{padding:12px;background:#fff8e8;border-radius:10px;font-size:13px;line-height:1.6}
+@media(min-width:650px){.login{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body><main>
+<h1>🥬 여수언니 김치 주문 관리</h1><p class="sub">판매자 전용 화면 · 주문자 정보는 로그인한 관리자에게만 표시됩니다.</p>
+<section class="card" id="loginBox">
+<div class="notice">관리자 계정으로 로그인하세요. 관리자 권한이 없는 계정은 주문 내역을 볼 수 없습니다.</div>
+<div class="login"><input id="email" type="email" autocomplete="username" placeholder="관리자 이메일"><input id="password" type="password" autocomplete="current-password" placeholder="비밀번호"></div>
+<button id="login">관리자 로그인</button><p id="loginMsg" class="sub" aria-live="polite"></p>
+</section>
+<section id="dashboard" hidden>
+<div class="stats"><div class="stat"><span class="sub">전체 주문</span><b id="orderCount">0건</b></div><div class="stat"><span class="sub">주문 박스</span><b id="boxCount">0박스</b></div><div class="stat"><span class="sub">주문 합계</span><b id="salesTotal">0원</b></div></div>
+<div class="card"><div class="controls"><button id="refresh">새로고침</button><button class="secondary" id="logout">로그아웃</button></div><p class="sub">주문 상태와 우체국 송장번호를 입력한 뒤 저장하세요. 현재 송장 자동 발송은 아직 연결 전입니다.</p><div id="orders" aria-live="polite"></div></div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Set these public project values after creating the Supabase project.
+   The anon/publishable key is safe to expose only because table RLS is enabled.
+   NEVER put the service-role key here. */
+const SUPABASE_URL = "SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+const $ = (id) => document.getElementById(id);
+const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("SUPABASE_PROJECT");
+let db = null, session = null, realtimeChannel = null;
+if (configured && window.supabase) db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function message(text){$("loginMsg").textContent=text;}
+function won(n){return Number(n||0).toLocaleString("ko-KR")+"원";}
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
+async function login(){
+ if(!db){message("관리자 연결 설정이 아직 완료되지 않았습니다.");return;}
+ const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error){message("로그인 실패: "+error.message);return;}
+ session=data.session; $("loginBox").hidden=true;$("dashboard").hidden=false; await loadOrders();
+ if(!realtimeChannel){realtimeChannel=db.channel('kimchi-order-live').on('postgres_changes',{event:'*',schema:'public',table:'kimchi_orders'},()=>loadOrders()).subscribe();}
+}
+async function loadOrders(){
+ const host=$("orders");host.replaceChildren(el("p","sub","주문 내역을 불러오는 중…"));
+ const {data,error}=await db.from("kimchi_orders").select("*").order("created_at",{ascending:false}).limit(200);
+ if(error){host.replaceChildren(el("p","notice","조회 실패: 관리자 권한과 데이터베이스 설정을 확인하세요."));return;}
+ $("orderCount").textContent=data.length+"건";
+ $("boxCount").textContent=data.reduce((a,o)=>a+o.quantity,0)+"박스";
+ $("salesTotal").textContent=won(data.reduce((a,o)=>a+o.total_amount,0));
+ host.replaceChildren();
+ if(!data.length){host.append(el("p","sub","아직 접수된 주문이 없습니다."));return;}
+ data.forEach(o=>{
+  const card=el("article","order"),title=el("h3","",o.order_no+" · "+o.status);
+  const meta=el("div","meta",
+   new Date(o.created_at).toLocaleString("ko-KR")+"\n"+
+   "주문자: "+o.buyer_name+" / "+o.buyer_phone+"\n"+
+   "배송: "+(o.delivery_name||o.buyer_name)+" / "+(o.delivery_phone||o.buyer_phone)+"\n"+
+   "주소: "+o.delivery_address+"\n"+
+   "수량: "+o.quantity+"박스 · "+won(o.total_amount)+"\n"+
+   "결제: "+o.payment_method+"\n"+
+   (o.gift_message?"선물 메시지: "+o.gift_message+"\n":"")+
+   (o.delivery_memo?"요청: "+o.delivery_memo:""));
+  meta.style.whiteSpace="pre-line";
+  const status=el("select");["신규","입금확인","상품준비","발송완료","취소"].forEach(v=>{const op=el("option","",v);op.value=v;status.append(op);});status.value=o.status;
+  const tracking=el("input");tracking.placeholder="우체국 택배 송장번호";tracking.value=o.tracking_number||"";
+  const save=el("button","");save.textContent="주문 상태·송장번호 저장";
+  save.addEventListener("click",async()=>{
+   const {error}=await db.from("kimchi_orders").update({status:status.value,tracking_number:tracking.value.trim()||null,updated_at:new Date().toISOString()}).eq("id",o.id);
+   if(error){alert("저장 실패. 관리자 권한을 확인해 주세요.");return;}alert("저장했습니다.");await loadOrders();
+  });
+  card.append(title,meta,status,tracking,save);host.append(card);
+ });
+}
+$("login").addEventListener("click",login);
+$("refresh").addEventListener("click",loadOrders);
+$("logout").addEventListener("click",async()=>{if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null;}await db.auth.signOut();session=null;$("dashboard").hidden=true;$("loginBox").hidden=false;});
+if(!configured)message("Supabase 프로젝트 연결값 입력 대기 중입니다.");
+</script></body></html>

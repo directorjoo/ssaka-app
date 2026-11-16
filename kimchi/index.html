@@ -25,10 +25,41 @@
     .order input,.order textarea{width:100%;padding:13px;border:1px solid #ded6d0;border-radius:10px;font:inherit;margin:6px 0 12px;background:#fff}
     label{font-size:14px;font-weight:800}.qty{display:flex;align-items:center;gap:14px;margin:10px 0 16px}.qty button{width:42px;height:42px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:22px}
     .total{font-size:24px;font-weight:900;color:#9b2424}.foot{text-align:center;color:#786e66;font-size:12px;line-height:1.7;padding:22px 8px}
+
+    /* 기본 판매 페이지 디자인 마감 */
+    .video-top{padding:14px 16px 0;background:#f3eee7}
+    .video{position:relative;aspect-ratio:4/3;justify-content:flex-end;align-items:stretch;gap:0;padding:0;border-radius:20px;background:radial-gradient(circle at 50% 28%,#f8e8c7 0,#e8d5ae 42%,#b8a17a 100%);box-shadow:0 14px 32px #4b2a171c}
+    .video-art{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+    .video-art:before,.video-art:after{content:"";position:absolute;border:1px solid #ffffff70;border-radius:50%;width:250px;height:250px}
+    .video-art:after{width:330px;height:330px}
+    .jar{z-index:1;width:148px;height:174px;border-radius:25px 25px 30px 30px;background:linear-gradient(90deg,#6b281d,#9b3b25 22%,#b84a2d 70%,#74281d);border:5px solid #f7e8ce;box-shadow:0 18px 26px #45201455;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff4d9;transform:rotate(-5deg);text-shadow:0 2px 4px #542015}
+    .jar:before{content:"";position:absolute;top:-13px;width:104px;height:20px;border-radius:8px;background:linear-gradient(#e5d1a5,#9e8253);border:3px solid #f8ebd1}
+    .jar span{font-size:13px;letter-spacing:.2em}.jar b{font-size:28px;letter-spacing:-.08em}.jar small{font-size:10px;margin-top:6px}
+    .leaf{position:absolute;font-size:74px;filter:drop-shadow(0 8px 6px #54351d35)}
+    .leaf-a{left:8%;top:13%;transform:rotate(-25deg)}.leaf-b{right:7%;top:24%;transform:rotate(24deg)}
+    .video-caption{position:relative;z-index:2;padding:12px 16px 14px;background:linear-gradient(transparent,#24170fdc);color:#fff;text-align:left}
+    .video-caption span{display:block;font-size:10px;letter-spacing:.2em;color:#f4dba9;font-weight:900}
+    .video-caption strong{display:block;font-size:19px;margin:3px 0}
+    .video-caption small{font-size:11px;color:#f5e9dc}
+    .top{letter-spacing:-.02em}
+    .hero{box-shadow:0 14px 28px #4b17171a}
+    .section{box-shadow:0 5px 22px #3b24100a;border:1px solid #f0e9e2}
+    .section h2{letter-spacing:-.04em}
+    .features li{padding-left:2px}
+    .order{border:1px solid #eadfd5}
+    .btn{transition:transform .15s ease,filter .15s ease}
+    .btn:active{transform:scale(.985);filter:brightness(.97)}
+    .qty button{cursor:pointer;font-weight:800;color:#7f1d1d}
+    .foot{border-top:1px solid #eee5dc;margin-top:18px}
+    @media(min-width:520px){.video-top{padding-top:20px}.video{aspect-ratio:16/10}}
+
   </style>
 </head>
 <body>
-  <div class="video-top"><div class="video" id="videoFrame"><strong>🎬 여수 언니 현장 이야기 &amp; 인사 영상</strong><span class="muted">세로 3:4 영상 영역 · 유튜브 링크 연결 예정</span></div></div>
+  <div class="video-top"><div class="video" id="videoFrame">
+    <div class="video-art" aria-hidden="true"><span class="leaf leaf-a">🥬</span><span class="leaf leaf-b">🌿</span><div class="jar"><span>여수</span><b>갓김치</b><small>돌산의 깊은 맛</small></div></div>
+    <div class="video-caption"><span>YEOSU · DOLSAN</span><strong>여수의 정성을 담다</strong><small>여수 언니 명품 갓김치 · 소개 영상 준비 중</small></div>
+  </div></div>
   <div class="top">🌿 여수 산지직송 · 정성껏 담근 수제 김치</div>
   <header class="hero">
     <div class="eyebrow">🥬 여수언니 명품김치 · 공식 직판장</div>

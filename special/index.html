@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#B3132B"><title>싸바 특판상품</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f8f6f3;color:#29231f;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+main{max-width:560px;margin:auto;padding:18px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 18px}.top a{color:#8e0f22;text-decoration:none;font-weight:800}
+.hero{position:relative;overflow:hidden;padding:24px 20px;border-radius:24px;background:linear-gradient(135deg,#B3132B,#7E0A1B);color:#fff}
+.hero small{font-weight:800;letter-spacing:.14em;color:#ffdce1}.hero h1{margin:8px 0;font-size:30px;letter-spacing:-.05em}.hero p{margin:0;line-height:1.6;color:#fff0f2}
+.cart{position:absolute;right:18px;top:24px;width:76px;height:76px;animation:cartSway 1.15s ease-in-out infinite;transform-origin:50% 60%}
+@keyframes cartSway{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@media(prefers-reduced-motion:reduce){.cart{animation:none}}
+.list{display:grid;gap:14px;margin-top:18px}.product{display:grid;grid-template-columns:112px 1fr;gap:14px;align-items:center;padding:14px;border-radius:20px;background:#fff;box-shadow:0 5px 20px #3010100d;text-decoration:none;color:inherit}
+.thumb{width:112px;height:112px;display:grid;place-items:center;border-radius:15px;background:#f3eee8;font-size:46px;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}
+.name{font-size:17px;font-weight:900;line-height:1.35;word-break:keep-all}.desc{margin:5px 0 8px;color:#766d66;font-size:12.5px;line-height:1.5}.price{font-size:19px;font-weight:900;color:#B3132B}.tag{display:inline-block;margin-bottom:6px;padding:3px 8px;border-radius:99px;background:#fff0f2;color:#a30e27;font-size:11px;font-weight:800}
+.empty{padding:38px 18px;text-align:center;color:#766d66;background:#fff;border-radius:18px;margin-top:18px}
+footer{text-align:center;color:#8d8580;font-size:12px;line-height:1.7;margin-top:24px}
+</style>
+</head>
+<body><main>
+<div class="top"><a href="../app/">‹ 싸바 홈</a><strong>🍒 SAVA LAB</strong></div>
+<header class="hero">
+<small>SAVA LAB · SPECIAL DEALS</small>
+<h1>싸바 특판상품</h1>
+<p>좋은 상품을 발견한 순간,<br>싸바가 특별한 혜택으로 소개합니다.</p>
+<svg class="cart" viewBox="0 0 100 100" aria-label="장바구니" role="img"><path d="M13 20h12l9 47h43l12-34H30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 43h40M42 55h31" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="79" r="6" fill="#fff"/><circle cx="72" cy="79" r="6" fill="#fff"/></svg>
+</header>
+<section class="list" id="products" aria-live="polite"></section>
+<footer>싸바 SAVA · 특판상품 공식 안내<br>상품별 판매 조건과 배송 안내는 각 상품 페이지에서 확인하세요.</footer>
+</main>
+<script>
+/* 새 특판상품은 아래 목록에 한 줄 추가하면 됩니다.
+   name, description, price, image, badge, url만 바꾸어 재사용합니다. */
+const PRODUCTS = [
+ {name:"여수 언니 명품 갓김치 5kg",description:"작년과 동일한 가격 · 배송비 포함 · 선물하기 가능",price:"60,000원",image:"",emoji:"🥬",badge:"첫 번째 특판",url:"../kimchi/"}
+];
+const host=document.getElementById("products");
+PRODUCTS.forEach(function(p){
+ const a=document.createElement("a");a.className="product";a.href=p.url;
+ const thumb=document.createElement("div");thumb.className="thumb";
+ if(p.image){const im=document.createElement("img");im.src=p.image;im.alt=p.name;thumb.appendChild(im)}else thumb.textContent=p.emoji||"🛍️";
+ const info=document.createElement("div"),tag=document.createElement("span");tag.className="tag";tag.textContent=p.badge||"특판상품";
+ const name=document.createElement("div");name.className="name";name.textContent=p.name;
+ const desc=document.createElement("div");desc.className="desc";desc.textContent=p.description||"";
+ const price=document.createElement("div");price.className="price";price.textContent=p.price||"가격 문의";
+ info.append(tag,name,desc,price);a.append(thumb,info);host.appendChild(a);
+});
+if(!PRODUCTS.length){const e=document.createElement("div");e.className="empty";e.textContent="새로운 특판상품을 준비하고 있습니다.";host.appendChild(e)}
+</script>
+</body></html>

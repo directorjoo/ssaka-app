@@ -47,7 +47,8 @@ async function login(){
  if(!db){message("관리자 연결 설정이 아직 완료되지 않았습니다.");return;}
  const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
  if(error){message("로그인 실패: "+error.message);return;}
- session=data.session; $("loginBox").hidden=true;$("dashboard").hidden=false; await loadOrders();\n if(!realtimeChannel){realtimeChannel=db.channel('kimchi-order-live').on('postgres_changes',{event:'*',schema:'public',table:'kimchi_orders'},()=>loadOrders()).subscribe();}
+ session=data.session; $("loginBox").hidden=true;$("dashboard").hidden=false; await loadOrders();
+ if(!realtimeChannel){realtimeChannel=db.channel('kimchi-order-live').on('postgres_changes',{event:'*',schema:'public',table:'kimchi_orders'},()=>loadOrders()).subscribe();}
 }
 async function loadOrders(){
  const host=$("orders");host.replaceChildren(el("p","sub","주문 내역을 불러오는 중…"));

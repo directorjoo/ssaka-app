@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAVA (싸바) 특별 예약 판매 마켓</title>
+    <!-- 카카오톡 공유 SDK -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <style>
+        :root {
+            --primary: #d9381e;
+            --primary-dark: #b52c14;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --border: #e0e0e0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding-bottom: 90px; }
+        
+        /* 상단 네비게이션 배너 */
+        header {
+            background: linear-gradient(135deg, #d9381e, #ff5722);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .sava-badge {
+            display: inline-block; background: rgba(0,0,0,0.25); padding: 3px 10px;
+            border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        header h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; cursor: pointer; }
+        header p { font-size: 0.85rem; opacity: 0.9; }
+        .top-stats {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 20px; font-size: 0.75rem;
+        }
+
+        /* 메인 컨테이너 */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        /* 비디오 섹션 */
+        .video-box {
+            background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; aspect-ratio: 1/1;
+        }
+        .video-box video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .video-upload-btn {
+            position: absolute; bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.7); color: white; border: none; padding: 6px 12px;
+            border-radius: 20px; font-size: 0.75rem; cursor: pointer;
+        }
+
+        /* 프로그레스 바 (재고 현황) */
+        .stock-card {
+            background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stock-info { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; }
+        .progress-bar-bg { background: #eee; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease; }
+
+        /* 탭 네비게이션 */
+        .tab-menu {
+            display: flex; background: var(--card-bg); border-radius: 12px; padding: 5px; margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            flex: 1; text-align: center; padding: 10px 0; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-sub); background: none; border: none; cursor: pointer; border-radius: 8px; transition: 0.2s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        /* 탭 내용 영역 */
+        .tab-content { display: none; background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .tab-content.active { display: block; }
+
+        /* 공통 UI 요소 */
+        h3 { font-size: 1.1rem; margin-bottom: 12px; color: var(--primary); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
+        p, li { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 8px; }
+        ul { padding-left: 20px; }
+
+        /* 주문 폼 */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; color: var(--text-main); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+        .option-group { display: flex; gap: 10px; }
+        .option-btn {
+            flex: 1; padding: 10px; border: 1px solid var(--border); background: white; border-radius: 8px;
+            font-size: 0.85rem; cursor: pointer; text-align: center;
+        }
+        .option-btn.selected { border-color: var(--primary); background: #fff5f3; color: var(--primary); font-weight: bold; }
+
+        /* 버튼 스타일 */
+        .btn {
+            width: 100%; background: var(--primary); color: white; border: none; padding: 12px;
+            border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; text-align: center;
+            box-shadow: 0 4px 10px rgba(217, 56, 30, 0.3); margin-top: 10px;
+        }
+        .btn:active { background: var(--primary-dark); }
+        .btn-kakao { background: #fee500; color: #191919; box-shadow: 0 4px 10px rgba(254, 229, 0, 0.3); margin-top: 8px; }
+        .btn-sub { background: #555; font-size: 0.85rem; padding: 8px; margin-top: 5px; }
+        .btn-sava { background: #111; color: white; font-size: 0.9rem; padding: 10px; margin-top: 8px; }
+
+        /* 사장님 현황판 스타일 */
+        .order-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; margin-top: 10px; }
+        .order-table th, .order-table td { border: 1px solid var(--border); padding: 6px; text-align: center; }
+        .order-table th { background: #f2f2f2; }
+
+        /* 하단 고정 주문 바 */
+        .fixed-bottom {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; gap: 10px; z-index: 100;
+        }
+        .fixed-bottom button { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; border: none; cursor: pointer; }
+        .btn-order-go { background: var(--primary); color: white; }
+        .btn-share-go { background: #fee500; color: #191919; }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 배너 (5번 연속 터치시 사장님 현황판 열림) -->
+    <header>
+        <div class="sava-badge">SAVA PLATFORM</div>
+        <h1 id="headerTitle" onclick="checkAdminSecret()">🥬 <span id="marketTitleText">여수 언니의 수제 김치 마켓</span></h1>
+        <p id="headerSubText">지인 대상 단 50박스 한정 예약 판매</p>
+        <div class="top-stats" id="viewCountBadge">👀 조회수 1회</div>
+    </header>
+
+    <div class="container">
+        <!-- 홍보 영상/이미지 영역 -->
+        <div class="video-box">
+            <video id="promoVideo" autoplay muted loop playsinline>
+                <source src="TalkMedia_talkv_high.mp4.mp4" type="video/mp4">
+                동영상을 지원하지 않는 브라우저입니다.
+            </video>
+            <input type="file" id="fileLoader" accept="video/*,image/*" style="display:none;" onchange="loadMedia(event)">
+            <button class="video-upload-btn" onclick="document.getElementById('fileLoader').click()">📁 홍보 영상/이미지 교체</button>
+        </div>
+
+        <!-- 남은 수량 프로그레스 바 -->
+        <div class="stock-card">
+            <div class="stock-info">
+                <span>📦 한정 수량 잔여 현황</span>
+                <span id="stockText">42개 남음 (총 8개 주문 완료)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="stockProgress" style="width: 16%;"></div>
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="switchTab(0)">상품소개</button>
+            <button class="tab-btn" onclick="switchTab(1)">주문하기</button>
+            <button class="tab-btn" onclick="switchTab(2)">계좌안내</button>
+            <button class="tab-btn" onclick="switchTab(3)">문의·공유</button>
+        </div>
+
+        <!-- [탭 1] 상품 소개 -->
+        <div class="tab-content active" id="tab-0">
+            <h3>❤️ 지인분들께 드리는 글</h3>
+            <p id="introDesc">안녕하세요! 정성을 다해 준비한 특별 상품을 소중한 지인분들께 먼저 선보입니다.</p>
+            <br>
+            <h3>📋 상품 및 가격 안내</h3>
+            <ul id="productInfoList">
+                <li><b>상품 구성:</b> 수제 갓김치 또는 배추김치 (5kg 1박스)</li>
+                <li><b>판매 가격:</b> <b>55,000원</b> (택배비 및 포장비 모두 포함)</li>
+                <li><b>한정 수량:</b> 딱 50박스 선착순 마감</li>
+            </ul>
+            <br>
+            <button class="btn" onclick="switchTab(1)">바로 주문하러 가기 🛒</button>
+        </div>
+
+        <!-- [탭 2] 주문하기 -->
+        <div class="tab-content" id="tab-1">
+            <h3>📝 간편 주문서 작성</h3>
+            <div class="form-group">
+                <label>상품 옵션 선택</label>
+                <div class="option-group" id="optionGroupContainer">
+                    <div class="option-btn selected" id="opt1" onclick="selectOption('알싸한 갓김치 (5kg)', this)">알싸한 갓김치</div>
+                    <div class="option-btn" id="opt2" onclick="selectOption('시원한 배추김치 (5kg)', this)">시원한 배추김치</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>주문 수량</label>
+                <select id="orderQty" class="form-control" onchange="calcTotal()">
+                    <option value="1">1박스 (5kg) - 55,000원</option>
+                    <option value="2">2박스 (10kg) - 110,000원</option>
+                    <option value="3">3박스 (15kg) - 165,000원</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>주문자 성함</label>
+                <input type="text" id="orderName" class="form-control" placeholder="성함을 입력해주세요">
+            </div>
+            <div class="form-group">
+                <label>연락처 (휴대폰 번호)</label>
+                <input type="tel" id="orderPhone" class="form-control" placeholder="010-0000-0000">
+            </div>
+            <div class="form-group">
+                <label>받으실 주소</label>
+                <input type="text" id="orderAddr" class="form-control" placeholder="상세 주소를 입력해주세요">
+            </div>
+            <div style="background: #fff8f6; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                <span style="font-size: 0.85rem; color: var(--text-sub);">최종 결제 금액</span><br>
+                <strong id="totalPriceText" style="font-size: 1.2rem; color: var(--primary);">55,000원</strong>
+            </div>
+            <button class="btn" onclick="submitOrderSMS()">📩 문자로 간편 주문 접수하기</button>
+            <button class="btn btn-sub" onclick="copyOrderText()">📋 주문 내용 텍스트 복사하기</button>
+        </div>
+
+        <!-- [탭 3] 계좌 안내 -->
+        <div class="tab-content" id="tab-2">
+            <h3>💳 입금 계좌 안내</h3>
+            <p>아래 계좌로 입금해 주시면 확인 후 안전하게 발송해 드립니다.</p>
+            <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">
+                <p id="bankInfoDisplay" style="font-size: 1rem; font-weight: bold; color: #333; margin-bottom: 5px;">농협 351-XXXX-XXXX-XX (예금주: 주경중)</p>
+                <button class="btn btn-sub" style="width: auto; padding: 6px 15px; margin-top: 5px;" onclick="copyBankInfo()">계좌번호 복사</button>
+            </div>
+            <button class="btn btn-sub" onclick="openBankEditModal()">✏️ 계좌정보 수정하기</button>
+        </div>
+
+        <!-- [탭 4] 문의 및 공유 (싸바 메인 링크 포함) -->
+        <div class="tab-content" id="tab-3">
+            <h3>📢 지인 단톡방 소문내기 & 문의</h3>
+            <p>소중한 분들께 링크와 안내문을 공유해 보세요!</p>
+            <button class="btn btn-kakao" onclick="shareKakao()">💬 카카오톡으로 공유하기</button>
+            <button class="btn btn-sub" onclick="copyShareText()">🔗 공유용 문구 + 링크 복사</button>
+            <br>
+            <a href="tel:01058705815" style="text-decoration: none;">
+                <button class="btn" style="background: #2b7a78; margin-top: 15px;">📞 전화 문의하기 (010-5870-5815)</button>
+            </a>
+            <br>
+            <!-- 싸바(SAVA) 메인 디지털 명함으로 이동하는 버튼 -->
+            <button class="btn btn-sava" onclick="goToSavaMain()">🌐 SAVA (싸바) 메인 명함으로 가기</button>
+        </div>
+
+        <!-- 사장님 현황판 영역 -->
+        <div class="tab-content" id="adminPanel" style="border: 2px solid var(--primary);">
+            <h3>📊 사장님 전용 주문 관리 현황판</h3>
+            <div style="font-size: 0.85rem; margin-bottom: 10px;">
+                <p>• 누적 조회수: <span id="adminViewCount">1</span>회</p>
+                <p>• 총 주문 수량: <span id="adminTotalBox">8</span>개 / 50개 한정</p>
+                <p>• 예상 총 매출: <span id="adminTotalRevenue">440,000</span>원</p>
+            </div>
+            <button class="btn btn-sub" onclick="resetOrders()">데이터 초기화</button>
+            <div style="overflow-x: auto; margin-top: 10px;">
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>성함</th>
+                            <th>상품옵션</th>
+                            <th>날짜</th>
+                            <th>연락처/주소</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">접수된 주문이 여기에 표시됩니다.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 하단 고정 바 -->
+    <div class="fixed-bottom">
+        <button class="btn-share-go" onclick="shareKakao()">💬 카톡 공유</button>
+        <button class="btn-order-go" onclick="switchTab(1)">상품 주문하기</button>
+    </div>
+
+    <script>
+        let selectedOptionName = '알싸한 갓김치 (5kg)';
+        let totalBoxSold = 8;
+        let viewCount = 1;
+        let adminClickCount = 0;
+
+        window.onload = function() {
+            if(localStorage.getItem('viewCount')) {
+                viewCount = parseInt(localStorage.getItem('viewCount')) + 1;
+            }
+            localStorage.setItem('viewCount', viewCount);
+            document.getElementById('viewCountBadge').innerText = `👀 조회수 ${viewCount}회`;
+            document.getElementById('adminViewCount').innerText = viewCount;
+
+            if(localStorage.getItem('totalBoxSold')) {
+                totalBoxSold = parseInt(localStorage.getItem('totalBoxSold'));
+            }
+            updateStockUI();
+            loadOrderTable();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('admin') === '1') {
+                showAdminPanelDirect();
+            }
+            try { Kakao.init('YOUR_KAKAO_APP_KEY'); } catch(e) {}
+        }
+
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const btns = document.querySelectorAll('.tab-btn');
+            tabs.forEach((tab, i) => {
+                if(i === index) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+            btns.forEach((btn, i) => {
+                if(i === index) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function selectOption(name, el) {
+            selectedOptionName = name;
+            const buttons = el.parentNode.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function calcTotal() {
+            const qty = parseInt(document.getElementById('orderQty').value);
+            const price = qty * 55000;
+            document.getElementById('totalPriceText').innerText = price.toLocaleString() + '원';
+        }
+
+        function updateStockUI() {
+            let remain = 50 - totalBoxSold;
+            if(remain < 0) remain = 0;
+            document.getElementById('stockText').innerText = `${remain}개 남음 (총 ${totalBoxSold}개 주문 완료)`;
+            const percent = (totalBoxSold / 50) * 100;
+            document.getElementById('stockProgress').style.width = percent + '%';
+            document.getElementById('adminTotalBox').innerText = totalBoxSold;
+            document.getElementById('adminTotalRevenue').innerText = (totalBoxSold * 55000).toLocaleString();
+        }
+
+        function submitOrderSMS() {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const addr = document.getElementById('orderAddr').value.trim();
+            const qty = document.getElementById('orderQty').value;
+
+            if(!name || !phone || !addr) {
+                alert('주문자 성함, 연락처, 주소를 모두 정확히 입력해주세요!');
+                return;
+            }
+
+            const msg = `[상품주문접수]\n- 선택옵션: ${selectedOptionName} (${qty}개)\n- 성함: ${name}\n- 연락처: ${phone}\n- 주소: ${addr}`;
+            window.location.href = `sms:01058705815?body=${encodeURIComponent(msg)}`;
+
+            saveOrderData({name, phone, addr, item: `${selectedOptionName} ${qty}개`, date: new Date().toLocaleDateString()});
+            totalBoxSold += parseInt(qty);
+            localStorage.setItem('totalBoxSold', totalBoxSold);
+            updateStockUI();
+        }
+
+        function copyOrderText() {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const addr = document.getElementById('orderAddr').value.trim();
+            const qty = document.getElementById('orderQty').value;
+            const text = `[상품 주문]\n- 옵션: ${selectedOptionName} ${qty}개\n- 성함: ${name}\n- 연락처: ${phone}\n- 주소: ${addr}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('주문 내용이 복사되었습니다.');
+            });
+        }
+
+        function copyBankInfo() {
+            navigator.clipboard.writeText(document.getElementById('bankInfoDisplay').innerText).then(() => {
+                alert('계좌번호가 복사되었습니다.');
+            });
+        }
+
+        function openBankEditModal() {
+            const newInfo = prompt('수정할 계좌번호와 예금주를 입력하세요:', document.getElementById('bankInfoDisplay').innerText);
+            if(newInfo) document.getElementById('bankInfoDisplay').innerText = newInfo;
+        }
+
+        function copyShareText() {
+            const shareText = `[SAVA 특별 예약 판매 마켓]\n지금 바로 확인해보세요!\n🔗 링크: ${window.location.href}`;
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('공유 문구가 복사되었습니다.');
+            });
+        }
+
+        function shareKakao() {
+            if (window.Kakao && Kakao.isInitialized()) {
+                Kakao.Share.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: 'SAVA (싸바) 특별 예약 판매 마켓',
+                        description: '지금 바로 상품을 만나보세요!',
+                        imageUrl: 'https://images.unsplash.com/photo-1583225293635-f76361a33a76',
+                        link: { mobileWebUrl: window.location.href, webUrl: window.location.href },
+                    },
+                });
+            } else {
+                copyShareText();
+            }
+        }
+
+        // 싸바 메인 명함으로 이동하는 함수
+        function goToSavaMain() {
+            window.location.href = 'https://sava.kr';
+        }
+
+        function loadMedia(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const player = document.getElementById('promoVideo');
+                player.src = url;
+                player.load();
+                alert('홍보 미디어가 교체되었습니다!');
+            }
+        }
+
+        function checkAdminSecret() {
+            adminClickCount++;
+            if(adminClickCount >= 5) {
+                adminClickCount = 0;
+                const pwd = prompt('사장님 비밀번호를 입력하세요:');
+                if(pwd === '5815') showAdminPanelDirect();
+            }
+        }
+
+        function showAdminPanelDirect() {
+            document.getElementById('adminPanel').style.display = 'block';
+            switchTab(4);
+            alert('사장님 현황판에 입장하셨습니다.');
+        }
+
+        function saveOrderData(order) {
+            let orders = JSON.parse(localStorage.getItem('marketOrders') || '[]');
+            orders.push(order);
+            localStorage.setItem('marketOrders', JSON.stringify(orders));
+            loadOrderTable();
+        }
+
+        function loadOrderTable() {
+            let orders = JSON.parse(localStorage.getItem('marketOrders') || '[]');
+            const tbody = document.getElementById('orderTableBody');
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #999;">접수된 주문이 없습니다.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = '';
+            orders.forEach((o, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${o.name}</td>
+                        <td>${o.item}</td>
+                        <td>${o.date}</td>
+                        <td>${o.phone}<br>${o.addr}</td>
+                        <td><button onclick="deleteOrder(${idx})" style="padding:2px 6px; font-size:0.7rem;">삭제</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteOrder(idx) {
+            let orders = JSON.parse(localStorage.getItem('marketOrders') || '[]');
+            orders.splice(idx, 1);
+            localStorage.setItem('marketOrders', JSON.stringify(orders));
+            loadOrderTable();
+        }
+
+        function resetOrders() {
+            if(confirm('모든 주문 데이터를 초기화하시겠습니까?')) {
+                localStorage.removeItem('marketOrders');
+                localStorage.setItem('totalBoxSold', 0);
+                totalBoxSold = 0;
+                updateStockUI();
+                loadOrderTable();
+            }
+        }
+    </script>
+</body>
+</html>

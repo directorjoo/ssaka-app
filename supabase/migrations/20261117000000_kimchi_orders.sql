@@ -43,3 +43,13 @@ with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'kimchi_admin');
 
 grant select, update on public.kimchi_orders to authenticated;
 revoke all on public.kimchi_orders from anon;
+
+-- 주문 등록/상태 변경을 관리자 화면에 실시간 반영
+do $$
+begin
+  alter publication supabase_realtime add table public.kimchi_orders;
+exception
+  when duplicate_object then null;
+  when undefined_object then
+    raise notice 'supabase_realtime publication is unavailable; enable Realtime for kimchi_orders in the dashboard.';
+end $$;

@@ -140,7 +140,7 @@
       var orderButton=document.getElementById('orderInquiry');
       orderButton.disabled=true;orderButton.textContent='주문 접수 중…';
       try{
-        var response=await fetch(SUPABASE_URL.replace(/\\/$/,'')+'/functions/v1/kimchi-order',{
+        var response=await fetch((SUPABASE_URL.endsWith('/')?SUPABASE_URL.slice(0,-1):SUPABASE_URL)+'/functions/v1/kimchi-order',{
           method:'POST',
           headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY},
           body:JSON.stringify({

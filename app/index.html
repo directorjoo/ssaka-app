@@ -126,6 +126,15 @@
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
     .mk .go { display: flex; align-items: center; justify-content: center; min-height: 54px; border-radius: 18px; background: #EBD9B0; color: #123F33; font-size: 19px; font-weight: 900; text-decoration: none; letter-spacing: -0.02em; }
+    /* 싸바랩 특판상품 — 흰 장바구니가 가볍게 좌우로 흔들립니다 */
+    .special-promo { display:flex; align-items:center; gap:14px; margin:0 18px 12px; padding:15px 17px; border-radius:21px; background:linear-gradient(135deg,#B3132B,#7E0A1B); color:#fff; text-decoration:none; box-shadow:0 14px 28px -20px rgba(126,10,27,.9); overflow:hidden; }
+    .special-promo .sp-copy { min-width:0; flex:1; }
+    .special-promo .sp-kicker { display:block; font-size:10px; font-weight:900; letter-spacing:.13em; color:#ffd6dc; }
+    .special-promo b { display:block; margin:3px 0; font-size:20px; font-weight:900; letter-spacing:-.04em; }
+    .special-promo small { display:block; font-size:12px; line-height:1.45; color:#fff0f2; }
+    .special-promo .sp-cart { flex:none; width:66px; height:66px; transform-origin:50% 60%; animation:spCartSway 1.15s ease-in-out infinite; }
+    @keyframes spCartSway { 0%,100% { transform:rotate(-9deg); } 50% { transform:rotate(9deg); } }
+    @media (prefers-reduced-motion: reduce) { .special-promo .sp-cart { animation:none; } }
     .story { margin: 0 18px 12px; padding: 16px 16px 14px; border-radius: 22px; background: #FFF7E6; box-shadow: inset 0 0 0 1.5px #F3D9A4; }
     .story .st-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .story .st-top img { width: 46px; height: 46px; flex: none; }
@@ -488,6 +497,12 @@
     mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><b class="w">오픈!</b></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>싸바알림</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장 · 스마트명함<br><small>카톡 · SNS에 올리세요!</small></p>' +
       '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
+    // 싸바랩 특판상품 — 공통 특판 진열 페이지로 연결
+    var sp = el('a', 'special-promo'); sp.href = '../special/';
+    sp.setAttribute('aria-label', '싸바랩 특판상품 보기');
+    sp.innerHTML = '<div class="sp-copy"><span class="sp-kicker">SAVA LAB · SPECIAL DEALS</span><b>특판상품</b><small>좋은 상품을 특별한 혜택으로!<br>지금 진행 중인 특판을 확인하세요 ›</small></div>' +
+      '<svg class="sp-cart" viewBox="0 0 100 100" aria-hidden="true"><path d="M13 20h12l9 47h43l12-34H30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M38 43h40M42 55h31" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="79" r="6" fill="#fff"/><circle cx="72" cy="79" r="6" fill="#fff"/></svg>';
+    v.appendChild(sp);
     // 블로그 글쓰기
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';

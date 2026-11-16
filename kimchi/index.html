@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>여수언니 명품 갓김치 5kg | 60,000원</title>
-  <meta name="description" content="여수 언니 갓김치 5kg 한 박스 60,000원. 작년과 동일, 배송비 포함.">
+  <meta name="description" content="여수 언니 갓김치 5kg 한 박스 60,000원. 작년과 동일한 가격, 배송비 포함. 선물하기와 수량별 주문 문의.">\n  <meta name="theme-color" content="#7f1d1d">\n  <meta property="og:type" content="product">\n  <meta property="og:site_name" content="여수언니 명품김치">\n  <meta name="twitter:card" content="summary">
   <meta property="og:title" content="여수언니 명품 갓김치 5kg">
   <meta property="og:description" content="작년과 동일한 60,000원 · 배송비 포함 · 여수 산지직송">
   <meta property="og:url" content="https://sava.kr/kimchi/">
@@ -69,15 +69,15 @@
         <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="내가 먹기" checked style="width:auto;margin:0 5px 0 0"> 내가 먹기</label>
         <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="선물하기" style="width:auto;margin:0 5px 0 0"> 선물하기 🎁</label>
       </div>
-      <label for="buyer">주문자(보내는 분) 성함</label><input id="buyer" autocomplete="name" placeholder="성함">
-      <label for="phone">주문자 휴대폰 번호</label><input id="phone" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000">
+      <label for="buyer">주문자(보내는 분) 성함</label><input id="buyer" autocomplete="name" maxlength="30" placeholder="성함">
+      <label for="phone">주문자 휴대폰 번호</label><input id="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="13" placeholder="010-0000-0000">
       <div id="selfDelivery">
         <label for="address">배송 주소</label><textarea id="address" rows="2" autocomplete="street-address" placeholder="받으실 주소"></textarea>
       </div>
       <div id="giftDelivery" hidden>
         <div style="background:#fff8e8;border-radius:12px;padding:13px;margin:8px 0 12px;color:#6b4b20;font-size:13px">선물 받으실 분에게 갓김치를 직접 보내드립니다. 선물 받는 분에게는 주문 금액을 안내하지 않습니다.</div>
-        <label for="recipient">선물 받는 분 성함</label><input id="recipient" placeholder="받는 분 성함">
-        <label for="recipientPhone">받는 분 휴대폰 번호</label><input id="recipientPhone" inputmode="tel" placeholder="010-0000-0000">
+        <label for="recipient">선물 받는 분 성함</label><input id="recipient" maxlength="30" placeholder="받는 분 성함">
+        <label for="recipientPhone">받는 분 휴대폰 번호</label><input id="recipientPhone" type="tel" inputmode="tel" maxlength="13" placeholder="010-0000-0000">
         <label for="giftAddress">받는 분 배송 주소</label><textarea id="giftAddress" rows="2" placeholder="선물 받으실 주소"></textarea>
         <label for="giftMessage">선물 메시지 (선택)</label><textarea id="giftMessage" rows="2" placeholder="감사와 사랑의 마음을 전해보세요"></textarea>
       </div>
@@ -88,7 +88,7 @@
         <option value="신용카드 원격결제 요청 (압구정 순천만 영업장에서 별도 안내)">신용카드 · 순천만 원격결제 요청</option>
       </select>
       <p class="price-note">카카오페이와 토스페이는 결제사 연결 후 이용할 수 있습니다. 현재는 준비 중입니다.</p>
-      <button class="btn dark" id="orderInquiry" type="button">주문 내용 문자로 보내기</button>
+      <button class="btn dark" id="orderInquiry" type="button">60,000원 주문 문의 문자 보내기</button>
       <p class="price-note">버튼을 누르면 문자 앱이 열리고 주문 내용이 입력됩니다. 마지막으로 ‘전송’을 눌러주세요.</p>
     </section>
     <div class="foot">여수 언니 명품 갓김치 · sava.kr/kimchi<br>5kg 60,000원 · 배송비 포함 · 작년과 동일</div>
@@ -111,7 +111,7 @@
   kakaoBtn.addEventListener('click',kakaoShare);
   document.getElementById('copyLink').addEventListener('click',function(){copy(URL);});
   var count=1,price=60000;
-  function update(){document.getElementById('qty').textContent=count;document.getElementById('total').textContent='총 '+(count*price).toLocaleString('ko-KR')+'원';}
+  function update(){var total=count*price;document.getElementById('qty').textContent=count;document.getElementById('total').textContent='총 '+total.toLocaleString('ko-KR')+'원';document.getElementById('orderInquiry').textContent=total.toLocaleString('ko-KR')+'원 주문 문의 문자 보내기';}
   document.getElementById('minus').addEventListener('click',function(){count=Math.max(1,count-1);update();});
   document.getElementById('plus').addEventListener('click',function(){count=Math.min(50,count+1);update();});
   var orderRadios=document.querySelectorAll('input[name="orderType"]');
@@ -125,8 +125,8 @@
     if(!buyer||!phone||!address){alert('주문자 성함, 휴대폰 번호, 배송 주소를 입력해 주세요.');return;}
     if(orderType==='선물하기'&&(!recipient||!recipientPhone)){alert('선물 받는 분 성함과 휴대폰 번호를 입력해 주세요.');return;}
     var delivery=orderType==='선물하기'?'받는 분: '+recipient+'\n받는 분 연락처: '+recipientPhone+'\n선물 배송 주소: '+giftAddress+'\n선물 메시지: '+giftMessage:'배송 주소: '+address;
-    var message='[여수 언니 갓김치 주문]\n주문 방식: '+orderType+'\n보내는 분: '+buyer+'\n보내는 분 연락처: '+phone+'\n'+delivery+'\n수량: '+count+'박스\n금액: '+(count*price).toLocaleString('ko-KR')+'원\n결제방법: '+payment+'\n배송 요청사항: '+memo+'\n주문 페이지: '+URL;
-    var seller='01029477775';
+    var message='[여수 언니 갓김치 주문 문의]\n주문 방식: '+orderType+'\n보내는 분: '+buyer+'\n보내는 분 연락처: '+phone+'\n'+delivery+'\n수량: '+count+'박스\n금액: '+(count*price).toLocaleString('ko-KR')+'원\n결제방법: '+payment+'\n배송 요청사항: '+memo+'\n주문 페이지: '+URL;
+    var seller='01029477775';\n    if(!confirm('주문 내용을 문자 앱으로 전달합니다. 문자 앱에서 내용을 확인한 뒤 전송해 주세요.'))return;
     if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
       window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);
     }else if(/Android/i.test(navigator.userAgent)){

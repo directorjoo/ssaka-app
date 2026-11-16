@@ -97,6 +97,9 @@
 (function(){
   var KEY='3a133064daebee3be143bc4a1a940c47';
   var URL='https://sava.kr/kimchi/';
+  // 백엔드 개통 후 Supabase 프로젝트 URL과 anon/publishable 키를 입력합니다.
+  var SUPABASE_URL='';
+  var SUPABASE_ANON_KEY='';
   var YOUTUBE_VIDEO_ID=''; // 유튜브 영상 주소를 받으면 영상 ID만 입력
   if(YOUTUBE_VIDEO_ID){var frame=document.getElementById('videoFrame');frame.innerHTML='<iframe title="여수 언니 갓김치 소개 영상" src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(YOUTUBE_VIDEO_ID)+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:0;border-radius:14px;position:absolute;inset:0"></iframe>';frame.style.position='relative';frame.style.padding='0';}
   var shareText='여수 언니 갓김치가 올해도 찾아왔습니다! 🌿\n5kg 한 박스 60,000원(배송비 포함), 작년과 동일한 가격입니다.\n정성껏 담근 여수 돌산 갓김치 맛보세요.';
@@ -119,7 +122,7 @@
   var orderRadios=document.querySelectorAll('input[name="orderType"]');
   function setOrderType(){var gift=document.querySelector('input[name="orderType"]:checked').value==='선물하기';document.getElementById('selfDelivery').hidden=gift;document.getElementById('giftDelivery').hidden=!gift;}
   orderRadios.forEach(function(r){r.addEventListener('change',setOrderType);});
-  document.getElementById('orderInquiry').addEventListener('click',function(){
+  document.getElementById('orderInquiry').addEventListener('click',async function(){
     var buyer=document.getElementById('buyer').value.trim(),phone=document.getElementById('phone').value.trim(),memo=document.getElementById('memo').value.trim(),payment=document.getElementById('payment').value;
     var orderType=document.querySelector('input[name="orderType"]:checked').value;
     var recipient=document.getElementById('recipient').value.trim(),recipientPhone=document.getElementById('recipientPhone').value.trim(),giftAddress=document.getElementById('giftAddress').value.trim(),giftMessage=document.getElementById('giftMessage').value.trim();
@@ -132,7 +135,34 @@
     var delivery=orderType==='선물하기'?'받는 분: '+recipient+'\n받는 분 연락처: '+recipientPhone+'\n선물 배송 주소: '+giftAddress+'\n선물 메시지: '+giftMessage:'배송 주소: '+address;
     var message='[여수 언니 갓김치 주문 문의]\n주문 방식: '+orderType+'\n보내는 분: '+buyer+'\n보내는 분 연락처: '+phone+'\n'+delivery+'\n수량: '+count+'박스\n금액: '+(count*price).toLocaleString('ko-KR')+'원\n결제방법: '+payment+'\n배송 요청사항: '+memo+'\n주문 페이지: '+URL;
     var seller='01029477775';
-    if(!confirm('주문 내용을 문자 앱으로 전달합니다. 문자 앱에서 내용을 확인한 뒤 전송해 주세요.'))return;
+    if(!confirm('입력한 주문 내용을 접수할까요?'))return;
+    if(SUPABASE_URL && SUPABASE_ANON_KEY){
+      var orderButton=document.getElementById('orderInquiry');
+      orderButton.disabled=true;orderButton.textContent='주문 접수 중…';
+      try{
+        var response=await fetch(SUPABASE_URL.replace(/\\/$/,'')+'/functions/v1/kimchi-order',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY},
+          body:JSON.stringify({
+            order_type:orderType,buyer_name:buyer,buyer_phone:phone,
+            delivery_name:orderType==='선물하기'?recipient:buyer,
+            delivery_phone:orderType==='선물하기'?recipientPhone:phone,
+            delivery_address:address,gift_message:giftMessage,
+            quantity:count,payment_method:payment,delivery_memo:memo
+          })
+        });
+        var result=await response.json();
+        if(!response.ok || !result.ok)throw new Error(result.error||'주문 접수에 실패했습니다.');
+        alert('주문이 접수되었습니다!\\n주문번호: '+result.order.order_no+'\\n수량: '+result.order.quantity+'박스\\n금액: '+result.order.total_amount.toLocaleString('ko-KR')+'원\\n판매자가 확인 후 연락드리겠습니다.');
+        orderButton.textContent='주문 접수 완료';
+        return;
+      }catch(error){
+        alert((error.message||'주문 저장에 실패했습니다.')+'\\n문자 주문으로 다시 접수할 수 있습니다.');
+        orderButton.disabled=false;orderButton.textContent=(count*price).toLocaleString('ko-KR')+'원 문자 주문으로 접수';
+      }
+      return;
+    }
+    if(!confirm('현재 온라인 주문 저장 연결 전입니다. 문자 앱에서 주문 내용을 확인하고 전송해 주세요.'))return;
     if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
       window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);
     }else if(/Android/i.test(navigator.userAgent)){

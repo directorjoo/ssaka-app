@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>여수언니 명품 갓김치 5kg | 60,000원</title>
-  <meta name="description" content="여수 언니 갓김치 5kg 한 박스 60,000원. 작년과 동일한 가격, 배송비 포함. 선물하기와 수량별 주문 문의.">\n  <meta name="theme-color" content="#7f1d1d">\n  <meta property="og:type" content="product">\n  <meta property="og:site_name" content="여수언니 명품김치">\n  <meta name="twitter:card" content="summary">
+  <meta name="description" content="여수 언니 갓김치 5kg 한 박스 60,000원. 작년과 동일한 가격, 배송비 포함. 선물하기와 수량별 주문 문의.">
+  <meta name="theme-color" content="#7f1d1d">
+  <meta property="og:type" content="product">
+  <meta property="og:site_name" content="여수언니 명품김치">
+  <meta name="twitter:card" content="summary">
   <meta property="og:title" content="여수언니 명품 갓김치 5kg">
   <meta property="og:description" content="작년과 동일한 60,000원 · 배송비 포함 · 여수 산지직송">
   <meta property="og:url" content="https://sava.kr/kimchi/">
@@ -85,6 +89,27 @@
     .section:not(.order):not(.greeting){padding:20px}
     @media(max-width:380px){.order-body{padding:15px 13px}.greeting{padding:20px 17px}.order-total strong{font-size:19px}}
 
+
+    /* 겨울 시즌 디자인 마감 */
+    body{background:#f3f6f5}
+    .video-top{background:linear-gradient(180deg,#e8f0ef,#f3f6f5)}
+    .video{background:radial-gradient(circle at 50% 25%,#fffdf3 0,#e8eee7 48%,#b9c9c2 100%)}
+    .video-art{background-image:radial-gradient(circle at 12% 16%,#ffffffb8 0 2px,transparent 3px),radial-gradient(circle at 83% 19%,#ffffffa8 0 2px,transparent 3px),radial-gradient(circle at 72% 48%,#ffffff8c 0 1.5px,transparent 3px),radial-gradient(circle at 25% 62%,#ffffffa0 0 2px,transparent 3px)}
+    .top{background:#23443d;color:#f4f5e9}
+    .hero{background:linear-gradient(145deg,#23443d 0%,#315b4d 52%,#7f2927 100%)}
+    .eyebrow{color:#f2e7c7}
+    .pricebox{background:#ffffff18;border-color:#ffffff55}
+    .greeting{background:linear-gradient(145deg,#fffefa 0%,#edf4f0 100%);border-color:#d7e3dc}
+    .greeting .greet-label{background:#eaf2ed;color:#315b4d;border-color:#d3e1d8}
+    .greeting h2{color:#294b40}
+    .greeting .signature{color:#315b4d;border-color:#d7e3dc}
+    .order-head{background:linear-gradient(120deg,#23443d,#3e6657)}
+    .order-step b,.qty button{color:#315b4d}
+    .order-total{background:#f0f5f1;border-color:#dce8df}
+    .order-total strong,.total{color:#8c3029}
+    .choice:has(input:checked){border-color:#416b5a;background:#f1f7f2;color:#315b4d}
+    .choice input{accent-color:#315b4d}
+    @media(prefers-reduced-motion:no-preference){.video-art:before{animation:winterGlow 5s ease-in-out infinite alternate}@keyframes winterGlow{from{opacity:.55}to{opacity:1}}}
   </style>
 </head>
 <body>
@@ -92,9 +117,9 @@
     <div class="video-art" aria-hidden="true"><span class="leaf leaf-a">🥬</span><span class="leaf leaf-b">🌿</span><div class="jar"><span>여수</span><b>갓김치</b><small>돌산의 깊은 맛</small></div></div>
     <div class="video-caption"><span>YEOSU · DOLSAN</span><strong>여수의 정성을 담다</strong><small>여수 언니 명품 갓김치 · 소개 영상 준비 중</small></div>
   </div></div>
-  <div class="top">🌿 여수 산지직송 · 정성껏 담근 수제 김치</div>
+  <div class="top">❄️ 겨울 밥상을 따뜻하게 · 여수 산지직송 갓김치</div>
   <header class="hero">
-    <div class="eyebrow">🥬 여수언니 명품김치 · 공식 직판장</div>
+    <div class="eyebrow">❄️ 겨울철 별미 · 여수언니 명품김치 공식 직판장</div>
     <h1>여수 언니 갓김치 5kg</h1>
     <div>해풍 맞고 자란 알싸한 돌산갓의 깊은 감칠맛</div>
     <div class="pricebox"><span class="tag">물가 상승에도 가격 동결 · 작년과 동일</span><div class="price">60,000원 <small>배송비 포함</small></div><div>5kg 한 박스 · 아이스박스 무료배송</div></div>
@@ -169,7 +194,7 @@
   var SUPABASE_ANON_KEY='';
   var YOUTUBE_VIDEO_ID=''; // 유튜브 영상 주소를 받으면 영상 ID만 입력
   if(YOUTUBE_VIDEO_ID){var frame=document.getElementById('videoFrame');frame.innerHTML='<iframe title="여수 언니 갓김치 소개 영상" src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(YOUTUBE_VIDEO_ID)+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;border:0;border-radius:14px;position:absolute;inset:0"></iframe>';frame.style.position='relative';frame.style.padding='0';}
-  var shareText='여수 언니 갓김치가 올해도 찾아왔습니다! 🌿\n5kg 한 박스 60,000원(배송비 포함), 작년과 동일한 가격입니다.\n정성껏 담근 여수 돌산 갓김치 맛보세요.';
+  var shareText='찬 바람 부는 겨울, 여수 언니 갓김치로 따뜻한 밥상을 준비하세요! ❄️\\n5kg 한 박스 60,000원(배송비 포함), 작년과 동일한 가격입니다.\\n정성껏 담근 여수 돌산 갓김치 맛보세요.';
   var kakaoBtn=document.getElementById('kakaoShare');
   function copy(text){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){alert('복사했습니다. 카카오톡 대화방에 붙여넣으세요.');}).catch(function(){window.prompt('아래 내용을 복사하세요',text);});}else{window.prompt('아래 내용을 복사하세요',text);}}
   function nativeShare(){if(navigator.share){navigator.share({title:'여수언니 명품 갓김치 5kg',text:shareText,url:URL}).catch(function(e){if(e.name!=='AbortError')copy(shareText+'\n'+URL);});}else{copy(shareText+'\n'+URL);}}

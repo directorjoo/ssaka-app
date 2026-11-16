@@ -122,11 +122,15 @@
     var orderType=document.querySelector('input[name="orderType"]:checked').value;
     var recipient=document.getElementById('recipient').value.trim(),recipientPhone=document.getElementById('recipientPhone').value.trim(),giftAddress=document.getElementById('giftAddress').value.trim(),giftMessage=document.getElementById('giftMessage').value.trim();
     var address=orderType==='선물하기'?giftAddress:document.getElementById('address').value.trim();
+    var buyerDigits=phone.replace(/[^0-9]/g,'');
     if(!buyer||!phone||!address){alert('주문자 성함, 휴대폰 번호, 배송 주소를 입력해 주세요.');return;}
+    if(!/^01[016789][0-9]{7,8}$/.test(buyerDigits)){alert('주문자 휴대폰 번호를 확인해 주세요.');return;}
     if(orderType==='선물하기'&&(!recipient||!recipientPhone)){alert('선물 받는 분 성함과 휴대폰 번호를 입력해 주세요.');return;}
+    if(orderType==='선물하기'&&!/^01[016789][0-9]{7,8}$/.test(recipientPhone.replace(/[^0-9]/g,''))){alert('선물 받는 분 휴대폰 번호를 확인해 주세요.');return;}
     var delivery=orderType==='선물하기'?'받는 분: '+recipient+'\n받는 분 연락처: '+recipientPhone+'\n선물 배송 주소: '+giftAddress+'\n선물 메시지: '+giftMessage:'배송 주소: '+address;
     var message='[여수 언니 갓김치 주문 문의]\n주문 방식: '+orderType+'\n보내는 분: '+buyer+'\n보내는 분 연락처: '+phone+'\n'+delivery+'\n수량: '+count+'박스\n금액: '+(count*price).toLocaleString('ko-KR')+'원\n결제방법: '+payment+'\n배송 요청사항: '+memo+'\n주문 페이지: '+URL;
-    var seller='01029477775';\n    if(!confirm('주문 내용을 문자 앱으로 전달합니다. 문자 앱에서 내용을 확인한 뒤 전송해 주세요.'))return;
+    var seller='01029477775';
+    if(!confirm('주문 내용을 문자 앱으로 전달합니다. 문자 앱에서 내용을 확인한 뒤 전송해 주세요.'))return;
     if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
       window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);
     }else if(/Android/i.test(navigator.userAgent)){

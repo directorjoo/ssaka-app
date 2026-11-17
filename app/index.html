@@ -104,17 +104,6 @@
     .si-pad { padding: 0 18px; }
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
-    .km-special { position:relative; display:block; overflow:hidden; margin:0 18px 12px; padding:15px 16px 14px; border-radius:24px; color:#fff; text-decoration:none; background:linear-gradient(135deg,#8E0A1C 0%,#B3132B 62%,#7F1020 100%); box-shadow:0 15px 30px -18px rgba(116,8,25,.72); -webkit-tap-highlight-color:transparent; }
-    .km-special:active { transform:scale(.985); }
-    .km-special .km-eyebrow { display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; background:#FFE7A8; color:#713B13; font-size:11px; font-weight:900; letter-spacing:-.02em; }
-    .km-special h2 { margin:9px 0 3px; color:#FFF5E5; font-size:25px; line-height:1.15; font-weight:900; letter-spacing:-.045em; }
-    .km-special p { margin:0 92px 9px 0; color:rgba(255,255,255,.9); font-size:13px; line-height:1.45; word-break:keep-all; }
-    .km-special .km-price { display:flex; align-items:baseline; gap:6px; font-size:20px; font-weight:900; letter-spacing:-.04em; color:#FFE7A8; }
-    .km-special .km-price small { font-size:11px; font-weight:700; color:rgba(255,255,255,.82); letter-spacing:0; }
-    .km-special .km-go { position:absolute; right:13px; bottom:13px; display:flex; align-items:center; min-height:34px; padding:0 11px; border-radius:12px; background:#FFE7A8; color:#713B13; font-size:12px; font-weight:900; }
-    .km-special .km-mark { position:absolute; right:14px; top:27px; width:68px; height:68px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.3); border-radius:20px; background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.08)); box-shadow:inset 0 1px rgba(255,255,255,.25),0 10px 22px rgba(50,0,10,.16); transform:rotate(5deg); }
-    .km-special .km-mark span { font-size:34px; filter:drop-shadow(0 3px 3px rgba(0,0,0,.18)); }
-    .km-special .km-mark b { position:absolute; right:-5px; bottom:-5px; padding:3px 7px; border-radius:8px; background:#fff; color:#9A182A; font-size:11px; font-weight:900; }
     .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
     .wr:active { transform: scale(.985); }
     .wr i { font-style: normal; font-size: 34px; line-height: 1; }
@@ -125,14 +114,16 @@
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { color: #F4E7C8; margin: 2px 0 0; font-size: 34px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
     .mk p { margin: 8px 0 14px; font-size: 14.5px; line-height: 1.5; opacity: .95; word-break: keep-all; padding-right: 84px; }
+    .mk-main { display: block; color: inherit; text-decoration: none; }
+    .mk-main:active { opacity: .92; }
     .mk .ad { position: absolute; right: 8px; top: 6px; width: 96px; height: 128px; pointer-events: none; }
-    .mk .mini { position: absolute; left: 22px; top: 4px; width: 60px; height: 78px; border-radius: 12px; background: #fff; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 9px 8px; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
+    .mk .mini { position: absolute; left: 22px; top: 4px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 78px; border-radius: 12px; background: #fff; color: #B3132B; text-decoration: none; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 6px 5px; pointer-events: auto; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
     .mk .dance { position: absolute; left: 0; bottom: 0; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
     @keyframes mkWave { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg) translateY(-3px); } }
     @keyframes mkHop { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
     @media (prefers-reduced-motion: reduce) { .mk .mini, .mk .dance { animation: none; } }
-    .mk .mini::before { content: ""; display: block; margin: 0 auto; width: 22px; height: 22px; border-radius: 50%; background: #FBE3E6 url(../img/cherry.svg) center/15px no-repeat; margin-bottom: 4px; }
-    .mk .mini .w { display: block; text-align: center; margin-top: 6px; font-size: 17px; font-weight: 900; color: #B3132B; letter-spacing: -.05em; line-height: 1.1; word-break: keep-all; }
+    .mk .mini::before { content: ""; display: block; margin: 0 auto 3px; width: 18px; height: 18px; flex: none; border-radius: 50%; background: #FBE3E6 url(../img/cherry.svg) center/13px no-repeat; }
+    .mk .mini .w { display: block; text-align: center; margin-top: 1px; font-size: 11px; font-weight: 900; color: #B3132B; letter-spacing: -.06em; line-height: 1.25; word-break: keep-all; }
     .mk .mini .w.long { font-size: 14px; }
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
@@ -494,23 +485,15 @@
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="28" height="28" style="vertical-align:-7px"> 친구야 놀자!</span><small>보고 싶은 친구 부르기</small></a></div>';
     v.appendChild(eh);
-    // 싸바알림 — 누르면 싸바알림 화면(무엇을 만들까요)으로
-    var mk = el('a', 'mk'); mk.href = '#alim'; mk.setAttribute('aria-label', '싸바알림 — 가게홍보 · 모임공지 · 프로필 · 초대장 · 스마트명함');
-    mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><b class="w">오픈!</b></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>싸바알림</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장 · 스마트명함<br><small>카톡 · SNS에 올리세요!</small></p>' +
-      '<span class="go">✏️ 1분 만에 만들기 ›</span>';
+    // 싸바알림 — 본문은 기존 알림 만들기로, 오른쪽 작은 흔들리는 흰 카드는 언니김치 특판으로
+    var mk = el('div', 'mk');
+    mk.innerHTML = '<a class="mk-main" href="#alim" aria-label="싸바알림 — 가게홍보 · 모임공지 · 프로필 · 초대장 · 스마트명함"><h2>싸바알림</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장 · 스마트명함<br><small>카톡 · SNS에 올리세요!</small></p><span class="go">✏️ 1분 만에 만들기 ›</span></a>' +
+      '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치특판"><b class="w">언니김치<br>특판</b></a><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div>';
     v.appendChild(mk);
-    // 여수언니 갓김치 특판 — 상품 페이지로 바로 연결
-    var km = el('a', 'km-special'); km.href = '../kimchi/'; km.setAttribute('aria-label', '여수언니 갓김치 특판, 5kg 60,000원, 배송비 포함');
-    km.innerHTML = '<span class="km-eyebrow">🍒 싸바 특판 · 여수 산지직송</span><div class="km-mark" aria-hidden="true"><span>🥬</span><b>5kg</b></div><h2>여수언니 갓김치</h2><p>알싸한 돌산갓의 깊은 맛 · 한 박스 5kg</p><div class="km-price">60,000원 <small>배송비 포함</small></div><span class="km-go">특판 보러가기 ›</span>';
-    v.appendChild(km);
     // 블로그 글쓰기
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
     v.appendChild(wr);
-    // 카드에 홍보 단어가 한 번 흔들릴 때마다 바뀜
-    (function () { var W = ['오픈!', '할인', '신메뉴', '예약', '이벤트', '단골 모집'], i = 0, w = mk.querySelector('.w');
-      if (!w || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
-      clearInterval(window.__mkW); window.__mkW = setInterval(function () { if (!document.body.contains(w)) return clearInterval(window.__mkW); i = (i + 1) % W.length; w.textContent = W[i]; w.classList.toggle('long', W[i].length > 3); }, 1600); })();
     if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
     // 내가 만든 카드 — 3장만, 나머지는 "더 보기"
     var mine = S.mine();

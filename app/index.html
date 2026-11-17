@@ -104,6 +104,17 @@
     .si-pad { padding: 0 18px; }
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
+    .km-special { position:relative; display:block; overflow:hidden; margin:0 18px 12px; padding:15px 16px 14px; border-radius:24px; color:#fff; text-decoration:none; background:linear-gradient(135deg,#8E0A1C 0%,#B3132B 62%,#7F1020 100%); box-shadow:0 15px 30px -18px rgba(116,8,25,.72); -webkit-tap-highlight-color:transparent; }
+    .km-special:active { transform:scale(.985); }
+    .km-special .km-eyebrow { display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; background:#FFE7A8; color:#713B13; font-size:11px; font-weight:900; letter-spacing:-.02em; }
+    .km-special h2 { margin:9px 0 3px; color:#FFF5E5; font-size:25px; line-height:1.15; font-weight:900; letter-spacing:-.045em; }
+    .km-special p { margin:0 92px 9px 0; color:rgba(255,255,255,.9); font-size:13px; line-height:1.45; word-break:keep-all; }
+    .km-special .km-price { display:flex; align-items:baseline; gap:6px; font-size:20px; font-weight:900; letter-spacing:-.04em; color:#FFE7A8; }
+    .km-special .km-price small { font-size:11px; font-weight:700; color:rgba(255,255,255,.82); letter-spacing:0; }
+    .km-special .km-go { position:absolute; right:13px; bottom:13px; display:flex; align-items:center; min-height:34px; padding:0 11px; border-radius:12px; background:#FFE7A8; color:#713B13; font-size:12px; font-weight:900; }
+    .km-special .km-mark { position:absolute; right:14px; top:27px; width:68px; height:68px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.3); border-radius:20px; background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.08)); box-shadow:inset 0 1px rgba(255,255,255,.25),0 10px 22px rgba(50,0,10,.16); transform:rotate(5deg); }
+    .km-special .km-mark span { font-size:34px; filter:drop-shadow(0 3px 3px rgba(0,0,0,.18)); }
+    .km-special .km-mark b { position:absolute; right:-5px; bottom:-5px; padding:3px 7px; border-radius:8px; background:#fff; color:#9A182A; font-size:11px; font-weight:900; }
     .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
     .wr:active { transform: scale(.985); }
     .wr i { font-style: normal; font-size: 34px; line-height: 1; }
@@ -488,6 +499,10 @@
     mk.innerHTML = '<div class="ad" aria-hidden="true"><div class="mini"><b class="w">오픈!</b></div><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div><h2>싸바알림</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장 · 스마트명함<br><small>카톡 · SNS에 올리세요!</small></p>' +
       '<span class="go">✏️ 1분 만에 만들기 ›</span>';
     v.appendChild(mk);
+    // 여수언니 갓김치 특판 — 상품 페이지로 바로 연결
+    var km = el('a', 'km-special'); km.href = '../kimchi/'; km.setAttribute('aria-label', '여수언니 갓김치 특판, 5kg 60,000원, 배송비 포함');
+    km.innerHTML = '<span class="km-eyebrow">🍒 싸바 특판 · 여수 산지직송</span><div class="km-mark" aria-hidden="true"><span>🥬</span><b>5kg</b></div><h2>여수언니 갓김치</h2><p>알싸한 돌산갓의 깊은 맛 · 한 박스 5kg</p><div class="km-price">60,000원 <small>배송비 포함</small></div><span class="km-go">특판 보러가기 ›</span>';
+    v.appendChild(km);
     // 블로그 글쓰기
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';

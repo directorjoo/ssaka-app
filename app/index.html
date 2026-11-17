@@ -129,9 +129,9 @@
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
     .mk .go-row { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .mk .go { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 40px; padding: 4px 3px; border-radius: 15px; background: #EBD9B0; color: #123F33; font-size: 18px; line-height: 1.1; font-weight: 900; text-decoration: none; letter-spacing: -0.04em; text-align: center; white-space: nowrap; }
-    .mk .go .pencil { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform: scaleX(-1) rotate(-42deg); transform-origin: 50% 50%; animation: pencilRun .8s ease-in-out infinite; }
+    .mk .go .pencil { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform: scaleX(-1) rotate(0deg); transform-origin: 50% 50%; animation: pencilRun .8s ease-in-out infinite; }
     .mk .go .cart { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform-origin: 50% 80%; animation: cartRun .65s ease-in-out infinite; }
-    @keyframes pencilRun { 0%,100% { transform: scaleX(-1) translateY(0) rotate(-42deg); } 50% { transform: scaleX(-1) translateY(-2px) rotate(-36deg); } }
+    @keyframes pencilRun { 0%,100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 50% { transform: scaleX(-1) translateY(-2px) rotate(4deg); } }
     @keyframes cartRun { 0%,100% { transform: translateX(0) rotate(-5deg); } 50% { transform: translateX(3px) rotate(5deg); } }
     @media (max-width: 360px) {
       .mk { padding: 10px 12px 9px; }

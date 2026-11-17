@@ -129,9 +129,9 @@
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
     .mk .go-row { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .mk .go { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 40px; padding: 4px 3px; border-radius: 15px; background: #EBD9B0; color: #123F33; font-size: 18px; line-height: 1.1; font-weight: 900; text-decoration: none; letter-spacing: -0.04em; text-align: center; white-space: nowrap; }
-    .mk .go .pencil { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform: scaleX(-1) rotate(-45deg); transform-origin: 50% 50%; animation: pencilRun .8s ease-in-out infinite; }
+    .mk .go .pencil { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 25px; flex: none; animation: pencilRun .8s ease-in-out infinite; } .mk .go .pencil svg { display: block; width: 25px; height: 25px; }
     .mk .go .cart { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform-origin: 50% 80%; animation: cartRun .65s ease-in-out infinite; }
-    @keyframes pencilRun { 0%,100% { transform: scaleX(-1) translateY(0) rotate(-45deg); } 50% { transform: scaleX(-1) translateY(-2px) rotate(-40deg); } }
+    @keyframes pencilRun { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
     @keyframes cartRun { 0%,100% { transform: translateX(0) rotate(-5deg); } 50% { transform: translateX(3px) rotate(5deg); } }
     @media (max-width: 360px) {
       .mk { padding: 10px 12px 9px; }
@@ -503,7 +503,7 @@
     var mk = el('div', 'mk');
     mk.innerHTML = '<a class="mk-main" href="#alim" aria-label="싸바알림판 — 가게홍보 · 모임공지 · 프로필 · 초대장">' +
       '<h2>싸바알림판</h2><p>가게홍보 · 모임공지<br>프로필 · 초대장<br><small>SNS에 알리세요!</small></p></a>' +
-      '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true">✏️</span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
+      '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M25.8 3.2a3 3 0 0 1 4.2 4.2L10.2 27.2 3 29l1.8-7.2L25.8 3.2Z" fill="#76552b"/><path d="m4.8 21.8 5.4 5.4L3 29l1.8-7.2Z" fill="#e9c99a"/><path d="m25.8 3.2 4.2 4.2-3.8 3.8L22 7l3.8-3.8Z" fill="#b78b50"/><path d="m22 7 4.2 4.2" stroke="#f5e5c7" stroke-width="1.2"/></svg></span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
       '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w">언니김치<br>특판</b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
     v.appendChild(mk);
     // 블로그 글쓰기

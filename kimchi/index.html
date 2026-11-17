@@ -72,11 +72,11 @@
       <p class="price-note">아래 주문정보 입력은 현재 화면 계산용입니다. 실제 주문 접수·결제 연동 전에는 판매자에게 주문이 전달되지 않습니다.</p>
       <label>주문 방식</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px">
-        <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="내가 먹기" checked style="width:auto;margin:0 5px 0 0"> 내가 먹기</label>
-        <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="선물하기" style="width:auto;margin:0 5px 0 0"> 선물하기 🎁</label>
+        <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="우리 집 받기" checked style="width:auto;margin:0 5px 0 0"> 우리 집 받기</label>
+        <label style="border:1px solid #ded6d0;border-radius:12px;padding:13px;text-align:center"><input type="radio" name="orderType" value="선물 보내기" style="width:auto;margin:0 5px 0 0"> 선물 보내기 🎁</label>
       </div>
-      <label for="buyer">주문자(보내는 분) 성함</label><input id="buyer" autocomplete="name" placeholder="성함">
-      <label for="phone">주문자 휴대폰 번호</label><input id="phone" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000">
+      <label for="buyer">주문자 성함</label><input id="buyer" autocomplete="name" placeholder="성함">
+      <label for="phone">주문자 연락처</label><input id="phone" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000">
       <div id="selfDelivery">
         <label for="address">배송 주소</label><textarea id="address" rows="2" autocomplete="street-address" placeholder="받으실 주소"></textarea>
       </div>
@@ -121,13 +121,13 @@
   document.getElementById('minus').addEventListener('click',function(){count=Math.max(1,count-1);update();});
   document.getElementById('plus').addEventListener('click',function(){count=Math.min(50,count+1);update();});
   var orderRadios=document.querySelectorAll('input[name="orderType"]');
-  function setOrderType(){var gift=document.querySelector('input[name="orderType"]:checked').value==='선물하기';document.getElementById('selfDelivery').hidden=gift;document.getElementById('giftDelivery').hidden=!gift;}
+  function setOrderType(){var gift=document.querySelector('input[name="orderType"]:checked').value==='선물 보내기';document.getElementById('selfDelivery').hidden=gift;document.getElementById('giftDelivery').hidden=!gift;}
   orderRadios.forEach(function(r){r.addEventListener('change',setOrderType);});
   document.getElementById('orderInquiry').addEventListener('click',function(){
     var buyer=document.getElementById('buyer').value.trim(),phone=document.getElementById('phone').value.trim(),memo=document.getElementById('memo').value.trim(),payment=document.getElementById('payment').value;
     var orderType=document.querySelector('input[name="orderType"]:checked').value;
     var recipient=document.getElementById('recipient').value.trim(),recipientPhone=document.getElementById('recipientPhone').value.trim(),giftAddress=document.getElementById('giftAddress').value.trim(),giftMessage=document.getElementById('giftMessage').value.trim();
-    var address=orderType==='선물하기'?giftAddress:document.getElementById('address').value.trim();
+    var address=orderType==='선물 보내기'?giftAddress:document.getElementById('address').value.trim();
     if(!buyer||!phone||!address){alert('주문자 성함, 휴대폰 번호, 배송 주소를 입력해 주세요.');return;}
     if(orderType==='선물하기'&&(!recipient||!recipientPhone)){alert('선물 받는 분 성함과 휴대폰 번호를 입력해 주세요.');return;}
     var delivery=orderType==='선물하기'?'받는 분: '+recipient+'\\n받는 분 연락처: '+recipientPhone+'\\n선물 배송 주소: '+giftAddress+'\\n선물 메시지: '+giftMessage:'배송 주소: '+address;

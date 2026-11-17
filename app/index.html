@@ -102,38 +102,33 @@
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
-    /* 기존 싸바알림판 크기 안에서 좌우만 간결하게 정리 */
-    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 14px 12px 12px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
-    .mk-visuals, .mk-actions { display: grid; grid-template-columns: minmax(0,1fr) 1px minmax(0,1fr); align-items: center; }
-    .mk-visuals { min-height: 124px; }
-    .mk-alim-panel { min-width: 0; padding: 5px 7px 5px 2px; color: #fff; text-decoration: none; display: flex; flex-direction: column; justify-content: center; }
-    .mk-alim-panel h2 { margin: 0 0 5px; color: #F4E7C8; font-size: 22px; line-height: 1.12; font-weight: 900; letter-spacing: -.04em; white-space: nowrap; }
-    .mk-alim-panel p { margin: 0; font-size: 11.5px; line-height: 1.45; font-weight: 700; opacity: .96; word-break: keep-all; }
-    .mk-connector { width: 1px; height: 100%; min-height: 112px; background: rgba(255,255,255,.38); justify-self: center; }
-    .mk-right { position: relative; min-width: 0; min-height: 124px; }
-    .mk-ad { position: absolute; right: 0; top: 0; width: 126px; height: 124px; pointer-events: none; }
-    .mk-mini { position: absolute; left: 18px; top: 2px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 90px; height: 117px; border-radius: 18px; background: #fff; color: #B3132B; text-decoration: none; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 7px 6px; pointer-events: auto; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
-    .mk-mini .w { display: block; width: 100%; text-align: center; margin-top: 0; font-size: 20px; font-weight: 900; color: #B3132B; letter-spacing: -.08em; line-height: 1.25; word-break: keep-all; }
-    .mk-dance { position: absolute; left: 0; bottom: 0; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
+    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 18px 18px 14px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
+    .mk:active { transform: scale(.985); }
+    .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
+    .wr:active { transform: scale(.985); }
+    .wr i { font-style: normal; font-size: 34px; line-height: 1; }
+    .wr b { display: block; font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
+    .wr span { display: block; font-size: 13px; opacity: .88; margin-top: 3px; line-height: 1.4; word-break: keep-all; }
+    .wr em { margin-left: auto; font-style: normal; flex: none; padding: 9px 12px; border-radius: 14px; background: #fff; color: #1B3F7A; font-size: 14px; font-weight: 900; }
+    .mk p small { display: block; margin-top: 4px; font-size: 13px; opacity: .8; }
+    .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
+    .mk h2 { color: #F4E7C8; margin: 2px 0 0; font-size: 34px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; }
+    .mk p { margin: 8px 0 14px; font-size: 14px; line-height: 1.45; opacity: .95; word-break: keep-all; padding-right: 118px; }
+    .mk-main { display: block; color: inherit; text-decoration: none; }
+    .mk-main:active { opacity: .92; }
+    .mk .ad { position: absolute; right: 8px; top: 6px; width: 126px; height: 145px; pointer-events: none; }
+    .mk .mini { position: absolute; left: 18px; top: 4px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 90px; height: 117px; border-radius: 18px; background: #fff; color: #B3132B; text-decoration: none; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 7px 6px; pointer-events: auto; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
+    .mk .dance { position: absolute; left: 0; bottom: 0; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
     @keyframes mkWave { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg) translateY(-3px); } }
     @keyframes mkHop { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
-    @media (prefers-reduced-motion: reduce) { .mk-mini, .mk-dance { animation: none; } }
-    .mk-actions { margin-top: 8px; min-height: 38px; }
-    .mk-actions .mk-connector { min-height: 30px; height: 30px; }
-    .mk-action { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 38px; padding: 6px 3px; border-radius: 13px; background: #EBD9B0; color: #123F33; text-decoration: none; text-align: center; font-size: 12.5px; font-weight: 900; line-height: 1.15; letter-spacing: -.035em; white-space: nowrap; }
-    .mk-alim-panel:active, .mk-mini:active, .mk-action:active { transform: scale(.985); }
-    .mk-alim-panel:focus-visible, .mk-mini:focus-visible, .mk-action:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 2px; }
-    @media (max-width: 360px) {
-      .mk { padding: 12px 9px 10px; }
-      .mk-alim-panel { padding-right: 4px; }
-      .mk-alim-panel h2 { font-size: 18px; }
-      .mk-alim-panel p { font-size: 10.5px; }
-      .mk-mini { left: 12px; width: 84px; height: 109px; }
-      .mk-ad { width: 112px; height: 116px; }
-      .mk-visuals, .mk-right { min-height: 116px; }
-      .mk-dance { width: 58px; height: 52px; }
-      .mk-action { font-size: 11.5px; }
-    }
+    @media (prefers-reduced-motion: reduce) { .mk .mini, .mk .dance { animation: none; } }
+    .mk .mini::before { display: none; }
+    .mk .mini .w { display: block; width: 100%; text-align: center; margin-top: 0; font-size: 20px; font-weight: 900; color: #B3132B; letter-spacing: -.08em; line-height: 1.25; word-break: keep-all; }
+    .mk .mini .w.long { font-size: 14px; }
+    .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+    .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
+    .mk .go-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mk .go { display: flex; align-items: center; justify-content: center; min-height: 54px; padding: 6px 4px; border-radius: 18px; background: #EBD9B0; color: #123F33; font-size: 15px; line-height: 1.15; font-weight: 900; text-decoration: none; letter-spacing: -0.03em; text-align: center; white-space: nowrap; }
     .story { margin: 0 18px 12px; padding: 16px 16px 14px; border-radius: 22px; background: #FFF7E6; box-shadow: inset 0 0 0 1.5px #F3D9A4; }
     .story .st-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .story .st-top img { width: 46px; height: 46px; flex: none; }
@@ -491,18 +486,12 @@
     eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="28" height="28" style="vertical-align:-7px"> 친구야 놀자!</span><small>보고 싶은 친구 부르기</small></a></div>';
     v.appendChild(eh);
-    // 원래 크기와 초록색을 유지하고, 좌우 내용만 간결하게 정리
-    var mk = el('section', 'mk');
-    mk.setAttribute('aria-label', '싸바알림판과 언니김치 특판');
-    mk.innerHTML = '<div class="mk-visuals">' +
-      '<a class="mk-alim-panel" href="#alim" aria-label="싸바알림판"><h2>싸바알림판</h2><p>가게홍보 · 모임공지<br>프로필 · 초대장<br>SNS에 올리세요!</p></a>' +
-      '<span class="mk-connector" aria-hidden="true"></span>' +
-      '<div class="mk-right"><div class="mk-ad"><a class="mk-mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w">언니김치<br>특판</b></a><img class="mk-dance" src="../img/cherry-dance-anim.svg" alt=""></div></div>' +
-      '</div><div class="mk-actions">' +
-      '<a class="mk-action" href="#alim">1분에 만들기</a>' +
-      '<span class="mk-connector" aria-hidden="true"></span>' +
-      '<a class="mk-action" href="../kimchi/">특판코너 가기</a>' +
-      '</div>';
+    // 기존 싸바알림판의 크기와 디자인은 유지하고 문구와 하단 바로가기만 정리
+    var mk = el('div', 'mk');
+    mk.innerHTML = '<a class="mk-main" href="#alim" aria-label="싸바알림판 — 가게홍보 · 모임공지 · 프로필 · 초대장">' +
+      '<h2>싸바알림판</h2><p>가게홍보 · 모임공지 · 프로필<br>초대장<br><small>SNS에 올리세요!</small></p></a>' +
+      '<div class="go-row"><a class="go" href="#alim">✏️ 1분에 만들기</a><a class="go" href="../kimchi/">특판코너 가기</a></div>' +
+      '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w">언니김치<br>특판</b></a><img class="dance" src="../img/cherry-dance-anim.svg" alt=""></div>';
     v.appendChild(mk);
     // 블로그 글쓰기
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');

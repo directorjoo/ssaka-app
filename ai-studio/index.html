@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#B3132B">
+<title>싸바 AI 스튜디오</title>
+<style>
+:root{--red:#B3132B;--deep:#8E0A1C;--soft:#FBE9EC;--ink:#252326;--muted:#77717a;--line:#eee8e9;--paper:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:#f7f5f5;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+header{background:var(--paper);border-bottom:1px solid var(--line);padding:18px 18px 15px}
+.head{max-width:760px;margin:auto;display:flex;align-items:center;gap:11px}
+.logo{width:39px;height:39px;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:22px}
+h1{font-size:19px;margin:0;font-weight:850;letter-spacing:-.5px}
+.sub{font-size:12px;color:var(--muted);margin-top:3px}
+main{max-width:760px;margin:22px auto;padding:0 15px 48px}
+.intro{padding:18px 18px 17px;border-radius:19px;background:linear-gradient(135deg,#fff 0%,#fff8f9 100%);border:1px solid #f1dfe2;box-shadow:0 7px 22px #5a18200b}
+.intro strong{display:block;font-size:17px;letter-spacing:-.4px}
+.intro p{font-size:13px;line-height:1.65;color:#69636a;margin:7px 0 0}
+.tabs{display:flex;gap:8px;margin:17px 0 12px}
+.tab{flex:1;border:1px solid #e9e1e3;background:#fff;color:#5e555a;border-radius:13px;padding:13px 8px;font-size:14px;font-weight:750}
+.tab[aria-selected=true]{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 5px 13px #b3132b26}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 5px 18px #20101608}
+label{display:block;font-size:13px;font-weight:750;margin:0 0 8px}
+textarea,select,input[type=file]{width:100%;font:inherit}
+textarea{border:1px solid #e6dfe1;border-radius:12px;padding:13px;min-height:125px;resize:vertical;font-size:14px;line-height:1.6;outline:none}
+textarea:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px #b3132b12}
+select{border:1px solid #e6dfe1;border-radius:11px;padding:12px;background:#fff;font-size:14px}
+.field{margin-bottom:16px}
+.hint{font-size:12px;color:var(--muted);line-height:1.55;margin:7px 1px 0}
+.upload{display:block;border:1px dashed #d9c8cc;border-radius:13px;padding:16px;background:#fffafb}
+.upload input{font-size:13px}
+.preview{display:none;max-width:100%;max-height:230px;object-fit:contain;border-radius:12px;margin:12px auto 0}
+.primary{width:100%;border:0;border-radius:13px;background:var(--red);color:#fff;padding:15px;font-size:15px;font-weight:800;box-shadow:0 6px 15px #b3132b24}
+.primary:disabled{opacity:.55}
+.result{display:none;margin-top:15px;padding:17px;border:1px solid #eadfe1;border-radius:16px;background:#fff}
+.result h2{font-size:14px;margin:0 0 10px}
+.resultText{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.8;color:#373137}
+.copy{margin-top:13px;border:1px solid #e5dadd;background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;color:var(--deep)}
+.notice{margin-top:14px;padding:12px 14px;border-radius:12px;background:#f3f0f1;color:#716970;font-size:12px;line-height:1.65}
+.status{font-size:13px;color:var(--muted);text-align:center;margin:12px 0 0;min-height:20px}
+@media(min-width:600px){header{padding:21px}.intro{padding:22px}.panel{padding:22px}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="logo">🍒</div><div><h1>싸바 AI 스튜디오</h1><div class="sub">사진과 아이디어를 더 멋지게 준비하는 곳</div></div></div></header>
+<main>
+<section class="intro">
+<strong>만들고 싶은 이미지를 말해 주세요.</strong>
+<p>Claude가 아이디어를 정리하고, 사진을 살펴보고, 이미지 제작에 쓸 구체적인 지시문을 만들어 줍니다.</p>
+</section>
+
+<div class="tabs" role="tablist" aria-label="AI 기능 선택">
+<button class="tab" id="tab-prompt" type="button" role="tab" aria-selected="true">✍️ 이미지 기획</button>
+<button class="tab" id="tab-analyze" type="button" role="tab" aria-selected="false">🖼️ 사진 분석</button>
+</div>
+
+<section class="panel">
+<div id="prompt-panel">
+<div class="field">
+<label for="kind">무엇을 만들까요?</label>
+<select id="kind">
+<option value="홍보 이미지">가게·상품 홍보 이미지</option>
+<option value="초대장">초대장·모임 안내</option>
+<option value="프로필 이미지">프로필·명함 이미지</option>
+<option value="포스터">포스터·행사 이미지</option>
+<option value="상품 사진">상품 사진</option>
+<option value="general">자유롭게 만들기</option>
+</select>
+</div>
+<div class="field">
+<label for="prompt">원하는 이미지를 설명해 주세요.</label>
+<textarea id="prompt" maxlength="3000" placeholder="예: 겨울 느낌의 고급스러운 갓김치 홍보 이미지. 실제 갓김치 사진을 중심으로 하고, 배경은 따뜻한 나무 식탁. 글자는 나중에 넣을 수 있도록 여백을 남겨줘."></textarea>
+<p class="hint">원하는 분위기, 색상, 사진 속 대상, 넣고 싶은 문구를 적어 주세요.</p>
+</div>
+<button class="primary" id="make-prompt" type="button">이미지 제작 지시문 만들기</button>
+</div>
+
+<div id="analyze-panel" hidden>
+<div class="field">
+<label for="photo">분석할 사진을 선택해 주세요.</label>
+<div class="upload"><input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><img id="preview" class="preview" alt="선택한 사진 미리보기"></div>
+<p class="hint">JPG·PNG·WEBP·GIF, 최대 4MB. 사진은 분석 요청에만 사용하며 싸바 서버에 저장하지 않습니다.</p>
+</div>
+<div class="field">
+<label for="note">어떤 점을 살펴볼까요?</label>
+<textarea id="note" maxlength="1200" placeholder="예: 이 사진을 김치 상품 홍보에 쓰고 싶어. 원본 느낌은 살리고 배경과 밝기를 어떻게 개선하면 좋을지 알려줘."></textarea>
+</div>
+<button class="primary" id="analyze-photo" type="button">사진 분석하기</button>
+</div>
+
+<div class="status" id="status" aria-live="polite"></div>
+<div class="result" id="result" aria-live="polite">
+<h2>🍒 싸바 AI의 제안</h2>
+<div class="resultText" id="result-text"></div>
+<button class="copy" id="copy-result" type="button">결과 복사</button>
+</div>
+</section>
+
+<div class="notice">현재 1단계는 Claude의 이미지 기획·사진 분석 기능입니다. 실제 이미지 파일 생성, 배경 제거, 사진 합성은 별도 이미지 생성 API를 연결하는 다음 단계에서 추가합니다.</div>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let mode = 'prompt';
+  let selectedFile = null;
+  let lastResult = '';
+  const deviceKey = 'sava-ai-studio-device';
+  let device = '';
+  try {
+    device = localStorage.getItem(deviceKey) || '';
+    if (!device) {
+      device = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+      localStorage.setItem(deviceKey, device);
+    }
+  } catch (e) { device = 'browser-session'; }
+
+  function setMode(next) {
+    mode = next;
+    $('tab-prompt').setAttribute('aria-selected', String(next === 'prompt'));
+    $('tab-analyze').setAttribute('aria-selected', String(next === 'analyze'));
+    $('prompt-panel').hidden = next !== 'prompt';
+    $('analyze-panel').hidden = next !== 'analyze';
+    $('status').textContent = '';
+    $('result').style.display = 'none';
+  }
+  $('tab-prompt').addEventListener('click', () => setMode('prompt'));
+  $('tab-analyze').addEventListener('click', () => setMode('analyze'));
+
+  $('photo').addEventListener('change', () => {
+    selectedFile = $('photo').files && $('photo').files[0] || null;
+    const img = $('preview');
+    if (!selectedFile) { img.style.display = 'none'; img.removeAttribute('src'); return; }
+    if (selectedFile.size > 4 * 1024 * 1024) {
+      selectedFile = null;
+      $('photo').value = '';
+      img.style.display = 'none';
+      $('status').textContent = '사진은 4MB 이하로 선택해 주세요.';
+      return;
+    }
+    img.src = URL.createObjectURL(selectedFile);
+    img.style.display = 'block';
+  });
+
+  function fileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const value = String(reader.result || '');
+        resolve(value.slice(value.indexOf(',') + 1));
+      };
+      reader.onerror = () => reject(new Error('사진을 읽지 못했어요.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function callApi(payload, button) {
+    button.disabled = true;
+    $('status').textContent = 'Claude가 살펴보고 있어요…';
+    $('result').style.display = 'none';
+    try {
+      const response = await fetch('/api/ai-studio', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ...payload, device })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        const messages = {
+          'no-key': '서버 API 키 설정을 확인해야 해요.',
+          'no-db': '서버 데이터 연결을 확인해야 해요.',
+          'daily-limit': '오늘 사용할 수 있는 횟수를 다 썼어요.',
+          'image-big': '사진 용량이 4MB를 넘어요.',
+          'image-type': 'JPG·PNG·WEBP·GIF 사진을 선택해 주세요.'
+        };
+        throw new Error(messages[data.error] || '요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      }
+      lastResult = data.result || '';
+      $('result-text').textContent = lastResult;
+      $('result').style.display = 'block';
+      $('status').textContent = '완료했어요.';
+    } catch (error) {
+      $('status').textContent = error.message || '연결에 실패했어요.';
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  $('make-prompt').addEventListener('click', () => {
+    const prompt = $('prompt').value.trim();
+    if (prompt.length < 5) { $('status').textContent = '만들고 싶은 이미지를 조금 더 설명해 주세요.'; return; }
+    callApi({ mode: 'prompt', kind: $('kind').value, prompt }, $('make-prompt'));
+  });
+
+  $('analyze-photo').addEventListener('click', async () => {
+    if (!selectedFile) { $('status').textContent = '먼저 사진을 선택해 주세요.'; return; }
+    const button = $('analyze-photo');
+    button.disabled = true;
+    try {
+      const image = await fileAsBase64(selectedFile);
+      await callApi({ mode: 'analyze', image, mimeType: selectedFile.type, note: $('note').value.trim() }, button);
+    } catch (error) {
+      $('status').textContent = error.message || '사진을 읽지 못했어요.';
+      button.disabled = false;
+    }
+  });
+
+  $('copy-result').addEventListener('click', async () => {
+    if (!lastResult) return;
+    try { await navigator.clipboard.writeText(lastResult); $('status').textContent = '복사했어요.'; }
+    catch (e) { $('status').textContent = '복사할 수 없어요. 결과를 길게 눌러 복사해 주세요.'; }
+  });
+})();
+</script>
+</body>
+</html>

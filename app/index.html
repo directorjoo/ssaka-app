@@ -117,8 +117,8 @@
     .mk-main { display: block; color: inherit; text-decoration: none; }
     .mk-main:active { opacity: .92; }
     .mk .ad { position: absolute; right: 8px; top: 6px; width: 126px; height: 145px; pointer-events: none; }
-    .mk .mini { position: absolute; left: 18px; top: 4px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 14px; background: #fff; color: #B3132B; text-decoration: none; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 6px; pointer-events: auto; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
-    .mk .dance { position: absolute; left: 24px; top: -4px; bottom: auto; z-index: 3; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
+    .mk .mini { position: absolute; left: 18px; top: 14px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 14px; background: #fff; color: #B3132B; text-decoration: none; box-shadow: 0 10px 22px rgba(0,0,0,.3); padding: 6px; pointer-events: auto; transform-origin: 50% 120%; animation: mkWave 1.6s ease-in-out infinite; }
+    .mk .dance { position: absolute; left: 24px; top: -12px; bottom: auto; z-index: 3; width: 64px; height: 57px; animation: mkHop .8s ease-in-out infinite; }
     @keyframes mkWave { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg) translateY(-3px); } }
     @keyframes mkHop { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
     @media (prefers-reduced-motion: reduce) { .mk .mini, .mk .dance { animation: none; } }

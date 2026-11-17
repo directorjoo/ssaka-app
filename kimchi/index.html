@@ -25,7 +25,7 @@
     .order input,.order textarea{width:100%;padding:13px;border:1px solid #ded6d0;border-radius:10px;font:inherit;margin:6px 0 12px;background:#fff}
     label{font-size:20px;line-height:1.6;font-weight:800;word-break:keep-all}.qty{display:flex;align-items:center;gap:14px;margin:10px 0 16px}.qty button{width:42px;height:42px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:33px}
     .total{font-size:35px;font-weight:900;color:#9b2424}.foot{text-align:center;color:#786e66;font-size:18px;line-height:1.8;padding:22px 8px;word-break:keep-all}
-    .kakao-bottom{display:none;position:fixed;left:0;right:0;bottom:0;z-index:1000;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eadbd2;box-shadow:0 -4px 18px #00000012;grid-template-columns:1fr 1fr;gap:9px}.kakao-bottom .btn{min-height:48px;font-size:16px;padding:9px 8px}.kakao-bottom .home{background:#7f1d1d;color:#fff}body.kakao-inapp{padding-bottom:90px}body.kakao-inapp .kakao-bottom{display:grid}
+    .kakao-bottom{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:1000;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eadbd2;box-shadow:0 -4px 18px #00000012;grid-template-columns:1fr 1fr;gap:9px}.kakao-bottom .btn{min-height:48px;font-size:16px;padding:9px 8px}.kakao-bottom .home{background:#7f1d1d;color:#fff}body{padding-bottom:88px}.cherry-tap{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 0 4px}.cherry-tap img{width:48px;height:48px;object-fit:contain;animation:cherryTap 1.4s ease-in-out infinite}.cherry-tap .barrel{font-size:34px;display:inline-block;transform-origin:center;animation:barrelBump 1.4s ease-in-out infinite}@keyframes cherryTap{0%,100%{transform:translateY(0) rotate(-5deg)}45%{transform:translateY(-7px) rotate(8deg)}60%{transform:translateY(0) rotate(-8deg)}}@keyframes barrelBump{0%,35%,100%{transform:rotate(0)}48%{transform:rotate(-9deg) translateX(-2px)}58%{transform:rotate(8deg) translateX(2px)}}
   </style>
 </head>
 <body>
@@ -99,6 +99,7 @@
       </div>
       <p class="price-note">원하는 방법을 선택해 주문 내용을 보내주세요.</p>
     </section>
+    <div class="cherry-tap" aria-label="싸바 체리가 통을 두드리는 모습"><img src="../img/cherry-dance-anim.svg" alt="싸바 체리"><span class="barrel" aria-hidden="true">🛢️</span></div>
     <div class="actions">
       <button class="btn kakao" id="kakaoShare">💬 카카오톡으로 언니김치 소개하기</button>
       <button class="btn light" id="copyLink">🔗 언니김치 소개 링크 복사하기</button>
@@ -112,13 +113,12 @@
 <script>
 (function(){
   var KEY='3a133064daebee3be143bc4a1a940c47';
-  var isKakaoInApp=/KAKAOTALK/i.test(navigator.userAgent);
-  if(isKakaoInApp){
-    document.body.classList.add('kakao-inapp');
-    document.getElementById('returnKakao').addEventListener('click',function(){
-      window.location.href='kakaotalk://inappbrowser/close';
-    });
-  }
+  var isKakaoInApp=/KAKAOTALK|KakaoTalk/i.test(navigator.userAgent);
+  document.getElementById('returnKakao').addEventListener('click',function(){
+    if(isKakaoInApp){window.location.href='kakaotalk://inappbrowser/close';}
+    else if(history.length>1){history.back();}
+    else{window.location.href='https://talk.kakao.com/';}
+  });
   var URL='https://sava.kr/kimchi/';
   var shareText='여수 언니 갓김치가 올해도 찾아왔습니다! 🌿\n5kg 한 박스 60,000원(배송비 포함), 작년과 동일한 가격입니다.\n정성껏 담근 여수 돌산 갓김치 맛보세요.';
   var kakaoBtn=document.getElementById('kakaoShare');

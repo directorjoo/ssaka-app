@@ -7,7 +7,6 @@
   <meta name="description" content="여수 언니 갓김치 5kg 한 박스 60,000원. 작년과 동일, 배송비 포함.">
   <meta property="og:title" content="여수언니 명품 갓김치 5kg">
   <meta property="og:description" content="5kg 60,000원 · 배송비 포함, 작년과 동일 · 여수 산지직송">
-  <meta property="og:url" content="https://sava.kr/kimchi/?s=2">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://sava.kr/img/gatkimchi-share.jpg">
   <meta property="og:image:width" content="800">
@@ -143,7 +142,9 @@ fit();window.addEventListener('resize',fit);if(document.fonts&&document.fonts.re
 <script>
 (function(){
   var KEY='3a133064daebee3be143bc4a1a940c47';
-  var URL='https://sava.kr/kimchi/?s=2'; // 카톡 미리보기 캐시를 새로 받게 주소 끝 번호를 바꿈
+  var URL='https://sava.kr/kimchi/';
+  // 사이트를 고칠 때마다 올라가는 버전 번호를 주소 끝에 붙여서, 카톡이 늘 새 미리보기를 받아 오게 함 (손댈 것 없음)
+  fetch('/version.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j&&j.v)URL='https://sava.kr/kimchi/?v='+String(j.v).replace(/[^0-9a-z.-]/gi,'');}).catch(function(){});
   var shareText='여수 언니 갓김치가 올해도 찾아왔습니다! 🌿\n5kg 한 박스 60,000원(배송비 포함), 작년과 동일한 가격입니다.\n정성껏 담근 여수 돌산 갓김치 맛보세요.';
   var kakaoBtn=document.getElementById('kakaoShare');
   function copy(text){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){alert('복사했습니다. 카카오톡 대화방에 붙여넣으세요.');}).catch(function(){window.prompt('아래 내용을 복사하세요',text);});}else{window.prompt('아래 내용을 복사하세요',text);}}

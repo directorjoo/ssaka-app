@@ -918,49 +918,76 @@
     var i = 0; try { i = (parseInt(localStorage.getItem('sava-poem') || '-1', 10) + 1) % P.length; localStorage.setItem('sava-poem', String(i)); } catch (e) {}
     var el = document.getElementById('missPoem'); if (!el) return;
     var p = P[i];
-    el.textContent = '“' + p[0] + '”';
-    var s = document.createElement('small'); s.textContent = '— ' + p[1]; el.appendChild(s);
-    var m = document.createElement('span'); m.className = 'more'; m.textContent = '📜 시 전편 감상하기'; el.appendChild(m);
+    function paintFrame() {
+      el.textContent = '“' + p[0] + '”';
+      var s = document.createElement('small'); s.textContent = '— ' + p[1]; el.appendChild(s);
+      var m = document.createElement('span'); m.className = 'more'; m.textContent = '📜 시 전편 감상하기'; el.appendChild(m);
+    }
+    paintFrame();
     function esc(t) { return t.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
-    function openPoem() {
-      var full = esc(p[2]);
-      // 머리말에 나온 구절은 형광펜으로 (줄이 나뉘어 있어도 각 줄을 찾아 칠함)
-      var lines = full.split('\n').map(function (ln) {
+    function linesOf(q) {
+      return esc(q[2]).split('\n').map(function (ln) {
         var flat = ln.replace(/[,.…]/g, '').trim();
-        var hit = flat && p[0].replace(/[,.…]/g, '').indexOf(flat) > -1 && flat.length > 1;
-        if (!hit && ln.indexOf(p[0]) > -1) return ln.replace(p[0], '<span class="hl">' + p[0] + '</span>');
+        var hit = flat && q[0].replace(/[,.…]/g, '').indexOf(flat) > -1 && flat.length > 1;
+        if (!hit && ln.indexOf(q[0]) > -1) return ln.replace(q[0], '<span class="hl">' + q[0] + '</span>');
         return hit ? '<span class="hl">' + ln + '</span>' : ln;
       }).join('\n');
-      var title = p[1].replace(/^.*「(.*)」.*$/, '$1'), who = p[1].replace(/\s*「.*」/, '');
-      if (title === p[1]) { title = '“' + p[0] + '”'; }
-      var sh = document.createElement('div'); sh.className = 'psheet'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-label', p[1] + ' 전편');
+    }
+    var REPEAT = 3; // 같은 시를 세 번 흘려보내고 다음 시인으로
+    function openPoem() {
+      var sh = document.createElement('div'); sh.className = 'psheet'; sh.setAttribute('role', 'dialog');
       sh.innerHTML = '<div class="frame"><i class="gem g1"></i><i class="gem g2"></i><i class="gem g3"></i><i class="gem g4"></i><i class="crown" aria-hidden="true"></i><div class="frame-in"><div class="partbg"></div><div class="pview"><div class="proll"><h2></h2><span class="by"></span><div class="pt"></div><span class="last">💭 이 시를 읽으니,<br>누가 떠오르세요?</span></div></div></div></div>' +
-        '<div class="pbtns"><button type="button" class="psend">💌 이 구절 담아 안부 보내기</button><button type="button" class="x">닫기</button></div><div class="phint">화면을 누르면 멈췄다 흘러가요</div><div class="partcap"></div><div class="pmus">♪ 슈베르트 「겨울 나그네」 · 1928년 한스 두한 녹음</div>';
-      sh.querySelector('h2').textContent = title; sh.querySelector('.by').textContent = who + (p[3] ? ' · ' + p[3] : '');
-      sh.querySelector('.pt').innerHTML = lines;
+        '<div class="pbtns"><button type="button" class="psend">💌 이 구절 담아 안부 보내기</button><button type="button" class="x">닫기</button></div><div class="phint">화면을 누르면 멈췄다 흘러가요 · 세 번 흐르면 다음 시로</div><div class="partcap"></div><div class="pmus">♪ 슈베르트 「겨울 나그네」</div>';
       document.body.appendChild(sh); document.body.style.overflow = 'hidden'; if (window.SavaMusic) { SavaMusic.start(); SavaMusic.paint(); }
-      (function () { var art = ART[p[1]] || ART['_'], k = 0, bg = sh.querySelector('.partbg'), img = new Image();
-        img.alt = ''; img.decoding = 'async'; img.style.setProperty('--fo', art[2]);
-        img.onload = function () { sh.classList.add('art'); img.classList.add('on'); pan(); var sn = ART['윤동주 「별 헤는 밤」'][1][0]; sh.querySelector('.partcap').textContent = '🎨 ' + (k < art[1].length - 2 ? art[0] : (art[1][k] === sn ? ART['윤동주 「별 헤는 밤」'][0] : ART['_'][0])); };
-        img.onerror = function () { k++; if (k < art[1].length) img.src = art[1][k]; else bg.remove(); };
-        // 영상처럼: 그림을 액자보다 크게 깔고 좌우(세로 그림은 위아래)로 천천히 훑으며 다가갔다 물러났다 반복
-        function pan() { if (!img.animate) return; var W = bg.clientWidth, H = bg.clientHeight, r = img.naturalWidth / img.naturalHeight, wide = r > W / H;
-          var w = wide ? H * r : W, h = wide ? H : W / r, ox = Math.max(0, w - W), oy = Math.max(0, h - H);
-          img.style.cssText += ';width:' + w + 'px;height:' + h + 'px;max-width:none;inset:auto;left:0;top:0;object-fit:fill;transform-origin:0 0';
-          var z1 = 1.06, z2 = 1.22, ex = -(ox + w * (z2 - 1) * .5), ey = -(oy + h * (z2 - 1) * .5);
-          img.animate([{ transform: 'translate(0,0) scale(' + z1 + ')' }, { transform: 'translate(' + (wide ? ex : -w * (z2 - 1) * .4) + 'px,' + (wide ? -h * (z2 - 1) * .4 : ey) + 'px) scale(' + z2 + ')' }],
-            { duration: Math.max(16000, Math.max(ox, oy) * 45), direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' }); }
-        bg.appendChild(img); img.src = art[1][0]; })();
-      var view = sh.querySelector('.pview'), roll = sh.querySelector('.proll'), last = roll.querySelector('.last'), anim = null;
+      var bg = sh.querySelector('.partbg'), view = sh.querySelector('.pview'), roll = sh.querySelector('.proll'), last = roll.querySelector('.last');
+      var anim = null, timer = null, round = 0, alive = true, curImg = null;
       var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-      requestAnimationFrame(function () {
-        var vh = view.clientHeight, end = -(last.offsetTop + last.offsetHeight / 2 - vh / 2), dist = vh - end;
-        if (reduce || !roll.animate) { roll.style.position = 'static'; roll.style.padding = '40px 22px'; sh.querySelector('.phint').hidden = true; return; }
-        var bgi = sh.querySelector('.partbg img'); if (bgi) bgi.style.setProperty('--kb', Math.round(Math.max(16000, dist * 38) / 1000 + 6) + 's');
-        anim = roll.animate([{ transform: 'translateY(' + vh + 'px)' }, { transform: 'translateY(' + end + 'px)' }], { duration: Math.max(16000, dist * 38), easing: 'cubic-bezier(.25,.1,.35,1)', fill: 'forwards' });
-        anim.onfinish = function () { sh.querySelector('.psend').classList.add('go'); sh.querySelector('.phint').hidden = true; };
-      });
-      function close() { if (anim) anim.cancel(); sh.remove(); document.body.style.overflow = ''; el.focus(); }
+      function setArt() {
+        var art = ART[p[1]] || ART['_'], k = 0, img = new Image(), sn = ART['윤동주 「별 헤는 밤」'];
+        img.alt = ''; img.decoding = 'async';
+        img.onload = function () { if (!alive) return; sh.classList.add('art'); var old = curImg; curImg = img; requestAnimationFrame(function () { img.classList.add('on'); }); pan(img);
+          if (old) setTimeout(function () { old.remove(); }, 1900);
+          sh.querySelector('.partcap').textContent = '🎨 ' + (k < art[1].length - 2 ? art[0] : (art[1][k] === sn[1][0] ? sn[0] : ART['_'][0])); };
+        img.onerror = function () { k++; if (k < art[1].length) img.src = art[1][k]; else img.remove(); };
+        bg.appendChild(img); img.src = art[1][0];
+      }
+      // 영상처럼: 그림을 액자보다 크게 깔고 좌우(세로 그림은 위아래)로 훑으며 다가갔다 물러났다 반복
+      function pan(img) { if (!img.animate) return; var W = bg.clientWidth, H = bg.clientHeight, r = img.naturalWidth / img.naturalHeight, wide = r > W / H;
+        var w = wide ? H * r : W, h = wide ? H : W / r, ox = Math.max(0, w - W), oy = Math.max(0, h - H);
+        img.style.cssText += ';width:' + w + 'px;height:' + h + 'px;max-width:none;inset:auto;left:0;top:0;object-fit:fill;transform-origin:0 0';
+        // 처음엔 크게 다가가 있다가 → 천천히 작아지며(물러나며) 그림 전체로 → 다시 다가가기 반복
+        var zb = 1.35, sx = -w * (zb - 1) * .5, sy = -h * (zb - 1) * .5;
+        img.animate([{ transform: 'translate(' + sx + 'px,' + sy + 'px) scale(' + zb + ')' }, { transform: 'translate(' + (-ox) + 'px,' + (-oy) + 'px) scale(1)' }],
+          { duration: Math.max(18000, Math.max(ox, oy) * 45), direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' }); }
+      function setPoem() {
+        var title = p[1].replace(/^.*「(.*)」.*$/, '$1'), who = p[1].replace(/\s*「.*」/, '');
+        if (title === p[1]) title = '“' + p[0] + '”';
+        sh.setAttribute('aria-label', p[1] + ' 전편');
+        sh.querySelector('h2').textContent = title; sh.querySelector('.by').textContent = who + (p[3] ? ' · ' + p[3] : '');
+        sh.querySelector('.pt').innerHTML = linesOf(p);
+      }
+      function run() {
+        if (!alive) return;
+        requestAnimationFrame(function () {
+          var vh = view.clientHeight, end = -(last.offsetTop + last.offsetHeight / 2 - vh / 2), dist = vh - end;
+          if (reduce || !roll.animate) { roll.style.position = 'static'; roll.style.padding = '40px 22px'; return; }
+          roll.style.opacity = '1';
+          anim = roll.animate([{ transform: 'translateY(' + vh + 'px)' }, { transform: 'translateY(' + end + 'px)' }], { duration: Math.max(14000, dist * 32), easing: 'cubic-bezier(.25,.1,.35,1)', fill: 'forwards' });
+          anim.onfinish = function () {
+            sh.querySelector('.psend').classList.add('go'); round++;
+            timer = setTimeout(function () { // 질문에서 잠깐 머문 뒤
+              if (!alive) return;
+              var fade = roll.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, fill: 'forwards' });
+              fade.onfinish = function () {
+                if (round >= REPEAT) { round = 0; i = (i + 1) % P.length; p = P[i]; try { localStorage.setItem('sava-poem', String(i)); } catch (e) {} setPoem(); setArt(); }
+                fade.cancel(); run();
+              };
+            }, 3500);
+          };
+        });
+      }
+      setPoem(); setArt(); run();
+      function close() { alive = false; clearTimeout(timer); if (anim) anim.cancel(); sh.remove(); document.body.style.overflow = ''; paintFrame(); el.focus(); }
       view.parentNode.addEventListener('click', function () { if (!anim || anim.playState === 'finished') return; if (anim.playState === 'paused') anim.play(); else anim.pause(); });
       sh.querySelector('.x').addEventListener('click', close);
       sh.addEventListener('click', function (e) { if (e.target === sh) close(); });

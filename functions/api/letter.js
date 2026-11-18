@@ -40,7 +40,7 @@ function plusDays(d, n) { return ymd(new Date(d.getTime() + n * 864e5)).replace(
 // 🎪 한국관광공사 TourAPI 4.0 (KorService2) — 오늘~7일 안에 열리는 행사·축제
 async function festivals(env, c, diag) {
   if (!dataKey(env)) { if (diag) diag.tour = '키 없음(DATA_API_KEY)'; return []; }
-  const today = ymd(kst()).replace(/-/g, ''), until = plusDays(kst(), 7);
+  const today = ymd(kst()).replace(/-/g, ''), until = plusDays(kst(), 14);
   const base = 'https://apis.data.go.kr/B551011/KorService2/searchFestival2?serviceKey=' + dkey(dataKey(env)) + '&MobileOS=ETC&MobileApp=sava&_type=json&numOfRows=100&pageNo=1&arrange=C&eventStartDate=' + plusDays(kst(), -60);
   async function call(q) {
     const r = await fetch(base + q, { cf: { cacheTtl: 3600 } }), t = await r.text();
@@ -53,8 +53,10 @@ async function festivals(env, c, diag) {
     // 두 달 전부터 시작한 행사까지 받아서, 지금 열리고 있거나 7일 안에 시작하는 것만 고름
     let it = await call('&lDongRegnCd=' + c[3]).catch(() => null);
     if (!it || !it.length) it = await call('&areaCode=' + c[2]);
+    // 1년 내내 하는 상설 행사(두 달 넘게)는 뒤로, 짧은 축제·곧 시작하는 행사를 앞으로
+    const len = x => (Date.parse(x.eventenddate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')) - Date.parse(x.eventstartdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))) / 864e5;
     const out = it.filter(x => x.eventstartdate <= until && x.eventenddate >= today)
-      .sort((x, y) => (x.eventstartdate > y.eventstartdate ? 1 : -1))
+      .sort((x, y) => ((len(x) > 60) - (len(y) > 60)) || (x.eventenddate > y.eventenddate ? 1 : -1))
       .slice(0, 6).map(x => ({ t: x.title, at: x.eventstartdate.slice(4, 6) + '/' + x.eventstartdate.slice(6) + '~' + x.eventenddate.slice(4, 6) + '/' + x.eventenddate.slice(6), addr: (x.addr1 || '').slice(0, 40), url: x.contentid ? 'https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=' + x.contentid : '' }));
     if (diag) diag.tour = '연결됨 · ' + out.length + '건';
     return out;
@@ -80,11 +82,14 @@ async function programs(env, c, diag) {
     } else list = j.jsonArray || j.items || [];
     if (!Array.isArray(list)) throw new Error(String(j.reqErr || j.message || '응답에 목록 없음').slice(0, 60));
     const today = ymd(kst()).replace(/-/g, ''), region = c[4];
+    const REG = { 서울: '서울', 부산: '부산', 대구: '대구', 인천: '인천', 광주: '광주', 대전: '대전', 울산: '울산', 세종: '세종', 경기: '경기', 강원: '강원', 충북: '충청북도|충북', 충남: '충청남도|충남', 전북: '전북|전라북도', 전남: '전남|전라남도', 경북: '경상북도|경북', 경남: '경상남도|경남', 제주: '제주' };
+    const mine = new RegExp(REG[region] || region), others = new RegExp(Object.keys(REG).filter(k => k !== region).map(k => REG[k]).join('|'));
     const rows = list.map(x => {
       const when = String(x.reqstBeginEndDe || ''), ds = when.replace(/[^0-9~]/g, '').split('~'), end = (ds[1] || '').slice(0, 8);
-      const tags = String(x.hashtags || '') + ' ' + String(x.jrsdInsttNm || '') + ' ' + String(x.excInsttNm || '');
-      return { t: String(x.pblancNm || x.title || '').slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), local: tags.indexOf(region) >= 0, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
-    }).filter(x => x.t && (!/^\d{8}$/.test(x.end) || x.end >= today));
+      const org = String(x.jrsdInsttNm || '') + ' ' + String(x.excInsttNm || ''), nm = String(x.pblancNm || x.title || ''), head = nm.replace(/^\s*[\[(]?\s*\d{4}년?도?\s*[\])]?\s*/, '').slice(0, 12);
+      const local = mine.test(org) || mine.test(head), elsewhere = !local && (others.test(org.replace(/중소벤처기업부|소상공인시장진흥공단|중소기업|창업진흥원|기술보증|신용보증/g, '')) || /^\s*\[?(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|충청|전라|경상)/.test(head));
+      return { t: nm.slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), local, elsewhere, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
+    }).filter(x => x.t && !x.elsewhere && (!/^\d{8}$/.test(x.end) || x.end >= today));
     rows.sort((x, y) => (y.local - x.local) || ((/^\d{8}$/.test(x.end) ? x.end : '9') > (/^\d{8}$/.test(y.end) ? y.end : '9') ? 1 : -1));
     const out = rows.slice(0, 10);
     if (diag) diag.bizinfo = '연결됨 · 진행 중 ' + rows.length + '건(우리 지역 ' + rows.filter(x => x.local).length + ')';

@@ -67,14 +67,16 @@ export async function onRequest({ request, env, params }) {
     if (!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT)) return redirect('/join/?err=setup');
     if (!isOpen(env)) return redirect('/join/?err=soon');
     const st = rand(16), next = safeNext(url.searchParams.get('next'));
+    // 아이폰 홈 화면 앱: 로그인이 앱 밖(사파리)에서 끝나므로, 앱이 나중에 받아 갈 '넘겨받기 표'(h)를 함께 기억
+    const hand = /^[a-f0-9]{32,64}$/.test(url.searchParams.get('h') || '') ? url.searchParams.get('h') : '';
     const q = new URLSearchParams({ response_type: 'code', client_id: (env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT), redirect_uri: redirectUri, state: st });
     if (url.searchParams.get('scope')) q.set('scope', clean(url.searchParams.get('scope'), 80)); // 비즈 앱 뒤 추가 동의(phone_number)
-    return redirect('https://kauth.kakao.com/oauth/authorize?' + q, [setCookie('sava_st', st + '|' + next, 600)]);
+    return redirect('https://kauth.kakao.com/oauth/authorize?' + q, [setCookie('sava_st', st + '|' + next + '|' + hand, 600)]);
   }
 
   // 2) 카카오에서 돌아옴
   if (path === 'kakao/callback' && request.method === 'GET') {
-    const [st, next] = cookie(request, 'sava_st').split('|');
+    const [st, next, hand] = cookie(request, 'sava_st').split('|');
     const clear = setCookie('sava_st', '', 0);
     if (url.searchParams.get('error')) return redirect('/join/?err=cancel', [clear]);
     if (!st || st !== url.searchParams.get('state')) return redirect('/join/?err=state', [clear]);
@@ -97,9 +99,27 @@ export async function onRequest({ request, env, params }) {
     const u = await db.prepare('SELECT id, agreed_at FROM users WHERE kakao_id = ?').bind(kid).first();
     const t = rand(32);
     await db.prepare('INSERT INTO sessions (th, uid, expires) VALUES (?, ?, ?)').bind(await sha(t), u.id, now + SESSION_DAYS * DAY).run();
+    if (hand && /^[a-f0-9]{32,64}$/.test(hand)) {
+      await db.prepare('CREATE TABLE IF NOT EXISTS auth_hand (hh TEXT PRIMARY KEY, uid INTEGER NOT NULL, expires INTEGER NOT NULL)').run();
+      await db.prepare('INSERT OR REPLACE INTO auth_hand (hh, uid, expires) VALUES (?, ?, ?)').bind(await sha(hand), u.id, now + 15 * 60 * 1000).run();
+    }
     const go = safeNext(next);
     const sid = setCookie('sava_sid', t, SESSION_DAYS * 86400);
     return redirect(u.agreed_at ? go : '/join/?next=' + encodeURIComponent(go), [clear, sid]);
+  }
+
+  // 2-1) 홈 화면 앱이 로그인 넘겨받기 (한 번만, 15분 안에)
+  if (path === 'claim' && request.method === 'POST') {
+    let b = {}; try { b = await request.json(); } catch (e) {}
+    const h = String(b.h || '');
+    if (!/^[a-f0-9]{32,64}$/.test(h)) return json({ ok: 0 }, 400);
+    await db.prepare('CREATE TABLE IF NOT EXISTS auth_hand (hh TEXT PRIMARY KEY, uid INTEGER NOT NULL, expires INTEGER NOT NULL)').run();
+    const hh = await sha(h), r = await db.prepare('SELECT uid, expires FROM auth_hand WHERE hh = ?').bind(hh).first();
+    if (!r || r.expires < Date.now()) return json({ ok: 0, wait: r ? 0 : 1 });
+    await db.prepare('DELETE FROM auth_hand WHERE hh = ?').bind(hh).run();
+    const t = rand(32);
+    await db.prepare('INSERT INTO sessions (th, uid, expires) VALUES (?, ?, ?)').bind(await sha(t), r.uid, Date.now() + SESSION_DAYS * DAY).run();
+    return json({ ok: 1 }, 200, [['set-cookie', setCookie('sava_sid', t, SESSION_DAYS * 86400)]]);
   }
 
   // 3) 내 정보

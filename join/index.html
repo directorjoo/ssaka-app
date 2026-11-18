@@ -93,6 +93,15 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
   var next = q.get('next') || '/app/';
   if (!/^\/(?!\/)/.test(next)) next = '/app/';
   $('kakaoGo').href = '/api/auth/kakao?next=' + encodeURIComponent(next);
+  // 아이폰 홈 화면 앱이면: 로그인이 앱 밖에서 끝나도 앱이 넘겨받을 수 있게 표(h)를 붙임
+  $('kakaoGo').addEventListener('click', function () {
+    var inApp = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+    if (!inApp) return;
+    var a = new Uint8Array(20); crypto.getRandomValues(a);
+    var h = Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+    try { localStorage.setItem('sava-auth-h', JSON.stringify({ h: h, t: Date.now() })); } catch (e) {}
+    this.href = '/api/auth/kakao?next=' + encodeURIComponent(next) + '&h=' + h;
+  });
   var ERR = { cancel: '카카오 로그인을 취소했어요.', state: '로그인 시간이 지났어요. 다시 눌러주세요.', token: '카카오 로그인에 실패했어요. 다시 눌러주세요.', me: '카카오 정보를 받지 못했어요. 다시 눌러주세요.', setup: '회원가입을 준비하고 있어요. 조금만 기다려 주세요!', soon: '회원가입은 11월 17일에 열려요. 조금만 기다려 주세요! 🍒' };
   function show(id) { ['vLogin', 'vAgree', 'vMe'].forEach(function (v) { $(v).hidden = v !== id; }); $('loading').hidden = true; }
   function post(path, body) { return fetch('/api/auth/' + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}), credentials: 'same-origin' }).then(function (r) { return r.json(); }); }
@@ -126,5 +135,5 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
   });
 })();
 </script>
-<script src="/js/home.js?v=5" defer></script>
+<script src="/js/home.js?v=6" defer></script>
 </body></html>

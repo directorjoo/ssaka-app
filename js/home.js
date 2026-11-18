@@ -5,6 +5,30 @@
 //   data-shift=".bar,.chat" : 화면 아래에 붙은 자체 막대를 공통 단추 위로 올림
 //   data-lang-top="12" : 🌐 단추 위치 (위에서 px)
 // 쓰는 중인 화면: SavaNav.onLeave = function () { saveDraft(); return '쓰던 내용은 저장해 뒀어요'; };
+// 아이폰 홈 화면 앱: 카카오 로그인이 앱 밖에서 끝나면, 앱으로 돌아왔을 때 로그인을 넘겨받음
+(function () {
+  var K = 'sava-auth-h';
+  function claim() {
+    var raw; try { raw = JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { raw = null; }
+    if (!raw || !raw.h) return;
+    if (Date.now() - (raw.t || 0) > 15 * 60 * 1000) { try { localStorage.removeItem(K); } catch (e) {} return; }
+    fetch('/api/auth/claim', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ h: raw.h }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) return;
+        try { localStorage.removeItem(K); } catch (e) {}
+        var d = document.createElement('div'); d.textContent = '🍒 로그인됐어요';
+        d.style.cssText = 'position:fixed;left:50%;top:40%;transform:translateX(-50%);z-index:2147483000;padding:14px 22px;border-radius:999px;background:#B3132B;color:#fff;font:800 17px system-ui,sans-serif';
+        document.body.appendChild(d);
+        setTimeout(function () { location.reload(); }, 900);
+      }).catch(function () {});
+  }
+  window.SavaAuthClaim = claim;
+  claim();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) claim(); });
+  window.addEventListener('focus', claim);
+  window.addEventListener('pageshow', claim);
+})();
 (function () {
   if (window.self !== window.top) return; // 미리보기 안에서는 숨김
   var s = document.currentScript || {}, ds = s.dataset || {};

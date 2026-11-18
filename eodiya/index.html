@@ -259,7 +259,7 @@
     .pview { position: absolute; inset: 0; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent); mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent); }
     .partbg { position: absolute; inset: 0; overflow: hidden; background: #2a1a22; }
     .partbg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.8s ease; transform-origin: var(--fo, 50% 40%); }
-    .partbg img.on { opacity: 1; animation: kenburns var(--kb, 40s) ease-in-out forwards; }
+    .partbg img.on { opacity: 1; }
     .partbg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(20,6,12,.38), rgba(20,6,12,.5) 40%, rgba(20,6,12,.62)); }
     @keyframes kenburns { from { transform: scale(1.04) translate(0,0); } to { transform: scale(1.32) translate(-2%,-3%); } }
     .psheet.art .proll { color: #FFF8EC; text-shadow: 0 1px 2px rgba(0,0,0,.85), 0 0 14px rgba(0,0,0,.55); }
@@ -268,7 +268,6 @@
     .psheet.art .proll .hl { color: #FFE27A; background: none; text-decoration: underline 2px rgba(255,226,122,.7); text-underline-offset: 6px; }
     .psheet.art .proll .last { color: #fff; }
     .partcap { margin-top: 4px; color: rgba(255,255,255,.8); font-size: 14px; text-align: center; }
-    @media (prefers-reduced-motion: reduce) { .partbg img.on { animation: none; } }
     .proll { position: absolute; left: 0; right: 0; top: 0; padding: 0 22px; font-family: 'Gowun Batang', serif; font-weight: 700; font-size: 20px; line-height: 2; color: #5a1420; white-space: pre-line; word-break: keep-all; will-change: transform; }
     .proll h2 { margin: 0 0 4px; font-size: 25px; color: #8E0F22; }
     .proll .by { display: block; margin-bottom: 26px; font-family: var(--font); font-size: 15px; color: #8a7272; }
@@ -942,8 +941,15 @@
       document.body.appendChild(sh); document.body.style.overflow = 'hidden'; if (window.SavaMusic) { SavaMusic.start(); SavaMusic.paint(); }
       (function () { var art = ART[p[1]] || ART['_'], k = 0, bg = sh.querySelector('.partbg'), img = new Image();
         img.alt = ''; img.decoding = 'async'; img.style.setProperty('--fo', art[2]);
-        img.onload = function () { sh.classList.add('art'); img.classList.add('on'); var sn = ART['윤동주 「별 헤는 밤」'][1][0]; sh.querySelector('.partcap').textContent = '🎨 ' + (k < art[1].length - 2 ? art[0] : (art[1][k] === sn ? ART['윤동주 「별 헤는 밤」'][0] : ART['_'][0])); };
+        img.onload = function () { sh.classList.add('art'); img.classList.add('on'); pan(); var sn = ART['윤동주 「별 헤는 밤」'][1][0]; sh.querySelector('.partcap').textContent = '🎨 ' + (k < art[1].length - 2 ? art[0] : (art[1][k] === sn ? ART['윤동주 「별 헤는 밤」'][0] : ART['_'][0])); };
         img.onerror = function () { k++; if (k < art[1].length) img.src = art[1][k]; else bg.remove(); };
+        // 영상처럼: 그림을 액자보다 크게 깔고 좌우(세로 그림은 위아래)로 천천히 훑으며 다가갔다 물러났다 반복
+        function pan() { if (!img.animate) return; var W = bg.clientWidth, H = bg.clientHeight, r = img.naturalWidth / img.naturalHeight, wide = r > W / H;
+          var w = wide ? H * r : W, h = wide ? H : W / r, ox = Math.max(0, w - W), oy = Math.max(0, h - H);
+          img.style.cssText += ';width:' + w + 'px;height:' + h + 'px;max-width:none;inset:auto;left:0;top:0;object-fit:fill;transform-origin:0 0';
+          var z1 = 1.06, z2 = 1.22, ex = -(ox + w * (z2 - 1) * .5), ey = -(oy + h * (z2 - 1) * .5);
+          img.animate([{ transform: 'translate(0,0) scale(' + z1 + ')' }, { transform: 'translate(' + (wide ? ex : -w * (z2 - 1) * .4) + 'px,' + (wide ? -h * (z2 - 1) * .4 : ey) + 'px) scale(' + z2 + ')' }],
+            { duration: Math.max(16000, Math.max(ox, oy) * 45), direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' }); }
         bg.appendChild(img); img.src = art[1][0]; })();
       var view = sh.querySelector('.pview'), roll = sh.querySelector('.proll'), last = roll.querySelector('.last'), anim = null;
       var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}

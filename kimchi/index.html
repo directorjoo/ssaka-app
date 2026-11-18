@@ -137,7 +137,7 @@
     if(!window.Kakao){nativeShare();return;}
     try{
       if(!Kakao.isInitialized())Kakao.init(KEY);
-      Kakao.Share.sendDefault({objectType:'text',text:shareText,link:{webUrl:URL,mobileWebUrl:URL},buttonTitle:'주문 페이지 보기'});
+      Kakao.Share.sendDefault({objectType:'feed',content:{title:'여수 언니 갓김치 5kg',description:'여수 돌산갓으로 정성껏 담근 갓김치 · 5kg 60,000원(배송비 포함)',imageUrl:'https://sava.kr/img/gatkimchi-original.jpg',link:{webUrl:URL,mobileWebUrl:URL}},buttons:[{title:'주문 페이지 보기',link:{webUrl:URL,mobileWebUrl:URL}}]});
     }catch(e){console.error('Kakao share error:',e);nativeShare();}
   }
   kakaoBtn.addEventListener('click',kakaoShare);

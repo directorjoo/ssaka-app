@@ -90,7 +90,15 @@
     .svc em { position: absolute; top: -4px; right: 10%; font-style: normal; font-size: 10.5px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--ssaka); color: #fff; }
     .svc-cap { margin: 2px 22px 0; font-size: 13.5px; color: var(--ink-2); }
     .eo-hero { position: relative; overflow: hidden; margin: 6px 18px 12px; padding: 13px 16px 11px; border-radius: 26px; background: linear-gradient(135deg, #C8162F 0%, #8E0F22 100%); color: #fff; box-shadow: 0 18px 36px -20px rgba(142,15,34,.9); }
-    .eo-hero .pin { position: absolute; right: 14px; top: 8px; font-size: 46px; line-height: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
+    .eo-hero .pin { position: absolute; right: 16px; top: 8px; width: 52px; height: 62px; line-height: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.28)); }
+    .eo-hero .pin-guy { display: block; transform-origin: 50% 100%; animation: pinDance 1.2s ease-in-out infinite; }
+    .eo-hero .pin-guy .pg-eyes { transform-origin: 30px 23.5px; animation: pinBlink 3.6s infinite; }
+    .eo-hero .pin .nt { position: absolute; font-style: normal; font-weight: 900; color: #FFE27A; font-size: 17px; opacity: 0; animation: noteUp 2.4s ease-out infinite; }
+    .eo-hero .pin .n1 { left: -14px; top: 18px; } .eo-hero .pin .n2 { left: -6px; top: 2px; color: #fff; animation-delay: 1.2s; }
+    @keyframes pinDance { 0%,100% { transform: translateY(0) rotate(-10deg); } 25% { transform: translateY(-7px) rotate(0deg) scale(1.04,.96); } 50% { transform: translateY(0) rotate(10deg); } 75% { transform: translateY(-7px) rotate(0deg) scale(1.04,.96); } }
+    @keyframes pinBlink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+    @keyframes noteUp { 0% { opacity: 0; transform: translate(0,6px) rotate(-10deg); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(-12px,-22px) rotate(12deg); } }
+    @media (prefers-reduced-motion: reduce) { .eo-hero .pin-guy, .eo-hero .pin-guy .pg-eyes, .eo-hero .pin .nt { animation: none; } }
     .eo-hero h2 { margin: 0; font-size: 38px; line-height: 1.05; font-weight: 900; letter-spacing: -0.04em; }
     .eo-hero p { margin: 4px 0 10px; line-height: 1.3; font-size: 17.5px; font-weight: 700; opacity: .95; word-break: keep-all; padding-right: 70px; }
     .eo-hero .eo-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -515,7 +523,7 @@
     var v = $('v-home'); v.innerHTML = '';
     // 어디야? — 싸바의 얼굴. [어디야?] [친구야 놀자!] 두 버튼 (여기야!는 어디야 화면 안에)
     var eh = el('div', 'eo-hero');
-    eh.innerHTML = '<span class="pin" aria-hidden="true">📍</span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
+    eh.innerHTML = '<span class="pin" aria-hidden="true"><svg class="pin-guy" viewBox="0 0 60 72" width="52" height="62"><path d="M30 70C30 70 6 44 6 26a24 24 0 0 1 48 0c0 18-24 44-24 44z" fill="#FFE27A" stroke="#fff" stroke-width="3"/><circle cx="30" cy="26" r="15" fill="#fff"/><g class="pg-eyes"><circle cx="24.5" cy="23.5" r="2.6" fill="#3a1d1d"/><circle cx="35.5" cy="23.5" r="2.6" fill="#3a1d1d"/></g><path d="M23.5 29.5q6.5 6 13 0" fill="none" stroke="#3a1d1d" stroke-width="2.6" stroke-linecap="round"/><circle cx="20" cy="30" r="2.6" fill="#FF8FA3" opacity=".85"/><circle cx="40" cy="30" r="2.6" fill="#FF8FA3" opacity=".85"/></svg><i class="nt n1">♪</i><i class="nt n2">♫</i></span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
       '<div class="eo-btns"><a href="../eodiya/">🙋 어디야?<small>잘 지내? 물어보기</small></a><a class="play" href="../eodiya/#play"><span><img src="../img/cherry-dance-anim.svg" alt="" width="28" height="28" style="vertical-align:-7px"> 친구야 놀자!</span><small>보고 싶은 친구 부르기</small></a></div>';
     v.appendChild(eh);
     // 기존 싸바알림판의 크기와 디자인은 유지하고 문구와 하단 바로가기만 정리

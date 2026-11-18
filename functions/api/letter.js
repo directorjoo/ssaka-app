@@ -5,7 +5,8 @@
 //   &city=광주 (날씨·행사 지역, 기본 광주)
 // 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다. 뉴스는 제목과 원문 링크만 씁니다.
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
-// 있으면 더 정확해지는 환경변수: TOUR_API_KEY(한국관광공사 행사정보), BIZINFO_API_KEY(기업마당 지원사업)
+// 있으면 더 정확해지는 환경변수: DATA_API_KEY(공공데이터포털 일반 인증키 하나로 관광공사 행사 + 중기부 기업마당 지원사업 둘 다)
+//   (예전 이름 TOUR_API_KEY도 그대로 읽음 · 기업마당 사이트에서 따로 받은 키가 있으면 BIZINFO_API_KEY)
 const MODEL_DEFAULT = 'claude-haiku-5-5';
 // [위도, 경도, 관광공사 옛 지역코드, 법정동 시도코드(KorService2), 기업마당 해시태그 지역]
 const CITY = { 광주: [35.1595, 126.8526, 5, 29, '광주'], 서울: [37.5665, 126.978, 1, 11, '서울'], 여수: [34.7604, 127.6622, 38, 46, '전남'], 순천: [34.9506, 127.4872, 38, 46, '전남'], 목포: [34.8118, 126.3922, 38, 46, '전남'], 전주: [35.8242, 127.148, 37, 52, '전북'], 부산: [35.1796, 129.0756, 6, 26, '부산'], 대구: [35.8714, 128.6014, 4, 27, '대구'], 대전: [36.3504, 127.3845, 3, 30, '대전'], 인천: [37.4563, 126.7052, 2, 28, '인천'], 제주: [33.4996, 126.5312, 39, 50, '제주'] };
@@ -34,12 +35,13 @@ async function weather(c) {
 }
 // 공공데이터포털 키는 '일반 인증키(Decoding)'를 넣는 게 정석이지만, 'Encoding' 키(%2B 등이 섞인 것)를 넣어도 되게 처리
 function dkey(k) { k = String(k || '').trim(); return /%[0-9A-Fa-f]{2}/.test(k) ? k : encodeURIComponent(k); }
+function dataKey(env) { return env.DATA_API_KEY || env.TOUR_API_KEY || ''; }
 function plusDays(d, n) { return ymd(new Date(d.getTime() + n * 864e5)).replace(/-/g, ''); }
 // 🎪 한국관광공사 TourAPI 4.0 (KorService2) — 오늘~7일 안에 열리는 행사·축제
 async function festivals(env, c, diag) {
-  if (!env.TOUR_API_KEY) { if (diag) diag.tour = '키 없음(TOUR_API_KEY)'; return []; }
+  if (!dataKey(env)) { if (diag) diag.tour = '키 없음(DATA_API_KEY)'; return []; }
   const today = ymd(kst()).replace(/-/g, ''), until = plusDays(kst(), 7);
-  const base = 'https://apis.data.go.kr/B551011/KorService2/searchFestival2?serviceKey=' + dkey(env.TOUR_API_KEY) + '&MobileOS=ETC&MobileApp=sava&_type=json&numOfRows=100&pageNo=1&arrange=C&eventStartDate=' + plusDays(kst(), -60);
+  const base = 'https://apis.data.go.kr/B551011/KorService2/searchFestival2?serviceKey=' + dkey(dataKey(env)) + '&MobileOS=ETC&MobileApp=sava&_type=json&numOfRows=100&pageNo=1&arrange=C&eventStartDate=' + plusDays(kst(), -60);
   async function call(q) {
     const r = await fetch(base + q, { cf: { cacheTtl: 3600 } }), t = await r.text();
     if (/SERVICE_KEY_IS_NOT_REGISTERED|SERVICE KEY IS NOT REGISTERED|Unauthorized|등록되지 않은/i.test(t)) throw new Error('키가 아직 등록 안 됨(승인 후 1~2시간 걸리기도 함)');
@@ -60,11 +62,22 @@ async function festivals(env, c, diag) {
 }
 // 📋 기업마당 지원사업 공고 — 소상공인 공고 중 아직 마감 안 된 것, 우리 지역 공고 먼저, 마감 가까운 순
 async function programs(env, c, diag) {
-  if (!env.BIZINFO_API_KEY) { if (diag) diag.bizinfo = '키 없음(BIZINFO_API_KEY)'; return []; }
+  if (!env.BIZINFO_API_KEY && !dataKey(env)) { if (diag) diag.bizinfo = '키 없음(DATA_API_KEY)'; return []; }
   try {
-    const r = await fetch('https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=' + encodeURIComponent(String(env.BIZINFO_API_KEY).trim()) + '&dataType=json&searchCnt=100&hashtags=' + encodeURIComponent('소상공인'), { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 3600 } });
-    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { throw new Error('응답 형식 이상(키 확인): ' + un(t).slice(0, 60)); }
-    const list = j.jsonArray || j.items || [];
+    // 기업마당 사이트 키가 있으면 그쪽, 없으면 공공데이터포털 「중소벤처기업부_중소기업 지원사업 공고 조회 서비스」
+    const u = env.BIZINFO_API_KEY
+      ? 'https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=' + encodeURIComponent(String(env.BIZINFO_API_KEY).trim()) + '&dataType=json&searchCnt=100&hashtags=' + encodeURIComponent('소상공인')
+      : 'https://apis.data.go.kr/1421000/bizinfo/pblancBsnsService?serviceKey=' + dkey(dataKey(env)) + '&dataType=json&pageNo=1&numOfRows=100&hashtags=' + encodeURIComponent('소상공인');
+    const r = await fetch(u, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 3600 } });
+    const t = await r.text();
+    if (/SERVICE_KEY_IS_NOT_REGISTERED|SERVICE KEY IS NOT REGISTERED|Unauthorized/i.test(t)) throw new Error('키가 아직 등록 안 됨(승인 후 1~2시간 걸리기도 함)');
+    let j; try { j = JSON.parse(t); } catch (e) { throw new Error('응답 형식 이상(키 확인): ' + un(t).slice(0, 60)); }
+    let list;
+    if (j.response) {
+      const h = j.response.header || {};
+      if (h.resultCode && h.resultCode !== '00' && h.resultCode !== '0000' && h.resultCode !== '03') throw new Error((h.resultCode + ' ' + (h.resultMsg || '')).trim());
+      const its = (j.response.body || {}).items; list = Array.isArray(its) ? its : (its && its.item) ? (Array.isArray(its.item) ? its.item : [its.item]) : [];
+    } else list = j.jsonArray || j.items || [];
     if (!Array.isArray(list)) throw new Error(String(j.reqErr || j.message || '응답에 목록 없음').slice(0, 60));
     const today = ymd(kst()).replace(/-/g, ''), region = c[4];
     const rows = list.map(x => {

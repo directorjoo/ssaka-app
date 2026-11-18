@@ -167,28 +167,13 @@
     var delivery=d.orderType==='선물 보내기'?'받는 분: '+d.recipient+'\\n받는 분 연락처: '+d.recipientPhone+'\\n선물 배송 주소: '+d.address+'\\n선물 메시지: '+d.giftMessage:'배송 주소: '+d.address;
     return '[여수 언니 갓김치 주문]\\n주문 방식: '+d.orderType+'\\n주문자: '+d.buyer+'\\n주문자 연락처: '+d.phone+'\\n'+delivery+'\\n수량: '+d.quantity+'박스\\n금액: '+d.amount.toLocaleString('ko-KR')+'원\\n결제방법: '+d.payment+'\\n배송 요청사항: '+d.memo+'\\n주문 페이지: '+URL;
   }
-  async function saveOrder(d){
-    var r=await fetch('/api/kimchi-orders',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'create',order:d})});
-    var j=await r.json().catch(function(){return {};});
-    if(!r.ok||!j.ok)throw new Error(j.error==='setup'?'관리자 저장 기능 설정이 아직 끝나지 않았습니다. 판매자에게 직접 문의해 주세요.':'주문 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
-    return j.orderNo;
+  function goSavaOrder(){
+    var d=getOrderData();if(!d)return;
+    try{sessionStorage.setItem('sava-kimchi-draft',JSON.stringify(d));location.href='/app/orders/';}
+    catch(e){alert('주문 정보를 싸바 앱으로 전달하지 못했습니다. 다시 시도해 주세요.');}
   }
-  document.getElementById('orderSms').addEventListener('click',async function(){
-    var d=getOrderData();if(!d)return;
-    try{var no=await saveOrder(d);var message=orderMessage(d)+'\\n주문번호: '+no;var seller='01029477775';
-      if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);}
-      else if(/Android/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'?body='+encodeURIComponent(message);}
-      else{copy(message+'\\n문자 수신처: '+seller);}
-    }catch(e){alert(e.message);}
-  });
-  document.getElementById('orderKakao').addEventListener('click',async function(){
-    var d=getOrderData();if(!d)return;
-    try{var no=await saveOrder(d);var message=orderMessage(d)+'\\n주문번호: '+no;
-      if(!window.Kakao)throw new Error('Kakao SDK unavailable');
-      if(!Kakao.isInitialized())Kakao.init(KEY);
-      Kakao.Share.sendDefault({objectType:'text',text:message,link:{webUrl:URL,mobileWebUrl:URL},buttonTitle:'주문 페이지 보기'});
-    }catch(e){alert(e.message);}
-  });})();
+  document.getElementById('orderSms').addEventListener('click',goSavaOrder);
+  document.getElementById('orderKakao').addEventListener('click',goSavaOrder);})();
 </script>
 </body>
 </html>

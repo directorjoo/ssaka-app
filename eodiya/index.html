@@ -853,30 +853,40 @@
 
   // 시가 있으면 음악이 있어야지 — 슈베르트 「겨울 나그네」(1928 한스 두한·페르디난트 폴 녹음, 퍼블릭 도메인)를 계속 들려줘요
   window.SavaMusic = (function () {
-    var LIST = [
-      ['https://archive.org/download/Winterreise01Duhan/Winterreise%2001%20Duhan.mp3', 'https://upload.wikimedia.org/wikipedia/commons/transcoded/d/de/01_-_Gute_Nacht_(CK_2946-2,_ES_383).flac/01_-_Gute_Nacht_(CK_2946-2,_ES_383).flac.mp3'],
-      ['https://archive.org/download/Winterreise01Duhan/Winterreise%2002%20Duhan.mp3']
-    ];
-    var a = null, track = 0, alt = 0, started = false, btn = document.getElementById('musBtn');
-    var off = false; try { off = localStorage.getItem('sava-music') === 'off'; } catch (e) {}
-    function paint() { if (!btn) return; var on = !!(a && !a.paused); btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.querySelector('i').textContent = on ? '🎵' : (off ? '🔇' : '▶'); }
-    function load() { a.src = LIST[track][alt]; }
+    // 앨범을 차례로: 지금은 슈베르트 「겨울 나그네」 24곡 전곡 (1928 한스 두한, 퍼블릭 도메인) — 나중에 베토벤 등 앨범을 여기에 이어 붙이면 됨
+    var WR = ['밤 인사','풍향계','얼어붙은 눈물','동결','보리수','넘쳐흐르는 눈물','냇물 위에서','회상','도깨비불','휴식','봄꿈','고독','우편마차','백발','까마귀','마지막 희망','마을에서','폭풍의 아침','환영','이정표','여인숙','용기','환일','거리의 악사'];
+    var KNOWN = { 1: '01', 2: '01', 9: '10', 10: '10', 11: '11', 12: '11', 13: '14', 14: '14', 23: '24', 24: '24' };
+    function wrSrc(n) { var nn = (n < 10 ? '0' : '') + n, f = 'Winterreise%20' + nn + '%20Duhan.mp3', ids = [];
+      if (KNOWN[n]) ids.push(KNOWN[n]); else { var lo = n % 2 ? n : n - 1, hi = lo + 1; [hi, lo].forEach(function (k) { ids.push((k < 10 ? '0' : '') + k); }); }
+      var out = ids.map(function (id) { return 'https://archive.org/download/Winterreise' + id + 'Duhan/' + f; });
+      if (n === 1) out.push('https://upload.wikimedia.org/wikipedia/commons/transcoded/d/de/01_-_Gute_Nacht_(CK_2946-2,_ES_383).flac/01_-_Gute_Nacht_(CK_2946-2,_ES_383).flac.mp3');
+      return out; }
+    var LIST = WR.map(function (t, i) { return { t: '슈베르트 「겨울 나그네」 ' + (i + 1) + '. ' + t, s: wrSrc(i + 1) }; });
+    var a = null, track = 0, alt = 0, started = false, fails = 0, btn = document.getElementById('musBtn');
+    var off = false; try { off = localStorage.getItem('sava-music') === 'off'; track = (parseInt(localStorage.getItem('sava-track') || '0', 10) || 0) % LIST.length; } catch (e) {}
+    function now() { return LIST[track].t; }
+    function paint() { if (!btn) return; var on = !!(a && !a.paused); btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.querySelector('i').textContent = on ? '🎵' : (off ? '🔇' : '▶');
+      btn.querySelector('span').textContent = on ? (track + 1) + '. ' + WR[track] : '겨울 나그네';
+      var c = document.querySelector('.psheet .pmus'); if (c) c.textContent = '♪ ' + now() + ' · 1928년 한스 두한'; }
+    function load() { a.src = LIST[track].s[alt]; try { localStorage.setItem('sava-track', String(track)); } catch (e) {} paint(); }
+    function next() { track = (track + 1) % LIST.length; alt = 0; load(); a.play().catch(function () {}); }
     function fadeIn() { a.volume = 0; var v = 0, t = setInterval(function () { v += .05; if (v >= .6 || a.paused) { clearInterval(t); } a.volume = Math.min(v, .6); }, 120); }
     function play() { if (!a) { a = new Audio(); a.preload = 'auto';
-        a.addEventListener('ended', function () { track = (track + 1) % LIST.length; alt = 0; load(); a.play().catch(function () {}); });
-        a.addEventListener('error', function () { if (alt + 1 < LIST[track].length) { alt++; load(); a.play().catch(function () {}); } else if (track + 1 < LIST.length) { track++; alt = 0; load(); a.play().catch(function () {}); } });
+        a.addEventListener('ended', function () { fails = 0; next(); });
+        a.addEventListener('playing', function () { fails = 0; });
+        a.addEventListener('error', function () { if (alt + 1 < LIST[track].s.length) { alt++; load(); a.play().catch(function () {}); } else if (++fails < LIST.length) next(); });
         a.addEventListener('play', paint); a.addEventListener('pause', paint); load(); }
       started = true; var p = a.play(); fadeIn(); if (p && p.catch) p.catch(function () { paint(); }); }
     function start() { if (off || (a && !a.paused)) return; play(); }
     if (btn) btn.addEventListener('click', function (e) { e.stopPropagation();
       if (a && !a.paused) { a.pause(); off = true; } else { off = false; play(); }
       try { localStorage.setItem('sava-music', off ? 'off' : 'on'); } catch (x) {} paint(); });
-    // 화면 어디든 처음 누르면 음악 시작 (꺼 두었으면 안 켜요)
+    // 화면 어디든 처음 누르면 음악 시작 (꺼 두었으면 안 켜요) — 다음에 오면 듣던 곡부터 이어서
     function first() { document.removeEventListener('pointerdown', first, true); if (!started) start(); }
     document.addEventListener('pointerdown', first, true);
     document.addEventListener('visibilitychange', function () { if (!a || off) return; if (document.hidden) a.pause(); else if (started) a.play().catch(function () {}); });
     paint();
-    return { start: start };
+    return { start: start, paint: paint };
   })();
 
   // 시마다 분위기에 맞는 명화 (위키미디어 공용, 퍼블릭 도메인) — 천천히 다가가는 영상처럼
@@ -908,7 +918,7 @@
         '<div class="pbtns"><button type="button" class="psend">💌 이 구절 담아 안부 보내기</button><button type="button" class="x">닫기</button></div><div class="phint">화면을 누르면 멈췄다 흘러가요</div><div class="partcap"></div><div class="pmus">♪ 슈베르트 「겨울 나그네」 · 1928년 한스 두한 녹음</div>';
       sh.querySelector('h2').textContent = title; sh.querySelector('.by').textContent = who + (p[3] ? ' · ' + p[3] : '');
       sh.querySelector('.pt').innerHTML = lines;
-      document.body.appendChild(sh); document.body.style.overflow = 'hidden'; if (window.SavaMusic) SavaMusic.start();
+      document.body.appendChild(sh); document.body.style.overflow = 'hidden'; if (window.SavaMusic) { SavaMusic.start(); SavaMusic.paint(); }
       (function () { var art = ART[p[1]] || ART['_'], k = 0, bg = sh.querySelector('.partbg'), img = new Image();
         img.alt = ''; img.decoding = 'async'; img.style.setProperty('--fo', art[2]);
         img.onload = function () { sh.classList.add('art'); img.classList.add('on'); var sn = ART['윤동주 「별 헤는 밤」'][1][0]; sh.querySelector('.partcap').textContent = '🎨 ' + (k < art[1].length - 2 ? art[0] : (art[1][k] === sn ? ART['윤동주 「별 헤는 밤」'][0] : ART['_'][0])); };

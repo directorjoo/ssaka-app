@@ -128,9 +128,13 @@
     ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, gov: gov, fx: fx })[k]();
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
-  function nlist(arr, rank) {
+  // 외국 사이트를 구글 번역으로 한국어로 열기 (예: www.bbc.com → www-bbc-com.translate.goog)
+  function ko(url) {
+    try { var u = new URL(url); if (/translate\.goog$/.test(u.hostname)) return url; u.hostname = u.hostname.replace(/-/g, '--').replace(/\./g, '-') + '.translate.goog'; u.searchParams.set('_x_tr_sl', 'auto'); u.searchParams.set('_x_tr_tl', 'ko'); u.searchParams.set('_x_tr_hl', 'ko'); return u.toString(); } catch (e) { return url; }
+  }
+  function nlist(arr, rank, tr) {
     return '<ul class="nl' + (rank ? ' rk' : '') + '">' + arr.map(function (n, i) {
-      return '<li><a href="' + esc(n.url) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span>' + esc(n.t) + (n.src ? '<small>' + esc(n.src) + '</small>' : '') + '</span></a></li>';
+      return '<li><a href="' + esc(tr ? ko(n.url) : n.url) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span>' + esc(n.t) + (n.src ? '<small>' + esc(n.src) + '</small>' : '') + '</span></a></li>';
     }).join('') + '</ul>';
   }
 
@@ -198,14 +202,14 @@
   function world() {
     var h = '<h2>🌏 세계 방송</h2><div class="src">각국 대표 채널 뉴스를 한국어로 · 누르면 원문 기사</div><div id="wnl"><div class="msg">세계 뉴스를 한국어로 옮기는 중이에요…</div></div>' +
       '<div class="sec">📺 생방송·뉴스 바로가기</div><div class="grid2" style="grid-template-columns:repeat(3,1fr)">' +
-      WN.map(function (c) { return '<a class="lk" href="' + c[2] + '" target="_blank" rel="noopener" style="text-align:center;border-color:' + c[3] + '33"><b style="color:' + c[3] + '">' + c[0] + '</b><span>' + c[1] + '</span></a>'; }).join('') + '</div>' +
+      WN.map(function (c) { return '<a class="lk" href="' + ko(c[2]) + '" target="_blank" rel="noopener" style="text-align:center;border-color:' + c[3] + '33"><b style="color:' + c[3] + '">' + c[0] + '</b><span>' + c[1] + '</span></a>'; }).join('') + '</div>' +
       '<div class="sec">🎬 오락·문화</div><div class="grid2">' + WE.map(function (c) { return '<a class="lk" href="' + c[2] + '" target="_blank" rel="noopener"><b>' + c[0] + '</b><span>' + c[1] + '</span></a>'; }).join('') + '</div>' +
-      '<p class="note">바깥 방송 화면이 영어·일본어로 나오면, 브라우저의 ‘번역’ 단추(크롬 주소창 옆, 사파리 ‘가가’ 메뉴)를 누르면 한국어로 볼 수 있어요.</p>';
+      '<p class="note">뉴스와 방송 사이트는 한국어로 번역해서 열려요. 혹시 번역 화면이 안 열리면 브라우저의 ‘번역’ 단추(크롬 주소창 옆, 사파리 ‘가가’ 메뉴)를 눌러 주세요.</p>';
     pane.innerHTML = h;
     api('world').then(function (d) {
       if (cur !== 'world') return;
       var by = {}; (d.list || []).forEach(function (n) { (by[n.src] = by[n.src] || []).push(n); });
-      $('wnl').innerHTML = Object.keys(by).map(function (s) { return '<div class="sec">' + esc(s) + '</div>' + nlist(by[s]); }).join('') + '<div class="src" style="margin-top:8px">' + esc(d.at) + ' 기준 · 제목은 AI가 한국어로 옮겼어요</div>';
+      $('wnl').innerHTML = Object.keys(by).map(function (s) { return '<div class="sec">' + esc(s) + '</div>' + nlist(by[s], false, true); }).join('') + '<div class="src" style="margin-top:8px">' + esc(d.at) + ' 기준 · ' + (d.ko ? '제목은 AI가 한국어로 옮겼어요 · 누르면 한국어 번역 기사' : '지금 번역이 밀려 원어 제목으로 보여요 · 몇 분 뒤 다시 열면 한국어로 나와요') + '</div>';
     }).catch(function () { if (cur === 'world') $('wnl').innerHTML = ''; });
   }
 

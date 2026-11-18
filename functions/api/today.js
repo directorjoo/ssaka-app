@@ -47,6 +47,24 @@ async function summarize(env, heads, biz) {
   try { const o = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1)); return { lines: (o.lines || []).slice(0, 5).map(s => String(s).replace(/\*/g, '').slice(0, 80)), tip: String(o.tip || '').replace(/\*/g, '').slice(0, 90) }; } catch (e) { return null; }
 }
 
+async function translate(env, arr) {
+  const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY; if (!key || !arr.length) return;
+  for (let i = 0; i < arr.length; i += 10) {
+    const part = arr.slice(i, i + 10);
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+        body: JSON.stringify({ model: env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 2000, system: '영어·일본어 등 외국어 뉴스 제목을 자연스러운 한국어 뉴스 제목으로 옮긴다. 뜻을 더하거나 빼지 않는다. 사람·나라 이름은 한국 언론 표기대로. 따옴표는 작은따옴표(\')만 쓴다. 답은 JSON 객체 하나만, 받은 번호를 그대로 키로: {"1":"한국어 제목","2":"..."}', messages: [{ role: 'user', content: part.map((n, j) => (j + 1) + '. ' + n.o).join('\n') }] })
+      });
+      if (!r.ok) continue;
+      const j = await r.json(), txt = ((j.content || []).find(c => c.type === 'text') || {}).text || '';
+      const o = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+      part.forEach((n, j) => { const v = String(o[j + 1] || o[String(j + 1)] || '').replace(/\*/g, '').trim(); if (v && /[가-힣]/.test(v)) n.t = v.slice(0, 120); });
+    } catch (e) {}
+  }
+}
+
 async function build(k, env) {
   if (k === 'news') {
     const [top, biz] = await Promise.all([
@@ -81,19 +99,12 @@ async function build(k, env) {
     const got = await Promise.all(SRC.map(s => rss(s[1]).then(x => items(x).slice(0, 5).map(it => ({ src: s[0], o: tag(it, 'title').slice(0, 160), url: tag(it, 'link') })).filter(n => n.o && /^https?:\/\//.test(n.url))).catch(() => [])));
     const all = [].concat.apply([], got);
     if (!all.length) throw new Error('world');
-    const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
-    if (key) {
-      try {
-        const r = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-          body: JSON.stringify({ model: env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 1500, system: '뉴스 제목을 자연스러운 한국어 뉴스 제목으로 옮긴다. 뜻을 더하거나 빼지 않는다. 사람·나라 이름은 한국 언론 표기대로. 답은 JSON 배열 하나만(입력 순서 그대로, 같은 개수): ["...","..."]', messages: [{ role: 'user', content: JSON.stringify(all.map(n => n.o)) }] })
-        });
-        if (r.ok) { const j = await r.json(), txt = ((j.content || []).find(c => c.type === 'text') || {}).text || ''; const arr = JSON.parse(txt.slice(txt.indexOf('['), txt.lastIndexOf(']') + 1)); if (Array.isArray(arr) && arr.length === all.length) all.forEach((n, i) => { n.t = String(arr[i] || '').replace(/\*/g, '').slice(0, 120); }); }
-      } catch (e) {}
-    }
-    all.forEach(n => { if (!n.t) n.t = n.o; });
-    return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), list: all };
+    // 번역: 번호 붙여 보내고 번호로 받아서, 몇 개가 빠져도 나머지는 한국어로 (전부 실패하면 10개씩 나눠 한 번 더)
+    await translate(env, all);
+    if (all.some(n => !n.t)) await translate(env, all.filter(n => !n.t));
+    const done = all.filter(n => n.t).length;
+    all.forEach(n => { n.ko = !!n.t; if (!n.t) n.t = n.o; });
+    return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), list: all, ko: done, total: all.length };
   }
   if (k === 'yt') {
     if (!env.YOUTUBE_API_KEY) return { k, need: 'key' };
@@ -110,10 +121,11 @@ async function build(k, env) {
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
   if (!/^(news|google|gov|yt|world)$/.test(k)) return json({ error: 'bad-k' }, 400);
-  const ttl = k === 'google' ? 1800 : 3600, slot = Math.floor(Date.now() / (ttl * 1000));
+  let ttl = k === 'google' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
   const ckey = new Request(u.origin + '/__today/' + k + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, env); } catch (e) { return json({ error: 'source', msg: String(e.message || e).slice(0, 80) }, 502); }
+  if (k === 'world' && data && !data.ko) ttl = 300;
   const res = json(data, 200, 300);
   const store = new Response(res.clone().body, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + ttl } });
   if (waitUntil) waitUntil(cache.put(ckey, store)); else await cache.put(ckey, store);

@@ -106,10 +106,9 @@
         예금주: <strong>지해순</strong>
       </div>
       <p class="price-note">카카오페이와 토스페이는 결제사 연결 후 이용할 수 있습니다. 현재는 준비 중입니다.</p>
-      <h2>주문내용 보내기</h2>
+      <h2>싸바 앱에서 주문하기</h2>
       <div class="actions">
-        <button class="btn kakao" id="orderKakao" type="button">싸바 앱에서 주문하기</button>
-        <button class="btn dark" id="orderSms" type="button">싸바 앱에서 주문하기</button>
+        <button class="btn kakao" id="orderKakao" type="button">주문정보 확인하고 접수하기</button>
       </div>
       <p class="price-note">주문정보를 확인한 뒤 싸바 앱에서 최종 접수해 주세요.</p>
     </section>
@@ -172,7 +171,6 @@
     try{sessionStorage.setItem('sava-kimchi-draft',JSON.stringify(d));location.href='/app/orders/';}
     catch(e){alert('주문 정보를 싸바 앱으로 전달하지 못했습니다. 다시 시도해 주세요.');}
   }
-  document.getElementById('orderSms').addEventListener('click',goSavaOrder);
   document.getElementById('orderKakao').addEventListener('click',goSavaOrder);})();
 </script>
 </body>

@@ -82,6 +82,8 @@
     .post .row2.r3 { grid-template-columns: 1fr 1fr 1.1fr; }
     .post .row2.r3 .btn { font-size: 14px; padding-left: 4px; padding-right: 4px; white-space: nowrap; }
     .post .c4:disabled { opacity: .45; }
+    .post .ed { margin: 8px 0 4px; }
+    .post .hint2 { margin: 8px 0 0; font-size: 12.5px; color: #888; }
     .post .c4:not(:disabled) { color: #B3132B; border-color: #B3132B; }
     .warn { font-size: 12.5px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.55; }
     .bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(251,247,241,.96); backdrop-filter: blur(8px); border-top: 1px solid #ece4d8; z-index: 5; }
@@ -182,7 +184,7 @@
   function savePosts() { try { localStorage.setItem(PK, JSON.stringify({ ind: st.ind, posts: posts, at: Date.now() })); } catch (e) {} postBtns(); pushSoon(); }
   // 로그인했으면 계정에도 저장 → 아이폰·안드로이드·노트북·맥북 어디서든 같은 글
   var sent = {}, pushT = 0, logged = false;
-  function sig(p) { return p ? JSON.stringify([p.title, p.edited, p.etags, (p.blocks || []).length]) : 'x'; }
+  function sig(p) { return p ? JSON.stringify([p.title, p.blocks, p.tags, p.edited, p.etags]) : 'x'; }
   function pushSoon() { if (!logged) return; clearTimeout(pushT); pushT = setTimeout(pushNow, 1200); }
   function pushNow() {
     var out = {}, any = false;
@@ -406,32 +408,19 @@
   function paintPost(n) {
     var p = posts[n], ty = n > 100 ? { name: QT[n - 101] } : S.types(st.ind)[n - 1], old = $('post' + n);
     var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
-    el.innerHTML = '<div class="ty2"></div><input class="pt" aria-label="제목"><div class="pb" contenteditable="true"></div><div class="tg" contenteditable="true"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2 r3"><button type="button" class="btn gh c4" disabled>↩ 되돌리기</button><button type="button" class="btn gh c3">🔄 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 블로그 열기</a></div>';
+    el.innerHTML = '<div class="ty2"></div><div class="ed"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2 r3"><button type="button" class="btn gh c4" disabled>↩ 되돌리기</button><button type="button" class="btn gh c3">🔄 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 블로그 열기</a></div><p class="hint2">글자를 누르면 고칠 수 있어요. 문단을 누르면 위에 뜨는 단추로 소제목·인용구·박스로 바꾸고 글씨 크기도 바꿔요.</p>';
     el.querySelector('.ty2').textContent = n > 100 ? '⚡ 상위글 틀 · ' + ty.name : n + '형 · ' + ty.name;
-    el.querySelector('.pt').value = p.title;
-    var txt = p.blocks.map(function (b) { return b.t === 'img' ? '[사진 ' + b.n + (b.hint ? ' · ' + b.hint : '') + ']' : b.text; }).join('\n\n');
-    el.querySelector('.pb').textContent = p.edited || txt;
-    el.querySelector('.tg').textContent = p.etags || (p.tags || []).join(' ');
-    el.querySelector('.c1').addEventListener('click', function () { copy(el.querySelector('.pt').value, '제목을 복사했어요'); });
-    el.querySelector('.c2').addEventListener('click', function () { copy(postText(n, el), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
+    var indL = (S.BY[st.ind] || {}).label || '';
+    var ed = SavaBlog.editor(p, { toast: toast, link: cardLink, dev: dev(), ind: indL ? indL + ' business' : '',
+      onChange: function (np) { posts[n] = np; savePosts(); } });
+    ed.undoBtn = el.querySelector('.c4');
+    el.querySelector('.ed').appendChild(ed.el);
+    el.querySelector('.c1').addEventListener('click', function () { copy(ed.title(), '제목을 복사했어요'); });
+    el.querySelector('.c2').addEventListener('click', function () {
+      ed.copyBody().then(function () { toast('본문을 복사했어요. 블로그 본문에 붙여넣으세요 (글씨 크기·박스 그대로)'); }, function () { copy(ed.text(), '본문을 복사했어요. 블로그 본문에 붙여넣으세요'); });
+    });
+    el.querySelector('.c4').addEventListener('click', function () { if (ed.undo()) toast('↩ 한 단계 되돌렸어요'); });
     el.querySelector('.c3').addEventListener('click', function () { delete posts[n]; savePosts(); run([n]); });
-    // 되돌리기: 고칠 때마다(잠깐 멈추면) 그 전 모습을 기억
-    var H = [], hT = 0, un = el.querySelector('.c4');
-    function snapP() { return { t: el.querySelector('.pt').value, b: el.querySelector('.pb').innerText, g: el.querySelector('.tg').innerText }; }
-    H.push(snapP());
-    function keep() { var x = snapP(), l = H[H.length - 1]; if (!l || l.t !== x.t || l.b !== x.b || l.g !== x.g) { H.push(x); if (H.length > 80) H.shift(); } un.disabled = H.length < 2; }
-    un.addEventListener('click', function () {
-      clearTimeout(hT); keep();
-      if (H.length < 2) return;
-      H.pop(); var d = H[H.length - 1];
-      el.querySelector('.pt').value = d.t; el.querySelector('.pb').innerText = d.b; el.querySelector('.tg').innerText = d.g;
-      posts[n] = Object.assign({}, posts[n], { title: d.t, edited: d.b, etags: d.g, at: Date.now() }); savePosts();
-      un.disabled = H.length < 2; toast('↩ 한 단계 되돌렸어요');
-    });
-    el.addEventListener('input', function () {
-      posts[n] = Object.assign({}, posts[n], { title: el.querySelector('.pt').value, edited: el.querySelector('.pb').innerText, etags: el.querySelector('.tg').innerText, at: Date.now() }); savePosts();
-      un.disabled = false; clearTimeout(hT); hT = setTimeout(keep, 700);
-    });
     var out = $('out');
     if (old) old.replaceWith(el);
     else { var after = null; out.querySelectorAll('.post').forEach(function (x) { if (+x.id.slice(4) > n && !after) after = x; }); out.insertBefore(el, after); }
@@ -498,5 +487,6 @@
 </script>
 <script src="/js/home.js?v=5" defer data-shift=".bar"></script>
 <script src="../js/cherry.js?v=1"></script>
+<script src="../js/blogedit.js?v=1"></script>
 </body>
 </html>

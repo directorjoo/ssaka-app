@@ -657,3 +657,8 @@
 .sk .sk-list li.sk-tt .sk-tm { white-space: nowrap; }
 .sk-edbar .un { flex: 1.2; background: #fff; color: #B3132B; border: 1.5px solid #B3132B; }
 .sk-edbar .un:disabled { opacity: .45; }
+
+/* 카드 글씨 크기 차이: 제목 > 묶음 제목(소제목) > 본문 > 작은 글씨 */
+.sk .sk-list li.sk-h { font-size: 17px !important; letter-spacing: .02em; }
+.sk .sk-list li.sk-h.sk-sm { font-size: 14px !important; }
+.sk .sk-list.sk-doc li.sk-p { font-size: 15.5px; }

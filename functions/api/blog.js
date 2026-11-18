@@ -54,6 +54,17 @@ const SURVEY_RULES = `너는 동네 가게·학원·사람의 네이버 블로�
 답은 JSON 하나만, 코드블록 없이:
 {"title":"검색에 잘 걸리는 제목(35자 안팎)","blocks":[{"t":"img","n":1,"hint":"..."},{"t":"p","text":"..."},{"t":"h","text":"..."}],"tags":["#..."]}`;
 
+// 모든 글에 공통: 글씨 크기 차이가 나는 꾸밈 블록 (인용구·요점 박스·정보 박스·사진 프롬프트)
+const FORMAT = `
+
+[꾸밈 블록 — 꼭 지킨다]
+- 인용구 "q" 3~4개를 글 곳곳(소제목 사이)에 넣는다: 글의 핵심 한마디를 40자 안쪽으로. 운영하는 분의 다짐·말이나 이 대목의 요점. 손님이 한 말처럼 지어내지 않는다(사실에 손님 말이 적혀 있을 때만 그대로 옮김).
+- 요점 정리 박스 "sum" 1개: 마무리 바로 앞에 "lines" 3~5줄, 줄마다 20자 안팎.
+- 정보 박스 "info" 1~2개: 시간·위치·가격·준비물·신청 방법처럼 따로 챙겨 볼 정보. "title"(10자 안쪽)과 "lines". 사실에 있는 정보만 쓰고, 없으면 넣지 않는다.
+- 사진 자리 "img"에는 "hint"(한국어 12자 안팎)와 "prompt"(영어 이미지 생성 지시, 20~30단어, 사진처럼 사실적인 장면, 자연광, 글자·간판·로고 없이, 사람은 뒷모습이나 손 위주)를 함께 쓴다.
+- 소제목 "h"는 짧게(20자 안쪽). 본문 "p"는 2~3문장.
+블록 모양 예: {"t":"q","text":"..."} {"t":"sum","lines":["...","..."]} {"t":"info","title":"이용 안내","lines":["...","..."]} {"t":"img","n":2,"hint":"...","prompt":"..."}`;
+
 function surveyText(sv, type) {
   const qa = (Array.isArray(sv.qa) ? sv.qa : []).slice(0, 110).map(x => ({ q: clean(x[0], 90), a: clean(x[1], 400), t: String(x[2] || '0').split(',').map(Number) })).filter(x => x.q && x.a);
   const hit = qa.filter(x => x.t.includes(type) || x.t.includes(0)), rest = qa.filter(x => !(x.t.includes(type) || x.t.includes(0)));
@@ -79,9 +90,15 @@ function parse(text) {
   text = String(text || '').trim().replace(/^```(json)?|```$/g, '').trim();
   const s = text.indexOf('{'), e = text.lastIndexOf('}');
   const o = JSON.parse(text.slice(s, e + 1));
-  const blocks = (Array.isArray(o.blocks) ? o.blocks : []).map(b => (
-    b.t === 'img' ? Object.assign({ t: 'img', n: b.n | 0 }, b.hint ? { hint: clean(String(b.hint).replace(/\*/g, ''), 30) } : {}) : { t: b.t === 'h' ? 'h' : 'p', text: clean(String(b.text || '').replace(/\*/g, ''), 1200) }
-  )).filter(b => b.t === 'img' ? b.n > 0 : b.text);
+  const T = x => clean(String(x || '').replace(/\*/g, ''), 1200);
+  const L = a => (Array.isArray(a) ? a : []).map(x => clean(String(x || '').replace(/\*/g, ''), 200)).filter(Boolean).slice(0, 8);
+  const blocks = (Array.isArray(o.blocks) ? o.blocks : []).map(b => {
+    if (b.t === 'img') return Object.assign({ t: 'img', n: b.n | 0 }, b.hint ? { hint: clean(String(b.hint).replace(/\*/g, ''), 30) } : {}, b.prompt ? { prompt: clean(String(b.prompt), 400) } : {});
+    if (b.t === 'sum') return { t: 'sum', lines: L(b.lines) };
+    if (b.t === 'info') return { t: 'info', title: clean(String(b.title || '안내'), 20), lines: L(b.lines) };
+    if (b.t === 'q') return { t: 'q', text: clean(String(b.text || '').replace(/[*"“”]/g, ''), 120) };
+    return { t: b.t === 'h' ? 'h' : 'p', text: T(b.text) };
+  }).filter(b => b.t === 'img' ? b.n > 0 : (b.lines ? b.lines.length : b.text));
   const tags = (Array.isArray(o.tags) ? o.tags : []).map(t => '#' + clean(t, 30).replace(/[#\s·]/g, '')).filter(t => t.length > 1).slice(0, 10);
   return { title: clean(String(o.title || '').replace(/\*/g, ''), 80), blocks, tags };
 }
@@ -90,7 +107,7 @@ async function ask(env, key, system, content) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-    body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 4000, system, messages: [{ role: 'user', content }] })
+    body: JSON.stringify({ model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 5000, system: system + FORMAT, messages: [{ role: 'user', content }] })
   });
   if (!r.ok) { let m = ''; try { m = ((await r.json()).error || {}).type || ''; } catch (e) {} return { err: json({ error: 'ai', status: r.status, type: m }, 502) }; }
   const out = await r.json();
@@ -307,7 +324,7 @@ export async function onRequest({ request, env }) {
     method: 'POST',
     headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
     body: JSON.stringify({
-      model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: RULES,
+      model: env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 5000, system: RULES + FORMAT,
       messages: [{ role: 'user', content: `사진 개수 N=${nImg}\n` + (photos.length ? '[사진 목록]\n' + photos.map((x, i) => (i + 1) + '. ' + x).join('\n') + '\n' : '') + `\n[싸바카드]\n${cardText(card, b.industry)}` + (owner.length ? '\n\n[대표님 한마디]\n' + owner.map(x => '- ' + x).join('\n') : '') }]
     })
   });

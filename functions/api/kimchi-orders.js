@@ -23,7 +23,21 @@ export async function onRequest({request,env}){
  let b={};try{const raw=await request.text();if(raw.length>16000)return json({error:'large'},413);b=JSON.parse(raw);}catch(e){return json({error:'bad'},400);}
  const user=await currentUser(request,env.DB);
  const kimchiAdmins=[env.SAVA_ADMIN_UID].concat(String(env.SAVA_KIMCHI_ADMINS||'').split(',')).map(function(s){return String(s||'').trim();}).filter(Boolean); // 김치 주문 관리자: 대표 + SAVA_KIMCHI_ADMINS(쉼표로 여러 명)
- const admin=!!user&&kimchiAdmins.indexOf(String(user.id))>=0;
+ const owner=!!user&&String(user.id)===String(env.SAVA_ADMIN_UID||'');
+ await env.DB.prepare('CREATE TABLE IF NOT EXISTS kimchi_admins (uid TEXT PRIMARY KEY, name TEXT, added INTEGER NOT NULL)').run();
+ await env.DB.prepare('CREATE TABLE IF NOT EXISTS kimchi_invites (code TEXT PRIMARY KEY, expires INTEGER NOT NULL, used_by TEXT)').run();
+ let admin=!!user&&kimchiAdmins.indexOf(String(user.id))>=0;
+ if(user&&!admin){const r=await env.DB.prepare('SELECT uid FROM kimchi_admins WHERE uid=?').bind(String(user.id)).first();admin=!!r;}
+ // 초대 링크로 관리자 되기 (로그인한 사람만, 링크는 3일 · 한 번만)
+ if(b.action==='join'){
+  if(!user)return json({error:'login'},401);
+  const code=clean(b.code,40).toUpperCase();const r=code&&await env.DB.prepare('SELECT code,expires,used_by FROM kimchi_invites WHERE code=?').bind(code).first();
+  if(admin)return json({ok:true,already:true});
+  if(!r||r.used_by||r.expires<Date.now())return json({error:'invite'},400);
+  await env.DB.prepare('INSERT OR REPLACE INTO kimchi_admins (uid,name,added) VALUES (?,?,?)').bind(String(user.id),clean(user.alias||user.nick||'',20),Date.now()).run();
+  await env.DB.prepare('UPDATE kimchi_invites SET used_by=? WHERE code=?').bind(String(user.id),code).run();
+  return json({ok:true});
+ }
  if(b.action==='create'){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
   if(!b.agree)return json({error:'agree'},400);
@@ -63,7 +77,14 @@ export async function onRequest({request,env}){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
   const {results}=await env.DB.prepare('SELECT id,data,created,status FROM kimchi_orders ORDER BY created DESC LIMIT 500').all();
   const items=[];for(const r of results||[]){try{items.push({id:r.id,created:r.created,status:r.status,order:await unseal(k,r.data)});}catch(e){}}
-  return json({ok:true,items});
+  return json({ok:true,items,owner});
+ }
+ // 대표만: 관리자 초대 링크 만들기 · 관리자 목록 · 빼기
+ if(b.action==='invite'||b.action==='admins'||b.action==='removeAdmin'){
+  if(!owner)return json({error:'forbidden'},403);
+  if(b.action==='invite'){const code=rand(6);await env.DB.prepare('INSERT INTO kimchi_invites (code,expires) VALUES (?,?)').bind(code,Date.now()+3*86400e3).run();return json({ok:true,code,link:new URL(request.url).origin+'/app/orders/?join='+code});}
+  if(b.action==='admins'){const {results}=await env.DB.prepare('SELECT uid,name,added FROM kimchi_admins ORDER BY added').all();return json({ok:true,items:results||[]});}
+  await env.DB.prepare('DELETE FROM kimchi_admins WHERE uid=?').bind(clean(b.uid,30)).run();return json({ok:true});
  }
  if(b.action==='status'){if(!statuses.includes(b.status))return json({error:'status'},400);await env.DB.prepare('UPDATE kimchi_orders SET status=? WHERE id=?').bind(b.status,clean(b.id,40)).run();return json({ok:true});}
  return json({error:'bad-action'},400);

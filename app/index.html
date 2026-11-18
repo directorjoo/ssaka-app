@@ -647,7 +647,12 @@
     acct.appendChild(document.createTextNode('🍒 싸바 회원가입 · 로그인')); acct.appendChild(el('span', '', '카카오로 1초'));
     m.appendChild(acct);
     fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.user && j.user.agreed) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님)'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; }
+      if (j && j.user) {
+        acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = j.user.agreed ? '로그아웃 · 탈퇴' : '가입 마무리';
+        // 김치 주문 관리 (관리자만 내용이 보임)
+        var od = el('a', ''); od.href = '/app/orders/?admin=1'; od.appendChild(document.createTextNode('🥬 주문 관리')); od.appendChild(el('span', '', '관리자'));
+        acct.insertAdjacentElement('afterend', od);
+      }
     }).catch(function () {});
     [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '싸바 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);

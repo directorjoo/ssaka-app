@@ -227,9 +227,18 @@
     .send .kakao, .send .big.kakao { position: relative; overflow: hidden; }
     .send .kakao::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.65), transparent); transform: skewX(-20deg); animation: shine 2.6s ease-in-out infinite; }
     @keyframes shine { 0%,55% { left: -60%; } 100% { left: 130%; } }
-    .topbar { min-height: 46px; margin-bottom: 8px; }
     @media (prefers-reduced-motion: reduce) { .party, .ehero .spark { display: none; } .ehero::before, .ehero .logo, .send .kakao::after { animation: none; } }
+    .topbar { min-height: 0; margin: 0; }
+    .miss { position: relative; margin: 2px 0 16px; padding: 6px 92px 0 2px; }
+    .miss-q { margin: 0; font-size: clamp(21px, 6.3vw, 28px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.2; color: #2a1a1a; white-space: nowrap; }
+    .mq-e { display: inline-block; margin-right: 6px; animation: mqBob 2.6s ease-in-out infinite; }
+    @keyframes mqBob { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
+    .miss-poem { margin: 12px -90px 0 0; padding: 12px 16px 11px 18px; border-left: 4px solid #E9A3B1; border-radius: 4px 16px 16px 4px; background: rgba(255,255,255,.78); font-family: 'Gowun Batang', serif; font-size: 19px; font-weight: 700; line-height: 1.55; color: #8E0F22; word-break: keep-all; box-shadow: 0 8px 18px -14px rgba(142,15,34,.6); animation: poemIn .7s ease-out both; }
+    .miss-poem small { display: block; margin-top: 4px; font-family: var(--font); font-size: 14.5px; font-weight: 700; color: #8a7272; }
+    @keyframes poemIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .mq-e, .miss-poem { animation: none; } }
   </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&text=%20%2C%E2%80%94%E2%80%9C%E2%80%9D%E3%80%8C%E3%80%8D%EA%B0%80%EA%B0%81%EA%B0%9C%EA%B2%83%EA%B2%A0%EA%B3%A0%EA%B4%B4%EA%B5%BD%EA%B7%B8%EA%B8%B8%EA%B9%80%EA%B9%8C%EB%81%9D%EB%82%98%EB%82%A0%EB%82%B4%EB%84%A4%EB%85%84%EB%85%B8%EB%8A%94%EB%8B%88%EB%8B%98%EB%8B%A4%EB%8C%80%EB%8D%98%EB%8F%84%EB%8F%8C%EB%8F%99%EB%91%90%EB%93%A0%EB%93%A4%EB%95%8C%EB%96%A0%EB%9D%BC%EB%9F%AC%EB%A1%9C%EB%A1%A0%EB%A5%BC%EB%A6%AC%EB%A6%BD%EB%A7%8C%EB%A7%90%EB%AA%A8%EB%AA%BB%EB%AC%B5%EB%AF%BF%EB%B0%94%EB%B0%98%EB%B0%A4%EB%B2%84%EB%B2%88%EB%B2%97%EB%B3%91%EC%82%B4%EC%83%9D%EC%84%9C%EC%85%B0%EC%86%8C%EC%86%8D%EC%8A%A4%EC%8A%AC%EC%8A%B5%EC%8B%9C%EC%8B%A0%EC%95%84%EC%95%88%EC%95%8A%EC%95%BD%EC%96%91%EC%96%B4%EC%97%88%EC%97%90%EC%97%AC%EC%98%A4%EC%9A%94%EC%9A%A9%EC%9A%B4%EC%9A%B8%EC%9B%8C%EC%9B%94%EC%9D%80%EC%9D%84%EC%9D%98%EC%9D%B4%EC%9D%B5%EC%9D%B8%EC%9D%BC%EC%9E%83%EC%9E%88%EC%9E%8A%EC%9E%A0%EC%A0%95%EC%A1%B0%EC%A3%BC%EC%A7%80%EC%A7%84%EC%A7%9D%EC%B9%A8%ED%85%8C%ED%8A%B8%ED%8E%B4%ED%94%94%ED%94%BC%ED%95%98%ED%95%9C%ED%95%A0%ED%96%87%ED%99%A9&display=swap">
 <script src="/js/launch.js?v=2"></script>
 </head>
 <body>
@@ -240,6 +249,10 @@
     <div class="party" aria-hidden="true"><span>🎈</span><span>🎉</span><span>🍒</span><span>🥳</span><span>✨</span><span>🎈</span></div>
     <div class="brand topbar">
       <button type="button" class="cancel" id="cancelTop" style="display:none">✕ 취소</button>
+    </div>
+    <div class="miss">
+      <h1 class="miss-q"><span class="mq-e" aria-hidden="true">💭</span>누가 보고 싶으세요?</h1>
+      <p class="miss-poem" id="missPoem">“그립다 말을 할까 하니 그리워”<small>— 김소월 「가는 길」</small></p>
     </div>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
@@ -782,6 +795,13 @@
   function askPreview() { var f = $('from').value.trim(); $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
   $('from').addEventListener('input', askPreview); askPreview();
 
+  // 들어올 때마다 그리움의 시 한 구절 (첫 방문은 김소월 「가는 길」)
+  (function () {
+    var P = [["그립다 말을 할까 하니 그리워", "김소월 「가는 길」"], ["떠날 때에 다시 만날 것을 믿습니다", "한용운 「님의 침묵」"], ["어론 님 오신 날 밤이어든 굽이굽이 펴리라", "황진이"], ["그대를 생각하는 동안, 벗이여, 잃은 것은 모두 돌아오고 슬픔은 끝나네", "셰익스피어"], ["햇살이 바다에서 반짝일 때, 나는 그대를 생각하네", "괴테"], ["가도 아주 가지는 않노라시던 그러한 약속이 있었겠지요", "김소월 「개여울」"], ["못 잊어 생각이 나겠지요", "김소월 「못 잊어」"], ["만 리 길이라도, 내 다시 오리다", "로버트 번스"], ["다정도 병인 양하여 잠 못 들어 하노라", "이조년"]];
+    var i = 0; try { i = (parseInt(localStorage.getItem('sava-poem') || '-1', 10) + 1) % P.length; localStorage.setItem('sava-poem', String(i)); } catch (e) {}
+    var el = document.getElementById('missPoem'); if (!el) return;
+    el.textContent = '“' + P[i][0] + '”'; var s = document.createElement('small'); s.textContent = '— ' + P[i][1]; el.appendChild(s);
+  })();
   function partyBurst(el) {
     try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
     var r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, E = ['🎉','✨','🍒','🎈','💛','⭐'];

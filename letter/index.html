@@ -20,8 +20,10 @@
     .who button { min-height: 56px; border: 0; border-radius: 14px; background: none; font: inherit; font-size: 16.5px; font-weight: 900; color: #6b5a50; cursor: pointer; line-height: 1.15; }
     .who button small { display: block; font-size: 12.5px; font-weight: 700; opacity: .8; }
     .who button[aria-pressed="true"] { background: #fff; color: var(--ssaka); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
-    .cities { display: flex; gap: 6px; overflow-x: auto; margin: 10px 0 0; scrollbar-width: none; }
-    .cities button { flex: none; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 14px; font-weight: 800; color: #5a4a42; cursor: pointer; }
+    .cities { display: grid; gap: 5px; margin: 10px 0 0; padding: 8px; border-radius: 18px; background: #fff; border: 1.5px solid #efe3da; }
+    .cities .row { display: grid; grid-template-columns: 50px repeat(5, 1fr); gap: 5px; align-items: center; }
+    .cities .row span { font-size: 14.5px; font-weight: 900; color: #8E0A1C; letter-spacing: -.03em; line-height: 1.1; word-break: keep-all; }
+    .cities button { min-height: 38px; padding: 0; border-radius: 12px; border: 1.5px solid #e9dcd2; background: #FFF8F3; font: inherit; font-size: 15px; font-weight: 800; color: #5a4a42; cursor: pointer; }
     .cities button[aria-pressed="true"] { background: #1A4FB0; border-color: #1A4FB0; color: #fff; }
     .paper { position: relative; margin-top: 14px; padding: 22px 18px 18px; border-radius: 22px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 14px 30px -20px rgba(80,30,20,.45); }
     .paper::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border-radius: 22px 22px 0 0; background: repeating-linear-gradient(135deg, #B3132B 0 14px, #fff 14px 22px, #1A4FB0 22px 36px, #fff 36px 44px); }
@@ -60,17 +62,26 @@
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   var WHO = [['senior', '💊 어르신', '건강'], ['boss', '💰 대표님', '매출'], ['actor', '🎬 배우', '오디션']];
-  var CITIES = ['광주', '서울', '여수', '순천', '목포', '전주', '부산', '대구', '대전', '인천', '제주'];
+  // 17개 광역자치단체를 권역별로 묶어 한눈에
+  var GROUPS = [['수도권', ['서울', '경기', '인천']], ['강원·충청', ['강원', '대전', '세종', '충북', '충남']], ['호남·제주', ['광주', '전북', '전남', '제주']], ['영남', ['부산', '대구', '울산', '경북', '경남']]];
+  var CITIES = [].concat.apply([], GROUPS.map(function (g) { return g[1]; }));
+  var OLD = { 여수: '전남', 순천: '전남', 목포: '전남', 전주: '전북' };
   var qs = new URLSearchParams(location.search), k = qs.get('k'), city = qs.get('city');
   try { k = k || localStorage.getItem('sava-letter-k'); city = city || localStorage.getItem('sava-letter-city'); } catch (e) {}
   if (!WHO.some(function (w) { return w[0] === k; })) k = 'boss';
+  city = OLD[city] || city;
   if (CITIES.indexOf(city) < 0) city = '광주';
   var last = null;
   function bar() {
     var w = $('who'); w.innerHTML = '';
     WHO.forEach(function (x) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = x[1] + '<small>' + x[2] + '</small>'; b.setAttribute('aria-pressed', x[0] === k ? 'true' : 'false'); b.addEventListener('click', function () { k = x[0]; go(); }); w.appendChild(b); });
     var c = $('cities'); c.innerHTML = ''; c.hidden = k === 'actor';
-    CITIES.forEach(function (n) { var b = document.createElement('button'); b.type = 'button'; b.textContent = n; b.setAttribute('aria-pressed', n === city ? 'true' : 'false'); b.addEventListener('click', function () { city = n; go(); }); c.appendChild(b); });
+    GROUPS.forEach(function (g) {
+      var row = document.createElement('div'); row.className = 'row';
+      var lb = document.createElement('span'); lb.textContent = g[0]; row.appendChild(lb);
+      g[1].forEach(function (n) { var b = document.createElement('button'); b.type = 'button'; b.textContent = n; b.setAttribute('aria-pressed', n === city ? 'true' : 'false'); b.addEventListener('click', function () { city = n; go(); }); row.appendChild(b); });
+      c.appendChild(row);
+    });
   }
   function go() {
     try { localStorage.setItem('sava-letter-k', k); localStorage.setItem('sava-letter-city', city); } catch (e) {}

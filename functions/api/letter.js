@@ -2,14 +2,24 @@
 //   GET /api/letter?k=senior : 💊 어르신 — 건강 (날씨에 맞춘 몸 관리, 유행 질병, 무료 접종·검진, 제철 밥상, 사기 조심)
 //   GET /api/letter?k=boss   : 💰 대표님 — 매출 (날씨로 팔 것, 사람 몰리는 행사, 놓치면 손해인 지원·신고, 요즘 뜨는 것, 오늘 할 홍보)
 //   GET /api/letter?k=actor  : 🎬 배우 — 영화·드라마·연극·뮤지컬·광고 오디션 (마감 가까운 순)
-//   &city=광주 (날씨·행사 지역, 기본 광주)
+//   &city=전남 (17개 광역자치단체 중 하나 — 날씨 지역, 기본 광주)
 // 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다. 뉴스는 제목과 원문 링크만 씁니다.
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
 // 있으면 더 정확해지는 환경변수: DATA_API_KEY(공공데이터포털 일반 인증키 하나로 관광공사 행사 + 중기부 기업마당 지원사업 둘 다)
 //   (예전 이름 TOUR_API_KEY도 그대로 읽음 · 기업마당 사이트에서 따로 받은 키가 있으면 BIZINFO_API_KEY)
 const MODEL_DEFAULT = 'claude-haiku-5-5';
-// [위도, 경도, 관광공사 옛 지역코드, 법정동 시도코드(KorService2), 기업마당 해시태그 지역]
-const CITY = { 광주: [35.1595, 126.8526, 5, 29, '광주'], 서울: [37.5665, 126.978, 1, 11, '서울'], 여수: [34.7604, 127.6622, 38, 46, '전남'], 순천: [34.9506, 127.4872, 38, 46, '전남'], 목포: [34.8118, 126.3922, 38, 46, '전남'], 전주: [35.8242, 127.148, 37, 52, '전북'], 부산: [35.1796, 129.0756, 6, 26, '부산'], 대구: [35.8714, 128.6014, 4, 27, '대구'], 대전: [36.3504, 127.3845, 3, 30, '대전'], 인천: [37.4563, 126.7052, 2, 28, '인천'], 제주: [33.4996, 126.5312, 39, 50, '제주'] };
+// 17개 광역자치단체 — 날씨는 시·도청이 있는 곳 기준 [위도, 경도, 날씨에 쓰는 이름]
+const CITY = {
+  서울: [37.5665, 126.978, '서울'], 경기: [37.2636, 127.0286, '경기(수원)'], 인천: [37.4563, 126.7052, '인천'],
+  강원: [37.8813, 127.7298, '강원(춘천)'], 충북: [36.6424, 127.489, '충북(청주)'], 충남: [36.6588, 126.6728, '충남(내포)'],
+  대전: [36.3504, 127.3845, '대전'], 세종: [36.48, 127.289, '세종'],
+  전북: [35.8242, 127.148, '전북(전주)'], 전남: [34.8161, 126.4629, '전남(무안)'], 광주: [35.1595, 126.8526, '광주'],
+  경북: [36.5760, 128.5056, '경북(안동)'], 경남: [35.228, 128.6811, '경남(창원)'], 대구: [35.8714, 128.6014, '대구'],
+  울산: [35.5384, 129.3114, '울산'], 부산: [35.1796, 129.0756, '부산'], 제주: [33.4996, 126.5312, '제주']
+};
+// 예전에 보낸 링크(도시 이름)도 그대로 열리게
+const OLD = { 여수: '전남', 순천: '전남', 목포: '전남', 전주: '전북' };
+function pickCity(v) { v = OLD[v] || v; return CITY[v] ? v : '광주'; }
 function json(o, s, age) { return new Response(JSON.stringify(o), { status: s || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + (age || 0) } }); }
 function kst() { return new Date(Date.now() + 9 * 3600e3); }
 function ymd(d) { return d.toISOString().slice(0, 10); }
@@ -80,7 +90,7 @@ async function programs(env, c, diag) {
       const its = (j.response.body || {}).items; list = Array.isArray(its) ? its : (its && its.item) ? (Array.isArray(its.item) ? its.item : [its.item]) : [];
     } else list = j.jsonArray || j.items || [];
     if (!Array.isArray(list)) throw new Error(String(j.reqErr || j.message || '응답에 목록 없음').slice(0, 60));
-    const today = ymd(kst()).replace(/-/g, ''), region = c[4];
+    const today = ymd(kst()).replace(/-/g, '');
     const REG = { 서울: '서울', 부산: '부산', 대구: '대구', 인천: '인천', 광주: '광주', 대전: '대전', 울산: '울산', 세종: '세종', 경기: '경기', 강원: '강원', 충북: '충청북도|충북', 충남: '충청남도|충남', 전북: '전북|전라북도', 전남: '전남|전라남도', 경북: '경상북도|경북', 경남: '경상남도|경남', 제주: '제주' };
     const anyReg = new RegExp(Object.keys(REG).map(k => REG[k]).join('|'));
     const rows = list.map(x => {
@@ -120,7 +130,7 @@ async function build(k, city, env) {
     const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));
     src = '[오디션·모집 뉴스 제목]\n' + all.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n');
   }
-  const wtxt = w ? city + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
+  const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
   let out = null;
   if (key) {
@@ -144,7 +154,7 @@ async function build(k, city, env) {
 }
 
 export async function onRequestGet({ request, env, waitUntil }) {
-  const u = new URL(request.url), k = u.searchParams.get('k') || 'boss', city = CITY[u.searchParams.get('city')] ? u.searchParams.get('city') : '광주';
+  const u = new URL(request.url), k = u.searchParams.get('k') || 'boss', city = pickCity(u.searchParams.get('city'));
   if (!RULES[k]) return json({ error: 'bad-k' }, 400);
   // 연결 점검: /api/letter?check=1&city=광주 — 키 값은 보여주지 않고 연결 상태와 받아온 자료만 보여 줌
   if (u.searchParams.get('check')) {

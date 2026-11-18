@@ -47,14 +47,14 @@ export async function onRequest({request,env}){
   if(!r)return json({error:'not-found'},404);
   let o;try{o=await unseal(k,r.data);}catch(e){return json({error:'not-found'},404);}
   if(digits(o.phone)!==phone)return json({error:'not-found'},404);
-  return json({ok:true,item:{id:r.id,created:r.created,status:r.status,order:{orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}}});
+  return json({ok:true,item:{id:r.id,created:r.created,status:r.status,order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}}});
  }
  // 내 주문: 로그인한 회원이 낸 주문 (어느 기기에서든)
  if(b.action==='mine'){
   if(!user)return json({ok:true,items:[],login:0});
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
   const {results}=await env.DB.prepare('SELECT id,data,created,status FROM kimchi_orders WHERE uid=? ORDER BY created DESC LIMIT 50').bind(user.id).all();
-  const items=[];for(const r of results||[]){try{const o=await unseal(k,r.data);items.push({id:r.id,created:r.created,status:r.status,order:{orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}});}catch(e){}}
+  const items=[];for(const r of results||[]){try{const o=await unseal(k,r.data);items.push({id:r.id,created:r.created,status:r.status,order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}});}catch(e){}}
   return json({ok:true,items,login:1});
  }
  if(!admin)return json({error:'forbidden'},403);

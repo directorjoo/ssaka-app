@@ -248,7 +248,8 @@
         <h1>홈</h1>
       </div>
       <div class="top-act">
-        <button type="button" class="upd-btn" id="updBtn" aria-label="최신 버전으로 업데이트">🔄 업데이트</button>
+        <button type="button" class="upd-btn" id="updBtn" aria-label="최신 버전으로 업데이트" hidden>🔄 새 버전!</button>
+        <button type="button" class="tr-btn set-btn" onclick="window.SavaSettings && SavaSettings.open()" aria-label="설정 · 글씨 크기">⚙️</button>
         <button type="button" class="tr-btn notranslate" translate="no" onclick="window.SavaTr && SavaTr.open()" aria-label="Language 언어">🌐</button>
       </div>
     </div>
@@ -655,8 +656,8 @@
       if (j && j.user) {
         acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = j.user.agreed ? '로그아웃 · 탈퇴' : '가입 마무리';
         // 김치 주문 관리 (관리자만 내용이 보임)
-        var od = el('a', ''); od.href = '/app/orders/' + (String(j.user.id) === '1' ? '?admin=1' : ''); od.appendChild(document.createTextNode(String(j.user.id) === '1' ? '🥬 주문 관리' : '🥬 내 주문')); od.appendChild(el('span', '', String(j.user.id) === '1' ? '관리자' : '언니김치'));
-        if (String(j.user.id) === '1') acct.insertAdjacentElement('afterend', od);
+        var od = el('a', ''); od.href = '/app/orders/?admin=1'; od.appendChild(document.createTextNode('🥬 주문 관리')); od.appendChild(el('span', '', '관리자'));
+        if (j.admin) acct.insertAdjacentElement('afterend', od);
       }
     }).catch(function () {});
     [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '싸바 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
@@ -707,7 +708,7 @@
       fetch('/version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
         var cur = window.SsakaInstall && SsakaInstall.version;
         var isNew = j && j.v && cur && j.v !== cur;
-        b.classList.toggle('new', !!isNew); b.textContent = isNew ? '🔄 새 버전!' : '🔄 업데이트';
+        b.hidden = !isNew; b.classList.toggle('new', !!isNew);
       }).catch(function () {});
     }
     check(); document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
@@ -757,6 +758,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
-<script src="/js/home.js?v=6" defer data-bar="0"></script>
+<script src="/js/home.js?v=7" defer data-bar="0"></script>
 </body>
 </html>

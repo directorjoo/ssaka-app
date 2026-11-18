@@ -1,3 +1,74 @@
+// 글씨 크기 (⚙️ 설정에서 고름) — 싸바 모든 화면에 똑같이
+(function () {
+  var f = 100; try { f = +localStorage.getItem('sava-fs') || 100; } catch (e) {}
+  function apply(v) {
+    var h = document.documentElement;
+    h.style.webkitTextSizeAdjust = v + '%'; h.style.textSizeAdjust = v + '%';
+    // 아이폰·안드로이드가 아닌 곳(노트북 등)은 화면 전체 배율로
+    if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) h.style.zoom = v === 100 ? '' : String(v / 100);
+  }
+  apply(f);
+  window.SavaFont = { get: function () { return f; }, set: function (v) { f = v; try { localStorage.setItem('sava-fs', String(v)); } catch (e) {} apply(v); } };
+})();
+// ⚙️ 설정 창: SavaSettings.open()
+(function () {
+  var FS = [[100, '보통'], [115, '크게'], [130, '아주 크게'], [150, '가장 크게']];
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function css() {
+    if (document.getElementById('sv-set-css')) return;
+    var st = el('style'); st.id = 'sv-set-css';
+    st.textContent = '.sv-set-bg{position:fixed;inset:0;z-index:2147482000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}' +
+      '.sv-set{width:100%;max-width:560px;max-height:90dvh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;color:#222}' +
+      '.sv-set h2{margin:0 0 4px;font-size:22px;display:flex;justify-content:space-between;align-items:center}.sv-set h2 button{border:0;background:#f1ece6;border-radius:999px;width:40px;height:40px;font-size:18px}' +
+      '.sv-set h3{margin:18px 0 8px;font-size:15px;color:#8a7f76}' +
+      '.sv-fs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sv-fs button{min-height:56px;padding:4px 2px;word-break:keep-all;line-height:1.2;border:1.5px solid #e2d9d0;border-radius:12px;background:#fff;font-weight:800;color:#333}.sv-fs button.on{background:#B3132B;border-color:#B3132B;color:#fff}' +
+      '.sv-row{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:0 4px;border-bottom:1px solid #f0ebe5;text-decoration:none;color:#222;font-size:17px;font-weight:700;width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left;font-family:inherit}.sv-row span{color:#8a7f76;font-size:14px;font-weight:600}' +
+      '.sv-admin{margin-top:6px;padding:4px 12px;border-radius:14px;background:#fff6d9;border:1.5px solid #f5d46b}';
+    document.head.appendChild(st);
+  }
+  function open() {
+    css();
+    var bg = el('div', 'sv-set-bg'), box = el('div', 'sv-set'); bg.appendChild(box);
+    var h = el('h2', '', '⚙️ 설정'), x = el('button', '', '✕'); x.type = 'button'; x.setAttribute('aria-label', '닫기'); h.appendChild(x); box.appendChild(h);
+    // 글씨 크기
+    box.appendChild(el('h3', '', '글씨 크기'));
+    var fs = el('div', 'sv-fs');
+    FS.forEach(function (o) {
+      var b = el('button', window.SavaFont && SavaFont.get() === o[0] ? 'on' : '', o[1]); b.type = 'button'; b.style.fontSize = (13 * o[0] / 100) + 'px';
+      b.addEventListener('click', function () { SavaFont.set(o[0]); fs.querySelectorAll('button').forEach(function (y) { y.classList.toggle('on', y === b); }); });
+      fs.appendChild(b);
+    });
+    box.appendChild(fs);
+    // 내 계정·내 것
+    box.appendChild(el('h3', '', '내 정보'));
+    var acct = el('a', 'sv-row', '🍒 로그인 · 회원가입'); acct.href = '/join/?next=' + encodeURIComponent(location.pathname); acct.appendChild(el('span', '', '카카오로 1초')); box.appendChild(acct);
+    [['🛒 내 주문', '/app/orders/', '김치 등 상품'], ['📅 내 예약', '/app/#resv', ''], ['💌 받은 카드', '/app/#inbox', '']].forEach(function (r) {
+      var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); box.appendChild(a);
+    });
+    var admin = el('div', 'sv-admin'); admin.hidden = true; box.appendChild(admin);
+    // 앱
+    box.appendChild(el('h3', '', '앱'));
+    var up = el('button', 'sv-row', '🔄 최신 버전으로 업데이트'); up.type = 'button'; up.appendChild(el('span', '', window.SsakaInstall ? '지금 ' + SsakaInstall.version : ''));
+    up.addEventListener('click', function () { if (window.SsakaInstall) SsakaInstall.update(); else location.reload(); });
+    box.appendChild(up);
+    [['💡 의견 보내기', '/idea/', '채택되면 쿠폰'], ['개인정보처리방침', '/privacy/', ''], ['이용약관', '/terms/', '']].forEach(function (r) {
+      var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); box.appendChild(a);
+    });
+    fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.user) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; acct.href = '/join/'; }
+      if (j && j.admin) {
+        admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
+        [['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
+          var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); admin.appendChild(a);
+        });
+      }
+    }).catch(function () {});
+    function close() { bg.remove(); }
+    x.addEventListener('click', close); bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
+    document.body.appendChild(bg);
+  }
+  window.SavaSettings = { open: open };
+})();
 // 싸바 공통 이동 단추 — 어느 화면에서든 같은 자리
 //   아래쪽: [‹ 이전] [🏠 홈] [💬 카톡]   위쪽 오른쪽: [🌐 언어]
 // <script src="/js/home.js?v=4" defer></script>
@@ -76,6 +147,11 @@
     b.style.cssText = 'position:fixed;z-index:9990;top:calc(' + (+(ds.langTop || 10)) + 'px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 2px 10px rgba(0,0,0,.16);font-size:21px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent';
     b.addEventListener('click', function () { if (window.SavaTr) SavaTr.open(); });
     document.body.appendChild(b);
+    // ⚙️ 설정 (🌐 왼쪽)
+    var g = b.cloneNode(false); g.className = 'sava-set notranslate'; g.textContent = '⚙️'; g.setAttribute('aria-label', '설정 · 글씨 크기');
+    g.style.right = 'calc(60px + env(safe-area-inset-right))';
+    g.addEventListener('click', function () { if (window.SavaSettings) SavaSettings.open(); });
+    document.body.appendChild(g);
   }
   function addDock() {
     if (document.querySelector('.sava-dock')) return;
@@ -93,7 +169,7 @@
       '.sava-dock-sp{height:var(--sava-dock)}' +
       '.toast{bottom:calc(var(--sava-dock) + 18px) !important}' +
       (shift.length ? shift.join(',') + '{bottom:var(--sava-dock) !important}' : '') +
-      '@media print{.sava-dock,.sava-dock-sp,.sava-lang{display:none}}';
+      '@media print{.sava-dock,.sava-dock-sp,.sava-lang,.sava-set{display:none}}';
     document.head.appendChild(st);
     var n = document.createElement('nav');
     n.className = 'sava-dock'; n.setAttribute('aria-label', '이동');

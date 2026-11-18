@@ -154,30 +154,40 @@
   var orderRadios=document.querySelectorAll('input[name="orderType"]');
   function setOrderType(){var gift=document.querySelector('input[name="orderType"]:checked').value==='선물 보내기';document.getElementById('selfDelivery').hidden=gift;document.getElementById('giftDelivery').hidden=!gift;}
   orderRadios.forEach(function(r){r.addEventListener('change',setOrderType);});
-  function getOrderMessage(){
+  function getOrderData(){
     var buyer=document.getElementById('buyer').value.trim(),phone=document.getElementById('phone').value.trim(),memo=document.getElementById('memo').value.trim(),payment=document.getElementById('payment').value;
     var orderType=document.querySelector('input[name="orderType"]:checked').value;
     var recipient=document.getElementById('recipient').value.trim(),recipientPhone=document.getElementById('recipientPhone').value.trim(),giftAddress=document.getElementById('giftAddress').value.trim(),giftMessage=document.getElementById('giftMessage').value.trim();
     var address=orderType==='선물 보내기'?giftAddress:document.getElementById('address').value.trim();
     if(!buyer||!phone||!address){alert('주문자 성함, 연락처, 배송 주소를 입력해 주세요.');return null;}
     if(orderType==='선물 보내기'&&(!recipient||!recipientPhone)){alert('선물 받는 분 성함과 연락처를 입력해 주세요.');return null;}
-    var delivery=orderType==='선물 보내기'?'받는 분: '+recipient+'\\n받는 분 연락처: '+recipientPhone+'\\n선물 배송 주소: '+giftAddress+'\\n선물 메시지: '+giftMessage:'배송 주소: '+address;
-    return '[여수 언니 갓김치 주문]\\n주문 방식: '+orderType+'\\n주문자: '+buyer+'\\n주문자 연락처: '+phone+'\\n'+delivery+'\\n수량: '+count+'박스\\n금액: '+(count*price).toLocaleString('ko-KR')+'원\\n결제방법: '+payment+'\\n배송 요청사항: '+memo+'\\n주문 페이지: '+URL;
+    return {buyer:buyer,phone:phone,orderType:orderType,recipient:recipient,recipientPhone:recipientPhone,address:address,giftMessage:giftMessage,memo:memo,payment:payment,quantity:count,amount:count*price};
   }
-  document.getElementById('orderSms').addEventListener('click',function(){
-    var message=getOrderMessage();if(!message)return;
-    var seller='01029477775';
-    if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);}
-    else if(/Android/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'?body='+encodeURIComponent(message);}
-    else{copy(message+'\\n문자 수신처: '+seller);}
+  function orderMessage(d){
+    var delivery=d.orderType==='선물 보내기'?'받는 분: '+d.recipient+'\\n받는 분 연락처: '+d.recipientPhone+'\\n선물 배송 주소: '+d.address+'\\n선물 메시지: '+d.giftMessage:'배송 주소: '+d.address;
+    return '[여수 언니 갓김치 주문]\\n주문 방식: '+d.orderType+'\\n주문자: '+d.buyer+'\\n주문자 연락처: '+d.phone+'\\n'+delivery+'\\n수량: '+d.quantity+'박스\\n금액: '+d.amount.toLocaleString('ko-KR')+'원\\n결제방법: '+d.payment+'\\n배송 요청사항: '+d.memo+'\\n주문 페이지: '+URL;
+  }
+  async function saveOrder(d){
+    var r=await fetch('/api/kimchi-orders',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'create',order:d})});
+    var j=await r.json().catch(function(){return {};});
+    if(!r.ok||!j.ok)throw new Error(j.error==='setup'?'관리자 저장 기능 설정이 아직 끝나지 않았습니다. 판매자에게 직접 문의해 주세요.':'주문 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    return j.orderNo;
+  }
+  document.getElementById('orderSms').addEventListener('click',async function(){
+    var d=getOrderData();if(!d)return;
+    try{var no=await saveOrder(d);var message=orderMessage(d)+'\\n주문번호: '+no;var seller='01029477775';
+      if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'&body='+encodeURIComponent(message);}
+      else if(/Android/i.test(navigator.userAgent)){window.location.href='sms:'+seller+'?body='+encodeURIComponent(message);}
+      else{copy(message+'\\n문자 수신처: '+seller);}
+    }catch(e){alert(e.message);}
   });
-  document.getElementById('orderKakao').addEventListener('click',function(){
-    var message=getOrderMessage();if(!message)return;
-    try{
+  document.getElementById('orderKakao').addEventListener('click',async function(){
+    var d=getOrderData();if(!d)return;
+    try{var no=await saveOrder(d);var message=orderMessage(d)+'\\n주문번호: '+no;
       if(!window.Kakao)throw new Error('Kakao SDK unavailable');
       if(!Kakao.isInitialized())Kakao.init(KEY);
       Kakao.Share.sendDefault({objectType:'text',text:message,link:{webUrl:URL,mobileWebUrl:URL},buttonTitle:'주문 페이지 보기'});
-    }catch(e){console.error('Kakao order share error:',e);copy(message+'\\n주문 내용을 복사했습니다. 카카오톡 대화방에 붙여넣어 주세요.');}
+    }catch(e){alert(e.message);}
   });})();
 </script>
 </body>

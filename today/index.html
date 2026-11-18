@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B3132B">
+  <title>오늘의 싸바 · 뉴스 · 날씨 · 검색어 · 건강 · 혜택</title>
+  <meta property="og:title" content="☀️ 오늘의 싸바 — 뉴스 요약 · 날씨 · 인기 검색어 · 건강 · 정부 혜택">
+  <meta property="og:description" content="매일 보는 생활 채널을 싸바 안에서 한 번에. 대표님용 아침 뉴스 3줄, 우리 동네 날씨·미세먼지, 오늘의 인기 검색어, 어르신 건강, 정부 혜택.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #FFF8F3; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 560px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 0 calc(110px + env(safe-area-inset-bottom)); }
+    .hd { padding: 0 16px; }
+    h1 { margin: 8px 0 2px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; padding-right: 100px; }
+    .date { color: var(--ink-2); font-size: 15px; font-weight: 700; }
+    /* 동그라미 탭 */
+    .circles { display: flex; gap: 12px; overflow-x: auto; padding: 14px 16px 10px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .circles::-webkit-scrollbar { display: none; }
+    .cb { flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70px; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; scroll-snap-align: start; text-decoration: none; color: var(--ink); }
+    .cb i { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; font-style: normal; font-size: 30px; background: #fff; box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px var(--c, #ddd), 0 6px 14px -8px rgba(0,0,0,.4); transition: transform .15s; }
+    .cb b { font-size: 13.5px; font-weight: 800; letter-spacing: -.04em; white-space: nowrap; color: #5a4a42; }
+    .cb[aria-pressed="true"] i { transform: scale(1.06); background: var(--c); }
+    .cb[aria-pressed="true"] b { color: var(--ink); }
+    .pane { margin: 4px 14px 0; padding: 18px 16px; border-radius: 22px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 10px 24px -18px rgba(80,30,20,.4); min-height: 240px; }
+    .pane h2 { margin: 0 0 4px; font-size: 22px; font-weight: 900; letter-spacing: -.03em; }
+    .pane .src { color: var(--ink-2); font-size: 13.5px; margin-bottom: 12px; }
+    .sum { margin: 0 0 14px; padding: 14px 14px 12px; border-radius: 16px; background: #FFF3E6; }
+    .sum li { margin: 0 0 6px; font-size: 17px; line-height: 1.5; font-weight: 700; word-break: keep-all; }
+    .sum ul { margin: 0; padding-left: 20px; }
+    .tip { margin-top: 8px; padding-top: 10px; border-top: 1px dashed #e9cdb5; font-size: 16px; font-weight: 800; color: #B3132B; word-break: keep-all; }
+    .sec { margin: 18px 0 6px; font-size: 16px; font-weight: 900; color: #8E0A1C; }
+    .nl { list-style: none; margin: 0; padding: 0; }
+    .nl li { border-bottom: 1px solid #f3ebe5; }
+    .nl a { display: flex; gap: 10px; padding: 11px 2px; color: var(--ink); text-decoration: none; font-size: 16.5px; line-height: 1.45; word-break: keep-all; }
+    .nl a em { flex: none; min-width: 26px; font-style: normal; font-weight: 900; color: #B3132B; }
+    .nl a small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13.5px; }
+    .rk a em { font-size: 18px; }
+    .rk .tr { flex: none; margin-left: auto; align-self: center; padding: 3px 8px; border-radius: 999px; background: #FFF0E6; color: #a14a12; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+    .msg { padding: 30px 6px; text-align: center; color: var(--ink-2); font-size: 16px; line-height: 1.6; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 16px; border-radius: 14px; border: 0; background: var(--ssaka); color: #fff; font: inherit; font-size: 16px; font-weight: 900; text-decoration: none; cursor: pointer; }
+    .btn.l { background: #F3ECE6; color: #5a4a42; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .lk { display: block; padding: 12px; border-radius: 16px; background: #FFF8F3; border: 1.5px solid #f0e2d8; color: var(--ink); text-decoration: none; }
+    .lk b { display: block; font-size: 16px; font-weight: 900; }
+    .lk span { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13px; line-height: 1.4; word-break: keep-all; }
+    /* 날씨 */
+    .wx-top { display: flex; align-items: center; gap: 14px; }
+    .wx-ic { font-size: 64px; line-height: 1; }
+    .wx-t { font-size: 52px; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+    .wx-d { color: var(--ink-2); font-size: 16px; font-weight: 700; margin-top: 4px; }
+    .wx-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .wx-row div { padding: 10px 6px; border-radius: 14px; background: #F4F8FF; text-align: center; }
+    .wx-row b { display: block; font-size: 18px; font-weight: 900; }
+    .wx-row span { font-size: 13px; color: var(--ink-2); font-weight: 700; }
+    .dust { display: inline-block; padding: 1px 8px; border-radius: 999px; color: #fff; font-size: 13px; font-weight: 800; }
+    .wear { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FFF3E6; font-size: 16.5px; font-weight: 800; word-break: keep-all; }
+    .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 14px; text-align: center; }
+    .week div { padding: 8px 0; border-radius: 12px; background: #FAF6F2; font-size: 13px; font-weight: 800; }
+    .week i { display: block; font-style: normal; font-size: 22px; margin: 2px 0; }
+    .week small { display: block; color: var(--ink-2); font-weight: 700; }
+    .cities { display: flex; gap: 6px; overflow-x: auto; margin: 0 -2px 12px; padding: 2px; scrollbar-width: none; }
+    .cities button { flex: none; min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 14.5px; font-weight: 800; color: #5a4a42; cursor: pointer; }
+    .cities button[aria-pressed="true"] { background: #1A4FB0; border-color: #1A4FB0; color: #fff; }
+    /* 건강 */
+    .hcard { padding: 18px 16px; border-radius: 18px; background: linear-gradient(135deg, #E9F7EF, #F5FBF7); }
+    .hcard .no { color: #12924a; font-weight: 900; font-size: 14px; }
+    .hcard p { margin: 6px 0 0; font-size: 19px; line-height: 1.6; font-weight: 800; word-break: keep-all; }
+    .warn { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FFF0F0; color: #8E0A1C; font-size: 15px; font-weight: 700; line-height: 1.55; word-break: keep-all; }
+    .fx { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .fx div { padding: 12px; border-radius: 14px; background: #F7F7FA; }
+    .fx b { display: block; font-size: 15px; } .fx strong { display: block; margin-top: 2px; font-size: 22px; font-weight: 900; letter-spacing: -.02em; }
+    .note { margin: 14px 2px 0; color: var(--ink-2); font-size: 13.5px; line-height: 1.6; word-break: keep-all; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <div class="hd"><h1>☀️ 오늘의 싸바</h1><div class="date" id="date"></div></div>
+  <nav class="circles" id="circles" aria-label="오늘의 채널"></nav>
+  <section class="pane" id="pane" aria-live="polite"></section>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var now = new Date(), DAYS = '일월화수목금토';
+  $('date').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
+  var C = [
+    { k: 'news', t: '뉴스 요약', i: '🗞️', c: '#B3132B' },
+    { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' },
+    { k: 'google', t: '구글 검색어', i: '🔥', c: '#E8710A' },
+    { k: 'yt', t: '유튜브 인기', i: '▶️', c: '#e62117' },
+    { k: 'naver', t: '네이버', i: '🟢', c: '#03C75A' },
+    { k: 'health', t: '어르신 건강', i: '💊', c: '#12924a' },
+    { k: 'gov', t: '정부 혜택', i: '🎁', c: '#7a3fb0' },
+    { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' },
+    { k: 'radio', t: '라디오·TV', i: '📻', c: '#6a3a9c', href: '../radio/' }
+  ];
+  var cur = (location.hash || '').slice(1); try { cur = cur || localStorage.getItem('sava-today') || 'news'; } catch (e) { cur = cur || 'news'; }
+  if (!C.some(function (x) { return x.k === cur && !x.href; })) cur = 'news';
+  var bar = $('circles');
+  C.forEach(function (x) {
+    var b = el(x.href ? 'a' : 'button', 'cb'); if (x.href) b.href = x.href; else b.type = 'button';
+    b.style.setProperty('--c', x.c); b.dataset.k = x.k;
+    var i = el('i', '', x.i), t = el('b', '', x.t); b.appendChild(i); b.appendChild(t);
+    if (!x.href) b.addEventListener('click', function () { show(x.k); });
+    bar.appendChild(b);
+  });
+  function paintBar() { bar.querySelectorAll('.cb').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.k === cur ? 'true' : 'false'); }); }
+  var pane = $('pane');
+  function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
+  function show(k) {
+    cur = k; try { localStorage.setItem('sava-today', k); } catch (e) {} history.replaceState(null, '', '#' + k); paintBar();
+    ({ news: news, wx: wx, google: google, yt: yt, naver: naver, health: health, gov: gov, fx: fx })[k]();
+  }
+  function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
+  function nlist(arr, rank) {
+    return '<ul class="nl' + (rank ? ' rk' : '') + '">' + arr.map(function (n, i) {
+      return '<li><a href="' + esc(n.url) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span>' + esc(n.t) + (n.src ? '<small>' + esc(n.src) + '</small>' : '') + '</span></a></li>';
+    }).join('') + '</ul>';
+  }
+
+  // 🗞️ 뉴스 요약
+  function news() {
+    msg('오늘 뉴스를 모으는 중이에요…');
+    api('news').then(function (d) {
+      if (cur !== 'news') return;
+      var h = '<h2>🗞️ 오늘의 뉴스</h2><div class="src">' + esc(d.at) + ' 기준 · 제목을 누르면 원문 기사로 가요</div>';
+      if (d.sum && d.sum.lines && d.sum.lines.length) h += '<div class="sum"><div class="sec" style="margin-top:0">☕ 대표님 아침 3줄</div><ul>' + d.sum.lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' + (d.sum.tip ? '<div class="tip">💡 ' + esc(d.sum.tip) + '</div>' : '') + '</div>';
+      if (d.biz && d.biz.length) h += '<div class="sec">🏪 자영업·소상공인 소식</div>' + nlist(d.biz);
+      h += '<div class="sec">📌 지금 주요 뉴스</div>' + nlist(d.top || []);
+      h += '<p class="note">뉴스 제목과 원문 링크는 구글 뉴스에서 모아 와요. ‘아침 3줄’은 AI가 제목만 보고 정리한 것이라, 자세한 내용은 원문에서 확인해 주세요.</p>';
+      pane.innerHTML = h;
+    }).catch(function () { if (cur === 'news') msg('뉴스를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  // 🔥 구글 인기 검색어
+  function google() {
+    msg('구글 인기 검색어를 모으는 중이에요…');
+    api('google').then(function (d) {
+      if (cur !== 'google') return;
+      var h = '<h2>🔥 구글 인기 검색어</h2><div class="src">' + esc(d.at) + ' 기준 · 한국에서 지금 많이 찾는 말</div><ul class="nl rk">';
+      h += (d.list || []).map(function (x, i) {
+        var u = x.news && x.news.url ? x.news.url : 'https://www.google.com/search?q=' + encodeURIComponent(x.t);
+        return '<li><a href="' + esc(u) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span><b>' + esc(x.t) + '</b>' + (x.news ? '<small>' + esc(x.news.t) + ' · ' + esc(x.news.src) + '</small>' : '') + '</span>' + (x.traffic ? '<span class="tr">검색 ' + esc(x.traffic) + '</span>' : '') + '</a></li>';
+      }).join('') + '</ul><p class="note">구글 트렌드의 ‘지금 뜨는 검색어’예요. 누르면 관련 기사로 가요.</p>';
+      pane.innerHTML = h;
+    }).catch(function () { if (cur === 'google') msg('검색어를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  // ▶️ 유튜브 인기 (조회수 많은 순)
+  function views(n) { return n >= 1e8 ? (Math.round(n / 1e7) / 10) + '억' : n >= 1e4 ? Math.round(n / 1e4).toLocaleString('ko-KR') + '만' : n.toLocaleString('ko-KR'); }
+  function yt() {
+    msg('유튜브 인기 동영상을 모으는 중이에요…');
+    api('yt').then(function (d) {
+      if (cur !== 'yt') return;
+      if (d.need) { pane.innerHTML = '<h2>▶️ 유튜브 인기</h2><div class="msg">곧 열려요! 유튜브 인기 동영상을 조회수 순으로 보여 드릴게요.</div><div style="text-align:center"><a class="btn l" href="https://www.youtube.com/feed/trending" target="_blank" rel="noopener">유튜브 인기 급상승 바로 가기</a></div>'; return; }
+      pane.innerHTML = '<h2>▶️ 유튜브 인기 동영상</h2><div class="src">' + esc(d.at) + ' 기준 · 한국 인기 동영상을 조회수 많은 순으로</div><ul class="nl rk">' +
+        (d.list || []).map(function (v, i) { return '<li><a href="https://www.youtube.com/watch?v=' + encodeURIComponent(v.id) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em>' + (v.img ? '<img src="' + esc(v.img) + '" alt="" width="96" height="54" loading="lazy" style="flex:none;border-radius:8px;object-fit:cover">' : '') + '<span>' + esc(v.t) + '<small>' + esc(v.ch) + ' · 조회수 ' + views(v.views) + '회</small></span></a></li>'; }).join('') + '</ul>';
+    }).catch(function () { if (cur === 'yt') msg('유튜브 인기 동영상을 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  // 🟢 네이버
+  function naver() {
+    pane.innerHTML = '<h2>🟢 네이버</h2><div class="src">네이버는 2021년 2월에 ‘실시간 검색어’를 없앴어요</div>' +
+      '<div class="grid2">' +
+      '<a class="lk" href="https://news.naver.com" target="_blank" rel="noopener"><b>📰 네이버 뉴스</b><span>지금 많이 보는 기사</span></a>' +
+      '<a class="lk" href="https://datalab.naver.com" target="_blank" rel="noopener"><b>📈 네이버 데이터랩</b><span>요즘 뜨는 검색어·쇼핑 트렌드</span></a>' +
+      '<a class="lk" href="https://map.naver.com" target="_blank" rel="noopener"><b>🗺️ 네이버 지도</b><span>길찾기·우리 동네</span></a>' +
+      '<a class="lk" href="https://weather.naver.com" target="_blank" rel="noopener"><b>🌦️ 네이버 날씨</b><span>더 자세한 동네 날씨</span></a>' +
+      '</div><p class="note">대신 ‘🔥 구글 검색어’에서 지금 한국에서 많이 찾는 말을 볼 수 있어요.</p>';
+  }
+
+  // ☀️ 날씨 (Open-Meteo, 키 없이 무료)
+  var CITY = [['광주', 35.1595, 126.8526], ['서울', 37.5665, 126.978], ['여수', 34.7604, 127.6622], ['순천', 34.9506, 127.4872], ['목포', 34.8118, 126.3922], ['전주', 35.8242, 127.148], ['부산', 35.1796, 129.0756], ['대구', 35.8714, 128.6014], ['대전', 36.3504, 127.3845], ['인천', 37.4563, 126.7052], ['제주', 33.4996, 126.5312]];
+  var wsel = null; try { wsel = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
+  if (!wsel) wsel = CITY[0];
+  function wcode(c) {
+    if (c === 0) return ['☀️', '맑음']; if (c <= 2) return ['🌤️', '구름 조금']; if (c === 3) return ['☁️', '흐림']; if (c <= 48) return ['🌫️', '안개'];
+    if (c <= 57) return ['🌦️', '이슬비']; if (c <= 67) return ['🌧️', '비']; if (c <= 77) return ['❄️', '눈']; if (c <= 82) return ['🌦️', '소나기']; if (c <= 86) return ['🌨️', '눈']; return ['⛈️', '천둥번개'];
+  }
+  function grade(v, b) { var g = v <= b[0] ? ['좋음', '#1d6fd1'] : v <= b[1] ? ['보통', '#12924a'] : v <= b[2] ? ['나쁨', '#E8710A'] : ['매우 나쁨', '#c62828']; return '<span class="dust" style="background:' + g[1] + '">' + g[0] + '</span>'; }
+  function wear(t) { return t <= 0 ? '🧥 패딩·목도리·장갑 꼭 챙기세요' : t <= 5 ? '🧥 두꺼운 외투에 목도리까지' : t <= 11 ? '🧶 코트나 점퍼, 따뜻하게' : t <= 16 ? '🧥 가벼운 외투 하나' : t <= 22 ? '👕 긴팔 하나면 충분해요' : t <= 27 ? '👕 반팔·얇은 옷' : '🩳 시원하게, 물 자주 드세요'; }
+  function wx() {
+    var h = '<h2>☀️ 오늘의 날씨</h2><div class="cities" id="cities"></div><div id="wxb"><div class="msg">날씨를 불러오는 중이에요…</div></div>';
+    pane.innerHTML = h;
+    var cb = $('cities');
+    var me = el('button', '', '📍 내 위치'); me.type = 'button'; me.setAttribute('aria-pressed', wsel[0] === '내 위치' ? 'true' : 'false');
+    me.addEventListener('click', function () {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(function (p) { wsel = ['내 위치', +p.coords.latitude.toFixed(3), +p.coords.longitude.toFixed(3)]; try { localStorage.setItem('sava-wx', JSON.stringify(wsel)); } catch (e) {} wx(); }, function () { alert('위치를 쓸 수 없어요. 아래 도시를 골라 주세요.'); }, { timeout: 8000 });
+    });
+    cb.appendChild(me);
+    CITY.forEach(function (c) { var b = el('button', '', c[0]); b.type = 'button'; b.setAttribute('aria-pressed', c[0] === wsel[0] ? 'true' : 'false'); b.addEventListener('click', function () { wsel = c; try { localStorage.setItem('sava-wx', JSON.stringify(c)); } catch (e) {} wx(); }); cb.appendChild(b); });
+    var la = wsel[1], lo = wsel[2];
+    Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=' + la + '&longitude=' + lo + '&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=7').then(function (r) { return r.json(); }),
+      fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + la + '&longitude=' + lo + '&current=pm10,pm2_5&timezone=Asia%2FSeoul').then(function (r) { return r.json(); }).catch(function () { return null; })
+    ]).then(function (a) {
+      if (cur !== 'wx') return;
+      var w = a[0], q = a[1], c = w.current, d = w.daily, ic = wcode(c.weather_code);
+      var t = Math.round(c.temperature_2m);
+      var h2 = '<div class="wx-top"><div class="wx-ic">' + ic[0] + '</div><div><div class="wx-t">' + t + '°</div><div class="wx-d">' + esc(wsel[0]) + ' · ' + ic[1] + ' · 체감 ' + Math.round(c.apparent_temperature) + '°</div></div></div>';
+      h2 += '<div class="wx-row"><div><b>' + Math.round(d.temperature_2m_max[0]) + '° / ' + Math.round(d.temperature_2m_min[0]) + '°</b><span>최고 / 최저</span></div><div><b>' + (d.precipitation_probability_max[0] == null ? '-' : d.precipitation_probability_max[0] + '%') + '</b><span>비 올 확률</span></div><div><b>' + Math.round(c.wind_speed_10m) + 'km/h</b><span>바람</span></div></div>';
+      if (q && q.current) h2 += '<div class="wx-row" style="grid-template-columns:1fr 1fr"><div><b>' + Math.round(q.current.pm10) + '</b><span>미세먼지 ' + grade(q.current.pm10, [30, 80, 150]) + '</span></div><div><b>' + Math.round(q.current.pm2_5) + '</b><span>초미세먼지 ' + grade(q.current.pm2_5, [15, 35, 75]) + '</span></div></div>';
+      h2 += '<div class="wear">' + wear(t) + ((d.precipitation_probability_max[0] || 0) >= 50 ? ' · ☂️ 우산 챙기세요' : '') + '</div>';
+      h2 += '<div class="week">' + d.time.map(function (dt, i) { var x = new Date(dt + 'T00:00:00'); return '<div>' + (i === 0 ? '오늘' : DAYS[x.getDay()]) + '<i>' + wcode(d.weather_code[i])[0] + '</i>' + Math.round(d.temperature_2m_max[i]) + '°<small>' + Math.round(d.temperature_2m_min[i]) + '°</small></div>'; }).join('') + '</div>';
+      h2 += '<p class="note">날씨: Open-Meteo · 미세먼지 등급은 환경부 기준으로 나눴어요. 자세한 특보는 기상청을 확인해 주세요.</p>';
+      $('wxb').innerHTML = h2;
+    }).catch(function () { if (cur === 'wx') $('wxb').innerHTML = '<div class="msg">날씨를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
+  }
+
+  // 💊 어르신 건강 — 날마다 한 가지
+  var HT = [
+    '물은 목마르기 전에 조금씩. 하루 6~8잔을 나눠 드세요.',
+    '아침에 눈뜨면 바로 일어서지 말고, 1분쯤 앉았다가 천천히 일어나세요. 어지러워 넘어지는 걸 막아 줘요.',
+    '하루 30분 걷기. 한 번에 힘들면 10분씩 세 번도 좋아요.',
+    '혈압은 날마다 같은 시간에 재고 수첩에 적어 두세요. 병원 갈 때 가져가면 도움이 돼요.',
+    '욕실·화장실 바닥에 미끄럼 방지 매트를 깔아 두세요. 낙상은 집 안에서 가장 많이 일어나요.',
+    '약은 정해진 시간에. 요일별 약통을 쓰면 빠뜨리지 않아요.',
+    '국은 건더기 위주로, 국물은 반만. 싱겁게 먹는 게 혈압에 좋아요.',
+    '끼니마다 단백질 한 가지: 달걀·두부·생선·살코기. 근육이 지켜져요.',
+    '해 좋은 날 15분 햇볕 쬐기. 뼈 건강에 필요한 비타민D가 만들어져요.',
+    '밖에 다녀오면 비누로 30초 손 씻기. 감기·독감 예방의 기본이에요.',
+    '독감·폐렴구균 예방접종을 챙기세요. 어르신은 보건소·지정 병원에서 무료로 맞을 수 있어요.',
+    '낮잠은 30분 안으로. 밤잠이 더 깊어져요.',
+    '자기 전 양치는 꼭. 틀니는 빼서 깨끗이 씻어 두세요.',
+    '1년에 한 번 눈 검사. 백내장·녹내장은 일찍 찾을수록 좋아요.',
+    '말소리가 잘 안 들리면 미루지 말고 청력 검사를 받아 보세요.',
+    '하루 한 번 가족·친구와 통화하기. 마음 건강에 큰 힘이 돼요. 싸바로 “잘 지내?” 한마디 보내 보세요.',
+    '계단에서는 꼭 난간을 잡으세요.',
+    '추운 날엔 모자와 목도리로 머리·목을 따뜻하게. 체온이 덜 빠져나가요.',
+    '채소·과일·물을 넉넉히. 변비 예방에 좋아요.',
+    '국가건강검진은 2년마다 무료. 올해 대상인지 확인해 보세요.',
+    '당뇨가 있다면 날마다 발을 살펴보세요. 작은 상처도 그냥 넘기지 마세요.',
+    '아침저녁 5분 스트레칭. 굳은 몸이 풀리고 넘어짐도 줄어요.',
+    '담배를 끊고 싶다면 보건소 금연클리닉을 이용해 보세요. 무료예요.',
+    '밤에 화장실 가는 길에 작은 수면등을 켜 두세요.',
+    '신문 읽기, 일기 쓰기, 새로운 것 배우기. 머리도 쓸수록 건강해져요.',
+    '밥은 천천히 꼭꼭 씹어서. 사레들리는 걸 막아 줘요.',
+    '추운 새벽 운동보다 해 뜬 뒤 따뜻할 때 걷는 게 좋아요.',
+    '마음이 울적한 날이 오래가면 혼자 참지 말고 가족이나 보건소에 이야기해 주세요.',
+    '외출할 때 휴대전화와 비상 연락처 쪽지를 챙기세요.',
+    '짠 반찬 한 가지를 줄이고, 나물 한 가지를 늘려 보세요.'
+  ];
+  function health() {
+    var day = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5), i = day % HT.length;
+    pane.innerHTML = '<h2>💊 어르신 건강</h2><div class="src">날마다 한 가지씩 바뀌어요</div>' +
+      '<div class="hcard"><div class="no">오늘의 건강 한마디</div><p>' + esc(HT[i]) + '</p></div>' +
+      '<div class="hcard" style="margin-top:8px;background:#F7F7FA"><div class="no" style="color:#5a4a42">내일은</div><p style="font-size:16.5px">' + esc(HT[(i + 1) % HT.length]) + '</p></div>' +
+      '<div class="warn">🚨 갑자기 한쪽 팔다리에 힘이 빠지거나, 말이 어눌해지거나, 가슴이 5분 넘게 아프면 바로 <b>119</b>에 전화하세요.</div>' +
+      '<div class="grid2" style="margin-top:12px"><a class="lk" href="https://health.kdca.go.kr" target="_blank" rel="noopener"><b>🏥 국가건강정보포털</b><span>질병관리청 건강 정보</span></a><a class="lk" href="https://www.nhis.or.kr" target="_blank" rel="noopener"><b>🩺 국민건강보험</b><span>건강검진 대상 확인</span></a></div>' +
+      '<p class="note">일반적인 건강 습관 안내예요. 몸 상태에 따라 다를 수 있으니, 약이나 운동은 다니는 병원과 상의해 주세요.</p>';
+  }
+
+  // 🎁 정부 혜택
+  var GOV = [
+    ['🎁 보조금24', '나에게 맞는 정부 혜택 한 번에 찾기', 'https://www.gov.kr/portal/rcvfvrSvc/main'],
+    ['🤝 복지로', '복지 서비스 찾기·신청', 'https://www.bokjiro.go.kr'],
+    ['👵 기초연금', '어르신 기초연금 안내·모의계산', 'https://basicpension.mohw.go.kr'],
+    ['💼 노인일자리', '어르신 일자리·사회활동', 'https://www.seniorro.or.kr'],
+    ['🏪 소상공인진흥공단', '자영업 지원사업·교육', 'https://www.semas.or.kr'],
+    ['📋 기업마당', '자영업·중소기업 지원사업 모음', 'https://www.bizinfo.go.kr']
+  ];
+  function gov() {
+    var h = '<h2>🎁 정부 혜택</h2><div class="src">공식 누리집에서 직접 확인·신청하세요</div><div class="grid2">' +
+      GOV.map(function (g) { return '<a class="lk" href="' + g[2] + '" target="_blank" rel="noopener"><b>' + g[0] + '</b><span>' + g[1] + '</span></a>'; }).join('') + '</div><div id="govn"><div class="msg">이번 주 혜택 소식을 모으는 중이에요…</div></div>';
+    pane.innerHTML = h;
+    api('gov').then(function (d) {
+      if (cur !== 'gov') return;
+      var x = '';
+      if (d.list && d.list.length) x += '<div class="sec">📰 이번 주 지원금·혜택 소식</div>' + nlist(d.list);
+      if (d.senior && d.senior.length) x += '<div class="sec">👵 어르신 지원 소식</div>' + nlist(d.senior);
+      x += '<p class="note">소식은 뉴스 제목을 모은 것이에요. 신청 자격·기간은 꼭 공식 누리집에서 확인해 주세요. 돈을 먼저 보내라는 ‘지원금 문자’는 사기예요.</p>';
+      $('govn').innerHTML = x;
+    }).catch(function () { if (cur === 'gov') $('govn').innerHTML = ''; });
+  }
+
+  // 💱 환율
+  function fx() {
+    msg('환율을 불러오는 중이에요…');
+    fetch('https://open.er-api.com/v6/latest/USD').then(function (r) { return r.json(); }).then(function (j) {
+      if (cur !== 'fx') return;
+      var R = j.rates, krw = R.KRW;
+      function f(code, unit) { return Math.round(krw / R[code] * unit * 10) / 10; }
+      var rows = [['🇺🇸 미국 달러', '1달러', f('USD', 1)], ['🇯🇵 일본 엔', '100엔', f('JPY', 100)], ['🇪🇺 유로', '1유로', f('EUR', 1)], ['🇨🇳 중국 위안', '1위안', f('CNY', 1)], ['🇻🇳 베트남 동', '1만 동', f('VND', 10000)], ['🇹🇭 태국 바트', '1바트', f('THB', 1)]];
+      pane.innerHTML = '<h2>💱 오늘의 환율</h2><div class="src">' + esc((j.time_last_update_utc || '').slice(5, 16)) + ' 기준 · 원화로 얼마?</div><div class="fx">' +
+        rows.map(function (r) { return '<div><b>' + r[0] + '</b><span style="color:var(--ink-2);font-size:13px">' + r[1] + ' =</span><strong>' + r[2].toLocaleString('ko-KR') + '원</strong></div>'; }).join('') + '</div>' +
+        '<p class="note">참고용 기준 환율이에요(ExchangeRate-API). 은행에서 살 때·팔 때는 수수료가 붙어 조금 달라요.</p>';
+    }).catch(function () { if (cur === 'fx') msg('환율을 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  paintBar(); show(cur);
+  var a = bar.querySelector('[aria-pressed="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ inline: 'center', block: 'nearest' });
+})();
+</script>
+<script src="/js/home.js?v=9" defer></script>
+</body>
+</html>

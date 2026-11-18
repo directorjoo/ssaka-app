@@ -202,7 +202,7 @@
     }
     wrap.appendChild(main);
 
-    if (card.video) {
+    if (card.video && /^https:\/\//i.test(String(card.video))) { // 영상 주소는 https만 (javascript: 같은 위험한 주소 막기)
       var v = el(live ? 'a' : 'div', 'sk-video');
       if (live) { v.href = card.video; v.target = '_blank'; v.rel = 'noopener'; }
       v.appendChild(icon('play'));

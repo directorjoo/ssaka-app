@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B3132B">
+  <title>라디오 · TV · 싸바</title>
+  <meta property="og:title" content="📻 라디오 · 📺 TV 바로 듣고 보기 · 싸바">
+  <meta property="og:description" content="KBS·MBC·SBS·CBS·국악방송 라디오와 24시간 뉴스를 한 번에. 방송사 공식 앱·웹으로 바로 연결해요.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
+  <link rel="icon" href="../img/favicon.png?v=2">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #FFF8F3; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 520px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    h1 { margin: 8px 0 4px; font-size: 28px; font-weight: 900; letter-spacing: -.03em; }
+    .sub { margin: 0 0 6px; color: var(--ink-2); font-size: 15.5px; line-height: 1.6; word-break: keep-all; }
+    h2 { display: flex; align-items: center; gap: 8px; margin: 26px 2px 10px; font-size: 21px; font-weight: 900; letter-spacing: -.02em; }
+    .list { display: grid; gap: 10px; }
+    .ch { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; padding: 12px 12px 12px 12px; border-radius: 20px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 6px 16px -12px rgba(80,30,20,.35); }
+    .ch .logo { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; color: #fff; font-weight: 900; font-size: 15px; letter-spacing: -.04em; text-align: center; line-height: 1.05; }
+    .ch b { display: block; font-size: 18.5px; font-weight: 900; letter-spacing: -.03em; }
+    .ch span { display: block; margin-top: 2px; color: var(--ink-2); font-size: 14.5px; line-height: 1.4; word-break: keep-all; }
+    .ch .btns { display: flex; flex-direction: column; gap: 6px; }
+    .ch a.play { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 76px; min-height: 44px; padding: 0 12px; border-radius: 14px; background: var(--ssaka); color: #fff; text-decoration: none; font-weight: 900; font-size: 16px; }
+    .ch a.app { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 10px; border-radius: 12px; border: 1.5px solid #eadbd0; color: #6b5a50; text-decoration: none; font-weight: 800; font-size: 13.5px; }
+    .tv .ch a.play { background: #1A4FB0; }
+    .note { margin: 22px 4px 0; color: var(--ink-2); font-size: 14px; line-height: 1.65; word-break: keep-all; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <h1>📻 라디오 · 📺 TV</h1>
+  <p class="sub">누르면 방송사 공식 웹·앱으로 바로 연결돼요. 앱이 있으면 더 편하게 들을 수 있어요.</p>
+
+  <h2>📻 라디오</h2>
+  <div class="list" id="radio"></div>
+
+  <h2>📺 TV · 24시간 뉴스</h2>
+  <div class="list tv" id="tv"></div>
+
+  <p class="note">싸바는 방송을 직접 틀지 않고, 방송사가 공식으로 열어 둔 웹·앱으로 이어 드려요. 처음 한 번은 방송사 화면에서 ▶ 재생을 눌러 주세요.</p>
+</div>
+<script>
+(function () {
+  var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/i.test(ua), and = /Android/i.test(ua);
+  // [이름, 설명, 로고 글자, 로고 색, 웹 주소, 앱스토어 id, 앱 이름(구글플레이 검색어)]
+  var RADIO = [
+    ['KBS 클래식FM', '93.1MHz · 클래식·국악 (KBS 콩)', 'KBS<br>1FM', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
+    ['KBS 쿨FM · 해피FM', '89.1 · 106.1MHz · 가요·팝 (KBS 콩)', 'KBS<br>2FM', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
+    ['MBC FM4U · 표준FM', '91.9 · 95.9MHz (MBC 미니)', 'MBC', '#111', 'https://mini.imbc.com', '384041016', 'MBC mini'],
+    ['SBS 파워FM · 러브FM', '107.7 · 103.5MHz (SBS 고릴라)', 'SBS', '#0a7a3f', 'https://www.sbs.co.kr/radio/gorealra.html', '406456433', 'SBS 고릴라'],
+    ['CBS 음악FM', '93.9MHz · 가요·팝·클래식 (CBS 레인보우)', 'CBS<br>93.9', '#e4572e', 'https://www.cbs.co.kr', '432866707', 'CBS레인보우'],
+    ['국악방송', '99.1MHz · 우리 소리 (덩더쿵)', '국악<br>99.1', '#7a5a2a', '', '975033702', '국악방송 덩더쿵']
+  ];
+  var TV = [
+    ['YTN 24시간 뉴스', '공식 홈페이지 생방송', 'YTN', '#0b4ea2', 'https://www.ytn.co.kr/_hd/hd_live.html', '353117998', 'YTN'],
+    ['KBS 1TV · 2TV', 'KBS 온에어 (지역에 따라 일부 프로그램 제한)', 'KBS', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
+    ['유튜브 생방송 뉴스', '지금 생방송 중인 뉴스 채널 찾기', '▶︎', '#e62117', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', '']
+  ];
+  function appUrl(id, name) {
+    if (ios && id) return 'https://apps.apple.com/kr/app/id' + id;
+    if (and && name) return 'https://play.google.com/store/search?q=' + encodeURIComponent(name) + '&c=apps';
+    if (id) return 'https://apps.apple.com/kr/app/id' + id;
+    return '';
+  }
+  function row(c) {
+    var d = document.createElement('div'); d.className = 'ch';
+    var lg = document.createElement('div'); lg.className = 'logo'; lg.style.background = c[3]; lg.innerHTML = c[2];
+    var tx = document.createElement('div'); var b = document.createElement('b'); b.textContent = c[0]; var s = document.createElement('span'); s.textContent = c[1]; tx.appendChild(b); tx.appendChild(s);
+    var bt = document.createElement('div'); bt.className = 'btns';
+    var au = appUrl(c[5], c[6]);
+    var main = c[4] || au;
+    if (main) { var p = document.createElement('a'); p.className = 'play'; p.href = main; p.target = '_blank'; p.rel = 'noopener'; p.textContent = c[4] ? '▶ 듣기' : '▶ 앱'; bt.appendChild(p); }
+    if (c[4] && au) { var a = document.createElement('a'); a.className = 'app'; a.href = au; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '앱 받기'; bt.appendChild(a); }
+    d.appendChild(lg); d.appendChild(tx); d.appendChild(bt); return d;
+  }
+  var r = document.getElementById('radio'), t = document.getElementById('tv');
+  RADIO.forEach(function (c) { r.appendChild(row(c)); });
+  TV.forEach(function (c) { var x = row(c); var p = x.querySelector('.play'); if (p) p.textContent = '▶ 보기'; t.appendChild(x); });
+})();
+</script>
+<script src="/js/home.js?v=9" defer></script>
+</body>
+</html>

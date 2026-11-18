@@ -537,6 +537,10 @@
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
     v.appendChild(wr);
+    // 라디오 · TV (방송사 공식 웹·앱으로 연결)
+    var rd = el('a', 'wr'); rd.style.background = 'linear-gradient(135deg, #6a3a9c, #43206e)'; rd.href = '../radio/'; rd.setAttribute('aria-label', '라디오 · TV');
+    rd.innerHTML = '<i aria-hidden="true">📻</i><div><b>라디오 · TV</b><span>KBS·MBC·SBS·CBS·국악방송 · 24시간 뉴스</span></div><em>듣기 ›</em>';
+    v.appendChild(rd);
     v.appendChild(secHead('지금 보내기 좋은 카드'));
     v.appendChild(campaigns());
     v.appendChild(el('div', 'divider'));

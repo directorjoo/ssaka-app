@@ -1019,7 +1019,6 @@
           anim = roll.animate([{ transform: 'translateY(' + vh + 'px)' }, { transform: 'translateY(' + end + 'px)' }], { duration: Math.max(14000, dist * 32), easing: 'cubic-bezier(.25,.1,.35,1)', fill: 'forwards' });
           anim.onfinish = function () {
             sh.querySelector('.psend').classList.add('go'); round++;
-            if (!sh.classList.contains('mini') && !expanded) { setTimeout(function () { if (alive && !expanded) setMini(true); }, 2500); }
             timer = setTimeout(function () { // 질문에서 잠깐 머문 뒤
               if (!alive) return;
               var fade = roll.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, fill: 'forwards' });
@@ -1038,6 +1037,8 @@
         requestAnimationFrame(function () { pan(curImg); run(); });
       }
       setPoem(); setArt(); run();
+      // 큰 화면으로 20초 감상한 뒤 작은 창으로 줄어들어 계속 흐름
+      setTimeout(function () { if (alive && !expanded && !sh.classList.contains('mini')) setMini(true); }, 20000);
       function close() { alive = false; clearTimeout(timer); if (anim) anim.cancel(); sh.remove(); document.body.style.overflow = ''; paintFrame(); el.focus(); }
       view.parentNode.addEventListener('click', function () { if (sh.classList.contains('mini')) return; if (!anim || anim.playState === 'finished') return; if (anim.playState === 'paused') anim.play(); else anim.pause(); });
       sh.querySelector('.frame').addEventListener('click', function (e) { if (!sh.classList.contains('mini') || e.target.closest('.pmx')) return; expanded = true; setMini(false); });

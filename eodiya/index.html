@@ -228,17 +228,43 @@
     .send .kakao::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.65), transparent); transform: skewX(-20deg); animation: shine 2.6s ease-in-out infinite; }
     @keyframes shine { 0%,55% { left: -60%; } 100% { left: 130%; } }
     @media (prefers-reduced-motion: reduce) { .party, .ehero .spark { display: none; } .ehero::before, .ehero .logo, .send .kakao::after { animation: none; } }
-    .topbar { min-height: 0; margin: 0; }
-    .miss { position: relative; margin: 2px 0 16px; padding: 6px 92px 0 2px; }
-    .miss-q { margin: 0; font-size: clamp(21px, 6.3vw, 28px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.2; color: #2a1a1a; white-space: nowrap; }
+    .topbar { min-height: 46px; margin: 0 0 8px; padding-right: 100px; }
+    .topbar .tb-brand { font-size: 17px; font-weight: 900; letter-spacing: -0.03em; color: #B3132B; }
+    /* ===== 액자 ===== */
+    .frame { position: relative; margin: 0 0 18px; padding: 11px; border-radius: 8px; background: linear-gradient(140deg, #6E0B1A, #B3132B 38%, #8E0F22 62%, #5E0916); box-shadow: 0 18px 30px -18px rgba(90,10,20,.75), 0 2px 0 rgba(255,255,255,.6) inset, 0 0 0 1px #4A0712; }
+    .frame::before { content: ''; position: absolute; inset: 5px; border-radius: 5px; border: 1.5px solid rgba(255,226,122,.75); pointer-events: none; }
+    .frame-in { position: relative; border-radius: 3px; background: #FFFBF2 radial-gradient(ellipse at 50% 0, #FFF3E2, transparent 70%); padding: 18px 16px 16px; text-align: center; box-shadow: inset 0 0 0 1px #E9C46A, inset 0 0 0 5px #FFFBF2, inset 0 0 0 6px rgba(233,196,106,.55), inset 0 4px 12px rgba(80,20,20,.16); }
+    .frame .gem { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFF3B8, #E9B53A 60%, #A87414); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+    .frame .g1 { left: 1px; top: 1px; } .frame .g2 { right: 1px; top: 1px; } .frame .g3 { left: 1px; bottom: 1px; } .frame .g4 { right: 1px; bottom: 1px; }
+    .miss-poem { display: block; width: 100%; margin: 0; padding: 4px 2px 2px; border: 0; background: none; cursor: pointer; font-family: 'Gowun Batang', serif; font-size: 20px; font-weight: 700; line-height: 1.6; color: #8E0F22; word-break: keep-all; animation: poemIn .8s ease-out both; }
+    .miss-poem small { display: block; margin-top: 6px; font-family: var(--font); font-size: 14.5px; font-weight: 700; color: #8a7272; }
+    .miss-poem .more { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: #B3132B; color: #fff; font-family: var(--font); font-size: 14.5px; font-weight: 800; box-shadow: 0 3px 0 #7A0C1C; animation: moreGlow 2.4s ease-in-out infinite; }
+    @keyframes moreGlow { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .orn { margin: 12px auto 8px; color: #D9A43A; font-size: 15px; letter-spacing: 8px; }
+    .miss-q { margin: 0; font-size: clamp(21px, 6.2vw, 27px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.25; color: #2a1a1a; }
     .mq-e { display: inline-block; margin-right: 6px; animation: mqBob 2.6s ease-in-out infinite; }
     @keyframes mqBob { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
-    .miss-poem { margin: 12px -90px 0 0; padding: 12px 16px 11px 18px; border-left: 4px solid #E9A3B1; border-radius: 4px 16px 16px 4px; background: rgba(255,255,255,.78); font-family: 'Gowun Batang', serif; font-size: 19px; font-weight: 700; line-height: 1.55; color: #8E0F22; word-break: keep-all; box-shadow: 0 8px 18px -14px rgba(142,15,34,.6); animation: poemIn .7s ease-out both; }
-    .miss-poem small { display: block; margin-top: 4px; font-family: var(--font); font-size: 14.5px; font-weight: 700; color: #8a7272; }
     @keyframes poemIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    @media (prefers-reduced-motion: reduce) { .mq-e, .miss-poem { animation: none; } }
+    /* ===== 시 전편이 흐르는 화면 ===== */
+    .psheet { position: fixed; inset: 0; z-index: 9990; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom)); background: rgba(38,6,12,.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); animation: psIn .45s ease-out both; }
+    @keyframes psIn { from { opacity: 0; } to { opacity: 1; } }
+    .psheet .frame { width: 100%; max-width: 480px; margin: 0; flex: 0 1 auto; }
+    .psheet .frame-in { padding: 0; height: min(66vh, 560px); overflow: hidden; }
+    .pview { position: absolute; inset: 0; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent); mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent); }
+    .proll { position: absolute; left: 0; right: 0; top: 0; padding: 0 22px; font-family: 'Gowun Batang', serif; font-weight: 700; font-size: 20px; line-height: 2; color: #5a1420; white-space: pre-line; word-break: keep-all; will-change: transform; }
+    .proll h2 { margin: 0 0 4px; font-size: 25px; color: #8E0F22; }
+    .proll .by { display: block; margin-bottom: 26px; font-family: var(--font); font-size: 15px; color: #8a7272; }
+    .proll .hl { color: #B3132B; background: linear-gradient(transparent 62%, #FFE3A3 62%); }
+    .proll .last { display: block; margin-top: 48px; font-family: var(--font); font-size: 24px; font-weight: 900; color: #2a1a1a; }
+    .pbtns { display: flex; gap: 8px; width: 100%; max-width: 480px; margin-top: 14px; }
+    .pbtns button { min-height: 52px; border: 0; border-radius: 16px; font-size: 16.5px; font-weight: 900; cursor: pointer; }
+    .pbtns .psend { flex: 1; background: #FFE27A; color: #5E0916; box-shadow: 0 4px 0 #C9A126; }
+    .pbtns .psend.go { animation: moreGlow 1.6s ease-in-out infinite; }
+    .pbtns .x { width: 84px; background: rgba(255,255,255,.16); color: #fff; }
+    .phint { margin-top: 8px; color: rgba(255,255,255,.75); font-size: 14px; }
+    @media (prefers-reduced-motion: reduce) { .mq-e, .miss-poem, .miss-poem .more, .pbtns .psend.go { animation: none; } .pview { overflow-y: auto; } }
   </style>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&text=%20%2C%E2%80%94%E2%80%9C%E2%80%9D%E3%80%8C%E3%80%8D%EA%B0%80%EA%B0%81%EA%B0%9C%EA%B2%83%EA%B2%A0%EA%B3%A0%EA%B4%B4%EA%B5%BD%EA%B7%B8%EA%B8%B8%EA%B9%80%EA%B9%8C%EB%81%9D%EB%82%98%EB%82%A0%EB%82%B4%EB%84%A4%EB%85%84%EB%85%B8%EB%8A%94%EB%8B%88%EB%8B%98%EB%8B%A4%EB%8C%80%EB%8D%98%EB%8F%84%EB%8F%8C%EB%8F%99%EB%91%90%EB%93%A0%EB%93%A4%EB%95%8C%EB%96%A0%EB%9D%BC%EB%9F%AC%EB%A1%9C%EB%A1%A0%EB%A5%BC%EB%A6%AC%EB%A6%BD%EB%A7%8C%EB%A7%90%EB%AA%A8%EB%AA%BB%EB%AC%B5%EB%AF%BF%EB%B0%94%EB%B0%98%EB%B0%A4%EB%B2%84%EB%B2%88%EB%B2%97%EB%B3%91%EC%82%B4%EC%83%9D%EC%84%9C%EC%85%B0%EC%86%8C%EC%86%8D%EC%8A%A4%EC%8A%AC%EC%8A%B5%EC%8B%9C%EC%8B%A0%EC%95%84%EC%95%88%EC%95%8A%EC%95%BD%EC%96%91%EC%96%B4%EC%97%88%EC%97%90%EC%97%AC%EC%98%A4%EC%9A%94%EC%9A%A9%EC%9A%B4%EC%9A%B8%EC%9B%8C%EC%9B%94%EC%9D%80%EC%9D%84%EC%9D%98%EC%9D%B4%EC%9D%B5%EC%9D%B8%EC%9D%BC%EC%9E%83%EC%9E%88%EC%9E%8A%EC%9E%A0%EC%A0%95%EC%A1%B0%EC%A3%BC%EC%A7%80%EC%A7%84%EC%A7%9D%EC%B9%A8%ED%85%8C%ED%8A%B8%ED%8E%B4%ED%94%94%ED%94%BC%ED%95%98%ED%95%9C%ED%95%A0%ED%96%87%ED%99%A9&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&text=%20%21%28%29%2C.03%3A%3F%E2%80%94%E2%80%9C%E2%80%9D%E2%80%A6%E3%80%8C%E3%80%8D%EA%B0%80%EA%B0%81%EA%B0%84%EA%B0%88%EA%B0%90%EA%B0%93%EA%B0%94%EA%B0%95%EA%B0%99%EA%B0%9A%EA%B0%9C%EA%B1%B7%EA%B1%B8%EA%B2%81%EA%B2%83%EA%B2%8C%EA%B2%A0%EA%B2%A8%EA%B2%B0%EA%B2%BD%EA%B3%81%EA%B3%84%EA%B3%A0%EA%B3%A1%EA%B3%A7%EA%B3%B1%EA%B3%BC%EA%B4%B4%EA%B5%AC%EA%B5%B3%EA%B5%B4%EA%B5%BD%EA%B7%80%EA%B7%91%EA%B7%9C%EA%B7%B8%EA%B8%88%EA%B8%8B%EA%B8%B0%EA%B8%B4%EA%B8%B8%EA%B9%80%EA%B9%8A%EA%B9%8C%EA%B9%A8%EA%BD%83%EB%81%8C%EB%81%9D%EB%82%98%EB%82%9C%EB%82%A0%EB%82%B4%EB%83%A5%EB%84%A3%EB%84%A4%EB%85%84%EB%85%95%EB%85%B8%EB%85%B9%EB%86%80%EB%86%93%EB%88%84%EB%88%88%EB%8A%94%EB%8B%88%EB%8B%98%EB%8B%A4%EB%8B%A8%EB%8B%AB%EB%8B%AC%EB%8B%AD%EB%8B%B4%EB%8B%B9%EB%8C%80%EB%8D%94%EB%8D%98%EB%8D%B0%EB%8F%84%EB%8F%8B%EB%8F%8C%EB%8F%95%EB%8F%99%EB%90%98%EB%91%90%EB%92%B7%EB%93%A0%EB%93%A3%EB%93%A4%EB%94%94%EB%94%B0%EB%95%8C%EB%96%A0%EB%96%A8%EB%98%90%EB%9C%B0%EB%9C%BB%EB%9D%BC%EB%9D%BD%EB%9E%80%EB%9E%8C%EB%9E%91%EB%9E%98%EB%9E%B4%EB%9F%AC%EB%9F%B0%EB%9F%BC%EB%A0%87%EB%A0%A4%EB%A1%9C%EB%A1%9D%EB%A1%A0%EB%A5%B4%EB%A5%B8%EB%A5%BC%EB%A6%85%EB%A6%87%EB%A6%AC%EB%A6%B4%EB%A6%BD%EB%A7%88%EB%A7%8C%EB%A7%8E%EB%A7%90%EB%A7%9D%EB%A7%B9%EB%A8%B9%EB%A8%BC%EB%A9%80%EB%A9%B0%EB%A9%B4%EB%AA%85%EB%AA%A8%EB%AA%A9%EB%AA%BB%EB%AC%B4%EB%AC%B5%EB%AC%BC%EB%AF%B8%EB%AF%BF%EB%B0%94%EB%B0%95%EB%B0%96%EB%B0%98%EB%B0%A4%EB%B0%B1%EB%B2%84%EB%B2%88%EB%B2%97%EB%B3%84%EB%B3%91%EB%B3%95%EB%B3%B4%EB%B4%84%EB%B6%80%EB%B6%88%EB%B6%89%EB%B9%84%EB%B9%9A%EB%B9%9B%EB%BF%90%EC%81%98%EC%82%AC%EC%82%B0%EC%82%B4%EC%82%B6%EC%82%BC%EC%83%81%EC%83%88%EC%83%98%EC%83%9D%EC%84%9C%EC%84%A4%EC%84%B8%EC%85%88%EC%85%B0%EC%86%8C%EC%86%8D%EC%88%98%EC%88%99%EC%88%A8%EC%88%B2%EC%8A%A4%EC%8A%A8%EC%8A%AC%EC%8A%B4%EC%8A%B5%EC%8B%9C%EC%8B%9D%EC%8B%A0%EC%8B%AC%EC%8B%B6%EC%8B%B8%EC%93%B8%EC%95%84%EC%95%88%EC%95%89%EC%95%8A%EC%95%8C%EC%95%9E%EC%95%A0%EC%95%BC%EC%95%BD%EC%96%91%EC%96%B4%EC%96%B5%EC%96%BC%EC%97%86%EC%97%87%EC%97%88%EC%97%90%EC%97%AC%EC%97%B0%EC%97%BC%EC%98%80%EC%98%9B%EC%98%A4%EC%98%AE%EC%99%80%EC%9A%94%EC%9A%A9%EC%9A%B0%EC%9A%B4%EC%9A%B8%EC%9B%80%EC%9B%8C%EC%9B%90%EC%9B%94%EC%9C%84%EC%9C%A0%EC%9C%BC%EC%9D%80%EC%9D%84%EC%9D%8C%EC%9D%98%EC%9D%B4%EC%9D%B5%EC%9D%B8%EC%9D%BC%EC%9D%BD%EC%9E%83%EC%9E%88%EC%9E%8A%EC%9E%90%EC%9E%91%EC%9E%94%EC%9E%98%EC%9E%A0%EC%9E%A1%EC%9E%A5%EC%A0%80%EC%A0%81%EC%A0%84%EC%A0%88%EC%A0%95%EC%A0%96%EC%A0%9C%EC%A0%B8%EC%A1%8C%EC%A1%B0%EC%A2%81%EC%A3%BC%EC%A3%BD%EC%A4%84%EC%A7%80%EC%A7%81%EC%A7%84%EC%A7%91%EC%A7%93%EC%A7%9D%EC%A9%8C%EC%B0%A8%EC%B0%AC%EC%B2%98%EC%B2%9C%EC%B2%AB%EC%B3%90%EC%B6%94%EC%B6%98%EC%B9%98%EC%B9%A8%EC%B9%B4%EC%BD%A4%ED%82%A4%ED%83%81%ED%83%84%ED%84%B0%ED%85%8C%ED%86%A0%ED%8A%B8%ED%8B%B0%ED%8C%8C%ED%8E%B4%ED%8E%B8%ED%8F%AC%ED%91%B8%ED%92%80%ED%92%8D%ED%94%88%ED%94%94%ED%94%BC%ED%95%98%ED%95%9C%ED%95%A0%ED%95%A9%ED%95%B4%ED%96%87%ED%96%A5%ED%97%88%ED%97%A4%ED%98%80%ED%99%80%ED%99%94%ED%99%A9%ED%9C%A9%ED%9D%90%ED%9D%98%ED%9D%AC%ED%9E%88%ED%9E%90%ED%9E%98&display=swap">
 <script src="/js/launch.js?v=2"></script>
 </head>
 <body>
@@ -248,11 +274,16 @@
   <section id="maker">
     <div class="party" aria-hidden="true"><span>🎈</span><span>🎉</span><span>🍒</span><span>🥳</span><span>✨</span><span>🎈</span></div>
     <div class="brand topbar">
+      <span class="tb-brand">🍒 싸바 어디야</span>
       <button type="button" class="cancel" id="cancelTop" style="display:none">✕ 취소</button>
     </div>
-    <div class="miss">
-      <h1 class="miss-q"><span class="mq-e" aria-hidden="true">💭</span>누가 보고 싶으세요?</h1>
-      <p class="miss-poem" id="missPoem">“그립다 말을 할까 하니 그리워”<small>— 김소월 「가는 길」</small></p>
+    <div class="frame miss" id="missFrame">
+      <i class="gem g1"></i><i class="gem g2"></i><i class="gem g3"></i><i class="gem g4"></i>
+      <div class="frame-in">
+        <button type="button" class="miss-poem" id="missPoem" aria-label="시 전편 감상하기">“그립다 말을 할까 하니 그리워”<small>— 김소월 「가는 길」</small></button>
+        <div class="orn" aria-hidden="true">✦ ❦ ✦</div>
+        <h1 class="miss-q"><span class="mq-e" aria-hidden="true">💭</span>누가 보고 싶으세요?</h1>
+      </div>
     </div>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
@@ -795,12 +826,54 @@
   function askPreview() { var f = $('from').value.trim(); $('playPrev').textContent = (f ? f + ': ' : '') + '친구야 놀자!'; }
   $('from').addEventListener('input', askPreview); askPreview();
 
-  // 들어올 때마다 그리움의 시 한 구절 (첫 방문은 김소월 「가는 길」)
+  // 들어올 때마다 그리움의 시 한 구절 (첫 방문은 김소월 「가는 길」) — 누르면 액자 속에서 시 전편이 흘러가요
   (function () {
-    var P = [["그립다 말을 할까 하니 그리워", "김소월 「가는 길」"], ["떠날 때에 다시 만날 것을 믿습니다", "한용운 「님의 침묵」"], ["어론 님 오신 날 밤이어든 굽이굽이 펴리라", "황진이"], ["그대를 생각하는 동안, 벗이여, 잃은 것은 모두 돌아오고 슬픔은 끝나네", "셰익스피어"], ["햇살이 바다에서 반짝일 때, 나는 그대를 생각하네", "괴테"], ["가도 아주 가지는 않노라시던 그러한 약속이 있었겠지요", "김소월 「개여울」"], ["못 잊어 생각이 나겠지요", "김소월 「못 잊어」"], ["만 리 길이라도, 내 다시 오리다", "로버트 번스"], ["다정도 병인 양하여 잠 못 들어 하노라", "이조년"]];
+    var P = [["그립다 말을 할까 하니 그리워", "김소월 「가는 길」", "그립다\n말을 할까\n하니 그리워\n\n그냥 갈까\n그래도\n다시 더 한 번……\n\n저 산에도 까마귀, 들에 까마귀,\n서산에는 해 진다고\n지저귑니다.\n\n앞 강물, 뒷 강물,\n흐르는 물은\n어서 따라오라고 따라가자고\n흘러도 연달아 흐릅디다려."], ["떠날 때에 다시 만날 것을 믿습니다", "한용운 「님의 침묵」", "님은 갔습니다.\n아아, 사랑하는 나의 님은 갔습니다.\n\n푸른 산빛을 깨치고\n단풍나무 숲을 향하여 난 작은 길을 걸어서,\n차마 떨치고 갔습니다.\n\n황금의 꽃같이 굳고 빛나던 옛 맹서는\n차디찬 티끌이 되어서\n한숨의 미풍에 날아갔습니다.\n\n날카로운 첫 키스의 추억은\n나의 운명의 지침을 돌려놓고\n뒷걸음쳐서 사라졌습니다.\n\n나는 향기로운 님의 말소리에 귀먹고,\n꽃다운 님의 얼굴에 눈멀었습니다.\n\n사랑도 사람의 일이라,\n만날 때에 미리 떠날 것을 염려하고\n경계하지 아니한 것은 아니지만,\n이별은 뜻밖의 일이 되고,\n놀란 가슴은 새로운 슬픔에 터집니다.\n\n그러나 이별을 쓸데없는 눈물의 원천을 만들고 마는 것은\n스스로 사랑을 깨치는 것인 줄 아는 까닭에,\n걷잡을 수 없는 슬픔의 힘을 옮겨서\n새 희망의 정수박이에 들어부었습니다.\n\n우리는 만날 때에 떠날 것을 염려하는 것과 같이,\n떠날 때에 다시 만날 것을 믿습니다.\n\n아아, 님은 갔지마는\n나는 님을 보내지 아니하였습니다.\n\n제 곡조를 못 이기는 사랑의 노래는\n님의 침묵을 휩싸고 돕니다."], ["어론 님 오신 날 밤이어든 굽이굽이 펴리라", "황진이", "동짓달 기나긴 밤을\n한 허리를 버혀 내어\n\n춘풍 이불 아래\n서리서리 넣었다가\n\n어론 님 오신 날 밤이어든\n굽이굽이 펴리라"], ["그대를 생각하는 동안, 벗이여, 잃은 것은 모두 돌아오고 슬픔은 끝나네", "셰익스피어 「소네트 30」", "달콤하고 고요한 생각의 자리에\n지난 일들의 기억을 불러내면,\n그리던 많은 것을 잃었음에 한숨짓고\n옛 슬픔으로 아까운 날들을 다시 서러워하네.\n\n눈물에 익숙지 않던 눈이 젖어\n죽음의 끝없는 밤에 숨은 귀한 벗들을 위해 울고,\n오래전 지운 사랑의 아픔에 새로 울며\n사라져 간 많은 얼굴들을 애도하네.\n\n지나간 서러움에 다시 서러워하며\n슬픔에서 슬픔으로 무겁게 헤아리네,\n이미 탄식한 탄식의 슬픈 셈을\n갚지 않은 빚처럼 다시 갚으며.\n\n그러나 그대를 생각하는 동안, 벗이여,\n잃은 것은 모두 돌아오고 슬픔은 끝나네.\n\n(우리말 옮김: 싸바)"], ["햇살이 바다에서 반짝일 때, 나는 그대를 생각하네", "괴테 「연인 곁에서」", "햇살이 바다에서 반짝일 때,\n나는 그대를 생각하네.\n달빛이 샘물에 어릴 때,\n나는 그대를 생각하네.\n\n먼 길 위에 먼지가 일 때,\n나는 그대를 보네.\n깊은 밤 좁은 다리 위에서\n나그네가 떨 때에도.\n\n물결이 나직이 일어설 때,\n나는 그대 목소리를 듣네.\n고요한 숲으로 나는 자주 귀 기울이러 가네,\n모든 것이 잠잠할 때.\n\n나는 그대 곁에 있네,\n그대 아무리 멀리 있어도 그대는 내 곁에 있네.\n해가 지고, 곧 별들이 나를 비추리.\n아, 그대가 여기 있다면!\n\n(우리말 옮김: 싸바)"], ["가도 아주 가지는 않노라시던 그러한 약속이 있었겠지요", "김소월 「개여울」", "당신은 무슨 일로\n그리합니까?\n홀로이 개여울에 주저앉아서\n\n파릇한 풀포기가\n돋아 나오고\n잔물은 봄바람에 해적일 때에\n\n가도 아주 가지는\n않노라시던\n그러한 약속이 있었겠지요\n\n날마다 개여울에\n나와 앉아서\n하염없이 무엇을 생각합니다\n\n가도 아주 가지는\n않노라심은\n굳이 잊지 말라는 부탁인지요"], ["못 잊어 생각이 나겠지요", "김소월 「못 잊어」", "못 잊어 생각이 나겠지요,\n그런대로 한세상 지내시구려,\n사노라면 잊힐 날 있으리다.\n\n못 잊어 생각이 나겠지요,\n그런대로 세월만 가라시구려,\n못 잊어도 더러는 잊히오리다.\n\n그러나 또 한긋 이렇지요,\n“그리워 살뜰히 못 잊는데,\n어쩌면 생각이 떠지나요?”"], ["만 리 길이라도, 내 다시 오리다", "로버트 번스 「붉디붉은 장미」", "오, 내 사랑은 붉디붉은 장미,\n유월에 갓 피어난.\n오, 내 사랑은 고운 가락,\n곱게 불러 주는 노래.\n\n그대 이토록 어여쁘니, 고운 이여,\n내 사랑도 이토록 깊어,\n나는 그대를 사랑하리, 내 님이여,\n바다가 모두 마를 때까지.\n\n바다가 모두 마르고\n바위가 햇볕에 녹을 때까지,\n나는 그대를 사랑하리, 내 님이여,\n삶의 모래가 흐르는 동안.\n\n그럼 잘 있어요, 내 하나뿐인 사랑,\n잠시만 안녕.\n나는 다시 오리다, 내 사랑,\n만 리 길이라도.\n\n(우리말 옮김: 싸바)"], ["다정도 병인 양하여 잠 못 들어 하노라", "이조년", "이화에 월백하고\n은한이 삼경인 제\n\n일지춘심을\n자규야 알랴마는\n\n다정도 병인 양하여\n잠 못 들어 하노라"]];
     var i = 0; try { i = (parseInt(localStorage.getItem('sava-poem') || '-1', 10) + 1) % P.length; localStorage.setItem('sava-poem', String(i)); } catch (e) {}
     var el = document.getElementById('missPoem'); if (!el) return;
-    el.textContent = '“' + P[i][0] + '”'; var s = document.createElement('small'); s.textContent = '— ' + P[i][1]; el.appendChild(s);
+    var p = P[i];
+    el.textContent = '“' + p[0] + '”';
+    var s = document.createElement('small'); s.textContent = '— ' + p[1]; el.appendChild(s);
+    var m = document.createElement('span'); m.className = 'more'; m.textContent = '📜 시 전편 감상하기'; el.appendChild(m);
+    function esc(t) { return t.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+    function openPoem() {
+      var full = esc(p[2]);
+      // 머리말에 나온 구절은 형광펜으로 (줄이 나뉘어 있어도 각 줄을 찾아 칠함)
+      var lines = full.split('\n').map(function (ln) {
+        var flat = ln.replace(/[,.…]/g, '').trim();
+        var hit = flat && p[0].replace(/[,.…]/g, '').indexOf(flat) > -1 && flat.length > 1;
+        return hit ? '<span class="hl">' + ln + '</span>' : ln;
+      }).join('\n');
+      var title = p[1].replace(/^.*「(.*)」.*$/, '$1'), who = p[1].replace(/\s*「.*」/, '');
+      if (title === p[1]) { title = '“' + p[0] + '”'; }
+      var sh = document.createElement('div'); sh.className = 'psheet'; sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-label', p[1] + ' 전편');
+      sh.innerHTML = '<div class="frame"><i class="gem g1"></i><i class="gem g2"></i><i class="gem g3"></i><i class="gem g4"></i><div class="frame-in"><div class="pview"><div class="proll"><h2></h2><span class="by"></span><div class="pt"></div><span class="last">💭 이 시를 읽으니,<br>누가 떠오르세요?</span></div></div></div></div>' +
+        '<div class="pbtns"><button type="button" class="psend">💌 이 구절 담아 안부 보내기</button><button type="button" class="x">닫기</button></div><div class="phint">화면을 누르면 멈췄다 흘러가요</div>';
+      sh.querySelector('h2').textContent = title; sh.querySelector('.by').textContent = who;
+      sh.querySelector('.pt').innerHTML = lines;
+      document.body.appendChild(sh); document.body.style.overflow = 'hidden';
+      var view = sh.querySelector('.pview'), roll = sh.querySelector('.proll'), last = roll.querySelector('.last'), anim = null;
+      var reduce = false; try { reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+      requestAnimationFrame(function () {
+        var vh = view.clientHeight, end = -(last.offsetTop + last.offsetHeight / 2 - vh / 2), dist = vh - end;
+        if (reduce || !roll.animate) { roll.style.position = 'static'; roll.style.padding = '40px 22px'; sh.querySelector('.phint').hidden = true; return; }
+        anim = roll.animate([{ transform: 'translateY(' + vh + 'px)' }, { transform: 'translateY(' + end + 'px)' }], { duration: Math.max(16000, dist * 38), easing: 'cubic-bezier(.25,.1,.35,1)', fill: 'forwards' });
+        anim.onfinish = function () { sh.querySelector('.psend').classList.add('go'); sh.querySelector('.phint').hidden = true; };
+      });
+      function close() { if (anim) anim.cancel(); sh.remove(); document.body.style.overflow = ''; el.focus(); }
+      view.parentNode.addEventListener('click', function () { if (!anim || anim.playState === 'finished') return; if (anim.playState === 'paused') anim.play(); else anim.pause(); });
+      sh.querySelector('.x').addEventListener('click', close);
+      sh.addEventListener('click', function (e) { if (e.target === sh) close(); });
+      document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { document.removeEventListener('keydown', k); close(); } });
+      sh.querySelector('.psend').addEventListener('click', function () {
+        var ask = document.querySelector('.mode[data-mode="ask"]'); if (ask && ask.getAttribute('aria-pressed') !== 'true') ask.click();
+        var ta = document.getElementById('gText'), msg = '“' + p[0] + '”\n문득 네 생각이 났어. 싸바?';
+        if (msg.length > 100) msg = '“' + p[0] + '”\n싸바?';
+        ta.value = msg.slice(0, 100); ta.dispatchEvent(new Event('input', { bubbles: true }));
+        close(); ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+    el.addEventListener('click', openPoem);
   })();
   function partyBurst(el) {
     try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}

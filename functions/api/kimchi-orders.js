@@ -22,7 +22,8 @@ export async function onRequest({request,env}){
  await ensure(env.DB);
  let b={};try{const raw=await request.text();if(raw.length>16000)return json({error:'large'},413);b=JSON.parse(raw);}catch(e){return json({error:'bad'},400);}
  const user=await currentUser(request,env.DB);
- const admin=!!user&&String(user.id)===String(env.SAVA_ADMIN_UID||'');
+ const kimchiAdmins=[env.SAVA_ADMIN_UID].concat(String(env.SAVA_KIMCHI_ADMINS||'').split(',')).map(function(s){return String(s||'').trim();}).filter(Boolean); // 김치 주문 관리자: 대표 + SAVA_KIMCHI_ADMINS(쉼표로 여러 명)
+ const admin=!!user&&kimchiAdmins.indexOf(String(user.id))>=0;
  if(b.action==='create'){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
   if(!b.agree)return json({error:'agree'},400);

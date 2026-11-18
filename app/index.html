@@ -639,7 +639,7 @@
     var m = el('div', 'more');
     // 받은 카드 · 예약 (아래 탭에서 옮겨 옴)
     var nIn = S.inbox().length, nNew = S.unread(), nRv = S.reservations().length;
-    [['💌 받은 카드', '#inbox', nNew ? '새 카드 ' + nNew : (nIn ? nIn + '장' : '')], ['📅 내 예약', '#resv', nRv ? nRv + '건' : '']].forEach(function (x) {
+    [['💌 받은 카드', '#inbox', nNew ? '새 카드 ' + nNew : (nIn ? nIn + '장' : '')], ['📅 내 예약', '#resv', nRv ? nRv + '건' : ''], ['🛒 내 주문', '/app/orders/', '김치 등 상품']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
     });
     // 회원: 로그인 상태에 따라 '회원가입' 또는 '내 정보'
@@ -650,8 +650,8 @@
       if (j && j.user) {
         acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = j.user.agreed ? '로그아웃 · 탈퇴' : '가입 마무리';
         // 김치 주문 관리 (관리자만 내용이 보임)
-        var od = el('a', ''); od.href = '/app/orders/?admin=1'; od.appendChild(document.createTextNode('🥬 주문 관리')); od.appendChild(el('span', '', '관리자'));
-        acct.insertAdjacentElement('afterend', od);
+        var od = el('a', ''); od.href = '/app/orders/' + (String(j.user.id) === '1' ? '?admin=1' : ''); od.appendChild(document.createTextNode(String(j.user.id) === '1' ? '🥬 주문 관리' : '🥬 내 주문')); od.appendChild(el('span', '', String(j.user.id) === '1' ? '관리자' : '언니김치'));
+        if (String(j.user.id) === '1') acct.insertAdjacentElement('afterend', od);
       }
     }).catch(function () {});
     [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '싸바 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {

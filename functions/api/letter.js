@@ -7,7 +7,8 @@
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
 // 있으면 더 정확해지는 환경변수: TOUR_API_KEY(한국관광공사 행사정보), BIZINFO_API_KEY(기업마당 지원사업)
 const MODEL_DEFAULT = 'claude-haiku-5-5';
-const CITY = { 광주: [35.1595, 126.8526, 5], 서울: [37.5665, 126.978, 1], 여수: [34.7604, 127.6622, 38], 순천: [34.9506, 127.4872, 38], 목포: [34.8118, 126.3922, 38], 전주: [35.8242, 127.148, 37], 부산: [35.1796, 129.0756, 6], 대구: [35.8714, 128.6014, 4], 대전: [36.3504, 127.3845, 3], 인천: [37.4563, 126.7052, 2], 제주: [33.4996, 126.5312, 39] };
+// [위도, 경도, 관광공사 옛 지역코드, 법정동 시도코드(KorService2), 기업마당 해시태그 지역]
+const CITY = { 광주: [35.1595, 126.8526, 5, 29, '광주'], 서울: [37.5665, 126.978, 1, 11, '서울'], 여수: [34.7604, 127.6622, 38, 46, '전남'], 순천: [34.9506, 127.4872, 38, 46, '전남'], 목포: [34.8118, 126.3922, 38, 46, '전남'], 전주: [35.8242, 127.148, 37, 52, '전북'], 부산: [35.1796, 129.0756, 6, 26, '부산'], 대구: [35.8714, 128.6014, 4, 27, '대구'], 대전: [36.3504, 127.3845, 3, 30, '대전'], 인천: [37.4563, 126.7052, 2, 28, '인천'], 제주: [33.4996, 126.5312, 39, 50, '제주'] };
 function json(o, s, age) { return new Response(JSON.stringify(o), { status: s || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + (age || 0) } }); }
 function kst() { return new Date(Date.now() + 9 * 3600e3); }
 function ymd(d) { return d.toISOString().slice(0, 10); }
@@ -31,23 +32,51 @@ async function weather(c) {
     return { sky, max: Math.round(d.temperature_2m_max[0]), min: Math.round(d.temperature_2m_min[0]), rain: d.precipitation_probability_max[0], tmrMax: Math.round(d.temperature_2m_max[1]), tmrMin: Math.round(d.temperature_2m_min[1]), pm10: q && q.daily && q.daily.pm10_max ? Math.round(q.daily.pm10_max[0]) : null, pm25: q && q.daily && q.daily.pm2_5_max ? Math.round(q.daily.pm2_5_max[0]) : null };
   } catch (e) { return null; }
 }
-async function festivals(env, area) {
-  if (!env.TOUR_API_KEY) return [];
+// 공공데이터포털 키는 '일반 인증키(Decoding)'를 넣는 게 정석이지만, 'Encoding' 키(%2B 등이 섞인 것)를 넣어도 되게 처리
+function dkey(k) { k = String(k || '').trim(); return /%[0-9A-Fa-f]{2}/.test(k) ? k : encodeURIComponent(k); }
+function plusDays(d, n) { return ymd(new Date(d.getTime() + n * 864e5)).replace(/-/g, ''); }
+// 🎪 한국관광공사 TourAPI 4.0 (KorService2) — 오늘~7일 안에 열리는 행사·축제
+async function festivals(env, c, diag) {
+  if (!env.TOUR_API_KEY) { if (diag) diag.tour = '키 없음(TOUR_API_KEY)'; return []; }
+  const today = ymd(kst()).replace(/-/g, ''), until = plusDays(kst(), 7);
+  const base = 'https://apis.data.go.kr/B551011/KorService2/searchFestival2?serviceKey=' + dkey(env.TOUR_API_KEY) + '&MobileOS=ETC&MobileApp=sava&_type=json&numOfRows=100&pageNo=1&arrange=C&eventStartDate=' + plusDays(kst(), -60);
+  async function call(q) {
+    const r = await fetch(base + q, { cf: { cacheTtl: 3600 } }), t = await r.text();
+    if (/SERVICE_KEY_IS_NOT_REGISTERED|SERVICE KEY IS NOT REGISTERED|Unauthorized|등록되지 않은/i.test(t)) throw new Error('키가 아직 등록 안 됨(승인 후 1~2시간 걸리기도 함)');
+    let j; try { j = JSON.parse(t); } catch (e) { throw new Error('응답 형식 이상: ' + un(t).slice(0, 60)); }
+    const h = (j.response || {}).header || {}; if (h.resultCode && h.resultCode !== '0000') throw new Error((h.resultCode + ' ' + (h.resultMsg || '')).trim());
+    let it = (((j.response || {}).body || {}).items || {}).item || []; return Array.isArray(it) ? it : [it];
+  }
   try {
-    const today = ymd(kst()).replace(/-/g, '');
-    const u = 'https://apis.data.go.kr/B551011/KorService2/searchFestival2?serviceKey=' + encodeURIComponent(env.TOUR_API_KEY) + '&MobileOS=ETC&MobileApp=sava&_type=json&numOfRows=12&pageNo=1&arrange=C&eventStartDate=' + today + (area ? '&areaCode=' + area : '');
-    const j = await (await fetch(u)).json();
-    let it = (((j.response || {}).body || {}).items || {}).item || []; if (!Array.isArray(it)) it = [it];
-    return it.filter(x => x.eventstartdate <= String(+today + 7) && x.eventenddate >= today).slice(0, 6).map(x => ({ t: x.title, at: x.eventstartdate + '~' + x.eventenddate, addr: (x.addr1 || '').slice(0, 40) }));
-  } catch (e) { return []; }
+    // 두 달 전부터 시작한 행사까지 받아서, 지금 열리고 있거나 7일 안에 시작하는 것만 고름
+    let it = await call('&lDongRegnCd=' + c[3]).catch(() => null);
+    if (!it || !it.length) it = await call('&areaCode=' + c[2]);
+    const out = it.filter(x => x.eventstartdate <= until && x.eventenddate >= today)
+      .sort((x, y) => (x.eventstartdate > y.eventstartdate ? 1 : -1))
+      .slice(0, 6).map(x => ({ t: x.title, at: x.eventstartdate.slice(4, 6) + '/' + x.eventstartdate.slice(6) + '~' + x.eventenddate.slice(4, 6) + '/' + x.eventenddate.slice(6), addr: (x.addr1 || '').slice(0, 40), url: x.contentid ? 'https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=' + x.contentid : '' }));
+    if (diag) diag.tour = '연결됨 · ' + out.length + '건';
+    return out;
+  } catch (e) { if (diag) diag.tour = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
-async function programs(env) {
-  if (!env.BIZINFO_API_KEY) return [];
+// 📋 기업마당 지원사업 공고 — 소상공인 공고 중 아직 마감 안 된 것, 우리 지역 공고 먼저, 마감 가까운 순
+async function programs(env, c, diag) {
+  if (!env.BIZINFO_API_KEY) { if (diag) diag.bizinfo = '키 없음(BIZINFO_API_KEY)'; return []; }
   try {
-    const j = await (await fetch('https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=' + encodeURIComponent(env.BIZINFO_API_KEY) + '&dataType=json&searchCnt=40&hashtags=' + encodeURIComponent('소상공인'))).json();
-    const list = (j.jsonArray || j.items || []);
-    return list.slice(0, 12).map(x => ({ t: String(x.pblancNm || x.title || '').slice(0, 90), when: String(x.reqstBeginEndDe || '').slice(0, 30), url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' })).filter(x => x.t);
-  } catch (e) { return []; }
+    const r = await fetch('https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=' + encodeURIComponent(String(env.BIZINFO_API_KEY).trim()) + '&dataType=json&searchCnt=100&hashtags=' + encodeURIComponent('소상공인'), { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 3600 } });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { throw new Error('응답 형식 이상(키 확인): ' + un(t).slice(0, 60)); }
+    const list = j.jsonArray || j.items || [];
+    if (!Array.isArray(list)) throw new Error(String(j.reqErr || j.message || '응답에 목록 없음').slice(0, 60));
+    const today = ymd(kst()).replace(/-/g, ''), region = c[4];
+    const rows = list.map(x => {
+      const when = String(x.reqstBeginEndDe || ''), ds = when.replace(/[^0-9~]/g, '').split('~'), end = (ds[1] || '').slice(0, 8);
+      const tags = String(x.hashtags || '') + ' ' + String(x.jrsdInsttNm || '') + ' ' + String(x.excInsttNm || '');
+      return { t: String(x.pblancNm || x.title || '').slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), local: tags.indexOf(region) >= 0, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
+    }).filter(x => x.t && (!/^\d{8}$/.test(x.end) || x.end >= today));
+    rows.sort((x, y) => (y.local - x.local) || ((/^\d{8}$/.test(x.end) ? x.end : '9') > (/^\d{8}$/.test(y.end) ? y.end : '9') ? 1 : -1));
+    const out = rows.slice(0, 10);
+    if (diag) diag.bizinfo = '연결됨 · 진행 중 ' + rows.length + '건(우리 지역 ' + rows.filter(x => x.local).length + ')';
+    return out;
+  } catch (e) { if (diag) diag.bizinfo = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
 
 const COMMON = '규칙: 받으면 오늘 바로 써먹을 수 있는 실용 정보만 쓴다. 명언·고사성어·좋은 글귀·교훈은 절대 넣지 않는다. 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 주어진 자료(날씨·뉴스 제목·공고)에 없는 숫자·날짜·사실은 지어내지 않는다(일반 상식 수준의 건강·장사 요령은 괜찮다). 존댓말, 쉬운 말, 한 항목 2문장 이내, 문장마다 짧게. 별표(*)와 마크다운 금지. 자료의 url을 쓸 때는 받은 그대로 쓴다.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄(날씨를 넣어서, 예: 싸바? 광주는 오늘 영하 2도예요)","items":[{"icon":"이모지 1개","title":"12자 안팎 제목","body":"내용","url":"있으면 원문 주소, 없으면 빈 문자열"}]}';
@@ -64,9 +93,9 @@ async function build(k, city, env) {
     const [a, b, s] = await Promise.all([news('독감 OR 감기 OR 유행 주의보 when:7d', 6), news('어르신 무료 접종 OR 건강검진 OR 보건소 OR 노인 혜택 when:14d', 6), news('노인 사기 OR 보이스피싱 수법 when:14d', 4)]);
     src = '[유행·질병 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[무료·혜택 뉴스]\n' + b.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[사기 뉴스]\n' + s.map(x => '- ' + x.t).join('\n');
   } else if (k === 'boss') {
-    const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 8), festivals(env, c[2]), programs(env), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
+    const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 8), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
     const p2 = p.length ? p : await news('소상공인 지원사업 신청 마감 when:7d', 5);
-    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[이번 주 ' + city + ' 행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.when ? ' 신청 ' + x.when : '') + ' (' + x.url + ')').join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
+    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[이번 주 ' + city + ' 행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + (x.url ? ' (' + x.url + ')' : '')).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + (x.local ? '[우리 지역] ' : '') + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' (' + x.url + ')').join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
   } else {
     const [a, b, m] = await Promise.all([news('오디션 모집 배우 when:7d', 10), news('배우 모집 OR 캐스팅 공고 OR 공개 오디션 when:10d', 8), news('뮤지컬 OR 연극 오디션 when:14d', 6)]);
     const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));
@@ -98,6 +127,11 @@ async function build(k, city, env) {
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || 'boss', city = CITY[u.searchParams.get('city')] ? u.searchParams.get('city') : '광주';
   if (!RULES[k]) return json({ error: 'bad-k' }, 400);
+  // 연결 점검: /api/letter?check=1&city=광주 — 키 값은 보여주지 않고 연결 상태와 받아온 자료만 보여 줌
+  if (u.searchParams.get('check')) {
+    const c = CITY[city], diag = {}, [f, p] = await Promise.all([festivals(env, c, diag), programs(env, c, diag)]);
+    return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
+  }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
   const ckey = new Request(u.origin + '/__letter/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;

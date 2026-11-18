@@ -125,7 +125,10 @@
     @keyframes mkHop { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
     @media (prefers-reduced-motion: reduce) { .mk .mini, .mk .dance { animation: none; } }
     .mk .mini::before { display: none; }
-    .mk .mini .w { position: relative; z-index: 1; display: block; width: 100%; text-align: center; margin-top: 0; font-size: 22px; font-weight: 900; color: #fff; -webkit-text-stroke: .6px rgba(90,0,12,.6); text-shadow: 0 2px 6px rgba(0,0,0,.75), 0 0 2px rgba(0,0,0,.9); letter-spacing: -.06em; line-height: 1.12; word-break: keep-all; }
+    @font-face { font-family: 'SavaSign'; src: url(../fonts/black-han-sans-0.woff2) format('woff2'); unicode-range: U+AE40,U+C5B8,U+D2B9; font-display: swap; }
+    @font-face { font-family: 'SavaSign'; src: url(../fonts/black-han-sans-1.woff2) format('woff2'); unicode-range: U+D310; font-display: swap; }
+    @font-face { font-family: 'SavaSign'; src: url(../fonts/black-han-sans-2.woff2) format('woff2'); unicode-range: U+B2C8,U+CE58; font-display: swap; }
+    .mk .mini .w { position: relative; z-index: 1; display: block; width: 100%; text-align: center; margin-top: 0; font-family: 'SavaSign', var(--font, sans-serif); font-size: 25px; font-weight: 400; color: #fff; -webkit-text-stroke: .6px rgba(90,0,12,.6); text-shadow: 0 2px 6px rgba(0,0,0,.75), 0 0 2px rgba(0,0,0,.9); letter-spacing: -.02em; line-height: 1.12; word-break: keep-all; }
     .mk .mini .w.long { font-size: 14px; }
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
@@ -140,7 +143,7 @@
       .mk h2 { font-size: 27px; }
       .mk p { font-size: 12px; padding-right: 108px; }
       .mk p small { font-size: 15px; }
-      .mk .mini { width: 88px; height: 88px; left: 20px; } .mk .mini .w { font-size: 20px; }
+      .mk .mini { width: 88px; height: 88px; left: 20px; } .mk .mini .w { font-size: 23px; }
       .mk .dance { left: 134px; right: auto; top: 2px; width: 56px; height: 50px; transform: none; }
       .mk .go { font-size: 16px; }
     }

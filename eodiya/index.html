@@ -185,13 +185,19 @@
     @keyframes epDance { 0%,100% { transform: translateY(0) rotate(-10deg); } 25%,75% { transform: translateY(-7px) rotate(0) scale(1.04,.96); } 50% { transform: translateY(0) rotate(10deg); } }
     @keyframes epNote { 0% { opacity: 0; transform: translate(0,6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-10px,-22px) rotate(15deg); } }
     .modes { gap: 9px; }
-    .mode { position: relative; gap: 6px; padding: 14px 10px 12px; min-height: 132px; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 5px 0 var(--mc-d), 0 12px 20px -12px rgba(0,0,0,.35); transition: transform .12s, box-shadow .12s, background .12s; }
-    .mode[data-mode="ask"] { --mc: #B3132B; --mc-d: #F2C3CB; --mc-s: #FDEBEE; }
-    .mode[data-mode="come"] { --mc: #1D6FD1; --mc-d: #C6DBF6; --mc-s: #EAF2FD; }
-    .mode[data-mode="play"] { --mc: #E0A100; --mc-d: #F7E2A6; --mc-s: #FFF6D9; }
-    .mode i { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--mc-s); font-size: 25px; }
-    .mode b { font-size: 20px; color: var(--mc); }
-    .mode span { font-size: 14.5px; color: #5a4f4f; line-height: 1.35; }
+    .mode { position: relative; gap: 6px; padding: 14px 10px 12px; min-height: 132px; border: 0; border-radius: 22px; background: var(--mc); box-shadow: 0 5px 0 var(--mc-d), 0 12px 20px -12px rgba(0,0,0,.35); transition: transform .12s, box-shadow .12s, background .12s; }
+    .mode[data-mode="ask"] { --mc: #B3132B; --mc-d: #6E0B1A; --mc-s: #FDEBEE; }
+    .mode[data-mode="come"] { --mc: #1A4FB0; --mc-d: #0E2F72; --mc-s: #EAF2FD; }
+    .mode[data-mode="play"] { --mc: #D2700A; --mc-d: #8A4605; --mc-s: #FFF6D9; }
+    /* 여기야!·놀자!도 싸바?처럼 진한 색 — 고른 것은 흰 테두리·체크로 */
+    .mode { background: var(--mc); }
+    .mode b, .mode span { color: #fff; }
+    .mode span { opacity: .92; }
+    .mode i { background: rgba(255,255,255,.95); }
+    .mode[aria-pressed="true"] { outline: 3px solid #fff; outline-offset: -6px; }
+    .mode i { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.95); font-size: 25px; }
+    .mode b { font-size: 20px; color: #fff; }
+    .mode span { font-size: 14.5px; color: #fff; opacity: .92; line-height: 1.35; }
     .mode[aria-pressed="true"] { background: var(--mc); transform: translateY(-3px); box-shadow: 0 7px 0 color-mix(in srgb, var(--mc) 60%, #000), 0 16px 24px -12px rgba(0,0,0,.45); }
     .mode[aria-pressed="true"] b, .mode[aria-pressed="true"] span { color: #fff; }
     .mode[aria-pressed="true"] i { background: rgba(255,255,255,.95); }

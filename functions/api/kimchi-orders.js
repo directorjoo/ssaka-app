@@ -13,7 +13,7 @@ async function keyB64(env){if(env.ORDER_DATA_KEY)return env.ORDER_DATA_KEY;if(!e
 async function getKey(env){const b64=await keyB64(env);if(!b64)return null;try{const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));if(raw.length!==32)return null;return await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);}catch(e){return null;}}
 async function seal(k,v){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(v))));const a=new Uint8Array(12+ct.length);a.set(iv);a.set(ct,12);return btoa(String.fromCharCode(...a));}
 async function unseal(k,v){const a=Uint8Array.from(atob(v),c=>c.charCodeAt(0));const p=await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(0,12)},k,a.slice(12));return JSON.parse(new TextDecoder().decode(p));}
-async function ensure(db){await db.prepare("CREATE TABLE IF NOT EXISTS kimchi_orders (id TEXT PRIMARY KEY, uid INTEGER NOT NULL DEFAULT 0, data TEXT NOT NULL, created INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new')").run();try{await db.prepare('ALTER TABLE kimchi_orders ADD COLUMN uid INTEGER NOT NULL DEFAULT 0').run();}catch(e){}}
+async function ensure(db){await db.prepare("CREATE TABLE IF NOT EXISTS kimchi_orders (id TEXT PRIMARY KEY, uid INTEGER NOT NULL DEFAULT 0, data TEXT NOT NULL, created INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new')").run();try{await db.prepare('ALTER TABLE kimchi_orders ADD COLUMN uid INTEGER NOT NULL DEFAULT 0').run();}catch(e){}try{await db.prepare("ALTER TABLE kimchi_orders ADD COLUMN track TEXT NOT NULL DEFAULT ''").run();}catch(e){}}
 const statuses=['new','paid','preparing','shipped','done','canceled'];
 export async function onRequest({request,env}){
  if(request.method!=='POST')return json({error:'method'},405);
@@ -58,25 +58,25 @@ export async function onRequest({request,env}){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
   const id=clean(b.orderNo,30),phone=digits(b.phone);
   if(!id||phone.length<9)return json({error:'required'},400);
-  const r=await env.DB.prepare('SELECT id,data,created,status FROM kimchi_orders WHERE id=?').bind(id).first();
+  const r=await env.DB.prepare('SELECT id,data,created,status,track FROM kimchi_orders WHERE id=?').bind(id).first();
   if(!r)return json({error:'not-found'},404);
   let o;try{o=await unseal(k,r.data);}catch(e){return json({error:'not-found'},404);}
   if(digits(o.phone)!==phone)return json({error:'not-found'},404);
-  return json({ok:true,item:{id:r.id,created:r.created,status:r.status,order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}}});
+  return json({ok:true,item:{id:r.id,created:r.created,status:r.status,track:r.track||'',order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}}});
  }
  // 내 주문: 로그인한 회원이 낸 주문 (어느 기기에서든)
  if(b.action==='mine'){
   if(!user)return json({ok:true,items:[],login:0});
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
-  const {results}=await env.DB.prepare('SELECT id,data,created,status FROM kimchi_orders WHERE uid=? ORDER BY created DESC LIMIT 50').bind(user.id).all();
-  const items=[];for(const r of results||[]){try{const o=await unseal(k,r.data);items.push({id:r.id,created:r.created,status:r.status,order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}});}catch(e){}}
+  const {results}=await env.DB.prepare('SELECT id,data,created,status,track FROM kimchi_orders WHERE uid=? ORDER BY created DESC LIMIT 50').bind(user.id).all();
+  const items=[];for(const r of results||[]){try{const o=await unseal(k,r.data);items.push({id:r.id,created:r.created,status:r.status,track:r.track||'',order:{buyer:o.buyer,orderType:o.orderType,quantity:o.quantity,amount:o.amount,recipient:o.recipient,address:o.address}});}catch(e){}}
   return json({ok:true,items,login:1});
  }
  if(!admin)return json({error:'forbidden'},403);
  if(b.action==='list'){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
-  const {results}=await env.DB.prepare('SELECT id,data,created,status FROM kimchi_orders ORDER BY created DESC LIMIT 500').all();
-  const items=[];for(const r of results||[]){try{items.push({id:r.id,created:r.created,status:r.status,order:await unseal(k,r.data)});}catch(e){}}
+  const {results}=await env.DB.prepare('SELECT id,data,created,status,track FROM kimchi_orders ORDER BY created DESC LIMIT 500').all();
+  const items=[];for(const r of results||[]){try{items.push({id:r.id,created:r.created,status:r.status,track:r.track||'',order:await unseal(k,r.data)});}catch(e){}}
   return json({ok:true,items,owner});
  }
  // 대표만: 관리자 초대 링크 만들기 · 관리자 목록 · 빼기
@@ -86,6 +86,8 @@ export async function onRequest({request,env}){
   if(b.action==='admins'){const {results}=await env.DB.prepare('SELECT uid,name,added FROM kimchi_admins ORDER BY added').all();return json({ok:true,items:results||[]});}
   await env.DB.prepare('DELETE FROM kimchi_admins WHERE uid=?').bind(clean(b.uid,30)).run();return json({ok:true});
  }
+ // 송장번호 저장 (택배사|번호) — 저장하면 '발송 완료'로
+ if(b.action==='track'){const c=clean(b.courier,20),num=String(b.num||'').replace(/[^0-9A-Za-z-]/g,'').slice(0,30);const id=clean(b.id,40);if(!num){await env.DB.prepare("UPDATE kimchi_orders SET track='' WHERE id=?").bind(id).run();return json({ok:true});}await env.DB.prepare("UPDATE kimchi_orders SET track=?, status=CASE WHEN status IN ('new','paid','preparing') THEN 'shipped' ELSE status END WHERE id=?").bind(c+'|'+num,id).run();return json({ok:true});}
  if(b.action==='status'){if(!statuses.includes(b.status))return json({error:'status'},400);await env.DB.prepare('UPDATE kimchi_orders SET status=? WHERE id=?').bind(b.status,clean(b.id,40)).run();return json({ok:true});}
  return json({error:'bad-action'},400);
 }

@@ -4,7 +4,13 @@ const json=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{'content
 const clean=(v,n)=>String(v??'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,n);
 const digits=v=>String(v||'').replace(/\D/g,'');
 const rand=n=>[...crypto.getRandomValues(new Uint8Array(n))].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
-async function getKey(env){if(!env.ORDER_DATA_KEY)return null;try{const raw=Uint8Array.from(atob(env.ORDER_DATA_KEY),c=>c.charCodeAt(0));if(raw.length!==32)return null;return await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);}catch(e){return null;}}
+// 암호화 열쇠: Cloudflare 비밀 ORDER_DATA_KEY 가 있으면 그것, 없으면 처음 한 번 만들어 R2(주문 DB와 다른 곳)에 보관
+async function keyB64(env){if(env.ORDER_DATA_KEY)return env.ORDER_DATA_KEY;if(!env.VIDEO)return null;
+ const o=await env.VIDEO.get('secret/order-data-key');if(o)return (await o.text()).trim();
+ const k=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+ await env.VIDEO.put('secret/order-data-key',k,{onlyIf:{etagDoesNotMatch:'*'}}).catch(()=>{});
+ const again=await env.VIDEO.get('secret/order-data-key');return again?(await again.text()).trim():null;}
+async function getKey(env){const b64=await keyB64(env);if(!b64)return null;try{const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));if(raw.length!==32)return null;return await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);}catch(e){return null;}}
 async function seal(k,v){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(v))));const a=new Uint8Array(12+ct.length);a.set(iv);a.set(ct,12);return btoa(String.fromCharCode(...a));}
 async function unseal(k,v){const a=Uint8Array.from(atob(v),c=>c.charCodeAt(0));const p=await crypto.subtle.decrypt({name:'AES-GCM',iv:a.slice(0,12)},k,a.slice(12));return JSON.parse(new TextDecoder().decode(p));}
 async function ensure(db){await db.prepare("CREATE TABLE IF NOT EXISTS kimchi_orders (id TEXT PRIMARY KEY, uid INTEGER NOT NULL DEFAULT 0, data TEXT NOT NULL, created INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'new')").run();try{await db.prepare('ALTER TABLE kimchi_orders ADD COLUMN uid INTEGER NOT NULL DEFAULT 0').run();}catch(e){}}

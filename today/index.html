@@ -106,6 +106,7 @@
     { k: 'world', t: '세계 방송', i: '🌏', c: '#0b4ea2' },
     { k: 'naver', t: '네이버', i: '🟢', c: '#03C75A' },
     { k: 'health', t: '어르신 건강', i: '💊', c: '#12924a' },
+    { k: 'minwon', t: '민원', i: '🏛️', c: '#3d5a80' },
     { k: 'gov', t: '정부 혜택', i: '🎁', c: '#7a3fb0' },
     { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' },
     { k: 'radio', t: '라디오·TV', i: '📻', c: '#6a3a9c', href: '../radio/' }
@@ -125,7 +126,7 @@
   function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
   function show(k) {
     cur = k; try { localStorage.setItem('sava-today', k); } catch (e) {} history.replaceState(null, '', '#' + k); paintBar();
-    ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, health: health, gov: gov, fx: fx })[k]();
+    ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, gov: gov, fx: fx })[k]();
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
   function nlist(arr, rank) {
@@ -300,6 +301,38 @@
       '<div class="warn">🚨 갑자기 한쪽 팔다리에 힘이 빠지거나, 말이 어눌해지거나, 가슴이 5분 넘게 아프면 바로 <b>119</b>에 전화하세요.</div>' +
       '<div class="grid2" style="margin-top:12px"><a class="lk" href="https://health.kdca.go.kr" target="_blank" rel="noopener"><b>🏥 국가건강정보포털</b><span>질병관리청 건강 정보</span></a><a class="lk" href="https://www.nhis.or.kr" target="_blank" rel="noopener"><b>🩺 국민건강보험</b><span>건강검진 대상 확인</span></a></div>' +
       '<p class="note">일반적인 건강 습관 안내예요. 몸 상태에 따라 다를 수 있으니, 약이나 운동은 다니는 병원과 상의해 주세요.</p>';
+  }
+
+  // 🏛️ 민원 바로가기 — 어디서 무엇을 누르는지 헤매지 않게 (발급은 정부 누리집에서 본인 인증으로)
+  var MW = [
+    ['📄 주민등록등본·초본', '정부24 · 본인 인증 후 바로 발급', 'https://www.gov.kr/mw/AA020InfoCappView.do?HighCtgCD=A01010001&CappBizCD=13100000015'],
+    ['🏪 사업자등록증명', '홈택스 · 민원증명 메뉴 (폰은 손택스 앱)', 'https://www.hometax.go.kr'],
+    ['🧾 부가세·종합소득세 신고', '홈택스 · 신고/납부 메뉴', 'https://www.hometax.go.kr'],
+    ['💰 소상공인 지원 신청', '소상공인24 · 정책자금·지원사업', 'https://www.sbiz24.kr'],
+    ['🏠 지방세 (재산세·자동차세)', '위택스 · 조회·납부', 'https://www.wetax.go.kr'],
+    ['🎁 나에게 맞는 혜택 찾기', '정부24 혜택알리미', 'https://www.gov.kr'],
+    ['🏧 가까운 무인민원발급기', '지도에서 바로 찾기', 'https://map.naver.com/p/search/' + encodeURIComponent('무인민원발급기')],
+    ['🏢 가까운 주민센터', '지도에서 바로 찾기', 'https://map.naver.com/p/search/' + encodeURIComponent('행정복지센터')]
+  ];
+  // [월, 일, 이름, 누구] — 매년 반복되는 신고·납부 마감 (주말·공휴일이면 다음 평일로 미뤄질 수 있어요)
+  var DUE = [[1, 25, '부가세 확정신고 (2기)', '대표님'], [2, 10, '사업장현황신고 (면세사업자)', '대표님'], [4, 25, '부가세 예정신고·납부', '대표님'],
+    [5, 31, '종합소득세·지방소득세 신고', '대표님·어르신(소득 있는 분)'], [6, 30, '자동차세 (1기)', '차 있는 분'], [7, 25, '부가세 확정신고 (1기)', '대표님'],
+    [7, 31, '재산세 (건물·주택 1기)', '집·건물 있는 분'], [8, 31, '주민세 (사업소분)', '대표님'], [9, 30, '재산세 (토지·주택 2기)', '땅·집 있는 분'],
+    [10, 25, '부가세 예정신고·납부', '대표님'], [12, 15, '종합부동산세', '해당되는 분'], [12, 31, '자동차세 (2기)', '차 있는 분']];
+  function minwon() {
+    var y = now.getFullYear(), t0 = new Date(y, now.getMonth(), now.getDate());
+    var up = DUE.map(function (d) { var dt = new Date(y, d[0] - 1, d[1]); if (dt < t0) dt = new Date(y + 1, d[0] - 1, d[1]); return { dt: dt, n: d[2], who: d[3], left: Math.round((dt - t0) / 864e5) }; })
+      ;
+    var withholding = new Date(y, now.getMonth() + (now.getDate() > 10 ? 1 : 0), 10);
+    up.push({ dt: withholding, n: '원천세 신고·납부 (직원 있는 가게)', who: '매달 10일', left: Math.round((withholding - t0) / 864e5) });
+    up = up.sort(function (a, b) { return a.dt - b.dt; }).slice(0, 4);
+    pane.innerHTML = '<h2>🏛️ 민원 바로가기</h2><div class="src">누르면 해당 정부 화면으로 바로 가요 · 발급은 그곳에서 본인 인증으로</div>' +
+      '<div class="sec" style="margin-top:4px">📅 다가오는 신고·납부 마감</div><ul class="nl">' +
+      up.map(function (u) { return '<li><a><em style="min-width:54px;font-size:15px">D-' + u.left + '</em><span><b>' + esc(u.n) + '</b><small>' + (u.dt.getMonth() + 1) + '월 ' + u.dt.getDate() + '일 · ' + esc(u.who) + '</small></span></a></li>'; }).join('') + '</ul>' +
+      '<div class="sec">📌 자주 찾는 민원</div><div class="grid2">' +
+      MW.map(function (m) { return '<a class="lk" href="' + m[2] + '" target="_blank" rel="noopener"><b>' + m[0] + '</b><span>' + m[1] + '</span></a>'; }).join('') + '</div>' +
+      '<div class="sec">🧳 주민센터 갈 때 챙길 것</div><div class="hcard" style="background:#F4F7FB"><p style="font-size:16.5px;font-weight:700">· 신분증 (주민등록증·운전면허증·모바일 신분증)<br>· 가족 대신 갈 때: 위임장 + 맡긴 사람 신분증 + 내 신분증<br>· 수수료 소액 (카드·현금) — 무인발급기·정부24는 더 싸거나 무료인 것이 많아요</p></div>' +
+      '<p class="note">마감일은 해마다 같은 날 기준이에요. 주말·공휴일이면 다음 평일로 미뤄지고, 사람마다 대상이 다를 수 있으니 정확한 날짜와 금액은 홈택스·위택스에서 확인해 주세요.</p>';
   }
 
   // 🎁 정부 혜택

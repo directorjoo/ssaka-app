@@ -122,6 +122,35 @@ export async function onRequest({ request, env, params }) {
     return json({ ok: 1 }, 200, [['set-cookie', setCookie('sava_sid', t, SESSION_DAYS * 86400)]]);
   }
 
+  // 2-2) 로그인 숫자: 로그인된 기기(사파리 등)에서 6자리 숫자를 받아, 다른 곳(홈 화면 앱·다른 폰)에서 넣으면 로그인
+  if (path === 'code' && request.method === 'POST') {
+    const me = await currentUser(request, db);
+    if (!me) return json({ error: 'login' }, 401);
+    await db.prepare('CREATE TABLE IF NOT EXISTS auth_hand (hh TEXT PRIMARY KEY, uid INTEGER NOT NULL, expires INTEGER NOT NULL)').run();
+    const n = crypto.getRandomValues(new Uint32Array(1))[0] % 1000000, code = String(n).padStart(6, '0');
+    await db.prepare('INSERT OR REPLACE INTO auth_hand (hh, uid, expires) VALUES (?, ?, ?)').bind(await sha('code:' + code), me.id, Date.now() + 5 * 60 * 1000).run();
+    return json({ code, minutes: 5 });
+  }
+  if (path === 'code/use' && request.method === 'POST') {
+    let b = {}; try { b = await request.json(); } catch (e) {}
+    const code = String(b.code || '').replace(/\D/g, '');
+    if (code.length !== 6) return json({ ok: 0, error: 'bad' }, 400);
+    // 숫자 맞히기 막기: 같은 곳에서 10분에 5번까지
+    await db.prepare('CREATE TABLE IF NOT EXISTS rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, until INTEGER NOT NULL)').run();
+    const rk = 'code:' + (await sha(request.headers.get('cf-connecting-ip') || 'x')).slice(0, 16), now = Date.now();
+    const rr = await db.prepare('SELECT n, until FROM rate WHERE k = ?').bind(rk).first();
+    if (rr && rr.until > now && rr.n >= 5) return json({ ok: 0, error: 'slow' }, 429);
+    if (!rr || rr.until < now) await db.prepare('INSERT OR REPLACE INTO rate (k, n, until) VALUES (?, 1, ?)').bind(rk, now + 600000).run();
+    else await db.prepare('UPDATE rate SET n = n + 1 WHERE k = ?').bind(rk).run();
+    await db.prepare('CREATE TABLE IF NOT EXISTS auth_hand (hh TEXT PRIMARY KEY, uid INTEGER NOT NULL, expires INTEGER NOT NULL)').run();
+    const hh = await sha('code:' + code), r = await db.prepare('SELECT uid, expires FROM auth_hand WHERE hh = ?').bind(hh).first();
+    if (!r || r.expires < now) return json({ ok: 0, error: 'wrong' });
+    await db.prepare('DELETE FROM auth_hand WHERE hh = ?').bind(hh).run();
+    const t = rand(32);
+    await db.prepare('INSERT INTO sessions (th, uid, expires) VALUES (?, ?, ?)').bind(await sha(t), r.uid, now + SESSION_DAYS * DAY).run();
+    return json({ ok: 1 }, 200, [['set-cookie', setCookie('sava_sid', t, SESSION_DAYS * 86400)]]);
+  }
+
   // 3) 내 정보
   if (path === 'me') return json({ user: pub(await currentUser(request, db)), ready: !!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT) && isOpen(env), soon: !isOpen(env) });
 

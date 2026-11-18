@@ -12,7 +12,7 @@
 })();
 // ⚙️ 설정 창: SavaSettings.open()
 (function () {
-  var FS = [[100, '보통'], [115, '크게'], [130, '아주 크게'], [150, '가장 크게']];
+  var MIN = 85, MAX = 170; // 아이폰 글씨 크기처럼 밀어서 조절 (100 = 보통, 115 ≈ 예전 '크게')
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function css() {
     if (document.getElementById('sv-set-css')) return;
@@ -21,7 +21,11 @@
       '.sv-set{width:100%;max-width:560px;max-height:90dvh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;color:#222}' +
       '.sv-set h2{margin:0 0 4px;font-size:22px;display:flex;justify-content:space-between;align-items:center}.sv-set h2 button{border:0;background:#f1ece6;border-radius:999px;width:40px;height:40px;font-size:18px}' +
       '.sv-set h3{margin:18px 0 8px;font-size:15px;color:#8a7f76}' +
-      '.sv-fs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.sv-fs button{min-height:56px;padding:4px 2px;word-break:keep-all;line-height:1.2;border:1.5px solid #e2d9d0;border-radius:12px;background:#fff;font-weight:800;color:#333}.sv-fs button.on{background:#B3132B;border-color:#B3132B;color:#fff}' +
+      '.sv-fs{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;background:#f7f3ee}.sv-fs b{flex:none;font-weight:800;color:#333;line-height:1}.sv-fs .s{font-size:14px}.sv-fs .l{font-size:28px}' +
+      '.sv-fs input{flex:1;min-width:0;height:44px;margin:0;accent-color:#B3132B;-webkit-appearance:none;appearance:none;background:transparent}' +
+      '.sv-fs input::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#B3132B var(--p,20%),#ddd5cc var(--p,20%))}.sv-fs input::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-12px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}' +
+      '.sv-fs input::-moz-range-track{height:6px;border-radius:3px;background:#ddd5cc}.sv-fs input::-moz-range-progress{height:6px;border-radius:3px;background:#B3132B}.sv-fs input::-moz-range-thumb{width:28px;height:28px;border:0;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}' +
+      '.sv-fsv{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#8a7f76;font-size:14px;font-weight:700}.sv-fsv button{border:0;background:none;color:#B3132B;font:inherit;font-weight:800;padding:6px 4px}' +
       '.sv-row{display:flex;justify-content:space-between;align-items:center;min-height:56px;padding:0 4px;border-bottom:1px solid #f0ebe5;text-decoration:none;color:#222;font-size:17px;font-weight:700;width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left;font-family:inherit}.sv-row span{color:#8a7f76;font-size:14px;font-weight:600}' +
       '.sv-admin{margin-top:6px;padding:4px 12px;border-radius:14px;background:#fff6d9;border:1.5px solid #f5d46b}';
     document.head.appendChild(st);
@@ -32,13 +36,16 @@
     var h = el('h2', '', '⚙️ 설정'), x = el('button', '', '✕'); x.type = 'button'; x.setAttribute('aria-label', '닫기'); h.appendChild(x); box.appendChild(h);
     // 글씨 크기
     box.appendChild(el('h3', '', '글씨 크기'));
-    var fs = el('div', 'sv-fs');
-    FS.forEach(function (o) {
-      var b = el('button', window.SavaFont && SavaFont.get() === o[0] ? 'on' : '', o[1]); b.type = 'button'; b.style.fontSize = (13 * o[0] / 100) + 'px';
-      b.addEventListener('click', function () { SavaFont.set(o[0]); fs.querySelectorAll('button').forEach(function (y) { y.classList.toggle('on', y === b); }); });
-      fs.appendChild(b);
-    });
-    box.appendChild(fs);
+    var fs = el('div', 'sv-fs'), cur = window.SavaFont ? SavaFont.get() : 100;
+    fs.appendChild(el('b', 's', '가'));
+    var rg = el('input'); rg.type = 'range'; rg.min = MIN; rg.max = MAX; rg.step = 5; rg.value = cur; rg.setAttribute('aria-label', '글씨 크기');
+    fs.appendChild(rg); fs.appendChild(el('b', 'l', '가'));
+    var fv = el('div', 'sv-fsv'), lab = el('span'), reset = el('button', '', '보통으로'); reset.type = 'button'; fv.appendChild(lab); fv.appendChild(reset);
+    function show(v) { lab.textContent = (v === 100 ? '보통' : v < 100 ? '작게' : '크게') + ' · ' + v + '%'; rg.style.setProperty('--p', ((v - MIN) / (MAX - MIN) * 100) + '%'); }
+    rg.addEventListener('input', function () { var v = +rg.value; show(v); if (window.SavaFont) SavaFont.set(v); });
+    reset.addEventListener('click', function () { rg.value = 100; show(100); if (window.SavaFont) SavaFont.set(100); });
+    show(cur);
+    box.appendChild(fs); box.appendChild(fv);
     // 내 계정·내 것
     box.appendChild(el('h3', '', '내 정보'));
     var acct = el('a', 'sv-row', '🍒 로그인 · 회원가입'); acct.href = '/join/?next=' + encodeURIComponent(location.pathname); acct.appendChild(el('span', '', '카카오로 1초')); box.appendChild(acct);

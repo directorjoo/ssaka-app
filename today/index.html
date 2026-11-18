@@ -18,11 +18,10 @@
     h1 { margin: 8px 0 2px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; padding-right: 100px; }
     .date { color: var(--ink-2); font-size: 15px; font-weight: 700; }
     /* 동그라미 탭 */
-    .circles { display: flex; gap: 12px; overflow-x: auto; padding: 14px 16px 10px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    .circles::-webkit-scrollbar { display: none; }
-    .cb { flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70px; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; scroll-snap-align: start; text-decoration: none; color: var(--ink); }
-    .cb i { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; font-style: normal; font-size: 30px; background: #fff; box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px var(--c, #ddd), 0 6px 14px -8px rgba(0,0,0,.4); transition: transform .15s; }
-    .cb b { font-size: 13.5px; font-weight: 800; letter-spacing: -.04em; white-space: nowrap; color: #5a4a42; }
+    .circles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; padding: 14px 12px 10px; }
+    .cb { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; text-decoration: none; color: var(--ink); }
+    .cb i { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; font-style: normal; font-size: 24px; background: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c, #ddd), 0 5px 10px -7px rgba(0,0,0,.4); transition: transform .15s; }
+    .cb b { font-size: 13px; font-weight: 800; letter-spacing: -.05em; white-space: nowrap; color: #5a4a42; }
     .cb[aria-pressed="true"] i { transform: scale(1.06); background: var(--c); }
     .cb[aria-pressed="true"] b { color: var(--ink); }
     .pane { margin: 4px 14px 0; padding: 18px 16px; border-radius: 22px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 10px 24px -18px rgba(80,30,20,.4); min-height: 240px; }

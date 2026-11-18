@@ -236,6 +236,9 @@
     .upd-btn { height: 40px; padding: 0 14px; border: 1.5px solid #e5ddd5; border-radius: 999px; background: #fff; color: #3B4250; font-weight: 800; font-size: 15px; line-height: 1; font-family: inherit; cursor: pointer; white-space: nowrap; }
     .upd-btn.new { background: #B3132B; color: #fff; border-color: #B3132B; animation: updPulse 1.6s ease-in-out infinite; }
     @keyframes updPulse { 50% { transform: scale(1.06); } }
+    .ic-btn { width: 46px; height: 46px; border: 2.5px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
+    .ic-lang { background: linear-gradient(145deg, #2E4A8C, #16244A); }
+    .ic-set { background: linear-gradient(145deg, #D4213D, #8E0F22); }
 </style>
 <script src="/js/launch.js?v=2"></script>
 </head>
@@ -249,8 +252,8 @@
       </div>
       <div class="top-act">
         <button type="button" class="upd-btn" id="updBtn" aria-label="최신 버전으로 업데이트" hidden>🔄 새 버전!</button>
-        <button type="button" class="tr-btn set-btn" onclick="window.SavaSettings && SavaSettings.open()" aria-label="설정 · 글씨 크기">⚙️</button>
-        <button type="button" class="tr-btn notranslate" translate="no" onclick="window.SavaTr && SavaTr.open()" aria-label="Language 언어">🌐</button>
+        <button type="button" class="ic-btn ic-lang notranslate" translate="no" onclick="window.SavaTr && SavaTr.open()" aria-label="Language 언어"></button>
+        <button type="button" class="ic-btn ic-set" onclick="window.SavaSettings && SavaSettings.open()" aria-label="설정 · 글씨 크기"></button>
       </div>
     </div>
   </header>
@@ -758,6 +761,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
-<script src="/js/home.js?v=7" defer data-bar="0"></script>
+<script src="/js/home.js?v=8" defer data-bar="0"></script>
 </body>
 </html>

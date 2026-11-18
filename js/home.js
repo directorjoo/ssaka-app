@@ -139,19 +139,29 @@
   window.SavaNav = { back: goBack, home: goHome, kakao: goKakao, tip: tip, onLeave: (window.SavaNav && window.SavaNav.onLeave) || null };
 
   var FONT = 'system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+  // 오른쪽 위: [가A 언어] [⚙ 설정] — 설정이 맨 오른쪽 구석
+  var ICON_SET = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="#fff" d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7.4 7.4 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.4-1a.5.5 0 0 0-.6.2L2.7 8.8a.5.5 0 0 0 .1.6l2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.3.4.5.4h3.8c.2 0 .5-.2.5-.4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>';
+  var ICON_LANG = '<svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><text x="3" y="13.5" font-size="11.5" font-weight="900" fill="#fff" font-family="system-ui,sans-serif">가</text><text x="14.5" y="24" font-size="12" font-weight="900" fill="#FFD84D" font-family="system-ui,sans-serif">A</text><path d="M5 18.5c1 2.6 3.3 4.4 6 4.6M23 9.5c-1-2.6-3.3-4.4-6-4.6" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>';
+  window.SAVA_ICONS = { set: ICON_SET, lang: ICON_LANG };
+  function fillIcons() {
+    document.querySelectorAll('.ic-set').forEach(function (b) { b.innerHTML = ICON_SET; });
+    document.querySelectorAll('.ic-lang').forEach(function (b) { b.innerHTML = ICON_LANG; });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fillIcons); else fillIcons();
   function addLang() {
     if (document.querySelector('.sava-lang')) return;
+    var base = 'position:fixed;z-index:9990;top:calc(' + (+(ds.langTop || 10)) + 'px + env(safe-area-inset-top));width:46px;height:46px;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.22)';
+    var g = document.createElement('button');
+    g.type = 'button'; g.className = 'sava-set notranslate'; g.setAttribute('translate', 'no'); g.setAttribute('aria-label', '설정 · 글씨 크기');
+    g.innerHTML = ICON_SET;
+    g.style.cssText = base + ';right:calc(10px + env(safe-area-inset-right));background:linear-gradient(145deg,#D4213D,#8E0F22)';
+    g.addEventListener('click', function () { if (window.SavaSettings) SavaSettings.open(); });
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'sava-lang notranslate'; b.setAttribute('translate', 'no'); b.setAttribute('aria-label', 'Language 언어');
-    b.textContent = '🌐';
-    b.style.cssText = 'position:fixed;z-index:9990;top:calc(' + (+(ds.langTop || 10)) + 'px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 2px 10px rgba(0,0,0,.16);font-size:21px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent';
+    b.innerHTML = ICON_LANG;
+    b.style.cssText = base + ';right:calc(64px + env(safe-area-inset-right));background:linear-gradient(145deg,#2E4A8C,#16244A)';
     b.addEventListener('click', function () { if (window.SavaTr) SavaTr.open(); });
-    document.body.appendChild(b);
-    // ⚙️ 설정 (🌐 왼쪽)
-    var g = b.cloneNode(false); g.className = 'sava-set notranslate'; g.textContent = '⚙️'; g.setAttribute('aria-label', '설정 · 글씨 크기');
-    g.style.right = 'calc(60px + env(safe-area-inset-right))';
-    g.addEventListener('click', function () { if (window.SavaSettings) SavaSettings.open(); });
-    document.body.appendChild(g);
+    document.body.appendChild(b); document.body.appendChild(g);
   }
   function addDock() {
     if (document.querySelector('.sava-dock')) return;

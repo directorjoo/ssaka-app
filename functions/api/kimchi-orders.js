@@ -19,6 +19,13 @@ export async function onRequest({request,env}){
  const admin=!!user&&String(user.id)===String(env.SAVA_ADMIN_UID||'');
  if(b.action==='create'){
   const k=await getKey(env);if(!k)return json({error:'setup'},503);
+  if(!b.agree)return json({error:'agree'},400);
+  // 장난 주문 막기: 같은 접속 주소에서 하루 10건까지
+  try{await env.DB.prepare('CREATE TABLE IF NOT EXISTS blog_use (k TEXT, day TEXT, n INTEGER, PRIMARY KEY (k, day))').run();
+   const ip=request.headers.get('cf-connecting-ip')||'x',h=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ko|'+ip)))].slice(0,10).map(x=>x.toString(16).padStart(2,'0')).join('');
+   const day=new Date(Date.now()+9*3600e3).toISOString().slice(0,10),kk='kimchi:'+h;
+   const r=await env.DB.prepare('SELECT n FROM blog_use WHERE k=? AND day=?').bind(kk,day).first();if(r&&r.n>=10)return json({error:'limit'},429);
+   await env.DB.prepare('INSERT INTO blog_use (k,day,n) VALUES (?,?,1) ON CONFLICT(k,day) DO UPDATE SET n=n+1').bind(kk,day).run();}catch(e){}
   const o=b.order||{},order={buyer:clean(o.buyer,40),phone:clean(o.phone,30),orderType:o.orderType==='선물 보내기'?'선물 보내기':'우리 집 받기',recipient:clean(o.recipient,40),recipientPhone:clean(o.recipientPhone,30),address:clean(o.address,300),giftMessage:clean(o.giftMessage,300),memo:clean(o.memo,300),payment:clean(o.payment,120),quantity:Math.max(1,Math.min(50,Number(o.quantity)||1))};
   order.amount=order.quantity*60000;
   if(!order.buyer||digits(order.phone).length<9||!order.address||(order.orderType==='선물 보내기'&&(!order.recipient||digits(order.recipientPhone).length<9)))return json({error:'required'},400);

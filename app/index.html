@@ -102,6 +102,7 @@
     .eo-hero .eo-btns a.play small { color: #7a5a10; }
     .eo-hero a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
     .si-pad { padding: 0 18px; }
+    .home-install-bottom{margin:18px 18px 28px;padding:14px;border:1px solid #f0d9dd;border-radius:20px;background:#fff8f9}.home-install-bottom .big{width:100%;min-height:54px;font-size:16px}
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 12px 16px 10px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
     .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
@@ -510,7 +511,6 @@
     var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
     wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
     v.appendChild(wr);
-    if (window.SsakaInstall && !SsakaInstall.standalone()) { var sp = el('div', 'si-pad'); SsakaInstall.chip(sp); v.appendChild(sp); }
     // 내가 만든 카드 — 3장만, 나머지는 "더 보기"
     var mine = S.mine();
     if (mine.length) {
@@ -534,6 +534,14 @@
       SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
     v.appendChild(st);
+    if (window.SsakaInstall && !SsakaInstall.standalone()) {
+      var installBottom = el("div", "home-install-bottom");
+      var installAction = el("button", "big red", "📲 싸바를 바탕화면에 저장");
+      installAction.type = "button";
+      installAction.addEventListener("click", function () { SsakaInstall.open(); });
+      installBottom.appendChild(installAction);
+      v.appendChild(installBottom);
+    }
   }
 
   // ---------- 받은 카드 ----------

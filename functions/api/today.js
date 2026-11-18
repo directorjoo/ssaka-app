@@ -2,6 +2,7 @@
 //   GET /api/today?k=news   : 오늘의 주요 뉴스 제목 + 자영업 대표님용 3줄 요약(AI, 1시간마다 새로)
 //   GET /api/today?k=google : 구글 인기 검색어 (한국)
 //   GET /api/today?k=gov    : 정부 지원금·혜택 새 소식 제목
+//   GET /api/today?k=world  : 세계 방송(BBC·NBC·NHK·알자지라) 뉴스 제목을 한국어로 (AI 번역, 1시간마다)
 //   GET /api/today?k=yt     : 유튜브 한국 인기 동영상(조회수 많은 순) — Cloudflare 환경변수 YOUTUBE_API_KEY 필요
 // 뉴스는 제목과 원문 링크만 보여 주고(본문 복사 없음), 요약은 제목들만 보고 씁니다.
 // 같은 결과를 Cloudflare 캐시에 30~60분 보관해서 방문자가 많아도 바깥 요청·AI 비용이 늘지 않게 합니다.
@@ -70,6 +71,30 @@ async function build(k, env) {
     ]);
     return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), list: a, senior: b };
   }
+  if (k === 'world') {
+    const SRC = [
+      ['BBC', 'https://feeds.bbci.co.uk/news/world/rss.xml'],
+      ['NBC', 'https://feeds.nbcnews.com/nbcnews/public/news'],
+      ['NHK', 'https://www3.nhk.or.jp/rss/news/cat0.xml'],
+      ['알자지라', 'https://www.aljazeera.com/xml/rss/all.xml']
+    ];
+    const got = await Promise.all(SRC.map(s => rss(s[1]).then(x => items(x).slice(0, 5).map(it => ({ src: s[0], o: tag(it, 'title').slice(0, 160), url: tag(it, 'link') })).filter(n => n.o && /^https?:\/\//.test(n.url))).catch(() => [])));
+    const all = [].concat.apply([], got);
+    if (!all.length) throw new Error('world');
+    const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
+    if (key) {
+      try {
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+          body: JSON.stringify({ model: env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 1500, system: '뉴스 제목을 자연스러운 한국어 뉴스 제목으로 옮긴다. 뜻을 더하거나 빼지 않는다. 사람·나라 이름은 한국 언론 표기대로. 답은 JSON 배열 하나만(입력 순서 그대로, 같은 개수): ["...","..."]', messages: [{ role: 'user', content: JSON.stringify(all.map(n => n.o)) }] })
+        });
+        if (r.ok) { const j = await r.json(), txt = ((j.content || []).find(c => c.type === 'text') || {}).text || ''; const arr = JSON.parse(txt.slice(txt.indexOf('['), txt.lastIndexOf(']') + 1)); if (Array.isArray(arr) && arr.length === all.length) all.forEach((n, i) => { n.t = String(arr[i] || '').replace(/\*/g, '').slice(0, 120); }); }
+      } catch (e) {}
+    }
+    all.forEach(n => { if (!n.t) n.t = n.o; });
+    return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), list: all };
+  }
   if (k === 'yt') {
     if (!env.YOUTUBE_API_KEY) return { k, need: 'key' };
     const r = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode=KR&hl=ko&maxResults=30&key=' + encodeURIComponent(env.YOUTUBE_API_KEY));
@@ -84,7 +109,7 @@ async function build(k, env) {
 
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  if (!/^(news|google|gov|yt|world)$/.test(k)) return json({ error: 'bad-k' }, 400);
   const ttl = k === 'google' ? 1800 : 3600, slot = Math.floor(Date.now() / (ttl * 1000));
   const ckey = new Request(u.origin + '/__today/' + k + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;

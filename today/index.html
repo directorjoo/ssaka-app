@@ -94,6 +94,7 @@
     { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' },
     { k: 'google', t: '구글 검색어', i: '🔥', c: '#E8710A' },
     { k: 'yt', t: '유튜브 인기', i: '▶️', c: '#e62117' },
+    { k: 'world', t: '세계 방송', i: '🌏', c: '#0b4ea2' },
     { k: 'naver', t: '네이버', i: '🟢', c: '#03C75A' },
     { k: 'health', t: '어르신 건강', i: '💊', c: '#12924a' },
     { k: 'gov', t: '정부 혜택', i: '🎁', c: '#7a3fb0' },
@@ -115,7 +116,7 @@
   function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
   function show(k) {
     cur = k; try { localStorage.setItem('sava-today', k); } catch (e) {} history.replaceState(null, '', '#' + k); paintBar();
-    ({ news: news, wx: wx, google: google, yt: yt, naver: naver, health: health, gov: gov, fx: fx })[k]();
+    ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, health: health, gov: gov, fx: fx })[k]();
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
   function nlist(arr, rank) {
@@ -162,6 +163,30 @@
       pane.innerHTML = '<h2>▶️ 유튜브 인기 동영상</h2><div class="src">' + esc(d.at) + ' 기준 · 한국 인기 동영상을 조회수 많은 순으로</div><ul class="nl rk">' +
         (d.list || []).map(function (v, i) { return '<li><a href="https://www.youtube.com/watch?v=' + encodeURIComponent(v.id) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em>' + (v.img ? '<img src="' + esc(v.img) + '" alt="" width="96" height="54" loading="lazy" style="flex:none;border-radius:8px;object-fit:cover">' : '') + '<span>' + esc(v.t) + '<small>' + esc(v.ch) + ' · 조회수 ' + views(v.views) + '회</small></span></a></li>'; }).join('') + '</ul>';
     }).catch(function () { if (cur === 'yt') msg('유튜브 인기 동영상을 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  // 🌏 세계 방송 — 각국 대표 채널 뉴스 제목을 한국어로 + 공식 생방송·오락 채널 바로가기
+  var WN = [
+    ['CNN', '미국', 'https://edition.cnn.com', '#cc0000'], ['BBC', '영국', 'https://www.bbc.com/news', '#bb1919'], ['NBC', '미국', 'https://www.nbcnews.com', '#0a5dc2'],
+    ['NHK', '일본', 'https://www3.nhk.or.jp/nhkworld/', '#333'], ['알자지라', '카타르', 'https://www.aljazeera.com', '#c98a00'], ['France 24', '프랑스', 'https://www.france24.com/en/', '#00a3e0'],
+    ['DW', '독일', 'https://www.dw.com/en/', '#05b2fc'], ['Sky News', '영국', 'https://news.sky.com', '#c4161c'], ['CGTN', '중국', 'https://www.cgtn.com', '#d81e05']
+  ];
+  var WE = [
+    ['KBS World', '한국 드라마·예능 (외국어 자막)', 'https://world.kbs.co.kr'], ['아리랑TV', '한국을 세계에 알리는 방송', 'https://www.arirang.com'],
+    ['삼성 TV 플러스', '무료 채널 수십 개 (영화·예능)', 'https://www.samsungtvplus.com'], ['유튜브 인기 음악', '지금 세계에서 뜨는 음악', 'https://music.youtube.com/charts']
+  ];
+  function world() {
+    var h = '<h2>🌏 세계 방송</h2><div class="src">각국 대표 채널 뉴스를 한국어로 · 누르면 원문 기사</div><div id="wnl"><div class="msg">세계 뉴스를 한국어로 옮기는 중이에요…</div></div>' +
+      '<div class="sec">📺 생방송·뉴스 바로가기</div><div class="grid2" style="grid-template-columns:repeat(3,1fr)">' +
+      WN.map(function (c) { return '<a class="lk" href="' + c[2] + '" target="_blank" rel="noopener" style="text-align:center;border-color:' + c[3] + '33"><b style="color:' + c[3] + '">' + c[0] + '</b><span>' + c[1] + '</span></a>'; }).join('') + '</div>' +
+      '<div class="sec">🎬 오락·문화</div><div class="grid2">' + WE.map(function (c) { return '<a class="lk" href="' + c[2] + '" target="_blank" rel="noopener"><b>' + c[0] + '</b><span>' + c[1] + '</span></a>'; }).join('') + '</div>' +
+      '<p class="note">바깥 방송 화면이 영어·일본어로 나오면, 브라우저의 ‘번역’ 단추(크롬 주소창 옆, 사파리 ‘가가’ 메뉴)를 누르면 한국어로 볼 수 있어요.</p>';
+    pane.innerHTML = h;
+    api('world').then(function (d) {
+      if (cur !== 'world') return;
+      var by = {}; (d.list || []).forEach(function (n) { (by[n.src] = by[n.src] || []).push(n); });
+      $('wnl').innerHTML = Object.keys(by).map(function (s) { return '<div class="sec">' + esc(s) + '</div>' + nlist(by[s]); }).join('') + '<div class="src" style="margin-top:8px">' + esc(d.at) + ' 기준 · 제목은 AI가 한국어로 옮겼어요</div>';
+    }).catch(function () { if (cur === 'world') $('wnl').innerHTML = ''; });
   }
 
   // 🟢 네이버

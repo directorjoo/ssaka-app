@@ -172,6 +172,37 @@
     .pg .g5 img { grid-row: span 2; border-radius: 12px; }
     .pg .g5 b { font-size: 16.5px; align-self: end; } .pg .g5 span { align-self: start; }
     .pg a:focus-visible { outline: 3px solid var(--ssaka, #B3132B); outline-offset: 2px; }
+    /* ===== 2026-11-18 화사하게 ===== */
+    html, body { background: #FFF6EF; }
+    .ehero { position: relative; overflow: hidden; margin: 0 -2px 16px; padding: 18px 18px 16px; border-radius: 26px; background: radial-gradient(circle at 88% 12%, rgba(255,255,255,.22) 0 46px, transparent 47px), linear-gradient(135deg, #D7193A 0%, #B3132B 55%, #8E0F22 100%); color: #fff; box-shadow: 0 16px 30px -18px rgba(142,15,34,.8); }
+    .ehero .brand { margin-bottom: 8px; padding-right: 96px; }
+    .ehero .logo { color: #fff; font-size: 40px; text-shadow: 0 3px 0 rgba(0,0,0,.15); }
+    .ehero .lead { margin: 0; color: #fff; font-size: 16px; line-height: 1.55; font-weight: 600; padding-right: 62px; word-break: keep-all; }
+    .ehero .lead b { display: block; width: fit-content; margin-top: 8px; padding: 5px 12px; border-radius: 14px; line-height: 1.4; background: rgba(255,255,255,.18); color: #FFE27A; font-weight: 800; font-size: 15px; }
+    .epin { position: absolute; right: 14px; bottom: 12px; width: 50px; height: 60px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.28)); }
+    .epin svg { display: block; transform-origin: 50% 100%; animation: epDance 1.2s ease-in-out infinite; }
+    .epin i { position: absolute; left: -14px; top: 6px; font-style: normal; font-weight: 900; color: #FFE27A; font-size: 18px; animation: epNote 2.2s ease-out infinite; }
+    @keyframes epDance { 0%,100% { transform: translateY(0) rotate(-10deg); } 25%,75% { transform: translateY(-7px) rotate(0) scale(1.04,.96); } 50% { transform: translateY(0) rotate(10deg); } }
+    @keyframes epNote { 0% { opacity: 0; transform: translate(0,6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-10px,-22px) rotate(15deg); } }
+    .modes { gap: 9px; }
+    .mode { position: relative; gap: 6px; padding: 14px 10px 12px; min-height: 132px; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 5px 0 var(--mc-d), 0 12px 20px -12px rgba(0,0,0,.35); transition: transform .12s, box-shadow .12s, background .12s; }
+    .mode[data-mode="ask"] { --mc: #B3132B; --mc-d: #F2C3CB; --mc-s: #FDEBEE; }
+    .mode[data-mode="come"] { --mc: #1D6FD1; --mc-d: #C6DBF6; --mc-s: #EAF2FD; }
+    .mode[data-mode="play"] { --mc: #E0A100; --mc-d: #F7E2A6; --mc-s: #FFF6D9; }
+    .mode i { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--mc-s); font-size: 25px; }
+    .mode b { font-size: 20px; color: var(--mc); }
+    .mode span { font-size: 14.5px; color: #5a4f4f; line-height: 1.35; }
+    .mode[aria-pressed="true"] { background: var(--mc); transform: translateY(-3px); box-shadow: 0 7px 0 color-mix(in srgb, var(--mc) 60%, #000), 0 16px 24px -12px rgba(0,0,0,.45); }
+    .mode[aria-pressed="true"] b, .mode[aria-pressed="true"] span { color: #fff; }
+    .mode[aria-pressed="true"] i { background: rgba(255,255,255,.95); }
+    .mode[aria-pressed="true"]::after { content: '✓'; position: absolute; top: 8px; right: 9px; width: 22px; height: 22px; border-radius: 50%; background: #fff; color: var(--mc); font-size: 14px; font-weight: 900; display: grid; place-items: center; }
+    .mode:active { transform: translateY(2px); }
+    .box { background: #fff; border-radius: 22px; box-shadow: 0 10px 24px -18px rgba(90,30,30,.45); border: 1px solid #F3E6DF; }
+    label.l { font-size: 15px; color: #4a3b3b; }
+    .note { font-size: 14.5px; }
+    .gtab { background: #FFF0E6; color: #8E0F22; font-size: 15px; }
+    .chip { font-size: 16px; background: #FFFBF8; border-color: #EAD9D0; }
+    @media (prefers-reduced-motion: reduce) { .epin svg, .epin i { animation: none; } }
   </style>
 <script src="/js/launch.js?v=2"></script>
 </head>
@@ -180,11 +211,14 @@
 
   <!-- ===== 보내는 화면 ===== -->
   <section id="maker">
+    <div class="ehero">
     <div class="brand">
       <div class="logo">어디야?</div>
       <button type="button" class="cancel" id="cancelTop" style="display:none">✕ 취소</button>
     </div>
-    <p class="lead">"어디야?" 묻고, "여기야!" 알려 주고, "친구야 놀자!" 불러 모으세요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <p class="lead">"어디야?" 묻고, "여기야!" 알려 주고, "친구야 놀자!" 불러 모으세요.<b>받는 사람은 앱 없이 카톡에서 바로 열어요</b></p>
+    <span class="epin" aria-hidden="true"><svg viewBox="0 0 60 72" width="50" height="60"><path d="M30 70C30 70 6 44 6 26a24 24 0 0 1 48 0c0 18-24 44-24 44z" fill="#FFE27A" stroke="#fff" stroke-width="3"/><circle cx="30" cy="26" r="15" fill="#fff"/><circle cx="24.5" cy="23.5" r="2.6" fill="#3a1d1d"/><circle cx="35.5" cy="23.5" r="2.6" fill="#3a1d1d"/><path d="M23.5 29.5q6.5 6 13 0" fill="none" stroke="#3a1d1d" stroke-width="2.6" stroke-linecap="round"/><circle cx="20" cy="30" r="2.6" fill="#FF8FA3"/><circle cx="40" cy="30" r="2.6" fill="#FF8FA3"/></svg><i>♪</i></span>
+    </div>
 
     <div class="modes" role="group" aria-label="무엇을 보낼까요">
       <button type="button" class="mode" data-mode="ask" aria-pressed="true"><i>💬</i><b>싸바?</b><span>안부 묻고 답장 받아요</span></button>

@@ -51,6 +51,8 @@ export async function currentUser(request, db) {
 }
 function pub(u) { return u ? { id: u.id, nick: u.alias || u.nick || '싸바 친구', kakaoNick: u.nick || '', agreed: !!u.agreed_at, marketing: !!u.marketing, phone: !!u.phone } : null; }
 
+// 카카오 REST API 키는 로그인 주소에 그대로 드러나는 공개값이라 코드에 둠 (Cloudflare 변수 KAKAO_REST_KEY 가 있으면 그것을 씀)
+const KAKAO_REST_DEFAULT = '8465121e9de2649dac7f2ecb7360f4d2';
 export async function onRequest({ request, env, params }) {
   const db = env.DB;
   if (!db) return json({ error: 'no-db' }, 503);
@@ -62,10 +64,10 @@ export async function onRequest({ request, env, params }) {
 
   // 1) 카카오 로그인 시작
   if (path === 'kakao' && request.method === 'GET') {
-    if (!env.KAKAO_REST_KEY) return redirect('/join/?err=setup');
+    if (!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT)) return redirect('/join/?err=setup');
     if (!isOpen(env)) return redirect('/join/?err=soon');
     const st = rand(16), next = safeNext(url.searchParams.get('next'));
-    const q = new URLSearchParams({ response_type: 'code', client_id: env.KAKAO_REST_KEY, redirect_uri: redirectUri, state: st });
+    const q = new URLSearchParams({ response_type: 'code', client_id: (env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT), redirect_uri: redirectUri, state: st });
     if (url.searchParams.get('scope')) q.set('scope', clean(url.searchParams.get('scope'), 80)); // 비즈 앱 뒤 추가 동의(phone_number)
     return redirect('https://kauth.kakao.com/oauth/authorize?' + q, [setCookie('sava_st', st + '|' + next, 600)]);
   }
@@ -76,7 +78,7 @@ export async function onRequest({ request, env, params }) {
     const clear = setCookie('sava_st', '', 0);
     if (url.searchParams.get('error')) return redirect('/join/?err=cancel', [clear]);
     if (!st || st !== url.searchParams.get('state')) return redirect('/join/?err=state', [clear]);
-    const body = new URLSearchParams({ grant_type: 'authorization_code', client_id: env.KAKAO_REST_KEY, redirect_uri: redirectUri, code: url.searchParams.get('code') || '' });
+    const body = new URLSearchParams({ grant_type: 'authorization_code', client_id: (env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT), redirect_uri: redirectUri, code: url.searchParams.get('code') || '' });
     if (env.KAKAO_CLIENT_SECRET) body.set('client_secret', env.KAKAO_CLIENT_SECRET);
     const tr = await fetch('https://kauth.kakao.com/oauth/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded;charset=utf-8' }, body });
     if (!tr.ok) return redirect('/join/?err=token', [clear]);
@@ -101,7 +103,7 @@ export async function onRequest({ request, env, params }) {
   }
 
   // 3) 내 정보
-  if (path === 'me') return json({ user: pub(await currentUser(request, db)), ready: !!env.KAKAO_REST_KEY && isOpen(env), soon: !isOpen(env) });
+  if (path === 'me') return json({ user: pub(await currentUser(request, db)), ready: !!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT) && isOpen(env), soon: !isOpen(env) });
 
   // 4) 가입 동의 (만 14세 이상 · 개인정보 필수 · 마케팅 선택)
   if (path === 'agree' && request.method === 'POST') {

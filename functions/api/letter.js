@@ -37,7 +37,7 @@ async function weather(c) {
 function dkey(k) { k = String(k || '').trim(); return /%[0-9A-Fa-f]{2}/.test(k) ? k : encodeURIComponent(k); }
 function dataKey(env) { return env.DATA_API_KEY || env.TOUR_API_KEY || ''; }
 function plusDays(d, n) { return ymd(new Date(d.getTime() + n * 864e5)).replace(/-/g, ''); }
-// 🎪 한국관광공사 TourAPI 4.0 (KorService2) — 오늘~7일 안에 열리는 행사·축제
+// 🎪 한국관광공사 TourAPI 4.0 (KorService2) — 2주 안에 열리는 전국 축제·행사
 async function festivals(env, c, diag) {
   if (!dataKey(env)) { if (diag) diag.tour = '키 없음(DATA_API_KEY)'; return []; }
   const today = ymd(kst()).replace(/-/g, ''), until = plusDays(kst(), 14);
@@ -50,19 +50,18 @@ async function festivals(env, c, diag) {
     let it = (((j.response || {}).body || {}).items || {}).item || []; return Array.isArray(it) ? it : [it];
   }
   try {
-    // 두 달 전부터 시작한 행사까지 받아서, 지금 열리고 있거나 2주 안에 시작하는 것만 고름 — 전국 행사 + 우리 지역 행사
-    const [all, loc] = await Promise.all([call(''), call('&lDongRegnCd=' + c[3]).catch(() => [])]);
+    // 두 달 전부터 시작한 행사까지 받아서, 지금 열리고 있거나 2주 안에 시작하는 전국 축제·행사만 고름
+    const all = await call('');
     const len = x => (Date.parse(x.eventenddate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')) - Date.parse(x.eventstartdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))) / 864e5;
     const ok = x => x.eventstartdate <= until && x.eventenddate >= today;
     // 1년 내내 하는 상설 행사(두 달 넘게)는 빼고, 끝나는 날이 가까운 축제부터
     const pick = (arr, n) => arr.filter(x => ok(x) && len(x) <= 60).sort((x, y) => (x.eventenddate > y.eventenddate ? 1 : -1)).slice(0, n);
-    const seen = {}, merged = pick(loc, 3).map(x => (x.local = 1, x)).concat(pick(all, 10)).filter(x => !seen[x.contentid] && (seen[x.contentid] = 1)).slice(0, 8);
-    const out = merged.map(x => ({ t: x.title, at: x.eventstartdate.slice(4, 6) + '/' + x.eventstartdate.slice(6) + '~' + x.eventenddate.slice(4, 6) + '/' + x.eventenddate.slice(6), addr: (x.addr1 || '').slice(0, 40), local: !!x.local, url: x.contentid ? 'https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=' + x.contentid : '' }));
-    if (diag) diag.tour = '연결됨 · ' + out.length + '건(우리 지역 ' + out.filter(x => x.local).length + ')';
+    const out = pick(all, 8).map(x => ({ t: x.title, at: x.eventstartdate.slice(4, 6) + '/' + x.eventstartdate.slice(6) + '~' + x.eventenddate.slice(4, 6) + '/' + x.eventenddate.slice(6), addr: (x.addr1 || '').slice(0, 40), url: x.contentid ? 'https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=' + x.contentid : '' }));
+    if (diag) diag.tour = '연결됨 · 전국 ' + out.length + '건';
     return out;
   } catch (e) { if (diag) diag.tour = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
-// 📋 기업마당 지원사업 공고 — 소상공인 공고 중 아직 마감 안 된 것, 우리 지역 공고 먼저, 마감 가까운 순
+// 📋 기업마당 지원사업 공고 — 전국 소상공인 공고 중 아직 마감 안 된 것, 마감 가까운 순
 async function programs(env, c, diag) {
   if (!env.BIZINFO_API_KEY && !dataKey(env)) { if (diag) diag.bizinfo = '키 없음(DATA_API_KEY)'; return []; }
   try {
@@ -83,18 +82,18 @@ async function programs(env, c, diag) {
     if (!Array.isArray(list)) throw new Error(String(j.reqErr || j.message || '응답에 목록 없음').slice(0, 60));
     const today = ymd(kst()).replace(/-/g, ''), region = c[4];
     const REG = { 서울: '서울', 부산: '부산', 대구: '대구', 인천: '인천', 광주: '광주', 대전: '대전', 울산: '울산', 세종: '세종', 경기: '경기', 강원: '강원', 충북: '충청북도|충북', 충남: '충청남도|충남', 전북: '전북|전라북도', 전남: '전남|전라남도', 경북: '경상북도|경북', 경남: '경상남도|경남', 제주: '제주' };
-    const mine = new RegExp(REG[region] || region), others = new RegExp(Object.keys(REG).filter(k => k !== region).map(k => REG[k]).join('|'));
+    const anyReg = new RegExp(Object.keys(REG).map(k => REG[k]).join('|'));
     const rows = list.map(x => {
       const when = String(x.reqstBeginEndDe || ''), ds = when.replace(/[^0-9~]/g, '').split('~'), end = (ds[1] || '').slice(0, 8);
       const org = String(x.jrsdInsttNm || '') + ' ' + String(x.excInsttNm || ''), nm = String(x.pblancNm || x.title || ''), head = nm.replace(/^\s*[\[(]?\s*\d{4}년?도?\s*[\])]?\s*/, '').slice(0, 12);
-      const local = mine.test(org) || mine.test(head), elsewhere = !local && (others.test(org.replace(/중소벤처기업부|소상공인시장진흥공단|중소기업|창업진흥원|기술보증|신용보증/g, '')) || /^\s*\[?(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|충청|전라|경상)/.test(head));
-      return { t: nm.slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), local, elsewhere, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
-    }).filter(x => x.t && !x.elsewhere && (!/^\d{8}$/.test(x.end) || x.end >= today));
+      // 전국 공고만: 지자체가 낸 공고나 제목이 특정 지역으로 시작하는 공고는 뺌
+      const regional = anyReg.test(org.replace(/중소벤처기업부|소상공인시장진흥공단|중소기업|창업진흥원|기술보증|신용보증|정보통신산업진흥원|한국/g, '')) || /^\s*\[?(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|충청|전라|경상)/.test(head) || /특별자치|광역시|특별시|[가-힣](시|군|구)청?(\s|$)/.test(org.trim());
+      return { t: nm.slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), regional, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
+    }).filter(x => x.t && !x.regional && (!/^\d{8}$/.test(x.end) || x.end >= today));
     const dk = x => /^\d{8}$/.test(x.end) ? x.end : '9';
     rows.sort((x, y) => (dk(x) > dk(y) ? 1 : dk(x) < dk(y) ? -1 : 0));
-    // 전국 공고가 기본, 우리 지역 공고는 최대 3개만 섞음 (다른 지역 전용 공고는 이미 뺐음)
-    const out = rows.filter(x => !x.local).slice(0, 7).concat(rows.filter(x => x.local).slice(0, 3)).sort((x, y) => (dk(x) > dk(y) ? 1 : -1));
-    if (diag) diag.bizinfo = '연결됨 · 진행 중 ' + rows.length + '건(우리 지역 ' + rows.filter(x => x.local).length + ')';
+    const out = rows.slice(0, 10);
+    if (diag) diag.bizinfo = '연결됨 · 전국 진행 중 ' + rows.length + '건';
     return out;
   } catch (e) { if (diag) diag.bizinfo = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
@@ -102,7 +101,7 @@ async function programs(env, c, diag) {
 const COMMON = '규칙: 받으면 오늘 바로 써먹을 수 있는 실용 정보만 쓴다. 명언·고사성어·좋은 글귀·교훈은 절대 넣지 않는다. 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 주어진 자료(날씨·뉴스 제목·공고)에 없는 숫자·날짜·사실은 지어내지 않는다(일반 상식 수준의 건강·장사 요령은 괜찮다). 존댓말, 쉬운 말, 한 항목 2문장 이내, 문장마다 짧게. 별표(*)와 마크다운 금지. 자료의 url을 쓸 때는 받은 그대로 쓴다.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄(날씨를 넣어서, 예: 싸바? 광주는 오늘 영하 2도예요)","items":[{"icon":"이모지 1개","title":"12자 안팎 제목","body":"내용","url":"있으면 원문 주소, 없으면 빈 문자열"}]}';
 const RULES = {
   senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. 항목 5개: 1) 오늘 날씨에 맞춘 몸 관리(기온·미세먼지·비에 맞게) 2) 요즘 조심할 병이나 유행(뉴스 제목 근거, 없으면 계절 질환) 3) 공짜로 받는 것(무료 접종·검진·보건소·어르신 혜택 — 뉴스 제목 근거, 원문 url 함께) 4) 오늘 밥상 한 가지(제철 재료로 쉽게) 5) 조심할 사기 수법(뉴스 근거, 없으면 흔한 유형 한 가지). ' + COMMON,
-  boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. 항목 5~6개: 1) 오늘 날씨로 팔 것(기온·비·미세먼지에 따라 손님이 찾는 것과 가게 앞 문구 예시) 2) 사람이 몰리는 곳·날(전국 축제·행사 자료가 있으면 그것 — 우리 지역 것이 있으면 먼저, 없으면 요일·계절 흐름) 3) 놓치면 손해(전국 지원사업 공고·정책자금·세금 신고 기한 — 마감 가까운 것, 자료 근거, url 함께) 4) 장사에 닿는 뉴스 한 줄(카드 수수료·배달앱·최저임금 등, url 함께) 5) 요즘 뜨는 것(인기 검색어에서 장사에 쓸 만한 것) 6) 오늘 할 홍보 하나(단골에게 보낼 한 줄 문구 예시, 마지막에 "싸바카드로 1분이면 만들어요"). ' + COMMON,
+  boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. 항목 5~6개: 1) 오늘 날씨로 팔 것(기온·비·미세먼지에 따라 손님이 찾는 것과 가게 앞 문구 예시) 2) 사람이 몰리는 곳·날(전국 축제·행사 자료가 있으면 그것, 없으면 요일·계절 흐름) 3) 놓치면 손해(전국 지원사업 공고·정책자금·세금 신고 기한 — 마감 가까운 것, 자료 근거, url 함께) 4) 장사에 닿는 뉴스 한 줄(카드 수수료·배달앱·최저임금 등, url 함께) 5) 요즘 뜨는 것(인기 검색어에서 장사에 쓸 만한 것) 6) 오늘 할 홍보 하나(단골에게 보낼 한 줄 문구 예시, 마지막에 "싸바카드로 1분이면 만들어요"). ' + COMMON,
   actor: '너는 배우들에게 매일 아침 오디션 소식을 정리해 주는 캐스팅 매니저다. 영화·드라마·웹드라마·연극·뮤지컬·광고·뮤직비디오를 가리지 않고 모두 다룬다. 주어진 오디션·모집 뉴스 제목 가운데 실제 모집 공고로 보이는 것만 골라 항목으로 만든다(최대 8개). icon은 분야 표시: 영화🎬 드라마📺 연극🎭 뮤지컬🎤 광고·뮤비📢 기타🎟️. title은 작품·제작사 이름, body는 배역·조건·마감(제목에 있는 것만)과 "자세한 지원 방법은 원문에서". 마감이 가까워 보이는 것을 앞에. 공고가 하나도 없으면 items에 오디션 준비 실전 요령 1개만(프로필 사진·자기소개 영상 등). ' + COMMON
 };
 
@@ -115,7 +114,7 @@ async function build(k, city, env) {
   } else if (k === 'boss') {
     const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 8), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
     const p2 = p.length ? p : await news('소상공인 지원사업 신청 마감 when:7d', 5);
-    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[2주 안 전국 축제·행사 (우리 지역=' + city + ')]\n' + (f.length ? f.map(x => '- ' + (x.local ? '[우리 지역] ' : '') + x.t + ' ' + x.at + ' ' + x.addr + (x.url ? ' (' + x.url + ')' : '')).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + (x.local ? '[우리 지역] ' : '') + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' (' + x.url + ')').join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
+    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[2주 안 전국 축제·행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + (x.url ? ' (' + x.url + ')' : '')).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' (' + x.url + ')').join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
   } else {
     const [a, b, m] = await Promise.all([news('오디션 모집 배우 when:7d', 10), news('배우 모집 OR 캐스팅 공고 OR 공개 오디션 when:10d', 8), news('뮤지컬 OR 연극 오디션 when:14d', 6)]);
     const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));

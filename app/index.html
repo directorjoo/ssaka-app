@@ -232,6 +232,10 @@
       .tr-btn { width: 38px; height: 38px; margin-right: 6px; border: 0; border-radius: 50%; background: #f2eee8; font-size: 19px; cursor: pointer; }
     .kk-btn { height: 38px; padding: 0 12px; margin-right: 6px; border: 0; border-radius: 999px; background: #FEE500; color: #3A1D1D; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
     .top-act { display: flex; align-items: center; }
+    .top-act { display: flex; align-items: center; gap: 8px; }
+    .upd-btn { height: 40px; padding: 0 14px; border: 1.5px solid #e5ddd5; border-radius: 999px; background: #fff; color: #3B4250; font-weight: 800; font-size: 15px; line-height: 1; font-family: inherit; cursor: pointer; white-space: nowrap; }
+    .upd-btn.new { background: #B3132B; color: #fff; border-color: #B3132B; animation: updPulse 1.6s ease-in-out infinite; }
+    @keyframes updPulse { 50% { transform: scale(1.06); } }
 </style>
 <script src="/js/launch.js?v=2"></script>
 </head>
@@ -244,6 +248,7 @@
         <h1>홈</h1>
       </div>
       <div class="top-act">
+        <button type="button" class="upd-btn" id="updBtn" aria-label="최신 버전으로 업데이트">🔄 업데이트</button>
         <button type="button" class="tr-btn notranslate" translate="no" onclick="window.SavaTr && SavaTr.open()" aria-label="Language 언어">🌐</button>
       </div>
     </div>
@@ -693,6 +698,20 @@
   var current = (location.hash || '').slice(1);
   if (!TITLES[current]) current = 'home';
   renderAll();
+
+  // 🔄 업데이트 (홈 위쪽 늘 보이게, 새 버전이 있으면 빨갛게 '새 버전!')
+  (function () {
+    var b = document.getElementById('updBtn'); if (!b) return;
+    b.addEventListener('click', function () { toast('최신 버전을 불러와요…'); if (window.SsakaInstall) SsakaInstall.update(); else location.reload(); });
+    function check() {
+      fetch('/version.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+        var cur = window.SsakaInstall && SsakaInstall.version;
+        var isNew = j && j.v && cur && j.v !== cur;
+        b.classList.toggle('new', !!isNew); b.textContent = isNew ? '🔄 새 버전!' : '🔄 업데이트';
+      }).catch(function () {});
+    }
+    check(); document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+  })();
   // 로그인했으면: 다른 폰에서 만든 내 카드도 목록에 가져오기
   fetch('/api/card?mine=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
     if (j && j.items && S.mergeMine && S.mergeMine(j.items) && (current === 'home' || current === 'alim')) renderAll();

@@ -132,9 +132,11 @@
       mapUrls: function (p) {
         return {
           kakao: kakaoMapUrl(p),
-          naver: naverMapUrl(p),
+          // 폰은 네이버지도 앱, 노트북·맥북은 바로 네이버지도 웹
+          naver: /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? naverMapUrl(p) : naverWebUrl(p),
           google: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.lat && p.lng ? p.lat + ',' + p.lng : (p.name || '')),
           onNaver: function () {
+            if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
             // 네이버지도 앱이 없으면 1.5초 뒤 웹으로
             var t = setTimeout(function () { location.href = naverWebUrl(p); }, 1500);
             window.addEventListener('pagehide', function () { clearTimeout(t); }, { once: true });

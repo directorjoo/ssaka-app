@@ -212,7 +212,6 @@
 
     var acts = el('nav', 'sk-actions');
     acts.setAttribute('aria-label', '바로가기');
-    var mapc = null;
     (card.buttons || ['call', 'map', 'save', 'copy']).forEach(function (b) {
       if (b === 'call' && c.phone) acts.appendChild(action('call', '바로 통화', c.callLabel || null, live && ctx.tel(c.phone), null, live));
       if (b === 'reserve' && card.reserve) {
@@ -222,15 +221,9 @@
       }
       if (b === 'rsvp' && c.phone) acts.appendChild(action('rsvp', '참석·불참', '카톡·문자로 답장', null, live && ctx.onRsvp, live));
       if (b === 'map' && card.place && card.place.name) {
-        if (live) {
-          var u = ctx.mapUrls(card.place);
-          mapc = el('div', 'sk-mapc');
-          var k = el('a', 'sk-mapbtn', '카카오맵'); k.href = u.kakao;
-          var n = el('a', 'sk-mapbtn', '네이버지도'); n.href = u.naver; on(n, u.onNaver);
-          var gg = el('a', 'sk-mapbtn', '구글지도'); gg.href = u.google; gg.target = '_blank'; gg.rel = 'noopener';
-          mapc.appendChild(k); mapc.appendChild(n); mapc.appendChild(gg);
-        }
-        acts.appendChild(action('map', '길찾기', card.place.name, null, function () { mapc.classList.toggle('open'); }, live));
+        // 길찾기 = 바로 네이버지도 (앱 있으면 앱, 없으면 1.5초 뒤 웹)
+        var u = live ? ctx.mapUrls(card.place) : null;
+        acts.appendChild(action('map', '길찾기', card.place.name, u && u.naver, u && u.onNaver, live));
       }
       if (b === 'save' && c.name && (c.phone || c.email)) {
         var s = action('save', '연락처 저장', null, null, live && ctx.onSave, live);
@@ -244,7 +237,6 @@
     if (nAct >= 2 && nAct <= 5) { acts.classList.add('sk-row'); acts.style.setProperty('--n', nAct); }
     else if (nAct % 2 === 1) acts.lastChild.classList.add('sk-wide');
     if (acts.children.length) wrap.appendChild(acts);
-    if (mapc) wrap.appendChild(mapc);
     // 복사 칸: 단추 동그라미 대신 내용이 다 보이는 큰 칸 (계좌번호·이름을 눈으로 보고 누르면 복사)
     if ((card.buttons || []).indexOf('copy') >= 0 && card.copy && card.copy.value) {
       var cbx = el(live ? 'button' : 'div', 'sk-copybox');

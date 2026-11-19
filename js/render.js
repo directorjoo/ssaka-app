@@ -87,7 +87,13 @@
     // 만들기 화면 미리보기에서 대표 사진이 아직 없으면: 결과와 똑같은 정사각형 자리를 보여 줌 (실제 카드에는 안 나옴)
     var phHold = !card.image && !card.sos && (!ctx || ctx.preview);
     var photo = el('div', 'sk-photo' + (card.image || phHold ? '' : ' sk-nophoto') + (phHold ? ' sk-phhold' : ''));
-    if (phHold) photo.appendChild(el('span', 'sk-phhold-t', '📷 대표 사진 자리\n정사각형(1:1)으로 들어가요'));
+    // 사진이 아직 없을 때: 줄무늬 경고판 대신 그 디자인 색으로 꾸민 그림 자리(용도 그림 + 작은 안내)
+    if (phHold) {
+      var indE = '';
+      try { var SD = (typeof window !== 'undefined' && window.SsakaDesigns) || null; var ii = SD && design && SD.industry(design.industry); indE = (ii && ii.emoji) || ''; } catch (e) {}
+      photo.appendChild(el('span', 'sk-phhold-e', indE || '📷'));
+      photo.appendChild(el('span', 'sk-phhold-t', '📷 사진을 넣으면 여기에'));
+    }
     if (card.image && !card.sos) {
       var img = el('img');
       img.src = card.image; img.alt = card.title || ''; img.decoding = 'async';

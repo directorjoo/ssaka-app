@@ -11,8 +11,8 @@
   <link rel="icon" href="../img/favicon.png?v=3">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=3">
   <link rel="stylesheet" href="../css/brand.css">
-  <link rel="stylesheet" href="../css/sk.css?v=90">
-  <link rel="stylesheet" href="../css/sk-world.css?v=5">
+  <link rel="stylesheet" href="../css/sk.css?v=91">
+  <link rel="stylesheet" href="../css/sk-world.css?v=6">
   <meta property="og:title" content="10초 만에 싸바 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
@@ -86,7 +86,7 @@
     }
     .tcard[aria-pressed="true"] { outline: 3px solid #B3132B; outline-offset: 2px; }
     .tcard:focus-visible { outline: 3px solid #2f6bff; outline-offset: 2px; }
-    .tcard .tscale { position: absolute; left: 0; top: 0; width: 390px; transform: scale(0.3026); transform-origin: 0 0; }
+    .tcard .tscale { position: absolute; left: 0; top: 0; width: 390px; transform: scale(var(--gs, 0.3026)); transform-origin: 0 0; }
     /* 올릴 곳을 인스타·스토리·정사각으로 고르면 디자인 미리보기도 그 모양으로 */
     .tcard.r-feed { height: 148px; } .tcard.r-sq { height: 118px; } .tcard.r-story { height: 210px; }
     .tcard .tsns { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: #fff; }
@@ -126,9 +126,9 @@
     .ind-gh { margin: 6px 2px 4px; font-size: 13.5px; font-weight: 800; color: var(--muted); }
     .ind-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 4px; margin-bottom: 8px; }
     .inds.circ .ind-grid button { display: grid; justify-items: center; gap: 6px; padding: 4px 0; border: 0; border-radius: 0; background: none; color: var(--text); font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.25; white-space: normal; word-break: keep-all; text-align: center; cursor: pointer; }
-    .inds.circ .ind-grid button i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 27px; background: var(--tint, #F2F2F4); box-shadow: inset 0 0 0 2px transparent; }
+    .inds.circ .ind-grid button i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: #fff; box-shadow: 0 0 0 1.5px #E4E4E7, 0 2px 6px rgba(0,0,0,.06); }
     .inds.circ .ind-grid button[aria-pressed="true"] { background: none; color: #B3132B; font-weight: 900; }
-    .inds.circ .ind-grid button[aria-pressed="true"] i { box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px #B3132B; }
+    .inds.circ .ind-grid button[aria-pressed="true"] i { background: #FFF1F2; box-shadow: 0 0 0 3px #B3132B, 0 4px 12px rgba(179,19,43,.25); }
     .inds.circ .ind-grid button:focus-visible { outline: 3px solid #B3132B; outline-offset: 2px; border-radius: 12px; }
     .gallery { display: grid; grid-auto-flow: column; grid-auto-columns: 118px; gap: 12px; overflow-x: auto; padding: 6px 6px 14px; margin-bottom: 12px; scrollbar-width: none; }
     .gallery::-webkit-scrollbar { display: none; }
@@ -137,6 +137,12 @@
     .dcols button i { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
     .dcols button[aria-pressed="true"] { border-color: #B3132B; box-shadow: 0 0 0 2px #B3132B inset; }
     @media (min-width: 860px) { .inds { flex-wrap: wrap; overflow: visible; } }
+    /* 휴대폰: 디자인 12가지를 옆으로 밀지 않고 3칸 격자로 한눈에 */
+    @media (max-width: 859px) {
+      .gallery { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-columns: auto; gap: 10px 8px; overflow: visible; padding: 4px 2px 12px; }
+      .gallery .tcard { width: auto; height: auto; aspect-ratio: 118 / 210; }
+      .gallery .tcard.r-feed { aspect-ratio: 4 / 5; } .gallery .tcard.r-sq { aspect-ratio: 1 / 1; } .gallery .tcard.r-story { aspect-ratio: 9 / 16; }
+    }
     @media (min-width: 860px) { .gallery { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, 118px); grid-auto-columns: auto; overflow: visible; } }
 
     fieldset { border: 0; margin: 0 0 14px; padding: 16px; background: var(--surface); border-radius: var(--radius); }
@@ -323,6 +329,8 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .mwrite { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; min-height: 44px; padding: 0 14px; border-radius: 999px; background: #E7EFFB; color: #1B3F7A; font-size: 14.5px; text-decoration: none; font-weight: 700; }
   .mwrite b { font-weight: 900; }
+  #mWrite { margin: 12px 0 0; background: none; color: #555; padding: 0 4px; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+  .mk-s2 #mWrite, .mk-s3 #mWrite { display: none; }
   #tidyBox:not([hidden]) { display: flex; }
   /* 만들기 탭 — 한 화면에 한 단계씩 (숨긴 칸도 값은 그대로 카드에 들어감) */
   .mtabs { position: sticky; top: calc(62px + env(safe-area-inset-top)); z-index: 30; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0 -16px 12px; padding: 8px 10px 8px; background: rgba(244,244,245,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
@@ -343,6 +351,11 @@
   .sec-h b { font-size: 17px; font-weight: 900; line-height: 1.35; color: #1a1a1a; word-break: keep-all; }
   .sec-h small { font-size: 14.5px; font-weight: 600; line-height: 1.45; color: #555; word-break: keep-all; }
   .sec-h small:empty { display: none; }
+  header p { word-break: keep-all; }
+  .tp[data-tab="design"] .dests button { grid-template-columns: 28px 1fr; padding: 8px; }
+  .tp[data-tab="design"] .dests button b { font-size: 14.5px; white-space: nowrap; letter-spacing: -.03em; }
+  .tp[data-tab="design"] { padding: 14px 10px; border-radius: 18px; background: #fff; border: 1.5px solid #E4E4E7; }
+  .tp[data-tab="design"] .step { font-size: 17px; font-weight: 900; color: #8E0A1C; }
   .tp[data-tab="design2"] { margin-top: 26px; padding: 14px; border-radius: 18px; background: #FFF6F7; border: 2px dashed #E7A3AE; }
   .tp[data-tab="design2"] .step { font-size: 17px; font-weight: 900; color: #8E0A1C; }
   .pv-up { margin: 0 0 10px; padding: 12px 14px; border-radius: 14px; background: #FFF6D9; border: 1.5px solid #F2C94C; font-size: 15px; line-height: 1.5; color: #4a3a00; word-break: keep-all; }
@@ -418,15 +431,14 @@
       </a>
     </div>
     <h1>10초 만에 카드 만들기</h1>
-    <p>① 용도를 고르면 ② 거기에 맞는 디자인이 나오고 ③ 그 카드에 필요한 질문만 나와요. 다 쓰면 다른 디자인·색과 비교해 보고 최종 결정해요.</p>
-    <a class="mwrite" href="../survey/">✍️ <b>블로그 글쓰기</b> · 질문에 답하면 글 10가지 ›</a>
+    <p>① 용도 고르기 → ② 디자인 고르기 → ③ 쭉 쓰고 완성!</p>
   </header>
 
   <div class="layout">
     <form id="form" autocomplete="off" onsubmit="return false">
       <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>칸마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
       <div class="tp" data-tab="design">
-      <div class="step">1. 어떤 용도의 카드예요?</div>
+      <div class="step" id="d1step">1. 용도 고르기 <span>어디에 올리고, 무엇을 알릴지</span></div>
       <button type="button" id="resumeBtn" hidden></button>
       <div class="use-h">어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></div>
       <div class="dests" id="dests" role="group" aria-label="올릴 곳"></div>
@@ -435,6 +447,7 @@
       <div class="use-go" id="useGo">👆 고르면 거기에 맞는 디자인이 바로 아래에 나와요</div>
       <div class="hlinks" id="hLinks" hidden></div>
       </div>
+      <a class="mwrite" id="mWrite" href="../survey/">✍️ 카드 말고 <b>블로그 글</b>이 필요하세요? ›</a>
       <div id="d2home">
       <div class="tp" data-tab="design2">
       <div class="step" id="d2step">2. 디자인 고르기 <span id="designInfo"></span></div>
@@ -725,7 +738,7 @@
     <section class="preview" aria-label="미리보기">
       <h2>미리보기 <small id="pvSmall" style="font-weight:600;font-size:12px;opacity:.7">· 글자를 누르면 바로 고쳐요</small></h2>
       <div class="pvdest" id="pvDest" hidden></div>
-      <div class="pv-up">👆 <b><span id="pvUpName">가게 정보</span>·사진·동영상 넣는 칸은 이 미리보기 위에 있어요.</b> 화면을 위로 올려 차례로 입력하세요. 디자인은 맨 아래에서 골라요.<button type="button" id="pvUpGo">✏️ 입력하러 가기</button></div>
+      <div class="pv-up">👆 <b><span id="pvUpName">가게 정보</span>·사진·동영상 넣는 칸은 이 미리보기 위에 있어요.</b> 화면을 위로 올려 차례로 입력하세요. 다 쓰고 ✅ 완성을 누르면 다른 디자인과 비교해 볼 수 있어요.<button type="button" id="pvUpGo">✏️ 입력하러 가기</button></div>
       <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
       <div class="snspv" id="snsPv" hidden><img id="snsPvImg" alt="올릴 사진 미리보기"><span class="snsld" id="snsPvLd"></span></div>
       <div class="done">
@@ -866,9 +879,9 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=87"></script>
+<script src="../js/designs.js?v=88"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=82"></script>
+<script src="../js/render.js?v=83"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -955,7 +968,7 @@
         var b = document.createElement('button');
         b.type = 'button'; b.dataset.ind = ind.id;
         var i = document.createElement('i'); i.setAttribute('aria-hidden', 'true'); i.textContent = ind.emoji;
-        if (IND_TINT[ind.id]) i.style.setProperty('--tint', IND_TINT[ind.id]);
+        /* 한 화면 2~3색 원칙: 동그라미는 모두 같은 바탕, 고른 것만 체리 */
         b.appendChild(i); b.appendChild(document.createTextNode(ind.label));
         b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
         b.addEventListener('click', function () { setIndustry(ind.id, true); afterUse(); });
@@ -1195,7 +1208,16 @@
     $('designInfo').textContent = designInfoText(design);
     paintCols();
     makePhotoSug();
+    fitGal();
   }
+  // 디자인 고르기: 옆으로 밀지 않고 한 화면에 3칸씩 — 칸 너비에 맞춰 카드 그림 크기를 맞춤
+  function fitGal() {
+    document.querySelectorAll('.gallery').forEach(function (g) {
+      var c = g.querySelector('.tcard'); if (c && c.clientWidth) g.style.setProperty('--gs', (c.clientWidth / 390).toFixed(4));
+    });
+  }
+  window.addEventListener('resize', fitGal);
+  if (window.ResizeObserver) try { new ResizeObserver(fitGal).observe($('gallery')); } catch (e) {}
   function setDesign(id) {
     design = id;
     document.querySelectorAll('.tcard').forEach(function (t) {
@@ -2674,7 +2696,7 @@
     { id: 'kakao', i: '💬', b: '카톡으로 보내기', s: '누르면 열리는 카드' },
     { id: 'feed', i: '📷', b: '인스타 피드', s: '세로 4:5' },
     { id: 'story', i: '📱', b: '스토리·릴스', s: '세로 9:16' },
-    { id: 'square', i: '🟩', b: '네이버·당근', s: '정사각 1:1' }
+    { id: 'square', i: '🖼️', b: '네이버·당근', s: '정사각 1:1' }
   ];
   var DEST_BY = {}; DESTS.forEach(function (d) { DEST_BY[d.id] = d; });
   var dest = 'kakao';
@@ -2711,12 +2733,14 @@
     stage = n;
     document.body.classList.toggle('mk-s1', n === 1);
     document.body.classList.toggle('mk-s2', n === 2);
+    document.body.classList.toggle('mk-s3', n === 3);
     $('useGo').hidden = n !== 1;
     if (scrollTo) setTimeout(function () { var el = typeof scrollTo === 'string' ? document.querySelector(scrollTo) : scrollTo; if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
   // 무엇을 알릴지 고르면 → 그 용도에 맞는 디자인으로
   function afterUse() {
     if (stage < 2) goStage(2);
+    setTimeout(fitGal, 0);
     setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
   // 디자인을 정하면 → 그 카드에 필요한 질문만

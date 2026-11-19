@@ -352,7 +352,7 @@
   // 같은 12가지가 SNS 이미지(인스타·카톡 채널·네이버·당근·블로그·유튜브…)에도 똑같은 모양으로 나옵니다 (js/export.js).
   // 예전 1~12번 · -w1~36 · 순천만 시안 번호는 쓰지 않아요. 예전 링크는 그 업종의 1번 디자인으로 보여 줍니다.
   var TWELVE = ['sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
-  var CALM = ['minimal', 'hanji', 'nordic', 'paris', 'gold'];
+  var CALM = ['minimal', 'hanji', 'nordic', 'gold']; // 부고: 가게 차양(paris)·네온 같은 들뜬 모양은 빼고 차분한 것만
   var COLOR_NAMES = {
     sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
     minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],

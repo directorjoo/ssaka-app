@@ -426,3 +426,71 @@
 .sk[data-style="hongjin"][data-v="3"] .sk-photo:not(.sk-nophoto) { width: 76% !important; border-radius: 0 !important; }
 .sk[data-style="nordic"][data-v="2"] .sk-photo:not(.sk-nophoto) { width: 76% !important; border-radius: 50% !important; }
 .sk[data-style="nordic"][data-v="3"] .sk-photo:not(.sk-nophoto) { border-radius: 24px !important; }
+
+/* =========================================================
+   순천만 시안 A · 순천만 노을 — 하늘·해·물결·갈대 풍경, 아치 사진, 가운데 명조
+   ========================================================= */
+.sk[data-style="sunset"] .sk-bg::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 220px;
+  background:
+    linear-gradient(to bottom, transparent 150px, var(--c2) 150px, var(--bg) 220px),
+    radial-gradient(circle at 68% 150px, var(--accent) 0 40px, transparent 41px),
+    linear-gradient(to bottom, var(--paper), var(--bg) 150px); }
+.sk[data-style="sunset"] .sk-bg::after { content: ""; position: absolute; top: 158px; left: 58%; width: 20%; height: 34px;
+  background: repeating-linear-gradient(to bottom, var(--accent) 0 2px, transparent 2px 8px);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent); mask-image: linear-gradient(to bottom, #000, transparent); }
+.sk[data-style="sunset"] .sk-bg i { display: block; position: absolute; top: 84px; width: 96px; height: 130px;
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(to top, transparent, #000 25%, #000 75%, transparent); }
+.sk[data-style="sunset"] .sk-bg i:nth-child(1) { left: 0; background: repeating-linear-gradient(96deg, transparent 0 9px, var(--c1) 9px 11px); }
+.sk[data-style="sunset"] .sk-bg i:nth-child(2) { right: 0; background: repeating-linear-gradient(84deg, transparent 0 9px, var(--c1) 9px 11px); }
+.sk[data-style="sunset"] .sk-bg i:nth-child(3) { display: none; }
+.sk[data-style="sunset"] .sk-wrap { padding-top: 196px; text-align: center; }
+.sk[data-style="sunset"] .sk-hero { display: flex; flex-direction: column; align-items: center; }
+.sk[data-style="sunset"] .sk-titles { order: -1; }
+.sk[data-style="sunset"] .sk-titles::before { content: ""; display: block; width: 36px; height: 2px; margin: 0 auto 16px; background: var(--accent-line); }
+.sk[data-style="sunset"] .sk-title { font-size: clamp(34px, 10.5vw, 46px); font-weight: 800; letter-spacing: .01em; line-height: 1.2; }
+.sk[data-style="sunset"] .sk-sub { font-size: 14.5px; letter-spacing: .04em; margin-top: 12px; }
+.sk[data-style="sunset"] .sk-photo { width: 84%; aspect-ratio: 4 / 5; margin-top: 24px; border-radius: 200px 200px 16px 16px; border: 2px solid var(--accent-line); padding: 5px; background: transparent; }
+.sk[data-style="sunset"] .sk-photo img { border-radius: 200px 200px 12px 12px; }
+.sk[data-style="sunset"] .sk-photo.sk-nophoto { width: 96px; height: 96px; aspect-ratio: auto; border-radius: 50%; display: grid; place-items: center; }
+.sk[data-style="sunset"] .sk-nophoto .sk-mono { font-family: var(--f-title); font-size: 40px; color: var(--accent-line); }
+.sk[data-style="sunset"] .sk-gal { margin-top: 20px; }
+.sk[data-style="sunset"] .sk-gal-i { border-radius: 60px 60px 10px 10px; }
+.sk[data-style="sunset"] .sk-list { margin-top: 22px; }
+.sk[data-style="sunset"] .sk-list li { font-family: var(--f-title); padding: 11px 0; font-size: 16px; line-height: 1.6; }
+.sk[data-style="sunset"] .sk-list li + li::before { content: ""; display: block; width: 28px; height: 1px; margin: 0 auto 11px; background: var(--accent-line); opacity: .8; }
+.sk[data-style="sunset"] .sk-actions { gap: 8px; margin-top: 24px; }
+.sk[data-style="sunset"] .sk-act { flex-direction: column; justify-content: center; text-align: center; gap: 6px; min-height: 92px; padding: 12px 8px; border-radius: 14px; border: 1.5px solid var(--accent-line); }
+.sk[data-style="sunset"] .sk-act:first-child { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.sk[data-style="sunset"] .sk-act .sk-lab { font-family: var(--f-title); font-size: 16px; }
+.sk[data-style="sunset"] .sk-act .sk-meta { max-width: 100%; opacity: .8; }
+.sk[data-style="sunset"] .sk-share, .sk[data-style="sunset"] .sk-sms, .sk[data-style="sunset"] .sk-video, .sk[data-style="sunset"] .sk-mapbtn { border-radius: 14px; }
+
+/* =========================================================
+   순천만 시안 B · 인스타 매거진 — 색 머리띠, 꽉 찬 사진, 3칸 사진판, 캡션 카드
+   ========================================================= */
+.sk[data-style="insta"] .sk-wrap { padding-top: 0; }
+.sk[data-style="insta"] .sk-hero { display: flex; flex-direction: column; margin: 0 -20px; }
+.sk[data-style="insta"] .sk-titles { order: -1; padding: 22px 84px 20px 20px; background: var(--accent); color: var(--on-accent); }
+.sk[data-style="insta"] .sk-titles::after { content: "오늘의\A맛"; white-space: pre; position: absolute; right: 18px; top: 50%; transform: translateY(-50%) rotate(-8deg);
+  width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; text-align: center; font-size: 13px; font-weight: 700; line-height: 1.2; }
+.sk[data-style="insta"] .sk-title { font-size: clamp(30px, 9vw, 40px); font-weight: 900; letter-spacing: -0.03em; color: inherit; }
+.sk[data-style="insta"] .sk-sub { color: inherit; opacity: .88; font-size: 14px; margin-top: 8px; }
+.sk[data-style="insta"] .sk-photo { aspect-ratio: 1 / 1; margin-top: 4px; background: var(--paper); }
+.sk[data-style="insta"] .sk-photo.sk-nophoto { aspect-ratio: 2 / 1; display: grid; place-items: center; }
+.sk[data-style="insta"] .sk-nophoto .sk-mono { font-size: 56px; font-weight: 900; color: var(--accent-line); }
+.sk[data-style="insta"] .sk-gal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin: 4px -20px 0; padding: 0; overflow: visible; }
+.sk[data-style="insta"] .sk-gal-i { width: auto; aspect-ratio: 1 / 1; border-radius: 0; }
+.sk[data-style="insta"] .sk-gal-i:nth-child(n+7) { display: none; }
+.sk[data-style="insta"] .sk-list { margin-top: 18px; padding: 6px 18px; border-radius: 14px; background: var(--paper); color: var(--ink); border: 1px solid var(--line-ink); }
+.sk[data-style="insta"] .sk-list li { padding: 11px 0; font-size: 15.5px; line-height: 1.6; }
+.sk[data-style="insta"] .sk-list li:first-child { font-size: 17.5px; font-weight: 800; color: var(--accent); }
+.sk[data-style="insta"] .sk-list li:first-child::before { content: "“"; margin-right: 2px; }
+.sk[data-style="insta"] .sk-list li:first-child::after { content: "”"; margin-left: 2px; }
+.sk[data-style="insta"] .sk-list li + li { border-top: 1px dashed var(--line-ink); }
+.sk[data-style="insta"] .sk-actions { gap: 8px; margin-top: 18px; }
+.sk[data-style="insta"] .sk-act { flex-direction: column; justify-content: center; text-align: center; gap: 6px; min-height: 88px; padding: 12px 8px; border-radius: 12px; border: 1.5px solid var(--accent-line); color: var(--on-bg); }
+.sk[data-style="insta"] .sk-act .sk-ico { color: var(--accent-line); }
+.sk[data-style="insta"] .sk-act:first-child { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.sk[data-style="insta"] .sk-act:first-child .sk-ico { color: inherit; }
+.sk[data-style="insta"] .sk-act .sk-meta { max-width: 100%; opacity: .8; }
+.sk[data-style="insta"] .sk-share, .sk[data-style="insta"] .sk-sms, .sk[data-style="insta"] .sk-video, .sk[data-style="insta"] .sk-mapbtn { border-radius: 12px; }

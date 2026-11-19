@@ -144,6 +144,16 @@
       { bg: '#eaeef0', paper: '#f8fafb', ink: '#1f2a30', accent: '#4a6b7c', c1: '#c9d6dc', c2: '#e2d3bf', c3: '#9fb7c2' },
       { bg: '#f4ece6', paper: '#fffaf6', ink: '#33241d', accent: '#b5704f', c1: '#e8c9b5', c2: '#cfd6c4', c3: '#d9a88c' }])
   ];
+  // 순천만 시안 2종 (음식점 맨 앞에 색 3벌씩) — 시안 A 순천만 노을 · 시안 B 인스타 매거진
+  W('sunset', '순천만 노을', 'calm', 'myeong', [
+    { bg: '#1b2a41', paper: '#2c3c63', ink: '#fff4dc', accent: '#e9a23b', c1: '#c9a86a', c2: '#3a3150' },
+    { bg: '#2a1b33', paper: '#4a2e50', ink: '#fbebdd', accent: '#f08a5d', c1: '#d8b07a', c2: '#5e3a5c' },
+    { bg: '#f6ebd7', paper: '#fff8ec', ink: '#2a2016', accent: '#b5661e', c1: '#a8875a', c2: '#e8d3b0' }]);
+  W('insta', '인스타 매거진', 'bold', 'sanskr', [
+    { bg: '#faf6ef', paper: '#ffffff', ink: '#2a1a1c', accent: '#b3132b' },
+    { bg: '#f3f5ee', paper: '#ffffff', ink: '#1c2a20', accent: '#2f6b4f' },
+    { bg: '#14161b', paper: '#1f2229', ink: '#f3efe8', accent: '#e8b04a' }]);
+  var SC_FAMS = ['sunset', 'insta'];
   STYLES.glass.mood = 'modern';
   var GLASS_PICK = [0, 3, 7];
 
@@ -307,6 +317,13 @@
   var BY_ID = {}, BY_INDUSTRY = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
+    if (ind.id === 'restaurant') SC_FAMS.forEach(function (fk) {
+      var st = STYLES[fk];
+      st.palettes.forEach(function (pal, pi) {
+        var ds = { id: 'restaurant-' + fk + (pi + 1), industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
+        BY_ID[ds.id] = ds; list.push(ds);
+      });
+    });
     // 새 디자인 가족 12 × 색 3 = 36장을 앞에 (기존 1~12번은 예전 카드 호환을 위해 뒤에 그대로)
     if (ind.world) {
       var w = 0;

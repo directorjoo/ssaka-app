@@ -7,6 +7,7 @@
   <title>오늘의 싸바 · 뉴스 · 날씨 · 혜택 알리미 · SNS 만들기 · 보험 점검 · 축제</title>
   <meta property="og:title" content="☀️ 오늘의 싸바 — 뉴스 요약 · 날씨 · 인기 검색어 · 건강 · 정부 혜택">
   <meta property="og:description" content="매일 보는 생활 채널을 싸바 안에서 한 번에. 대표님용 아침 뉴스 3줄, 우리 동네 날씨·미세먼지, 오늘의 인기 검색어, 어르신 건강, 정부 혜택.">
+  <meta property="og:url" content="https://sava.kr/today/">
   <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
   <link rel="icon" href="../img/favicon.png?v=3">
   <link rel="stylesheet" href="../css/brand.css">
@@ -122,6 +123,13 @@
     .pl-v { position: relative; padding-top: 56.25%; border-radius: 14px; overflow: hidden; background: #000; }
     .pl-v iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .pl-x { display: block; width: 100%; min-height: 58px; margin-top: 14px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .sendbar { display: flex; align-items: center; gap: 8px; margin: 6px 14px 8px; }
+    .sendbar .btn { flex: 1; min-height: 50px; background: #FEE500; color: #191600; font-size: 16.5px; box-shadow: 0 6px 14px -10px rgba(0,0,0,.5); }
+    .sendbar .btn.l { flex: none; background: #F3ECE6; color: #5a4a42; font-size: 15px; }
+    .welcome { scroll-margin-top: 76px; margin: 4px 14px 8px; padding: 14px 16px; border-radius: 18px; background: linear-gradient(135deg, #FFF0F3, #FFF8F0); border: 1.5px solid #f6cdd6; font-size: 16px; line-height: 1.6; font-weight: 700; word-break: keep-all; }
+    .welcome b { color: #B3132B; }
+    .welcome .row { display: flex; gap: 8px; margin-top: 10px; }
+    .welcome .row .btn { flex: 1; min-height: 46px; font-size: 15.5px; }
     .backbar { margin: 14px 2px 0; padding: 12px 14px; border-radius: 14px; background: #F3ECE6; color: #5a4a42; font-size: 14.5px; line-height: 1.6; word-break: keep-all; }
   </style>
 </head>
@@ -129,6 +137,8 @@
 <div class="w">
   <div class="hd"><h1>☀️ 오늘의 싸바</h1><div class="date" id="date"></div></div>
   <nav class="circles" id="circles" aria-label="오늘의 채널"></nav>
+  <div class="welcome" id="welcome" hidden>🍒 <b>받으신 화면이에요.</b> 아래 내용을 먼저 보시고, 다 보신 뒤에는 위 동그라미를 눌러 싸바의 다른 것도 둘러보세요.<div class="row"><a class="btn l" href="#" id="wtop">⬆️ 둘러보기</a><a class="btn" href="../app/">🏠 싸바 처음 화면</a></div></div>
+  <div class="sendbar"><button type="button" class="btn" id="send">★ 이 화면 카톡으로 보내기</button><button type="button" class="btn l" id="copy">🔗 링크</button></div>
   <section class="pane" id="pane" aria-live="polite"></section>
   <p class="backbar" style="margin:14px 14px 0">🍒 바깥 사이트는 새 창으로 열려요. 다 보시고 그 창을 닫거나(✕) ‘뒤로’를 누르면 싸바로 돌아와요. 싸바 화면 맨 아래 <b>🏠 홈</b>으로 언제든 처음으로.</p>
 </div>
@@ -166,7 +176,10 @@
   ];
   var C = [].concat.apply([], G.map(function (g) { return g.c; }));
   var OLDK = { gov: 'biz' }; // 예전 주소(#gov)도 열리게
-  var cur = (location.hash || '').slice(1); try { cur = cur || localStorage.getItem('sava-today') || 'news'; } catch (e) { cur = cur || 'news'; }
+  // 보낸 링크(?t=insure)로 들어오면 그 탭부터 보여 줌
+  var qT = new URLSearchParams(location.search).get('t') || '';
+  var fromLink = !!qT && !location.hash;
+  var cur = (location.hash || '').slice(1) || qT; try { cur = cur || localStorage.getItem('sava-today') || 'news'; } catch (e) { cur = cur || 'news'; }
   cur = OLDK[cur] || cur;
   if (!C.some(function (x) { return x.k === cur && !x.href; })) cur = 'news';
   var bar = $('circles');
@@ -178,7 +191,7 @@
       var b = el(x.href ? 'a' : 'button', 'cb' + (x.n ? ' new' : '')); if (x.href) b.href = x.href; else b.type = 'button';
       b.style.setProperty('--c', x.c); b.dataset.k = x.k;
       var i = el('i', '', x.i), t = el('b', '', x.t); b.appendChild(i); b.appendChild(t);
-      if (!x.href) b.addEventListener('click', function () { show(x.k); var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      if (!x.href) b.addEventListener('click', function () { fromLink = false; show(x.k); var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       row.appendChild(b);
     });
     bar.appendChild(box);
@@ -187,7 +200,8 @@
   var pane = $('pane');
   function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
   function show(k) {
-    cur = k; try { localStorage.setItem('sava-today', k); } catch (e) {} history.replaceState(null, '', '#' + k); paintBar();
+    cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
+    var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
     ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx })[k]();
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
@@ -632,10 +646,31 @@
     }).catch(function () { if (cur === 'fx') msg('환율을 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
   }
 
+  // ★ 지금 보고 있는 탭 하나만 보내기 — 받는 사람은 이 탭부터 보고, 위 동그라미로 싸바 전체를 둘러봄
+  var SENDT = { biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요' };
+  function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
+  $('send').addEventListener('click', function () {
+    var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '오늘의 싸바' };
+    var info = { title: xx.i + ' ' + xx.t + ' · 싸바', description: SENDT[cur] || '매일 보는 생활 정보를 싸바 안에서 한 번에', url: link(), buttonTitle: '이 화면 열기', installTitle: '싸바 둘러보기', installUrl: 'https://sava.kr/app/' };
+    if (window.SsakaShare) window.SsakaShare(info);
+    else if (navigator.share) navigator.share({ title: info.title, text: info.description, url: info.url }).catch(function () {});
+    else prompt('아래 링크를 복사해서 카톡에 붙여 넣으세요', info.url);
+  });
+  $('copy').addEventListener('click', function () {
+    var u = link();
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(u).then(function () { $('copy').textContent = '✅ 복사됨'; setTimeout(function () { $('copy').textContent = '🔗 링크'; }, 1800); }, function () { prompt('아래 링크를 복사하세요', u); });
+    else prompt('아래 링크를 복사하세요', u);
+  });
+  if (fromLink) {
+    $('welcome').hidden = false;
+    $('wtop').addEventListener('click', function (e) { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); });
+  }
   paintBar(); show(cur);
+  if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
   var a = bar.querySelector('[aria-pressed="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ inline: 'center', block: 'nearest' });
 })();
 </script>
+<script src="/js/share.js?v=3" defer></script>
 <script src="/js/home.js?v=9" defer></script>
 </body>
 </html>

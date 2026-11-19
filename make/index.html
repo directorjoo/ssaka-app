@@ -385,14 +385,25 @@
   .snspv .snsld:empty { display: none; }
   .pvdest { margin: 0 0 8px; padding: 8px 12px; border-radius: 12px; background: #EAF3FF; color: #1B3F7A; font-size: 14px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
   body.dest-sns .preview .phone, body.dest-sns .preview .pv-up { display: none; }
+  /* 사진(인스타·스토리·정사각)용일 때: 사진에 안 들어가는 칸은 감추고, 메뉴 칸은 예약 스위치 없이 바로 */
+  .sns-only { display: none; }
+  body.dest-sns [data-snsoff], body.dest-sns .kk-only { display: none !important; }
+  body.dest-sns .sns-only { display: block; }
+  body.dest-sns legend .sns-only { display: inline; }
+  body.dest-sns #resvBox { display: block !important; }
+  .snsfit { margin: 0 0 14px; padding: 14px 16px; border-radius: 16px; background: #FFF6F7; border: 2px solid #F3C6CD; font-size: 15px; line-height: 1.55; word-break: keep-all; }
+  .snsfit b { color: #B3132B; }
+  .snsfit ul { margin: 6px 0 0; padding-left: 20px; }
+  .snsfit .out { color: #6b6b6b; margin-top: 6px; }
+  .snsfit button { margin-top: 8px; width: 100%; padding: 11px; border-radius: 12px; border: 2px solid #B3132B; background: #fff; color: #B3132B; font-weight: 800; font-size: 15px; }
   #pvModal .snspv.r-story { height: min(70dvh, 640px); }
   #pvModal .pv-sns { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: start center; }
   .done-sns { display: grid; gap: 8px; }
   .done-sns .snspv { max-width: 300px; } .done-sns .snspv.r-story { height: min(52vh, 480px); }
-  .more-dest { margin-top: 6px; padding: 14px 12px; border-radius: 16px; background: #FFF6F7; border: 2px dashed #E7A3AE; text-align: left; }
+  .more-dest { margin: 4px 0 12px; padding: 14px 12px; border-radius: 16px; background: #FFF6F7; border: 2px dashed #E7A3AE; text-align: left; }
   .more-dest > b { display: block; font-size: 16px; font-weight: 900; color: #8E0A1C; margin-bottom: 2px; }
-  .more-dest > small { display: block; font-size: 13.5px; color: #555; margin-bottom: 10px; word-break: keep-all; }
-  .more-dest .made { display: block; margin-top: 8px; font-size: 13px; color: #2b9a4a; font-weight: 800; }
+  .more-dest > small { display: block; font-size: 15px; color: #555; margin-bottom: 10px; word-break: keep-all; }
+  .more-dest .made { display: block; margin-top: 8px; font-size: 15px; color: #2b9a4a; font-weight: 800; }
   .tp-head b { display: block; font-size: 18px; font-weight: 900; color: #1a1a1a; margin-bottom: 2px; }
 </style>
 <script src="/js/launch.js?v=3"></script>
@@ -442,6 +453,7 @@
       </div>
 
       <h2 class="sec-h" data-sec="basic"><span>3</span><b></b><small></small></h2>
+      <div class="snsfit" id="snsFit" hidden></div>
       <fieldset data-for="club" data-tab="basic">
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
         <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·내용·계좌를 알아서 채워 드려요.</div>
@@ -519,7 +531,7 @@
         <div class="hint">받는 사람이 누르면 카카오맵·네이버지도·구글지도에서 이 이름으로 찾아줘요.</div>
       </fieldset>
 
-      <fieldset data-for="shop profile" data-tab="basic">
+      <fieldset data-for="shop profile" data-tab="basic" data-snsoff>
         <legend id="lkLeg">우리 가게 다른 곳 (선택)</legend>
         <div class="hint" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
         <label for="lkDg">🥕 당근 비즈프로필</label>
@@ -571,8 +583,8 @@
         </div>
       </fieldset>
 
-      <h2 class="sec-h" data-sec="video"><span>5</span><b></b><small></small></h2>
-      <fieldset data-tab="video">
+      <h2 class="sec-h" data-sec="video" data-snsoff><span>5</span><b></b><small></small></h2>
+      <fieldset data-tab="video" data-snsoff>
         <legend>📹 동영상 올리기 (선택)</legend>
         <div class="clipbox">
           <label class="clipbtn" for="clipFile">📹 동영상 올리기 <small>15초 · 30MB까지</small></label>
@@ -606,14 +618,14 @@
             </div>
           </div>
         </div>
-        <div data-for="profile">
+        <div data-for="profile" data-snsoff>
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
           <div class="hint">동영상은 유튜브에 "일부 공개"로 올린 뒤 그 링크를 붙여넣으세요.</div>
           <input id="video" type="url" inputmode="url" placeholder="https://youtu.be/…">
         </div>
       </fieldset>
 
-      <fieldset data-for="profile club shop greet" id="copyFs" data-tab="content" data-part="copy">
+      <fieldset data-for="profile club shop greet" id="copyFs" data-tab="content" data-part="copy" data-snsoff>
         <legend id="copyLeg">복사 버튼 (선택)</legend>
         <div class="hint" id="copyHint">받는 사람이 단추를 누르면 적은 내용이 그대로 복사돼요.</div>
         <div class="row">
@@ -628,14 +640,15 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="shop" data-tab="content" data-part="resv">
-        <legend>예약 받기</legend>
-        <label class="switch"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
+      <fieldset data-for="shop" data-tab="content" data-part="resv" id="resvFs">
+        <legend><span class="kk-only">예약 받기</span><span class="sns-only">메뉴와 가격</span></legend>
+        <div class="hint sns-only">📷 사진에 들어갈 메뉴예요. "메뉴 이름 가격" 순서로 한 줄에 하나씩. 많이 적어도 올릴 곳 크기에 맞게 앞에서부터 넣어요.</div>
+        <label class="switch kk-only"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
         <div id="resvBox" hidden>
-          <label for="menu" data-l="menu">메뉴와 가격 (한 줄에 하나, 선택)</label>
+          <label for="menu" data-l="menu" class="kk-only">메뉴와 가격 (한 줄에 하나, 선택)</label>
           <textarea id="menu" maxlength="800" placeholder="갓김치 삼겹살 15000&#10;점심 백반 9000"></textarea>
-          <div class="hint" data-l="menuHint">"메뉴 이름 가격" 순서로 적으면 손님이 수량을 고르고 예상 금액이 계산돼요.</div>
-          <div id="depBox">
+          <div class="hint kk-only" data-l="menuHint">"메뉴 이름 가격" 순서로 적으면 손님이 수량을 고르고 예상 금액이 계산돼요.</div>
+          <div id="depBox" class="kk-only">
           <label for="account">예약금 받을 계좌</label>
           <input id="account" maxlength="60" placeholder="OO은행 000-0000-0000 예금주">
           <div class="row">
@@ -649,11 +662,11 @@
             </div>
           </div>
           </div>
-          <div class="hint">손님이 예약하면 날짜·시간·인원·메뉴·예약금이 정리된 문자가 위 전화번호로 와요. 취소도 예약번호가 담긴 문자로 와요.</div>
+          <div class="hint kk-only">손님이 예약하면 날짜·시간·인원·메뉴·예약금이 정리된 문자가 위 전화번호로 와요. 취소도 예약번호가 담긴 문자로 와요.</div>
         </div>
       </fieldset>
 
-      <fieldset data-for="club" data-tab="content" data-part="roster">
+      <fieldset data-for="club" data-tab="content" data-part="roster" data-snsoff>
         <legend id="rosterLeg">🙋 참석 명단 받기</legend>
         <label class="switch"><input type="checkbox" id="rosterOn" checked> <span>카드에서 참석 신청 받고, 번호 매긴 명단 자동으로 만들기</span></label>
         <div id="rosterBox">
@@ -672,8 +685,8 @@
         </div>
       </fieldset>
 
-      <h2 class="sec-h" data-sec="deco"><span>7</span><b></b><small></small></h2>
-      <fieldset data-tab="photo" data-part="motion">
+      <h2 class="sec-h" data-sec="deco" data-snsoff><span>7</span><b></b><small></small></h2>
+      <fieldset data-tab="photo" data-part="motion" data-snsoff>
         <legend>🎬 움직이는 카드 (짧은 영상처럼)</legend>
         <select id="motion">
           <option value="">움직임 없음</option>
@@ -686,7 +699,7 @@
         <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
       </fieldset>
 
-      <fieldset data-for="profile club shop greet" data-tab="deco" data-part="season">
+      <fieldset data-for="profile club shop greet" data-tab="deco" data-part="season" data-snsoff>
         <legend>시즌 테마</legend>
         <select id="season">
           <option value="">없음</option>
@@ -698,7 +711,7 @@
         <div class="hint">카드 위로 눈이나 색종이가 내리고, 맨 위에 시즌 인사가 붙어요.</div>
       </fieldset>
 
-      <fieldset data-tab="deco">
+      <fieldset data-tab="deco" data-snsoff>
         <legend>카드 열면 나오는 소리</legend>
         <div class="addr">
           <select id="sound"></select>
@@ -757,6 +770,12 @@
       <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
       <button type="button" class="kakao big" id="doneSnsSave">📥 이 사진 저장하기</button>
     </div>
+    <div class="more-dest" id="moreDest">
+      <b>➕ 같은 내용으로 다른 곳에도 올릴까요?</b>
+      <small>쓴 내용은 그대로예요. 고른 곳 크기에 맞게 넣을 것만 골라 넣고, 디자인만 다시 골라요.</small>
+      <div class="dests" id="moreDests" role="group" aria-label="다른 올릴 곳"></div>
+      <span class="made" id="madeDests"></span>
+    </div>
     <button type="button" class="kakao big" id="send2">💬 카톡으로 보내기</button>
     <button type="button" class="ghost big" id="sms2">📱 문자로 보내기 (연락처에서 고르기)</button>
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
@@ -765,12 +784,6 @@
     <button type="button" class="ghost big" id="rkLink" hidden>🔒 주최자용 명단 보기 링크 복사</button>
     <button type="button" class="ghost big" id="exp2">📸 SNS용 사진 만들기 (인스타·카톡채널·네이버·당근·유튜브)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
-    <div class="more-dest" id="moreDest">
-      <b>➕ 다른 곳에도 올릴까요?</b>
-      <small>쓴 내용은 그대로 두고, 고른 곳 크기에 맞는 디자인만 다시 골라요.</small>
-      <div class="dests" id="moreDests" role="group" aria-label="다른 올릴 곳"></div>
-      <span class="made" id="madeDests"></span>
-    </div>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
   </div>
 </div>
@@ -860,7 +873,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=83"></script>
+<script src="../js/export.js?v=84"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1004,26 +1017,32 @@
     if (!j) return;
     if (snsCache[j.key]) { putSns(j.el, snsCache[j.key]); return runSns(); }
     snsBusy = true;
-    var menu = []; try { menu = SsakaReserve.parseMenu(v('menu') || (EX().menu || '')); } catch (e) {}
+    var menu = snsMenu();
     SsakaExport.sns(j.card, j.d, { sizes: [j.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
       if (list && list[0]) { var u = URL.createObjectURL(list[0].blob); snsCache[j.key] = u; if (j.el.isConnected) putSns(j.el, u); }
     }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story'); })
       .then(function () { snsBusy = false; setTimeout(runSns, 0); });
   }
+  // 사진에 넣을 메뉴: 내가 적은 메뉴만. 아무것도 안 적은 예시 화면일 때만 예시 메뉴 (내 카드에 예시 메뉴가 섞이지 않게)
+  function snsMenu() {
+    var mine = ($('menu').value || '').trim(), out = [];
+    try { out = SsakaReserve.parseMenu(mine || (buildCard().isExample ? (EX().menu || '') : '')); } catch (e) {}
+    return out || [];
+  }
   // ---------- 3단계 미리보기도 고른 용도 모양(4:5·9:16·1:1) 사진 그대로 ----------
-  var snsPvGen = 0, snsPvKey = '', snsPvBlob = null, snsPvUrl = '', snsPvShape = '';
+  var snsPvFit = null, snsPvGen = 0, snsPvKey = '', snsPvBlob = null, snsPvUrl = '', snsPvShape = '';
   function destSns() { return (typeof dest === 'string' && SNS_OF[dest]) || null; }
   function setShape(el, dd) { el.classList.remove('r-feed', 'r-sq', 'r-story'); if (dd) el.classList.add(dd.cls); }
   function makeSnsImg(card) {
     var dd = destSns();
     if (!dd || !window.SsakaExport || !SsakaExport.sns) return Promise.resolve(null);
     var d = curDesign(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length;
-    if (key === snsPvKey && snsPvBlob) return Promise.resolve({ blob: snsPvBlob, url: snsPvUrl });
-    var menu = []; try { menu = SsakaReserve.parseMenu(v('menu') || (EX().menu || '')); } catch (e) {}
+    if (key === snsPvKey && snsPvBlob) return Promise.resolve({ blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit });
+    var menu = snsMenu();
     return SsakaExport.sns(card, d, { sizes: [dd.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
       if (!list || !list[0]) return null;
-      snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob);
-      return { blob: snsPvBlob, url: snsPvUrl };
+      snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob); snsPvFit = list[0].fit || null;
+      return { blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit };
     });
   }
   function showSnsIn(box, img, ld, card) {
@@ -1037,14 +1056,35 @@
       return r;
     }).catch(function () { ld.textContent = '사진을 그리지 못했어요'; return null; });
   }
+  // 사진에 무엇이 들어가고 무엇이 빠지는지 — 같은 내용을 크기에 맞게 알아서 고른 결과를 그대로 보여 줌
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function paintSnsFit(card, dd, ds) {
+    var box = $('snsFit');
+    if (!dd || !window.SsakaExport || !SsakaExport.plan) { box.hidden = true; return; }
+    var pl = SsakaExport.plan(card, { menu: snsMenu(), industry: industry }, dd.sz), L = [];
+    var food = type === 'shop', what = pl.items.some(function (x) { return x.p; }) ? '메뉴' : '내용';
+    L.push('<li>제목' + (card.subtitle ? ' · ' + esc(card.subtitle) : '') + '</li>');
+    L.push(card.image ? '<li>대표 사진' + ((card.gallery || []).length ? ' + 작은 사진 ' + Math.min(3, card.gallery.length) + '장' : '') + '</li>' : '<li>⚠️ <b>대표 사진이 없어요</b> — 빈 무늬로 나와요</li>');
+    if (pl.total) L.push('<li id="snsFitN" data-w="' + what + '">' + what + ' ' + pl.total + '줄 — 사진 크기에 맞게 넣고, 넘치면 "외 N가지"로 줄여요</li>');
+    else L.push('<li>' + what + ' 없음 — 아래 ' + (food ? '메뉴' : '내용') + ' 칸에 적으면 들어가요</li>');
+    var ft = [card.contact && card.contact.phone ? '전화' : '', (card.contact && card.contact.address) || card.place || (card.copy && /[로길동]\s?\d|구\s/.test(card.copy.value)) ? '주소' : ''].filter(Boolean);
+    if (ft.length) L.push('<li>' + ft.join(' · ') + '</li>');
+    box.innerHTML = '📷 <b>' + esc(ds.b) + '(' + esc(ds.s) + ') 사진에 이렇게 들어가요</b><ul>' + L.join('') + '</ul>' +
+      '<div class="out">사진에는 예약·참석 신청·소리·동영상·링크 단추가 안 들어가서 그 칸은 감췄어요. 카톡 카드로 만들 때 다시 나와요. 적어 둔 내용은 그대로 있어요.</div>' +
+      (card.image ? '' : '<button type="button" id="snsFitPh">📷 대표 사진 넣기</button>');
+    box.hidden = false;
+    var pb = $('snsFitPh'); if (pb) pb.onclick = function () { $('photoFile').click(); };
+  }
   function paintSnsPv() {
     var dd = destSns(), ds = (typeof DEST_BY === 'object' && DEST_BY[dest]) || null;
     document.body.classList.toggle('dest-sns', !!dd);
+    if (!dd) $('snsFit').hidden = true;
     $('snsPv').hidden = !dd; $('pvDest').hidden = !dd;
     $('pvSmall').textContent = dd ? '· 실제로 올라갈 사진 모양 그대로예요' : '· 글자를 누르면 바로 고쳐요';
     if (!dd || !ds) return;
     $('pvDest').textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용 사진으로 보여 드려요. 입력 칸에 쓰면 사진에 바로 들어가요.';
     var g = ++snsPvGen, card = buildCard().card;
+    try { paintSnsFit(card, dd, ds); } catch (e) {}
     if (snsPvShape !== dest) { $('snsPvImg').removeAttribute('src'); snsPvShape = dest; }
     var box = $('snsPv'), img = $('snsPvImg'), ld = $('snsPvLd');
     setShape(box, dd);
@@ -1052,6 +1092,8 @@
     makeSnsImg(card).then(function (r) {
       if (g !== snsPvGen) return;
       if (r) { img.src = r.url; ld.textContent = ''; } else ld.textContent = '사진을 그리지 못했어요';
+      var n = $('snsFitN'), f = r && r.fit;
+      if (n && f && f.total) n.innerHTML = n.dataset.w + ' ' + (f.shown < f.total ? f.total + '줄 중 <b>' + f.shown + '줄</b> 넣고 나머지는 "외 ' + (f.total - f.shown) + '가지"로' : f.total + '줄 <b>모두</b> 들어갔어요');
     }).catch(function () { if (g === snsPvGen) ld.textContent = '사진을 그리지 못했어요'; });
   }
   var mood = '';
@@ -1366,8 +1408,8 @@
       $('open').href = url;
       saveDraft();
       refreshProgress();
-      try { renderTabs(); } catch (e) {}
       try { paintSnsPv(); } catch (e) {}
+      try { renderTabs(); } catch (e) {}
       remember();
     }, 300);
   }
@@ -1489,7 +1531,9 @@
   function renderMoreDests() {
     var box = $('moreDests'); box.innerHTML = '';
     var left = DESTS.filter(function (d) { return madeDests.indexOf(d.id) < 0; });
-    $('moreDest').hidden = !left.length;
+    $('moreDest').hidden = false;
+    $('moreDest').querySelector('b').textContent = left.length ? '➕ 같은 내용으로 다른 곳에도 올릴까요?' : '🎉 올릴 곳을 모두 만들었어요!';
+    $('moreDest').querySelector('small').hidden = !left.length;
     left.forEach(function (d) {
       var b = document.createElement('button'); b.type = 'button';
       b.innerHTML = '<i aria-hidden="true">' + d.i + '</i><span><b>' + d.b + '</b><small>' + d.s + '</small></span>';
@@ -1630,6 +1674,8 @@
       toast('아직 비어 있어요: ' + miss.map(function (f) { return names[f]; }).join(', '));
       return;
     }
+    // 다른 곳에도 올리는 중이면: 디자인은 방금 골랐으니 비교 없이 바로 마지막 확인으로
+    if (madeDests.length && madeDests.indexOf(dest) < 0) { openFinalPv(); return; }
     openCompare();
   });
   // ---------- 완성 → 다른 디자인·색 비교 → 최종 결정? → 미리보기 확인 → OK → 체리 팡파레 ----------
@@ -1646,20 +1692,21 @@
   $('cmpBack').addEventListener('click', function () { closeCompare(); var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   $('cmpPick').addEventListener('click', function () { $('cmpActs').hidden = true; $('cmpAsk').hidden = false; $('cmpAsk').scrollIntoView({ behavior: 'smooth', block: 'end' }); });
   $('cmpNo').addEventListener('click', function () { $('cmpAsk').hidden = true; $('cmpActs').hidden = false; });
-  $('cmpYes').addEventListener('click', function () {
-    closeCompare();
+  $('cmpYes').addEventListener('click', function () { closeCompare(); openFinalPv(); });
+  // 마지막 확인: 고른 용도 모양 그대로 (사진이면 실제 올라갈 사진, 카톡이면 카드)
+  function openFinalPv() {
     var r = buildCard(), dd = destSns(), ds = DEST_BY[dest];
     document.querySelector('#pvModal .pv-phone').hidden = !!dd;
     $('pvSnsBox').hidden = !dd;
     if (dd) {
-      $('pvModalSub').textContent = ds.b + '(' + ds.s + ')에 이대로 올라가요. 고칠 게 있으면 [다시 고치기]';
+      $('pvModalSub').textContent = ds.b + '(' + ds.s + ')에 이대로 올라가요.' + (r.card.image ? '' : ' ⚠️ 대표 사진이 없어 빈 무늬로 나와요.') + ' 고칠 게 있으면 [다시 고치기]';
       showSnsIn($('pvSns'), $('pvSnsImg'), $('pvSnsLd'), r.card);
     } else {
       $('pvModalSub').textContent = '위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]';
       $('pvFrame').src = viewer + '?d=' + SsakaCodec.encode(r.card);
     }
     $('pvModal').hidden = false;
-  });
+  }
   $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고칠 곳을 고친 뒤 다시 [✅ 완성]을 누르세요'); });
   $('pvOk').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; openDone(); });
   $('cmpModal').addEventListener('click', function (e) { if (e.target === this) closeCompare(); });
@@ -2339,7 +2386,7 @@
       pb.appendChild(b);
     });
     var job = ++frameJob; frameFiles = []; $('expGrid2').innerHTML = '<p class="done-sub">만드는 중…</p>';
-    X.sns(c.card, sel, { pics: localPics, industry: industry, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
+    X.sns(c.card, sel, { pics: localPics, industry: industry, menu: snsMenu() }).then(function (list) {
       if (job !== frameJob) return;
       frameFiles = list; snsFigs($('expGrid2'), list);
       $('expSave').disabled = false;
@@ -2373,7 +2420,7 @@
       cb.appendChild(b);
     });
     var job = ++packJob; packFiles = []; $('packGrid').innerHTML = '<p class="done-sub">만드는 중…</p>';
-    K.build(c.card, pp.id, packSel.pal, { pics: localPics, industry: industry, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')), head: $('packHead').value, line: $('packLine').value }).then(function (list2) {
+    K.build(c.card, pp.id, packSel.pal, { pics: localPics, industry: industry, menu: snsMenu(), head: $('packHead').value, line: $('packLine').value }).then(function (list2) {
       if (job !== packJob) return;
       packFiles = list2; snsFigs($('packGrid'), list2); $('expSave').disabled = false;
     }).catch(function () { if (job === packJob) $('packGrid').innerHTML = '<p class="done-sub">템플릿을 만들지 못했어요. 다시 눌러주세요.</p>'; });
@@ -2392,7 +2439,7 @@
     var noSet = c.card.template === 'safe';
     $('expSec1').hidden = noSet; $('expGrid').hidden = noSet;
     if (noSet) { $('expStatus').textContent = '올릴 곳에 맞는 사진을 골라 저장하세요. 사진을 누르면 한 장씩 저장돼요.'; return; }
-    window.SsakaExport.build(c.card, curDesign(), { pics: localPics, industry: industry, menu: c.card.template === 'shop' ? SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) : [] }).then(function (list) {
+    window.SsakaExport.build(c.card, curDesign(), { pics: localPics, industry: industry, menu: c.card.template === 'shop' ? snsMenu() : [] }).then(function (list) {
       expFiles = list;
       snsFigs($('expGrid'), list.map(function (x) { return Object.assign({}, x, { title: x.label }); }));
       $('expStatus').textContent = list.length + '장을 만들었어요.' + (list.skipped ? ' (사진 ' + list.skipped + '장은 이 휴대폰에 원본이 없어 빠졌어요. 사진을 다시 올리면 들어가요.)' : ' 사진을 누르면 한 장씩 저장할 수도 있어요.');
@@ -2593,8 +2640,9 @@
     }[id] || ['', ''];
   }
   function renderTabs() {
-    var D2 = tabDefs();
+    var D2 = tabDefs(), num = 3, sns = document.body.classList.contains('dest-sns');
     document.querySelectorAll('#form .sec-h').forEach(function (h) {
+      if (!(sns && h.hasAttribute('data-snsoff'))) h.querySelector('span').textContent = num++;
       var id = h.dataset.sec, d = D2[id] || ['', ''], t = tabHead(id);
       h.querySelector('b').textContent = d[0] + ' ' + d[1] + (t[0] ? ' — ' + t[0] : '');
       h.querySelector('small').textContent = t[1] || '';
@@ -2656,6 +2704,7 @@
     if (paintedDest !== null && paintedDest !== dest) { snsGen++; snsQ = []; renderGallery(); try { if (PHPAL) paintPhotoSug(); } catch (e) {} }
     paintedDest = dest;
     try { paintSnsPv(); } catch (e) {}
+    try { renderTabs(); } catch (e) {}
   }
   var stage = 3;
   function goStage(n, scrollTo) {

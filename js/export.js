@@ -448,12 +448,27 @@
     var split = function (x) { var mm = String(x.n).match(/^(.*?)\s*\((.*?)\)\s*$/); return { n: mm ? mm[1] : x.n, note: mm ? mm[2] : '', p: x.p ? won(x.p) + '원' : '' }; };
     if (priced.length) return priced.map(split);
     if (m.length) return m.map(split); // 학원 강좌처럼 가격 없이 이름만 있는 목록
-    return (card.body || []).map(function (l) { return { n: String(l), note: '', p: '' }; });
+    return bodyItems(card.body).items.map(function (x) { return { n: x.n, note: '', p: x.p }; });
+  }
+  // 본문 줄을 사진용으로 나눔: "■ 겨울 특선" → 머리말, "벌교꼬막 30,000원"·"굴국밥 12000" → 메뉴·가격, 나머지 → 안내 줄
+  function bodyItems(body) {
+    var head = '', items = [];
+    (body || []).forEach(function (l) {
+      l = String(l || '').trim(); if (!l) return;
+      var h = /^[■▶◆●★#]+\s*(.+)$/.exec(l);
+      if (h && !/\d{4,}|원\s*$/.test(h[1])) { if (!head) head = h[1].replace(/[“”"]/g, '').trim(); return; }
+      l = l.replace(/^[·•\-–]\s*/, '');
+      var m = /^(.+?)\s*[:：]?\s*(\d{1,3}(?:,\d{3})+|\d{4,7})\s*원?\s*$/.exec(l);
+      if (m && !/^\d/.test(m[1])) items.push({ n: m[1].replace(/[\s:：·…]+$/, ''), p: won(String(m[2]).replace(/,/g, '')) + '원' });
+      else items.push({ n: l, p: '' });
+    });
+    return { head: head, items: items };
   }
   function frameAddr(card) {
     var v = card.copy && card.copy.value || '';
     if (/[로길동]\s?\d|구\s/.test(v)) return v;
-    return (card.place && card.place.name) || '';
+    var a = card.contact && card.contact.address && card.contact.address.street;
+    return a || (card.place && card.place.name) || '';
   }
   function corner(ctx, x, y, sx, sy, col) {
     ctx.strokeStyle = col; ctx.lineWidth = 3;
@@ -762,9 +777,11 @@
     if (!items.length || o.h < 30) return o.y;
     var fam = o.fam || FONT, al = o.align || 'left', gap = o.gap || 1.9;
     var bw = o.bullet ? 1.1 : 0;
+    // 다 못 넣으면 마지막 줄을 "외 N가지"로 (말없이 잘리지 않게)
+    var more0 = items.more || 0, unit = items.unit || '';
     function rows(fs) {
       ctx.font = (o.weight || 700) + ' ' + fs + 'px ' + fam;
-      var out = [], used = 0;
+      var out = [], used = 0, rh1 = fs * gap;
       for (var i = 0; i < items.length; i++) {
         var m = items[i], name = typeof m === 'string' ? m : m.n, price = typeof m === 'string' ? '' : (m.p || '');
         var room = o.w - fs * bw, ls = price ? [name] : wrap(ctx, name, room, 2);
@@ -772,13 +789,21 @@
         if (used + rh > o.h) break;
         out.push({ name: name, price: price, ls: ls, rh: rh }); used += rh;
       }
+      var hidden = items.length - out.length + more0;
+      if (hidden > 0 && out.length) {
+        while (out.length > 1 && used + rh1 > o.h) { used -= out.pop().rh; hidden++; }
+        var t = '외 ' + hidden + '가지' + (unit ? ' ' + unit : ' 더');
+        if (used + rh1 <= o.h) { out.push({ name: t, price: '', ls: [t], rh: rh1, more: 1 }); used += rh1; }
+      }
+      out.shown = out.filter(function (r) { return !r.more; }).length;
       return out;
     }
     var fs = o.fs, minFs = Math.max(o.min || 26, o.fs * 0.84), R = rows(fs);
-    while (R.length < items.length && fs > minFs) { fs = Math.max(minFs, fs - 2); R = rows(fs); }
+    while (R.shown < items.length && fs > minFs) { fs = Math.max(minFs, fs - 2); R = rows(fs); }
     if (!R.length) { fs = minFs; R = rows(fs); if (!R.length) return o.y; }
     // 줄이 적어 자리가 남으면 글씨를 키움 (최대 1.3배)
-    if (R.length === items.length) { var big = fs, R2; while (big < o.fs * 1.3) { R2 = rows(big + 2); if (R2.length < items.length) break; big += 2; R = R2; } fs = big; }
+    if (R.shown === items.length) { var big = fs, R2; while (big < o.fs * 1.3) { R2 = rows(big + 2); if (R2.shown < items.length) break; big += 2; R = R2; } fs = big; }
+    items.shown = R.shown;
     var y = o.y;
     R.forEach(function (r, i) {
       var ty = y + (fs * gap - fs) / 2, bx = o.x, room = o.w;
@@ -825,9 +850,9 @@
       var lt = lumOf(String(o.fill || '#888').charAt(0) === '#' ? o.fill : '#888') > 0.55, ink = lt ? 'rgba(0,0,0,' : 'rgba(255,255,255,';
       ctx.strokeStyle = ink + '.07)'; ctx.lineWidth = Math.max(6, Math.min(w, h) * 0.02);
       for (var k = -h; k < w; k += Math.max(24, Math.min(w, h) * 0.07)) { ctx.beginPath(); ctx.moveTo(x + k, y + h); ctx.lineTo(x + k + h, y); ctx.stroke(); }
-      var lab = D.head || D.title, fs = Math.min(h * 0.2, w * 0.16);
+      var lab = D.head || D.title, fs = Math.min(h * 0.11, w * 0.09);
       ctx.font = '800 ' + Math.round(fs) + 'px ' + (o.fam || FONT); while (ctx.measureText(lab).width > w * 0.8 && fs > 14) { fs -= 2; ctx.font = '800 ' + Math.round(fs) + 'px ' + (o.fam || FONT); }
-      ctx.fillStyle = ink + '.5)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x + w / 2, y + h / 2); ctx.textAlign = 'left';
+      ctx.fillStyle = ink + '.32)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x + w / 2, y + h / 2); ctx.textAlign = 'left';
     }
     ctx.restore();
     if (o.stroke) { ctx.strokeStyle = o.stroke; ctx.lineWidth = o.sw || 4; shapePath(ctx, x - (o.pad || 0), y - (o.pad || 0), w + (o.pad || 0) * 2, h + (o.pad || 0) * 2, o.shape, o.r ? o.r + (o.pad || 0) : 0); ctx.stroke(); }
@@ -882,7 +907,7 @@
     var bandH = Math.max((g.land ? 150 : 210) * u, tBlock(ctx, D.title, Object.assign({ dry: 1 }, TT)) - by + (D.sub ? 70 : 34) * u);
     ctx.fillStyle = P.accent; ctx.fillRect(0, 0, W, by + bandH);
     var ty = tBlock(ctx, D.title, TT);
-    if (D.sub) tBlock(ctx, D.sub, { x: bx, y: ty + 8 * u, w: W - bx * 2 - br * 2.4, size: 26 * u, min: 20 * u, fam: FONT, weight: 600, color: P.onAccent, lines: 1 });
+    if (D.sub) tBlock(ctx, D.sub, { x: bx, y: ty + 18 * u, w: W - bx * 2 - br * 2.4, size: 26 * u, min: 20 * u, fam: FONT, weight: 600, color: P.onAccent, lines: 1 });
     if (D.badge) {
       var cx = W - bx - br, cy = by + bandH / 2;
       ctx.save(); ctx.translate(cx, cy); ctx.rotate(-0.14); ctx.strokeStyle = P.onAccent; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(0, 0, br, 0, Math.PI * 2); ctx.stroke();
@@ -1202,24 +1227,44 @@
   };
   LAYS.safe = LAYS.mdark;
 
-  function snsData(card, design, opts, imgs) {
-    var items = frameMenu(card, opts).map(function (m) { return { n: m.n, p: m.p }; });
+  // 크기마다 사진에 넣을 줄 수 (넘치면 앞에서부터 이만큼 + "외 N가지")
+  var SNS_CAP = { sq: 4, p45: 6, story: 9, k43: 5, yt: 4, link: 3 };
+  function snsPlan(card, opts, sizeId) {
     var fromMenu = !!(card.reserve && card.reserve.menu && card.reserve.menu.length) || !!(opts && opts.menu && opts.menu.length);
-    var tag = fromMenu ? ((card.body || []).filter(function (l) { return /한정|할인|이벤트|신메뉴|오픈|모집|특강|무료/.test(l); })[0] || (card.body || [])[0] || '') : '';
-    tag = String(tag).replace(/^[^:：]{0,12}[:：]\s*/, '');
+    var B = bodyItems(card.body), items = frameMenu(card, opts).map(function (m) { return { n: m.n, p: m.p }; });
+    // 메뉴를 따로 적었으면 본문에서 '한정·할인·이벤트' 같은 한 줄을 꼬리표로 (머리말 줄 ■ 는 꼬리표로 안 씀)
+    var tag = '', hotLine = '';
+    if (fromMenu) { var hot = B.items.filter(function (x) { return !x.p && /한정|할인|이벤트|신메뉴|오픈|모집|특강|무료|특선/.test(x.n); })[0]; tag = hot ? hot.n.replace(/^[^:：]{0,12}[:：]\s*/, '') : ''; hotLine = hot ? hot.n : ''; }
+    // 메뉴를 따로 적었으면 본문의 안내 줄(배달 안 함·주차 등)도 자리가 남는 만큼 메뉴 뒤에
+    if (fromMenu) B.items.forEach(function (x) { if (!x.p && x.n !== (tag ? hotLine : '')) items.push({ n: x.n, p: '' }); });
+    var cap = SNS_CAP[sizeId] || 6, cut = 0, total = items.length, unit = fromMenu || items.some(function (x) { return x.p; }) ? '메뉴' : '';
+    if (items.length > cap) { cut = items.length - cap; items = items.slice(0, cap); }
+    items.more = cut; items.unit = unit;
+    return { items: items, cut: cut, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag, head: B.head, total: total, cap: cap };
+  }
+  // 01029477775 → 010-2947-7775, 025412125 → 02-541-2125 (이미 - 가 있으면 그대로)
+  function telFmt(t) {
+    t = String(t || '').trim(); var d = t.replace(/\D/g, '');
+    if (/-/.test(t) || d.length < 9) return t;
+    if (/^02/.test(d)) return d.replace(/^(02)(\d{3,4})(\d{4})$/, '$1-$2-$3');
+    return d.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
+  }
+  function snsData(card, design, opts, imgs, sizeId) {
+    var pl = snsPlan(card, opts, sizeId);
     var title = String(card.title || '').trim() || '싸바';
     return {
-      title: title, sub: String(card.subtitle || '').trim(), items: items, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag,
-      phone: card.contact && card.contact.phone || '', addr: frameAddr(card) || (card.place && card.place.name) || '',
-      head: IND_HEAD[opts.industry] || String(design.badge || '').replace(/\n/g, ' ') || TYPE_HEAD[card.template] || '안내', badge: design.badge || '',
+      title: title, sub: String(card.subtitle || '').trim(), items: pl.items, tag: pl.tag,
+      phone: telFmt(card.contact && card.contact.phone || ''), addr: frameAddr(card) || (card.place && card.place.name) || '',
+      head: IND_HEAD[opts.industry] || pl.head || String(design.badge || '').replace(/\n/g, ' ') || TYPE_HEAD[card.template] || '안내', badge: design.badge || '',
       imgs: imgs, main: imgs[0] || null, ip: card.image ? card.ip : null, fam: famStack(design)
     };
   }
   function drawSns(card, design, opts, imgs, size) {
     var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d');
-    var D = snsData(card, design, opts, imgs), P = design.colors;
+    var D = snsData(card, design, opts, imgs, size.id), P = design.colors;
     (LAYS[design.style] || LAYS.minimal)(ctx, W, H, D, P);
     mark(ctx, W, H, lumOf(P.bg) > 0.5);
+    c._fit = { shown: D.items.shown == null ? D.items.length : D.items.shown, total: D.items.length + (D.items.more || 0) };
     return c;
   }
   // 디자인 1개 → 올릴 곳 크기 6가지 (opts.sizes 로 골라 그릴 수 있음)
@@ -1238,7 +1283,7 @@
       var base = String(card.title || '싸바').replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 16), dn = design.name.replace(/[·\s]/g, '');
       var list = sizes.map(function (sz) { return { name: base + '-' + dn + '-' + sz.places[0].replace(/[·\s]/g, '') + '-' + sz.w + 'x' + sz.h, label: sz.label + ' · ' + sz.places.join(' · '), places: sz.places, size: sz, c: drawSns(card, design, opts, imgs, sz) }; });
       return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
-        return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, places: x.places, sizeId: x.size.id, blob: blobs[i], w: x.c.width, h: x.c.height }; });
+        return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, places: x.places, sizeId: x.size.id, blob: blobs[i], w: x.c.width, h: x.c.height, fit: x.c._fit }; });
       });
     });
   }
@@ -1246,5 +1291,5 @@
   // 업종별 템플릿(js/pack.js)이 같은 도구로 그리도록 내어 줌
   var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
     tBlock: tBlock, iList: iList, pic: pic, geo: geo, safeY: safeY, lumOf: lumOf, frameMenu: frameMenu, frameAddr: frameAddr, loadSerif: loadSerif, sizes: SNS_SIZES };
-  global.SsakaExport = { _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
+  global.SsakaExport = { plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

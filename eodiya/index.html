@@ -205,10 +205,10 @@
     .mode[data-mode="ask"]  { background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(60,0,10,.35) 100%), url(../img/mode-cherry-red.jpg?v=4) center/cover, var(--mc); }
     .mode[data-mode="come"] { background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,15,50,.35) 100%), url(../img/mode-cherry-blue.jpg?v=4) center/cover, var(--mc); }
     .mode[data-mode="play"] { background: url(../img/mode-cherry-yellow.jpg?v=5) center/cover, var(--mc); }
-    .mode b, .mode span { text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+    .mode b, .mode span { text-shadow: 0 1px 2px rgba(0,0,0,.8), 0 0 6px rgba(0,0,0,.5); }
     .mode span { font-weight: 700; }
     /* 노랑 칸은 흰 글씨가 묻혀서 진한 갈색 글씨로 */
-    .mode[data-mode="play"] b, .mode[data-mode="play"] span, .mode[data-mode="play"][aria-pressed="true"] b, .mode[data-mode="play"][aria-pressed="true"] span { color: #3D1F00; opacity: 1; text-shadow: 0 1px 3px rgba(255,240,170,.9); }
+    .mode[data-mode="play"] b, .mode[data-mode="play"] span, .mode[data-mode="play"][aria-pressed="true"] b, .mode[data-mode="play"][aria-pressed="true"] span { color: #3D1F00; opacity: 1; text-shadow: 0 1px 2px rgba(255,255,255,.95), 0 0 6px rgba(255,248,210,.9); }
     .mode[aria-pressed="true"]::after { content: '✓'; position: absolute; top: 8px; right: 9px; width: 22px; height: 22px; border-radius: 50%; background: #fff; color: var(--mc); font-size: 14px; font-weight: 900; display: grid; place-items: center; }
     .mode:active { transform: translateY(2px); }
     .box { background: #fff; border-radius: 22px; box-shadow: 0 10px 24px -18px rgba(90,30,30,.45); border: 1px solid #F3E6DF; }

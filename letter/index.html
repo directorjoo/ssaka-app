@@ -33,6 +33,9 @@
     .it i { font-style: normal; font-size: 28px; line-height: 1.1; text-align: center; }
     .it b { display: block; font-size: 18px; font-weight: 900; letter-spacing: -.02em; }
     .it p { margin: 4px 0 0; font-size: 16.5px; line-height: 1.6; word-break: keep-all; }
+    .sum { margin: 10px 0 4px; font-size: 17px; line-height: 1.75; word-break: keep-all; }
+    .src { margin-top: 16px; padding-top: 12px; border-top: 2px solid #f0e4dc; font-size: 14px; font-weight: 800; color: #8a7f78; }
+    .gl { margin-top: 12px; font-size: 14.5px; font-weight: 900; color: #B3132B; }
     .li { display: grid; grid-template-columns: 34px 1fr; gap: 8px; padding: 12px 0; border-top: 1px solid #f3ebe5; color: inherit; text-decoration: none; }
     .li i { font-style: normal; font-size: 22px; line-height: 1.3; text-align: center; }
     .li b { display: block; font-size: 16.5px; font-weight: 800; line-height: 1.45; color: #1A4FB0; word-break: keep-all; }
@@ -102,7 +105,10 @@
       var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + ' 아침편지</div>';
       h += '<div class="hello">' + esc(d.hello) + '</div>';
       if (d.list) {
-        h += d.items.length ? d.items.map(function (x) { return '<a class="li" href="' + esc(x.url) + '" target="_blank" rel="noopener"><i>' + esc(x.icon || '•') + '</i><span><b>' + esc(x.title) + '</b>' + (x.body ? '<small>' + esc(x.body) + '</small>' : '') + '</span></a>'; }).join('') : '<div class="msg">오늘은 새 소식이 없어요. 아래 바로가기에서 확인해 보세요.</div>';
+        if (d.summary) h += '<p class="sum">' + esc(d.summary) + '</p>';
+        if (d.items.length) h += '<div class="src">출처 · 제목을 누르면 원문이 열려요</div>';
+        var pg = '';
+        h += d.items.length ? d.items.map(function (x) { var g = x.g && x.g !== pg ? '<div class="gl">' + esc(x.g) + '</div>' : ''; pg = x.g || pg; return g + '<a class="li" href="' + esc(x.url) + '" target="_blank" rel="noopener"><i>' + esc(x.icon || '•') + '</i><span><b>' + esc(x.title) + '</b>' + (x.body ? '<small>' + esc(x.body) + '</small>' : '') + '</span></a>'; }).join('') : '<div class="msg">오늘은 새 소식이 없어요. 아래 바로가기에서 확인해 보세요.</div>';
         if (d.links && d.links.length) h += '<div class="go"><b>바로가기</b>' + d.links.map(function (x) { return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(x.t) + ' ›</a>'; }).join('') + '</div>';
       } else
       h += d.items.map(function (x) { return '<div class="it"><i>' + esc(x.icon || '•') + '</i><div><b>' + esc(x.title) + '</b><p>' + esc(x.body) + '</p>' + (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">원문 보기 ›</a>' : '') + '</div></div>'; }).join('');
@@ -113,7 +119,7 @@
   $('send').addEventListener('click', function () {
     var who = WHO.filter(function (w) { return w[0] === k; })[0];
     var url = location.origin + '/letter/?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city));
-    var desc = last ? (last.hello + ' · ' + last.items.slice(0, 3).map(function (x) { return x.icon + ' ' + x.title; }).join(' · ')) : '오늘 바로 쓸 수 있는 정보만 골라 드려요';
+    var desc = last && last.summary ? (last.hello + ' ' + last.summary) : last ? (last.hello + ' · ' + last.items.slice(0, 3).map(function (x) { return x.icon + ' ' + x.title; }).join(' · ')) : '오늘 바로 쓸 수 있는 정보만 골라 드려요';
     var opt = { title: '💌 싸바 아침편지 · ' + who[1] + ' ' + who[2], description: desc.slice(0, 120), url: url, buttonTitle: '편지 열기', noButtons: true };
     if (window.SsakaShare) SsakaShare(opt); else if (navigator.share) navigator.share({ title: opt.title, text: desc, url: url });
   });

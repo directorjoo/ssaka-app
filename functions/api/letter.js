@@ -108,11 +108,12 @@ async function programs(env, c, diag) {
   } catch (e) { if (diag) diag.bizinfo = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
 
-const COMMON = '규칙: 받으면 오늘 바로 써먹을 수 있는 실용 정보만 쓴다. 명언·고사성어·좋은 글귀·교훈은 절대 넣지 않는다. 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 주어진 자료(날씨·뉴스 제목·공고)에 없는 숫자·날짜·사실은 지어내지 않는다(일반 상식 수준의 건강·장사 요령은 괜찮다). 존댓말, 쉬운 말, 한 항목 2문장 이내, 문장마다 짧게. 별표(*)와 마크다운 금지. 자료 끝의 [번호]는 원문 링크 번호다. 주소를 직접 쓰지 말고 근거로 쓴 자료의 번호(숫자)만 ref에 넣는다.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄(날씨를 넣어서, 예: 싸바? 광주는 오늘 영하 2도예요)","items":[{"icon":"이모지 1개","title":"12자 안팎 제목","body":"내용","ref":근거 자료 번호(없으면 0)}]}';
+// 편지 모양: 맨 위 인사 + 요점 정리(AI가 몇 문장으로) → 아래에 기사·공고 제목과 출처, 원문 링크 목록
+const COMMON = '규칙: 아래 자료 제목들을 읽고 받는 사람에게 오늘 꼭 알릴 것만 골라 요점을 정리한다. 자료에 있는 이름(회사·작품·기관·행사)과 날짜를 그대로 짚어 준다. 자료에 없는 숫자·날짜·사실은 지어내지 않는다. 명언·고사성어·좋은 글귀·교훈, 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)와 마크다운 금지.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄","summary":"요점 3~5문장(한 문단)"}';
 const RULES = {
-  senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. 항목 5개: 1) 오늘 날씨에 맞춘 몸 관리(기온·미세먼지·비에 맞게) 2) 요즘 조심할 병이나 유행(뉴스 제목 근거, 없으면 계절 질환) 3) 공짜로 받는 것(무료 접종·검진·보건소·어르신 혜택 — 뉴스 제목 근거, 원문 url 함께) 4) 오늘 밥상 한 가지(제철 재료로 쉽게) 5) 조심할 사기 수법(뉴스 근거, 없으면 흔한 유형 한 가지). ' + COMMON,
-  boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. 항목 5~6개: 1) 오늘 날씨로 팔 것(기온·비·미세먼지에 따라 손님이 찾는 것과 가게 앞 문구 예시) 2) 사람이 몰리는 곳·날(전국 축제·행사 자료가 있으면 그것, 없으면 요일·계절 흐름) 3) 놓치면 손해(전국 지원사업 공고·정책자금·세금 신고 기한 — 마감 가까운 것, 자료 근거, url 함께) 4) 장사에 닿는 뉴스 한 줄(카드 수수료·배달앱·최저임금 등, url 함께) 5) 요즘 뜨는 것(인기 검색어에서 장사에 쓸 만한 것) 6) 오늘 할 홍보 하나(단골에게 보낼 한 줄 문구 예시, 마지막에 "싸바카드로 1분이면 만들어요"). ' + COMMON,
-  actor: '너는 배우들에게 매일 아침 오디션 소식을 정리해 주는 캐스팅 매니저다. 영화·드라마·웹드라마·연극·뮤지컬·광고·뮤직비디오를 가리지 않고 모두 다룬다. 주어진 오디션·모집 뉴스 제목 가운데 실제 모집 공고로 보이는 것만 골라 항목으로 만든다(최대 8개). icon은 분야 표시: 영화🎬 드라마📺 연극🎭 뮤지컬🎤 광고·뮤비📢 기타🎟️. title은 작품·제작사 이름, body는 배역·조건·마감(제목에 있는 것만)과 "자세한 지원 방법은 원문에서". 마감이 가까워 보이는 것을 앞에. 공고가 하나도 없으면 items에 오디션 준비 실전 요령 1개만(프로필 사진·자기소개 영상 등). ' + COMMON
+  senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. hello는 날씨를 넣어서(예: 어르신, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨에 맞춘 몸 관리 한 마디 + 자료에서 유행 질병, 무료 접종·검진·혜택, 조심할 사기 수법의 요점. ' + COMMON,
+  boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. hello는 날씨를 넣어서(예: 대표님, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨로 잘 팔릴 것 한 마디 + 자료에서 마감 가까운 지원사업, 사람 몰리는 축제·행사, 장사에 닿는 뉴스의 요점. ' + COMMON,
+  actor: '너는 배우들에게 매일 아침 오디션 소식을 알려 주는 캐스팅 매니저다. hello는 "연기자 여러분, 오늘도 좋은 날입니다." 같은 응원 한 줄. summary: 자료 중 실제 오디션·배우 모집으로 보이는 것만 골라 "어디서(회사·극단) 무엇(작품·분야)을 모집 중"인지 이어서 알려 준다(예: ○○엔터에서 뮤지컬 「○○」, 영화 「○○」에서 배우 모집 중이에요). 모집이 없으면 그렇다고 짧게. ' + COMMON
 };
 
 // 배우 편지 아래 늘 붙는 바로가기 — 공고가 직접 올라오는 곳
@@ -121,60 +122,66 @@ const ACTOR_LINKS = [
   { t: '네이버 뉴스 · 배우 오디션', url: 'https://search.naver.com/search.naver?where=news&sort=1&query=' + encodeURIComponent('배우 오디션 모집') },
   { t: '영화진흥위원회(영진위)', url: 'https://www.kofic.or.kr' }
 ];
+const BOSS_LINKS = [
+  { t: '기업마당 지원사업', url: 'https://www.bizinfo.go.kr' },
+  { t: '소상공인24', url: 'https://www.sbiz24.kr' }
+];
+
+function mmdd(d) { if (!d) return ''; const t = new Date(d + 9 * 3600e3); return (t.getUTCMonth() + 1) + '/' + t.getUTCDate(); }
+function uniq(arr) { const seen = {}; return arr.filter(x => x && x.t && !seen[x.t] && (seen[x.t] = 1)); }
 
 async function build(k, city, env) {
   const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();
-  // 긴 원문 주소는 AI에 보내지 않고 [번호]로 바꿔 보냄 — 답이 길어져 중간에 잘리는 것을 막음
-  const refs = [], R = url => { if (!url) return ''; refs.push(url); return '[' + refs.length + ']'; };
-  let src = '', raw = [];
+  let groups = [], extra = '', links = [];
   if (k === 'senior') {
     const [a, b, s] = await Promise.all([news('독감 OR 감기 OR 유행 주의보 when:7d', 6), news('어르신 무료 접종 OR 건강검진 OR 보건소 OR 노인 혜택 when:14d', 6), news('노인 사기 OR 보이스피싱 수법 when:14d', 4)]);
-    raw = [['🤧', a], ['🆓', b], ['🚨', s]];
-    src = '[유행·질병 뉴스]\n' + a.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[무료·혜택 뉴스]\n' + b.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[사기 뉴스]\n' + s.map(x => '- ' + x.t).join('\n');
+    groups = [['🤧', '유행·질병', a], ['🆓', '무료·혜택', b], ['🚨', '사기 조심', s]];
   } else if (k === 'boss') {
-    const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 8), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
-    const p2 = p.length ? p : await news('소상공인 지원사업 신청 마감 when:7d', 5);
-    raw = [['💰', p2.map(x => ({ t: x.t, b: (x.org ? x.org + ' · ' : '') + (x.when ? '신청 ' + x.when : ''), url: x.url }))], ['🎪', f.map(x => ({ t: x.t, b: x.at + ' ' + x.addr, url: x.url }))], ['📰', a]];
-    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[2주 안 전국 축제·행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + ' ' + R(x.url)).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' ' + R(x.url)).join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
+    const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 6), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
+    const p2 = p.length ? p.map(x => ({ t: x.t, src: (x.org || '기업마당') + (x.when ? ' · 신청 ' + x.when : ''), url: x.url })) : await news('소상공인 지원사업 신청 마감 when:7d', 5);
+    groups = [['💰', '지원사업', p2.slice(0, 6)], ['🎪', '축제·행사', f.slice(0, 6).map(x => ({ t: x.t, src: x.at + ' · ' + x.addr, url: x.url }))], ['📰', '장사 뉴스', a]];
+    if (tr.length) extra = '\n[지금 인기 검색어] ' + tr.join(', ');
+    links = BOSS_LINKS;
   } else {
-    const qs = ['오디션 when:14d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '광고 모델 모집 OR 아역 오디션 when:30d'];
+    const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d'];
     const got = await Promise.all(qs.map(q => news(q, 12)));
-    const seen = {}, all = [].concat(...got).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !seen[x.t] && (seen[x.t] = 1));
-    // 배우 편지는 AI가 다시 쓰지 않고 제목 + 원문 링크만 — 배우가 직접 골라 봄
-    const mm = d => { const t = new Date(d + 9 * 3600e3); return (t.getUTCMonth() + 1) + '/' + t.getUTCDate(); };
-    const list = all.sort((x, y) => y.d - x.d).slice(0, 20).map(x => ({ icon: /뮤지컬/.test(x.t) ? '🎤' : /연극/.test(x.t) ? '🎭' : /드라마/.test(x.t) ? '📺' : /광고|뮤직비디오|뮤비/.test(x.t) ? '📢' : '🎬', title: x.t, body: [x.src, x.d ? mm(x.d) : ''].filter(Boolean).join(' · '), url: x.url }));
-    return { k, city, date: ymd(today), w, list: true, hello: '싸바? 오늘의 오디션·모집 소식이에요. 제목을 누르면 원문이 열려요.', items: list, links: ACTOR_LINKS };
+    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src)).sort((x, y) => y.d - x.d).slice(0, 20);
+    const ic = t => /뮤지컬/.test(t) ? '🎤' : /연극/.test(t) ? '🎭' : /드라마/.test(t) ? '📺' : /광고|모델|뮤직비디오|뮤비/.test(t) ? '📢' : '🎬';
+    groups = [['🎬', '오디션·모집', all.map(x => Object.assign({ icon: ic(x.t) }, x))]];
+    links = ACTOR_LINKS;
   }
+  // 아래 목록: 제목 + 출처(날짜) + 원문 링크
+  const items = [];
+  groups.forEach(([icon, label, arr]) => uniq(arr || []).forEach(x => items.push({ icon: x.icon || icon, g: label, title: String(x.t).slice(0, 110), body: [x.src, mmdd(x.d)].filter(Boolean).join(' · ').slice(0, 80), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '' })));
+  // AI에는 제목만 보내고 짧은 요점만 받음(주소는 안 보냄 → 답이 잘리지 않음)
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
+  const src = groups.map(([, label, arr]) => '[' + label + ']\n' + ((arr || []).length ? arr.map(x => '- ' + x.t + (x.src ? ' (' + x.src + ')' : '')).join('\n') : '(자료 없음)')).join('\n') + extra;
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
   let out = null;
   if (key) {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-      body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: RULES[k], messages: [{ role: 'user', content: '오늘: ' + (today.getUTCMonth() + 1) + '월 ' + today.getUTCDate() + '일 ' + '일월화수목금토'[today.getUTCDay()] + '요일\n[날씨] ' + wtxt + '\n' + src }] })
-    });
-    if (r.ok) {
-      const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '';
-      try { out = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1)); } catch (e) {}
-    }
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+        body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 1200, system: RULES[k], messages: [{ role: 'user', content: '오늘: ' + (today.getUTCMonth() + 1) + '월 ' + today.getUTCDate() + '일 ' + '일월화수목금토'[today.getUTCDay()] + '요일\n[날씨] ' + wtxt + '\n' + src }] })
+      });
+      if (r.ok) {
+        const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '';
+        out = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+      }
+    } catch (e) { out = null; }
   }
   const clean = s => String(s || '').replace(/\*/g, '').trim();
-  if (!out || !Array.isArray(out.items) || !out.items.length) {
-    // AI가 실패해도 받아 온 자료는 그대로 보여 줌 (이 편지는 캐시하지 않고 다음에 다시 AI로 시도)
-    const items = [];
-    raw.forEach(([icon, arr]) => (arr || []).slice(0, 3).forEach(x => items.push({ icon, title: clean(x.t).slice(0, 24), body: clean(x.b || x.t).slice(0, 220), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '' })));
-    if (!items.length) throw new Error('ai');
-    return { k, city, date: ymd(today), w, fallback: true, hello: '싸바? ' + (w ? c[2] + '는 오늘 최고 ' + w.max + '도, 최저 ' + w.min + '도예요' : '오늘의 소식이에요'), items: items.slice(0, 8) };
-  }
-  const link = x => { const n = parseInt(x.ref, 10); if (n > 0 && refs[n - 1]) return refs[n - 1]; return /^https?:\/\//.test(x.url || '') ? x.url : ''; };
+  const ok = out && clean(out.summary);
+  if (!ok && !items.length) throw new Error('ai');
+  const hi = { senior: '어르신, 싸바?', boss: '대표님, 싸바?', actor: '연기자 여러분, 오늘도 좋은 날입니다.' }[k];
   return {
-    k, city, date: ymd(today), w,
-    hello: clean(out.hello).slice(0, 80),
-    items: out.items.slice(0, 8).map(x => ({ icon: clean(x.icon).slice(0, 4), title: clean(x.title).slice(0, 24), body: clean(x.body).slice(0, 220), url: String(link(x)).slice(0, 600) }))
+    k, city, date: ymd(today), w, list: true, fallback: !ok,
+    hello: clean(ok ? out.hello : '') .slice(0, 80) || hi + (w && k !== 'actor' ? ' ' + c[2] + '는 오늘 최고 ' + w.max + '도, 최저 ' + w.min + '도예요.' : ''),
+    summary: ok ? clean(out.summary).slice(0, 600) : '',
+    items: items.slice(0, 20), links
   };
 }
-
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || 'boss', city = pickCity(u.searchParams.get('city'));
   if (!RULES[k]) return json({ error: 'bad-k' }, 400);
@@ -184,7 +191,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter2/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);

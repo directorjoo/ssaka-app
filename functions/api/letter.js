@@ -29,7 +29,7 @@ async function getText(url) { const r = await fetch(url, { headers: { 'user-agen
 async function news(q, n) {
   try {
     const xml = await getText('https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=ko&gl=KR&ceid=KR:ko');
-    return (xml.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, n).map(x => { let t = tag(x, 'title'); const s = tag(x, 'source'); if (s && t.endsWith(' - ' + s)) t = t.slice(0, -(s.length + 3)); return { t: t.slice(0, 110), src: s.slice(0, 20), url: tag(x, 'link') }; }).filter(x => x.t && /^https?:/.test(x.url));
+    return (xml.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, n).map(x => { let t = tag(x, 'title'); const s = tag(x, 'source'); if (s && t.endsWith(' - ' + s)) t = t.slice(0, -(s.length + 3)); return { t: t.slice(0, 110), src: s.slice(0, 20), url: tag(x, 'link'), d: Date.parse(tag(x, 'pubDate')) || 0 }; }).filter(x => x.t && /^https?:/.test(x.url));
   } catch (e) { return []; }
 }
 async function weather(c) {
@@ -115,6 +115,13 @@ const RULES = {
   actor: '너는 배우들에게 매일 아침 오디션 소식을 정리해 주는 캐스팅 매니저다. 영화·드라마·웹드라마·연극·뮤지컬·광고·뮤직비디오를 가리지 않고 모두 다룬다. 주어진 오디션·모집 뉴스 제목 가운데 실제 모집 공고로 보이는 것만 골라 항목으로 만든다(최대 8개). icon은 분야 표시: 영화🎬 드라마📺 연극🎭 뮤지컬🎤 광고·뮤비📢 기타🎟️. title은 작품·제작사 이름, body는 배역·조건·마감(제목에 있는 것만)과 "자세한 지원 방법은 원문에서". 마감이 가까워 보이는 것을 앞에. 공고가 하나도 없으면 items에 오디션 준비 실전 요령 1개만(프로필 사진·자기소개 영상 등). ' + COMMON
 };
 
+// 배우 편지 아래 늘 붙는 바로가기 — 공고가 직접 올라오는 곳
+const ACTOR_LINKS = [
+  { t: '필름메이커스 배우 모집', url: 'https://www.filmmakers.co.kr/actorsAudition' },
+  { t: '네이버 뉴스 · 배우 오디션', url: 'https://search.naver.com/search.naver?where=news&sort=1&query=' + encodeURIComponent('배우 오디션 모집') },
+  { t: '영화진흥위원회(영진위)', url: 'https://www.kofic.or.kr' }
+];
+
 async function build(k, city, env) {
   const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();
   // 긴 원문 주소는 AI에 보내지 않고 [번호]로 바꿔 보냄 — 답이 길어져 중간에 잘리는 것을 막음
@@ -132,8 +139,10 @@ async function build(k, city, env) {
   } else {
     const [a, b, m] = await Promise.all([news('오디션 모집 배우 when:7d', 10), news('배우 모집 OR 캐스팅 공고 OR 공개 오디션 when:10d', 8), news('뮤지컬 OR 연극 오디션 when:14d', 6)]);
     const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));
-    raw = [['🎬', all]];
-    src = '[오디션·모집 뉴스 제목]\n' + all.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n');
+    // 배우 편지는 AI가 다시 쓰지 않고 제목 + 원문 링크만 — 배우가 직접 골라 봄
+    const mm = d => { const t = new Date(d + 9 * 3600e3); return (t.getUTCMonth() + 1) + '/' + t.getUTCDate(); };
+    const list = all.sort((x, y) => y.d - x.d).slice(0, 15).map(x => ({ icon: /뮤지컬/.test(x.t) ? '🎤' : /연극/.test(x.t) ? '🎭' : /드라마/.test(x.t) ? '📺' : /광고|뮤직비디오|뮤비/.test(x.t) ? '📢' : '🎬', title: x.t, body: [x.src, x.d ? mm(x.d) : ''].filter(Boolean).join(' · '), url: x.url }));
+    return { k, city, date: ymd(today), w, list: true, hello: '싸바? 오늘의 오디션·모집 소식이에요. 제목을 누르면 원문이 열려요.', items: list, links: ACTOR_LINKS };
   }
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;

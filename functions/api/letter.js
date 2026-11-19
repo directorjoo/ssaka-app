@@ -108,7 +108,7 @@ async function programs(env, c, diag) {
   } catch (e) { if (diag) diag.bizinfo = '실패: ' + String(e.message || e).slice(0, 80); return []; }
 }
 
-const COMMON = '규칙: 받으면 오늘 바로 써먹을 수 있는 실용 정보만 쓴다. 명언·고사성어·좋은 글귀·교훈은 절대 넣지 않는다. 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 주어진 자료(날씨·뉴스 제목·공고)에 없는 숫자·날짜·사실은 지어내지 않는다(일반 상식 수준의 건강·장사 요령은 괜찮다). 존댓말, 쉬운 말, 한 항목 2문장 이내, 문장마다 짧게. 별표(*)와 마크다운 금지. 자료의 url을 쓸 때는 받은 그대로 쓴다.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄(날씨를 넣어서, 예: 싸바? 광주는 오늘 영하 2도예요)","items":[{"icon":"이모지 1개","title":"12자 안팎 제목","body":"내용","url":"있으면 원문 주소, 없으면 빈 문자열"}]}';
+const COMMON = '규칙: 받으면 오늘 바로 써먹을 수 있는 실용 정보만 쓴다. 명언·고사성어·좋은 글귀·교훈은 절대 넣지 않는다. 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 주어진 자료(날씨·뉴스 제목·공고)에 없는 숫자·날짜·사실은 지어내지 않는다(일반 상식 수준의 건강·장사 요령은 괜찮다). 존댓말, 쉬운 말, 한 항목 2문장 이내, 문장마다 짧게. 별표(*)와 마크다운 금지. 자료 끝의 [번호]는 원문 링크 번호다. 주소를 직접 쓰지 말고 근거로 쓴 자료의 번호(숫자)만 ref에 넣는다.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄(날씨를 넣어서, 예: 싸바? 광주는 오늘 영하 2도예요)","items":[{"icon":"이모지 1개","title":"12자 안팎 제목","body":"내용","ref":근거 자료 번호(없으면 0)}]}';
 const RULES = {
   senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. 항목 5개: 1) 오늘 날씨에 맞춘 몸 관리(기온·미세먼지·비에 맞게) 2) 요즘 조심할 병이나 유행(뉴스 제목 근거, 없으면 계절 질환) 3) 공짜로 받는 것(무료 접종·검진·보건소·어르신 혜택 — 뉴스 제목 근거, 원문 url 함께) 4) 오늘 밥상 한 가지(제철 재료로 쉽게) 5) 조심할 사기 수법(뉴스 근거, 없으면 흔한 유형 한 가지). ' + COMMON,
   boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. 항목 5~6개: 1) 오늘 날씨로 팔 것(기온·비·미세먼지에 따라 손님이 찾는 것과 가게 앞 문구 예시) 2) 사람이 몰리는 곳·날(전국 축제·행사 자료가 있으면 그것, 없으면 요일·계절 흐름) 3) 놓치면 손해(전국 지원사업 공고·정책자금·세금 신고 기한 — 마감 가까운 것, 자료 근거, url 함께) 4) 장사에 닿는 뉴스 한 줄(카드 수수료·배달앱·최저임금 등, url 함께) 5) 요즘 뜨는 것(인기 검색어에서 장사에 쓸 만한 것) 6) 오늘 할 홍보 하나(단골에게 보낼 한 줄 문구 예시, 마지막에 "싸바카드로 1분이면 만들어요"). ' + COMMON,
@@ -117,18 +117,23 @@ const RULES = {
 
 async function build(k, city, env) {
   const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();
-  let src = '';
+  // 긴 원문 주소는 AI에 보내지 않고 [번호]로 바꿔 보냄 — 답이 길어져 중간에 잘리는 것을 막음
+  const refs = [], R = url => { if (!url) return ''; refs.push(url); return '[' + refs.length + ']'; };
+  let src = '', raw = [];
   if (k === 'senior') {
     const [a, b, s] = await Promise.all([news('독감 OR 감기 OR 유행 주의보 when:7d', 6), news('어르신 무료 접종 OR 건강검진 OR 보건소 OR 노인 혜택 when:14d', 6), news('노인 사기 OR 보이스피싱 수법 when:14d', 4)]);
-    src = '[유행·질병 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[무료·혜택 뉴스]\n' + b.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[사기 뉴스]\n' + s.map(x => '- ' + x.t).join('\n');
+    raw = [['🤧', a], ['🆓', b], ['🚨', s]];
+    src = '[유행·질병 뉴스]\n' + a.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[무료·혜택 뉴스]\n' + b.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[사기 뉴스]\n' + s.map(x => '- ' + x.t).join('\n');
   } else if (k === 'boss') {
     const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 8), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
     const p2 = p.length ? p : await news('소상공인 지원사업 신청 마감 when:7d', 5);
-    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n') + '\n[2주 안 전국 축제·행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + (x.url ? ' (' + x.url + ')' : '')).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' (' + x.url + ')').join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
+    raw = [['💰', p2.map(x => ({ t: x.t, b: (x.org ? x.org + ' · ' : '') + (x.when ? '신청 ' + x.when : ''), url: x.url }))], ['🎪', f.map(x => ({ t: x.t, b: x.at + ' ' + x.addr, url: x.url }))], ['📰', a]];
+    src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[2주 안 전국 축제·행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + ' ' + R(x.url)).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' ' + R(x.url)).join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
   } else {
     const [a, b, m] = await Promise.all([news('오디션 모집 배우 when:7d', 10), news('배우 모집 OR 캐스팅 공고 OR 공개 오디션 when:10d', 8), news('뮤지컬 OR 연극 오디션 when:14d', 6)]);
     const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));
-    src = '[오디션·모집 뉴스 제목]\n' + all.map(x => '- ' + x.t + ' (' + x.url + ')').join('\n');
+    raw = [['🎬', all]];
+    src = '[오디션·모집 뉴스 제목]\n' + all.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n');
   }
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
@@ -137,19 +142,26 @@ async function build(k, city, env) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-      body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 1600, system: RULES[k], messages: [{ role: 'user', content: '오늘: ' + (today.getUTCMonth() + 1) + '월 ' + today.getUTCDate() + '일 ' + '일월화수목금토'[today.getUTCDay()] + '요일\n[날씨] ' + wtxt + '\n' + src }] })
+      body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: RULES[k], messages: [{ role: 'user', content: '오늘: ' + (today.getUTCMonth() + 1) + '월 ' + today.getUTCDate() + '일 ' + '일월화수목금토'[today.getUTCDay()] + '요일\n[날씨] ' + wtxt + '\n' + src }] })
     });
     if (r.ok) {
       const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '';
       try { out = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1)); } catch (e) {}
     }
   }
-  if (!out || !Array.isArray(out.items)) throw new Error('ai');
   const clean = s => String(s || '').replace(/\*/g, '').trim();
+  if (!out || !Array.isArray(out.items) || !out.items.length) {
+    // AI가 실패해도 받아 온 자료는 그대로 보여 줌 (이 편지는 캐시하지 않고 다음에 다시 AI로 시도)
+    const items = [];
+    raw.forEach(([icon, arr]) => (arr || []).slice(0, 3).forEach(x => items.push({ icon, title: clean(x.t).slice(0, 24), body: clean(x.b || x.t).slice(0, 220), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '' })));
+    if (!items.length) throw new Error('ai');
+    return { k, city, date: ymd(today), w, fallback: true, hello: '싸바? ' + (w ? c[2] + '는 오늘 최고 ' + w.max + '도, 최저 ' + w.min + '도예요' : '오늘의 소식이에요'), items: items.slice(0, 8) };
+  }
+  const link = x => { const n = parseInt(x.ref, 10); if (n > 0 && refs[n - 1]) return refs[n - 1]; return /^https?:\/\//.test(x.url || '') ? x.url : ''; };
   return {
     k, city, date: ymd(today), w,
     hello: clean(out.hello).slice(0, 80),
-    items: out.items.slice(0, 8).map(x => ({ icon: clean(x.icon).slice(0, 4), title: clean(x.title).slice(0, 24), body: clean(x.body).slice(0, 220), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '' }))
+    items: out.items.slice(0, 8).map(x => ({ icon: clean(x.icon).slice(0, 4), title: clean(x.title).slice(0, 24), body: clean(x.body).slice(0, 220), url: String(link(x)).slice(0, 600) }))
   };
 }
 
@@ -165,6 +177,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const ckey = new Request(u.origin + '/__letter/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
+  if (data.fallback) return json(data, 200, 0);
   const res = json(data, 200, 600);
   const store = new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=10800' } });
   if (waitUntil) waitUntil(cache.put(ckey, store)); else await cache.put(ckey, store);

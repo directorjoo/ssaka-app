@@ -377,6 +377,22 @@
   .mk-s2 #form > .sec-h, .mk-s2 #form > fieldset, .mk-s2 #exFillBox, .mk-s2 #hLinks,
   .mk-s1 #bar, .mk-s2 #bar { display: none !important; }
   @media (max-width: 859px) { .mk-s1 .preview, .mk-s2 .preview { display: none !important; } }
+  /* 고른 용도(인스타 4:5·스토리 9:16·정사각 1:1)대로 미리보기도 그 모양 그대로 */
+  .snspv { position: relative; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #fff; border: 2px solid #eee; box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); }
+  .snspv.r-feed { aspect-ratio: 4 / 5; width: 100%; } .snspv.r-sq { aspect-ratio: 1 / 1; width: 100%; } .snspv.r-story { aspect-ratio: 9 / 16; height: min(640px, 78vh); }
+  .snspv img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .snspv .snsld { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.8); color: #8E0A1C; font-size: 15px; font-weight: 800; }
+  .snspv .snsld:empty { display: none; }
+  .pvdest { margin: 0 0 8px; padding: 8px 12px; border-radius: 12px; background: #EAF3FF; color: #1B3F7A; font-size: 14px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
+  body.dest-sns .preview .phone, body.dest-sns .preview .pv-up { display: none; }
+  #pvModal .snspv.r-story { height: min(70dvh, 640px); }
+  #pvModal .pv-sns { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: start center; }
+  .done-sns { display: grid; gap: 8px; }
+  .done-sns .snspv { max-width: 300px; } .done-sns .snspv.r-story { height: min(52vh, 480px); }
+  .more-dest { margin-top: 6px; padding: 14px 12px; border-radius: 16px; background: #FFF6F7; border: 2px dashed #E7A3AE; text-align: left; }
+  .more-dest > b { display: block; font-size: 16px; font-weight: 900; color: #8E0A1C; margin-bottom: 2px; }
+  .more-dest > small { display: block; font-size: 13.5px; color: #555; margin-bottom: 10px; word-break: keep-all; }
+  .more-dest .made { display: block; margin-top: 8px; font-size: 13px; color: #2b9a4a; font-weight: 800; }
   .tp-head b { display: block; font-size: 18px; font-weight: 900; color: #1a1a1a; margin-bottom: 2px; }
 </style>
 <script src="/js/launch.js?v=3"></script>
@@ -694,9 +710,11 @@
     </form>
 
     <section class="preview" aria-label="미리보기">
-      <h2>미리보기 <small style="font-weight:600;font-size:12px;opacity:.7">· 글자를 누르면 바로 고쳐요</small></h2>
+      <h2>미리보기 <small id="pvSmall" style="font-weight:600;font-size:12px;opacity:.7">· 글자를 누르면 바로 고쳐요</small></h2>
+      <div class="pvdest" id="pvDest" hidden></div>
       <div class="pv-up">👆 <b><span id="pvUpName">가게 정보</span>·사진·동영상 넣는 칸은 이 미리보기 위에 있어요.</b> 화면을 위로 올려 차례로 입력하세요. 디자인은 맨 아래에서 골라요.<button type="button" id="pvUpGo">✏️ 입력하러 가기</button></div>
       <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
+      <div class="snspv" id="snsPv" hidden><img id="snsPvImg" alt="올릴 사진 미리보기"><span class="snsld" id="snsPvLd"></span></div>
       <div class="done">
         <button type="button" class="kakao" id="send">💬 카톡으로 보내기</button>
         <button type="button" class="ghost" id="copy">🔗 링크 복사</button>
@@ -725,15 +743,20 @@
 </div>
 <div class="modal pv-modal" id="pvModal" hidden>
   <div class="modal-box pv-box">
-    <div class="cmp-head">👀 <b>마지막으로 확인해 보세요</b><small>위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]</small></div>
+    <div class="cmp-head">👀 <b>마지막으로 확인해 보세요</b><small id="pvModalSub">위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]</small></div>
     <div class="pv-phone"><iframe id="pvFrame" title="완성 카드 확인"></iframe></div>
+    <div class="pv-sns" id="pvSnsBox" hidden><div class="snspv" id="pvSns"><img id="pvSnsImg" alt="완성 사진 확인"><span class="snsld" id="pvSnsLd"></span></div></div>
     <div class="cmp-row"><button type="button" class="ghost" id="pvFix">✏️ 다시 고치기</button><button type="button" class="kakao" id="pvOk">👍 OK, 완성!</button></div>
   </div>
 </div>
 <div class="modal" id="doneModal" hidden>
   <div class="modal-box done-box">
-    <div class="done-head">🎉 카드가 완성됐어요!</div>
-    <p class="done-sub">이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <div class="done-head" id="doneHead">🎉 카드가 완성됐어요!</div>
+    <p class="done-sub" id="doneSub">이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <div class="done-sns" id="doneSns" hidden>
+      <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
+      <button type="button" class="kakao big" id="doneSnsSave">📥 이 사진 저장하기</button>
+    </div>
     <button type="button" class="kakao big" id="send2">💬 카톡으로 보내기</button>
     <button type="button" class="ghost big" id="sms2">📱 문자로 보내기 (연락처에서 고르기)</button>
     <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
@@ -742,6 +765,12 @@
     <button type="button" class="ghost big" id="rkLink" hidden>🔒 주최자용 명단 보기 링크 복사</button>
     <button type="button" class="ghost big" id="exp2">📸 SNS용 사진 만들기 (인스타·카톡채널·네이버·당근·유튜브)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
+    <div class="more-dest" id="moreDest">
+      <b>➕ 다른 곳에도 올릴까요?</b>
+      <small>쓴 내용은 그대로 두고, 고른 곳 크기에 맞는 디자인만 다시 골라요.</small>
+      <div class="dests" id="moreDests" role="group" aria-label="다른 올릴 곳"></div>
+      <span class="made" id="madeDests"></span>
+    </div>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
   </div>
 </div>
@@ -980,6 +1009,50 @@
       if (list && list[0]) { var u = URL.createObjectURL(list[0].blob); snsCache[j.key] = u; if (j.el.isConnected) putSns(j.el, u); }
     }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story'); })
       .then(function () { snsBusy = false; setTimeout(runSns, 0); });
+  }
+  // ---------- 3단계 미리보기도 고른 용도 모양(4:5·9:16·1:1) 사진 그대로 ----------
+  var snsPvGen = 0, snsPvKey = '', snsPvBlob = null, snsPvUrl = '', snsPvShape = '';
+  function destSns() { return (typeof dest === 'string' && SNS_OF[dest]) || null; }
+  function setShape(el, dd) { el.classList.remove('r-feed', 'r-sq', 'r-story'); if (dd) el.classList.add(dd.cls); }
+  function makeSnsImg(card) {
+    var dd = destSns();
+    if (!dd || !window.SsakaExport || !SsakaExport.sns) return Promise.resolve(null);
+    var d = curDesign(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length;
+    if (key === snsPvKey && snsPvBlob) return Promise.resolve({ blob: snsPvBlob, url: snsPvUrl });
+    var menu = []; try { menu = SsakaReserve.parseMenu(v('menu') || (EX().menu || '')); } catch (e) {}
+    return SsakaExport.sns(card, d, { sizes: [dd.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
+      if (!list || !list[0]) return null;
+      snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob);
+      return { blob: snsPvBlob, url: snsPvUrl };
+    });
+  }
+  function showSnsIn(box, img, ld, card) {
+    var dd = destSns(); setShape(box, dd);
+    if (!dd) return Promise.resolve(null);
+    ld.textContent = img.getAttribute('src') && box.dataset.shape === dest ? '' : '🍒 사진 그리는 중';
+    if (box.dataset.shape !== dest) img.removeAttribute('src');
+    box.dataset.shape = dest;
+    return makeSnsImg(card).then(function (r) {
+      if (r) { img.src = r.url; ld.textContent = ''; } else ld.textContent = '사진을 그리지 못했어요';
+      return r;
+    }).catch(function () { ld.textContent = '사진을 그리지 못했어요'; return null; });
+  }
+  function paintSnsPv() {
+    var dd = destSns(), ds = (typeof DEST_BY === 'object' && DEST_BY[dest]) || null;
+    document.body.classList.toggle('dest-sns', !!dd);
+    $('snsPv').hidden = !dd; $('pvDest').hidden = !dd;
+    $('pvSmall').textContent = dd ? '· 실제로 올라갈 사진 모양 그대로예요' : '· 글자를 누르면 바로 고쳐요';
+    if (!dd || !ds) return;
+    $('pvDest').textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용 사진으로 보여 드려요. 입력 칸에 쓰면 사진에 바로 들어가요.';
+    var g = ++snsPvGen, card = buildCard().card;
+    if (snsPvShape !== dest) { $('snsPvImg').removeAttribute('src'); snsPvShape = dest; }
+    var box = $('snsPv'), img = $('snsPvImg'), ld = $('snsPvLd');
+    setShape(box, dd);
+    if (!img.getAttribute('src')) ld.textContent = '🍒 사진 그리는 중';
+    makeSnsImg(card).then(function (r) {
+      if (g !== snsPvGen) return;
+      if (r) { img.src = r.url; ld.textContent = ''; } else ld.textContent = '사진을 그리지 못했어요';
+    }).catch(function () { if (g === snsPvGen) ld.textContent = '사진을 그리지 못했어요'; });
   }
   var mood = '';
   function moodList() {
@@ -1294,6 +1367,7 @@
       saveDraft();
       refreshProgress();
       try { renderTabs(); } catch (e) {}
+      try { paintSnsPv(); } catch (e) {}
       remember();
     }, 300);
   }
@@ -1395,20 +1469,53 @@
     $('doneModal').hidden = false;
   }
   // 올릴 곳을 인스타·스토리·정사각으로 골랐으면 완성 화면에서 그 크기 사진 만들기를 맨 위로
-  var EXP2_TXT = null;
+  // 완성 화면: 고른 용도의 결과물을 맨 위에 → 아래에서 "다른 곳에도 올릴까요?" (같은 내용으로 디자인만 다시)
+  var madeDests = [];
   function paintDoneDest() {
-    var b = $('exp2'), box = b.parentNode, ds = DEST_BY[dest] || DEST_BY.kakao;
-    if (EXP2_TXT === null) EXP2_TXT = b.textContent;
-    if (dest !== 'kakao') {
-      b.textContent = ds.i + ' ' + ds.b + ' 사진 만들기 (' + ds.s + ')'; b.className = 'kakao big';
-      box.insertBefore(b, $('send2'));
-      $('send2').className = 'ghost big';
+    var ds = DEST_BY[dest] || DEST_BY.kakao, dd = destSns();
+    if (madeDests.indexOf(dest) < 0) madeDests.push(dest);
+    $('doneSns').hidden = !dd;
+    $('send2').className = dd ? 'ghost big' : 'kakao big';
+    if (dd) {
+      $('doneHead').textContent = '🎉 ' + ds.b + ' 사진이 완성됐어요!';
+      $('doneSub').textContent = ds.s + ' 크기 그대로예요. 저장해서 올리세요. 카드 링크도 카톡으로 함께 보낼 수 있어요.';
+      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card);
     } else {
-      b.textContent = EXP2_TXT; b.className = 'ghost big';
-      box.insertBefore(b, $('open2'));
-      $('send2').className = 'kakao big';
+      $('doneHead').textContent = '🎉 카드가 완성됐어요!';
+      $('doneSub').textContent = '이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.';
     }
+    renderMoreDests();
   }
+  function renderMoreDests() {
+    var box = $('moreDests'); box.innerHTML = '';
+    var left = DESTS.filter(function (d) { return madeDests.indexOf(d.id) < 0; });
+    $('moreDest').hidden = !left.length;
+    left.forEach(function (d) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = '<i aria-hidden="true">' + d.i + '</i><span><b>' + d.b + '</b><small>' + d.s + '</small></span>';
+      b.addEventListener('click', function () { againFor(d.id); });
+      box.appendChild(b);
+    });
+    $('madeDests').textContent = '✔ 만든 것: ' + madeDests.map(function (id) { return (DEST_BY[id] || {}).b; }).join(' · ');
+  }
+  var again = false;
+  function againFor(id) {
+    $('doneModal').hidden = true;
+    setDest(id); again = true;
+    goStage(2);
+    setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
+    toast(DEST_BY[id].b + '(' + DEST_BY[id].s + ')에 맞는 디자인을 골라 주세요. 쓴 내용은 그대로예요');
+  }
+  $('doneSnsSave').addEventListener('click', function () {
+    makeSnsImg(buildCard().card).then(function (r) {
+      if (!r) { toast('사진을 아직 그리는 중이에요. 잠시 뒤 다시 눌러 주세요'); return; }
+      var f = new File([r.blob], 'sava-' + dest + '.jpg', { type: 'image/jpeg' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f] }).catch(function () {}); return; }
+      var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('사진을 내려받았어요');
+    });
+  });
   var INV = [
     '바쁘신 중에도 귀한 걸음 하시어\n자리를 빛내 주시면 감사하겠습니다.',
     '{t}에 여러분을 초대합니다.\n함께 이야기 나누고 새로운 인연을 만드는 자리가 되기를 바랍니다.\n귀한 걸음으로 자리를 빛내 주시기 바랍니다.',
@@ -1541,8 +1648,16 @@
   $('cmpNo').addEventListener('click', function () { $('cmpAsk').hidden = true; $('cmpActs').hidden = false; });
   $('cmpYes').addEventListener('click', function () {
     closeCompare();
-    var r = buildCard();
-    $('pvFrame').src = viewer + '?d=' + SsakaCodec.encode(r.card);
+    var r = buildCard(), dd = destSns(), ds = DEST_BY[dest];
+    document.querySelector('#pvModal .pv-phone').hidden = !!dd;
+    $('pvSnsBox').hidden = !dd;
+    if (dd) {
+      $('pvModalSub').textContent = ds.b + '(' + ds.s + ')에 이대로 올라가요. 고칠 게 있으면 [다시 고치기]';
+      showSnsIn($('pvSns'), $('pvSnsImg'), $('pvSnsLd'), r.card);
+    } else {
+      $('pvModalSub').textContent = '위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]';
+      $('pvFrame').src = viewer + '?d=' + SsakaCodec.encode(r.card);
+    }
     $('pvModal').hidden = false;
   });
   $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고칠 곳을 고친 뒤 다시 [✅ 완성]을 누르세요'); });
@@ -1556,6 +1671,7 @@
   }
   window.SavaEditOn = function () { return $('goEdit').classList.contains('on'); };
   $('goEdit').addEventListener('click', function () {
+    if (destSns()) { var hh = document.querySelector('#form .sec-h[data-sec="basic"]'); if (hh) hh.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('입력 칸에서 고치면 사진에 바로 들어가요'); return; }
     var on = !this.classList.contains('on');
     if (on) { document.querySelector('.preview').scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('카드에서 고칠 글자를 누르세요'); }
     editMode(on);
@@ -2521,13 +2637,14 @@
       var b = document.createElement('button'); b.type = 'button'; b.dataset.dest = d.id;
       b.innerHTML = '<i aria-hidden="true">' + d.i + '</i><span><b>' + d.b + '</b><small>' + d.s + '</small></span>';
       b.setAttribute('aria-pressed', d.id === dest ? 'true' : 'false');
-      b.addEventListener('click', function () {
-        dest = d.id; try { localStorage.setItem('sava-dest', dest); } catch (e) {}
-        box.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.dest === dest ? 'true' : 'false'); });
-        paintDest();
-      });
+      b.addEventListener('click', function () { setDest(d.id); });
       box.appendChild(b);
     });
+    paintDest();
+  }
+  function setDest(id) {
+    dest = id; try { localStorage.setItem('sava-dest', dest); } catch (e) {}
+    $('dests').querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.dest === dest ? 'true' : 'false'); });
     paintDest();
   }
   var paintedDest = null;
@@ -2538,6 +2655,7 @@
     // 올릴 곳이 바뀌면 디자인 미리보기를 그 모양으로 다시 그림
     if (paintedDest !== null && paintedDest !== dest) { snsGen++; snsQ = []; renderGallery(); try { if (PHPAL) paintPhotoSug(); } catch (e) {} }
     paintedDest = dest;
+    try { paintSnsPv(); } catch (e) {}
   }
   var stage = 3;
   function goStage(n, scrollTo) {
@@ -2553,7 +2671,11 @@
     setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
   // 디자인을 정하면 → 그 카드에 필요한 질문만
-  $('d2next').addEventListener('click', function () { goStage(3, '#form .sec-h[data-sec="basic"]'); toast('이 카드에 필요한 것만 물어볼게요 ✍️'); });
+  $('d2next').addEventListener('click', function () {
+    goStage(3, again ? '.preview' : '#form .sec-h[data-sec="basic"]');
+    if (again) { again = false; toast('쓴 내용 그대로 이 크기로 그렸어요. 확인하고 ✅ 완성을 누르세요'); }
+    else toast('이 카드에 필요한 것만 물어볼게요 ✍️');
+  });
   $('resumeBtn').addEventListener('click', function () { goStage(3, '#form .sec-h[data-sec="basic"]'); });
 
   var hadDraft = false;

@@ -148,7 +148,7 @@
     var who = WHO.filter(function (w) { return w[0] === k; })[0];
     var url = location.origin + '/letter/?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)) + '&r=1';
     var desc = last && last.summary ? (last.hello + ' ' + last.summary) : last ? (last.hello + ' · ' + last.items.slice(0, 3).map(function (x) { return x.icon + ' ' + x.title; }).join(' · ')) : '오늘 바로 쓸 수 있는 정보만 골라 드려요';
-    var opt = { title: '💌 싸바 아침편지 · ' + who[1] + ' ' + who[2], description: desc.slice(0, 120), url: url, buttonTitle: '편지 열기', noButtons: true };
+    var opt = { title: '💌 싸바 아침편지 · ' + who[1] + ' ' + who[2], description: desc.slice(0, 120), url: url, buttonTitle: '카드 열기', noButtons: true };
     if (window.SsakaShare) SsakaShare(opt); else if (navigator.share) navigator.share({ title: opt.title, text: desc, url: url });
   });
   go();

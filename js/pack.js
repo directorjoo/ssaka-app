@@ -173,12 +173,16 @@
       return;
     }
     var ph = Hh * (g.tall ? 0.6 : g.sq ? 0.55 : 0.62), cut = 110 * u;
+    var bot = g.tall ? sf.bot - 28 * u : sf.bot - m, HO = { x: m, y: 0, w: W - m * 2, size: (g.tall ? 176 : g.sq ? 140 : 160) * u, min: 60 * u, fam: HEAD, weight: 400, color: P.ink, lines: 2, lh: 1.04, dry: 1 };
+    var need = T(ctx, D.head, HO) + 16 * u + (D.item ? 74 * u : 0) + (D.line ? (g.tall ? T(ctx, D.line, { x: m, y: 0, w: W - m * 2, size: 38 * u, min: 22 * u, fam: FONT, weight: 600, color: P.ink, lines: 3, dry: 1 }) + 10 * u : 2 * 46 * u) : 0);
+    // 세로 9:16 — 글씨 아래가 비지 않게: 남는 자리만큼 사진을 키우고, 맨 아래(스토리 단추에 가리는 곳)는 색 띠로 채움
+    if (g.tall) ph = Math.max(Hh * 0.5, Math.min(Hh * 0.66, bot - 24 * u - need - 12 * u));
     pic(ctx, D.main, 0, 0, W, ph, D, { fill: P.acc });
     ctx.fillStyle = P.bg; ctx.beginPath(); ctx.moveTo(0, ph); ctx.lineTo(W, ph - cut); ctx.lineTo(W, Hh); ctx.lineTo(0, Hh); ctx.closePath(); ctx.fill();
     ctx.strokeStyle = P.acc; ctx.lineWidth = 14 * u; ctx.beginPath(); ctx.moveTo(0, ph + 2 * u); ctx.lineTo(W, ph - cut + 2 * u); ctx.stroke();
+    if (g.tall) { fill(ctx, P.acc, 0, sf.bot, W, Hh - sf.bot); fill(ctx, P.ink, 0, sf.bot, W, 6 * u); }
     pill(ctx, D.en, m, sf.top + m * 0.8, 24 * u, P.acc, P.onAcc);
-    var bot = sf.bot - m, HO = { x: m, y: 0, w: W - m * 2, size: (g.tall ? 176 : g.sq ? 140 : 160) * u, min: 60 * u, fam: HEAD, weight: 400, color: P.ink, lines: 2, lh: 1.04, dry: 1 };
-    var need = T(ctx, D.head, HO) + 16 * u + (D.item ? 74 * u : 0) + (D.line ? (g.tall ? 3 : 2) * 46 * u : 0), room = bot - 80 * u - (ph + 12 * u);
+    var room = bot - (g.tall ? 24 : 80) * u - (ph + 12 * u);
     var y2 = ph + 12 * u + Math.max(0, (room - need) * 0.45);
     HO.y = y2; delete HO.dry; y2 = T(ctx, D.head, HO) + 16 * u;
     var il2 = itemLine(D);
@@ -188,7 +192,12 @@
       if (D.item.p) pill(ctx, D.item.p, W - m, iy - 4 * u, 38 * u, P.acc, P.onAcc, { right: 1, ls: 0 });
       y2 += 14 * u;
     }
-    if (D.line && y2 < bot - 110 * u) y2 = T(ctx, D.line, { x: m, y: y2, w: W - m * 2, size: 38 * u, min: 22 * u, fam: FONT, weight: 600, color: P.ink, lines: g.tall ? 3 : 2 }) + 10 * u;
+    if (D.line && y2 < bot - (g.tall ? 40 : 110) * u) y2 = T(ctx, D.line, { x: m, y: y2, w: W - m * 2, size: 38 * u, min: 22 * u, fam: FONT, weight: 600, color: P.ink, lines: g.tall ? 3 : 2 }) + 10 * u;
+    if (g.tall) {
+      // 상호·전화는 아래 색 띠 안에 크게 — 띠가 비어 보이지 않게
+      T(ctx, foot(D), { x: m, y: sf.bot + 46 * u, w: W - m * 2, size: 40 * u, min: 24 * u, fam: FONT, weight: 900, color: P.onAcc, lines: 1 });
+      return { markBg: P.acc };
+    }
     fill(ctx, P.ink, m, bot - 62 * u, 60 * u, 4 * u);
     T(ctx, foot(D), { x: m, y: bot - 44 * u, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 800, color: P.ink, lines: 1 });
   };
@@ -479,8 +488,8 @@
     var pp = purposeOf(card, opts, purposeId); if (!pp) return null;
     var P = pal(palId && TPL_PALS[pp.tpl].indexOf(palId) >= 0 ? palId : TPL_PALS[pp.tpl][0]);
     var c = H.canvas(size.w, size.h), ctx = c.getContext('2d');
-    TPL[pp.tpl](ctx, size.w, size.h, data(card, pp, opts, imgs), P);
-    mark(ctx, size.w, size.h, P.bg);
+    var r = TPL[pp.tpl](ctx, size.w, size.h, data(card, pp, opts, imgs), P);
+    mark(ctx, size.w, size.h, (r && r.markBg) || P.bg);
     return c;
   }
   var headP = null;

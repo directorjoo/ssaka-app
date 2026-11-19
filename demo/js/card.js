@@ -497,6 +497,56 @@
       if (!root.querySelector('.sk-edta')) redrawList();
       drawPan();
     }
+    // SNS 올릴 곳 (js/export.js SNS_SIZES 와 같은 크기)
+    var SNS_USE = [
+      { id: 'p45', w: 1080, h: 1350, name: '인스타 피드', size: '세로 4:5', also: '카톡 채널 소식 · 스레드 · 페이스북' },
+      { id: 'story', w: 1080, h: 1920, name: '인스타 스토리·릴스', size: '세로 9:16', also: '유튜브 쇼츠 · 틱톡 · 카톡 프로필 배경' },
+      { id: 'sq', w: 1080, h: 1080, name: '네이버 플레이스·블로그', size: '정사각 1:1', also: '당근 소식 · 인스타 정사각' },
+      { id: 'k43', w: 1200, h: 900, name: '카톡 채널 메시지', size: '가로 4:3', also: '밴드' },
+      { id: 'yt', w: 1280, h: 720, name: '유튜브 썸네일', size: '가로 16:9', also: '블로그 본문 사진' },
+      { id: 'link', w: 1200, h: 630, name: '페이스북·X 링크', size: '가로 링크형', also: '링크 공유 미리보기' }
+    ];
+    function needExport() {
+      if (window.SsakaExport) return Promise.resolve(window.SsakaExport);
+      return new Promise(function (ok, no) {
+        var sc = document.createElement('script'); sc.src = '/js/export.js?v=83';
+        sc.onload = function () { window.SsakaExport ? ok(window.SsakaExport) : no(); }; sc.onerror = no;
+        document.head.appendChild(sc);
+      });
+    }
+    // 카톡에 올린 사진은 같은 주소로 받아 와야 저장되는 사진으로 그려짐
+    function viaPic(u) { u = String(u || ''); return /^https?:\/\//.test(u) && u.indexOf(location.origin) !== 0 ? '/api/pic?u=' + encodeURIComponent(u) : u; }
+    function nowCard() {
+      var tt = txt('.sk-title'), ss = txt('.sk-sub');
+      return Object.assign({}, card, { title: tt != null ? tt : card.title, subtitle: ss != null ? ss : card.subtitle, body: lines.concat(addr),
+        image: viaPic(W.image), ip: W.ip, gallery: W.gallery.map(viaPic),
+        contact: Object.assign({}, card.contact || {}, { phone: W.phone }) });
+    }
+    function snsMake(x) {
+      var sh = h('div', { class: 'sk-snssheet' }), bx = h('div', { class: 'box' });
+      bx.appendChild(h('b', { class: 'tt', text: x.name + ' · ' + x.size }));
+      var st = h('p', { class: 'st', text: '사진 만드는 중…' }); bx.appendChild(st);
+      var row = h('div', { class: 'bt' });
+      var sv = h('button', { type: 'button', class: 'ok', text: '📥 사진 저장하기' }); sv.disabled = true;
+      row.appendChild(sv); row.appendChild(h('button', { type: 'button', text: '닫기', onclick: function () { sh.remove(); } }));
+      bx.appendChild(row); sh.appendChild(bx);
+      sh.addEventListener('click', function (e) { if (e.target === sh) sh.remove(); });
+      document.body.appendChild(sh);
+      needExport().then(function (X) {
+        return X.sns(nowCard(), curDesign() || design, { industry: IND, sizes: [x.id], menu: card.reserve && card.reserve.menu || [] });
+      }).then(function (list) {
+        var f = list && list[0]; if (!f) throw new Error('none');
+        var u = URL.createObjectURL(f.blob), im = h('img', { alt: x.name }); im.src = u;
+        st.replaceWith(im);
+        bx.insertBefore(h('p', { class: 'st', text: '★ ' + x.name + ' · ' + x.also }), row);
+        sv.disabled = false;
+        sv.onclick = function () {
+          var fl = new File([f.blob], f.name, { type: 'image/jpeg' });
+          if (navigator.canShare && navigator.canShare({ files: [fl] })) { navigator.share({ files: [fl] }).catch(function () {}); return; }
+          var a = document.createElement('a'); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+        };
+      }).catch(function () { st.textContent = '사진을 만들지 못했어요. 닫고 다시 눌러 주세요'; });
+    }
     function drawPan() {
       pan.innerHTML = '';
       pan.appendChild(h('h3', { text: '📷 사진·디자인·영상·링크·전화·주소 고치기' }));
@@ -527,32 +577,59 @@
       var ip2 = h('input', { type: 'text', maxlength: '80', placeholder: '예: 서울 강남구 신사동 609-1 지하1층' }); ip2.value = W.street;
       ip2.addEventListener('change', function () { W.street = ip2.value.trim(); applyW(); push(); });
       f2.appendChild(ip2); pan.appendChild(f2);
-      // 🎨 디자인 바꾸기: 같은 업종의 디자인 + 색깔 (적은 글자·사진은 그대로)
+      // 🎯 어디에 쓸까요? — 디자인 이름 대신 쓰임새·올릴 곳·크기로 고름 (모양·색은 눈으로 보고)
+      pan.appendChild(h('h4', { class: 'sk-edsec', text: '🎯 어디에 쓸까요?' }));
+      pan.appendChild(h('p', { class: 'sk-edhint', text: '쓸 곳을 고르세요. 모양과 색은 눈으로 보고 누르면 돼요' }));
+      // ① 카톡으로 보내는 긴 카드 (지금 이 카드)
+      var u1 = h('div', { class: 'sk-eduse on' });
+      u1.appendChild(h('b', { text: '💬 카톡으로 보내는 카드 (지금 이 카드)' }));
+      u1.appendChild(h('p', { text: '세로로 길게 내려 읽어요. 글이 길어도, 사진 10장도 다 들어가요' }));
+      var tg = h('div', { class: 'sk-edtags' });
+      ['뉴스·소식', '모임 일정·장소', '인사말', '청첩장', '부고', '상품 홍보 (사진 10장)', '가게 안내·메뉴'].forEach(function (t) { tg.appendChild(h('span', { text: t })); });
+      u1.appendChild(tg);
       var dl = DS && IND ? DS.list(IND) : [];
       if (dl.length) {
         var cur = curDesign() || {};
-        pan.appendChild(h('h4', { class: 'sk-edsec', text: '🎨 디자인 바꾸기' }));
-        pan.appendChild(h('p', { class: 'sk-edhint', text: '눌러 보면 카드에 바로 입혀져요. 글자·사진은 그대로예요' }));
-        var dg = h('div', { class: 'sk-eddes' });
+        u1.appendChild(h('p', { class: 'sk-edlab', text: '모양 고르기 — 누르면 카드에 바로 입혀져요' }));
+        var dg = h('div', { class: 'sk-edlook' });
         dl.forEach(function (d) {
           var on = cur.id === d.id || (cur.style && cur.style === d.style && cur.industry === d.industry);
-          var b = h('button', { type: 'button', class: on ? 'on' : '', text: d.name || d.id, onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
-          b.style.background = d.colors.bg; b.style.color = d.colors.onBg || d.colors.ink; b.style.borderColor = d.colors.accent;
-          dg.appendChild(b);
+          var c = d.colors || {}, b = h('button', { type: 'button', class: on ? 'on' : '', 'aria-label': '모양 ' + (d.no || ''), onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
+          b.style.background = c.bg; b.style.borderColor = c.accent;
+          var mk = h('i', { class: 'mk' });
+          var band = h('i', { class: 'bd' }); band.style.background = c.accent; mk.appendChild(band);
+          var ph = h('i', { class: 'ph' }); ph.style.background = c.paper || c.accent; ph.style.borderColor = c.accent; mk.appendChild(ph);
+          [1, 0.75, 0.55].forEach(function (wd) { var ln = h('i', { class: 'ln' }); ln.style.background = c.ink; ln.style.width = (wd * 100) + '%'; mk.appendChild(ln); });
+          b.appendChild(mk); dg.appendChild(b);
         });
-        pan.appendChild(dg);
+        u1.appendChild(dg);
         var cs = cur.id && DS.colorsOf ? DS.colorsOf(cur.id) : [];
         if (cs.length > 1) {
-          pan.appendChild(h('p', { class: 'sk-edlab', text: '색깔 고르기' }));
-          var cg = h('div', { class: 'sk-edcol' });
+          u1.appendChild(h('p', { class: 'sk-edlab', text: '색 고르기' }));
+          var cg = h('div', { class: 'sk-edcolor' });
           cs.forEach(function (d) {
-            var b = h('button', { type: 'button', class: cur.id === d.id ? 'on' : '', text: d.colorName || d.name, onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
-            b.style.background = d.colors.bg; b.style.color = d.colors.onBg || d.colors.ink; b.style.borderColor = d.colors.accent;
+            var b = h('button', { type: 'button', class: cur.id === d.id ? 'on' : '', 'aria-label': '색 ' + (d.c || ''), onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
+            b.style.background = 'linear-gradient(135deg,' + d.colors.bg + ' 50%,' + d.colors.accent + ' 50%)';
             cg.appendChild(b);
           });
-          pan.appendChild(cg);
+          u1.appendChild(cg);
         }
       }
+      pan.appendChild(u1);
+      // ② SNS에 올릴 사진 — 올릴 곳마다 크기가 다름
+      var u2 = h('div', { class: 'sk-eduse' });
+      u2.appendChild(h('b', { text: '📸 SNS에 올릴 사진 만들기' }));
+      u2.appendChild(h('p', { text: '이 카드 내용 그대로, 올릴 곳에 맞는 크기로 사진을 만들어요' }));
+      var sg = h('div', { class: 'sk-edsns' });
+      SNS_USE.forEach(function (x) {
+        var b = h('button', { type: 'button', onclick: function () { snsMake(x); } });
+        var shp = h('i', { class: 'shp' }); shp.style.aspectRatio = x.w + ' / ' + x.h; if (x.w > x.h) { shp.style.width = '52px'; } else { shp.style.height = '48px'; shp.style.width = 'auto'; } var sb = h('i', { class: 'shb' }); sb.appendChild(shp); b.appendChild(sb);
+        var tx = h('span', { class: 'tx' });
+        tx.appendChild(h('b', { text: x.name })); tx.appendChild(h('em', { text: x.size })); tx.appendChild(h('small', { text: x.also }));
+        b.appendChild(tx); sg.appendChild(b);
+      });
+      u2.appendChild(sg);
+      pan.appendChild(u2);
       // 🎬 영상: 내 영상(대표 사진 자리에서 반복) + 영상 링크(유튜브·인스타)
       pan.appendChild(h('h4', { class: 'sk-edsec', text: '🎬 영상' }));
       var vb = h('div', { class: 'sk-edbtns' });

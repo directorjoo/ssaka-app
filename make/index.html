@@ -806,6 +806,7 @@
     <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
     <button type="button" class="ghost big" id="blog2">📝 네이버 블로그 글 만들기 (AI가 써줘요)</button>
     <button type="button" class="ghost big" id="rkLink" hidden>🔒 주최자용 명단 보기 링크 복사</button>
+    <button type="button" class="ghost big" id="reel2">🎬 릴스 영상 만들기 (사진으로 자동 · 음악까지)</button>
     <button type="button" class="ghost big" id="exp2">📸 SNS용 사진 만들기 (인스타·카톡채널·네이버·당근·유튜브)</button>
     <a class="ghost big" id="open2" target="_blank" rel="noopener">👀 내 카드 열어보기</a>
     <button type="button" class="textbtn" id="keepEdit">✏️ 계속 고치기</button>
@@ -2505,6 +2506,18 @@
     }).catch(function () { if (job === packJob) $('packGrid').innerHTML = '<p class="done-sub">템플릿을 만들지 못했어요. 다시 눌러주세요.</p>'; });
   }
   ['packHead', 'packLine'].forEach(function (id) { $(id).addEventListener('input', function () { clearTimeout(packT); packT = setTimeout(function () { var cc = current(); if (cc) makePack(cc); }, 500); }); });
+  // 🎬 릴스 영상: 카드 내용(상호·소개·메뉴·전화·주소·사진)을 그대로 넘겨 /reel 에서 세로 영상으로
+  $('reel2').addEventListener('click', function () {
+    var c = current(); if (!c) return; var k = c.card || {}, ct = k.contact || {};
+    var imgs = [k.image].concat(k.gallery || []).filter(function (u, i, a) { return u && /^(https?:\/\/|\/)/.test(u) && a.indexOf(u) === i; }).slice(0, 10);
+    try {
+      var old = JSON.parse(localStorage.getItem('sava-reel') || '{}');
+      if (JSON.stringify(old.images || []) !== JSON.stringify(imgs)) { localStorage.removeItem('sava-reel-ai'); localStorage.removeItem('sava-reel-job'); }
+      localStorage.setItem('sava-reel', JSON.stringify({ title: k.title || ct.name || '', subtitle: k.subtitle || '', phone: ct.phone || '', addr: (ct.address && ct.address.street) || (k.place && k.place.name) || '',
+        lines: (k.body || []).map(function (s) { return String(s).replace(/^[•·\-\s]+/, ''); }).filter(Boolean).slice(0, 10), images: imgs }));
+    } catch (e) {}
+    location.href = '/reel/';
+  });
   $('exp2').addEventListener('click', function () {
     var c = current(); if (!c) return;
     expCard = c.card; expUrl = link(c); expFiles = [];

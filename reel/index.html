@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <meta name="theme-color" content="#B3132B">
+  <title>릴스 영상 만들기 · 싸바</title>
+  <meta property="og:title" content="🎬 사진 몇 장으로 릴스 영상 뚝딱 · 싸바">
+  <meta property="og:description" content="사진과 상호만 넣으면 인스타 릴스·유튜브 쇼츠용 세로 영상을 자동으로 만들어요. 음악·글자·장면 전환까지.">
+  <meta property="og:image" content="https://sava.kr/img/ssaka-share.png">
+  <link rel="icon" href="../img/favicon.png?v=3">
+  <link rel="stylesheet" href="../css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #FFF8F3; color: var(--ink); font-family: var(--font); }
+    .w { max-width: 560px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 16px calc(120px + env(safe-area-inset-bottom)); }
+    h1 { margin: 8px 0 4px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; }
+    .sub { margin: 0 0 10px; color: var(--ink-2); font-size: 15.5px; line-height: 1.6; word-break: keep-all; }
+    h2 { margin: 24px 2px 10px; font-size: 20px; font-weight: 900; letter-spacing: -.02em; }
+    .stage { position: relative; width: min(100%, 300px); margin: 12px auto 0; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #111; box-shadow: 0 14px 34px -16px rgba(60,10,20,.6); }
+    .stage canvas { display: block; width: 100%; height: 100%; }
+    .stage .badge { position: absolute; left: 10px; top: 10px; padding: 4px 9px; border-radius: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: 13px; font-weight: 800; text-shadow: 0 1px 2px #000; }
+    .bar { height: 6px; margin: 10px auto 0; width: min(100%, 300px); border-radius: 4px; background: #eadbd0; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: var(--ssaka); }
+    .row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 52px; padding: 0 18px; border: 0; border-radius: 16px; background: var(--ssaka); color: #fff; font: 900 17px var(--font); text-decoration: none; cursor: pointer; }
+    .btn.ghost { background: #fff; color: var(--ssaka-deep); box-shadow: inset 0 0 0 2px var(--ssaka-line); }
+    .btn.big { min-width: 200px; font-size: 19px; }
+    .btn:disabled { opacity: .45; }
+    .box { margin-top: 10px; padding: 14px; border-radius: 20px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 6px 16px -12px rgba(80,30,20,.35); }
+    label.f { display: block; margin: 10px 0 4px; font-size: 15px; font-weight: 800; }
+    label.f small { color: var(--ink-2); font-weight: 600; font-size: 13px; }
+    input[type=text], input[type=tel], textarea, select { width: 100%; padding: 12px; border: 1.5px solid #e6d8ce; border-radius: 12px; font: 600 16px var(--font); background: #fffdfb; color: var(--ink); }
+    textarea { min-height: 84px; resize: vertical; line-height: 1.5; }
+    .pics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
+    .pics .p { position: relative; aspect-ratio: 9 / 16; border-radius: 10px; overflow: hidden; background: #eee center/cover no-repeat; }
+    .pics .p b { position: absolute; left: 4px; top: 4px; min-width: 20px; height: 20px; border-radius: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; display: grid; place-items: center; }
+    .pics .p button { position: absolute; right: 2px; top: 2px; width: 26px; height: 26px; border: 0; border-radius: 13px; background: rgba(0,0,0,.6); color: #fff; font-size: 14px; }
+    .pics .p.ai { outline: 3px solid #FFD400; }
+    .pics .add { display: grid; place-items: center; aspect-ratio: 9 / 16; border: 2px dashed #e0c9bb; border-radius: 10px; color: var(--ssaka-deep); font-size: 13px; font-weight: 800; text-align: center; line-height: 1.3; cursor: pointer; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { min-height: 42px; padding: 0 14px; border: 1.5px solid #e6d8ce; border-radius: 21px; background: #fff; font: 800 15px var(--font); color: var(--ink); }
+    .chip.on { border-color: var(--ssaka); background: var(--ssaka); color: #fff; }
+    .sw { width: 42px; min-height: 42px; padding: 0; border-radius: 21px; }
+    .sw.on { outline: 3px solid #1A1A1A; outline-offset: 2px; }
+    .note { margin: 8px 2px 0; color: var(--ink-2); font-size: 14px; line-height: 1.6; word-break: keep-all; }
+    .ai-box { background: linear-gradient(135deg, #FFF6D6, #fff); box-shadow: inset 0 0 0 2px #FFD400; }
+    .ai-box .st { margin-top: 8px; font-size: 15px; font-weight: 800; color: #6a4a00; }
+    .ex { margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; background: #FBE9EC; color: #8E0A1C; font-size: 14.5px; font-weight: 700; line-height: 1.5; }
+    .done video { display: block; width: min(100%, 300px); margin: 10px auto 0; border-radius: 18px; background: #000; aspect-ratio: 9 / 16; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <h1>🎬 릴스 영상 만들기</h1>
+  <p class="sub">사진과 상호만 넣으면 인스타 릴스·유튜브 쇼츠·틱톡용 세로 영상(9:16)을 자동으로 만들어요. 음악·글자·장면 바꾸기까지 싸바가 알아서 해요.</p>
+
+  <div class="stage"><canvas id="cv" width="1080" height="1920"></canvas><span class="badge" id="badge">미리보기</span></div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="row">
+    <button type="button" class="btn ghost" id="play">▶ 미리보기</button>
+    <button type="button" class="btn big" id="rec">🎬 영상 만들기</button>
+  </div>
+  <p class="note" id="recNote" style="text-align:center">영상은 실제 길이만큼(약 <b id="len">20</b>초) 걸려요. 만드는 동안 화면을 끄지 말고 그대로 두세요.</p>
+
+  <div class="box done" id="done" hidden>
+    <h2 style="margin-top:4px">🎉 영상이 완성됐어요!</h2>
+    <video id="out" controls playsinline></video>
+    <div class="row">
+      <button type="button" class="btn" id="save">📥 저장·공유하기</button>
+      <a class="btn ghost" id="dl" download="sava-reels.mp4">파일로 받기</a>
+    </div>
+    <p class="note">인스타그램 → ＋ → 릴스, 유튜브 → ＋ → Shorts에서 방금 저장한 영상을 고르면 돼요.</p>
+  </div>
+
+  <div class="ex" id="exNote" hidden>지금은 "압구정 순천만" 예시 사진이에요. 아래에서 내 사진과 상호로 바꿔 보세요.</div>
+
+  <h2>📷 사진 <small style="font-size:14px;color:var(--ink-2)">(10장까지, 순서대로 나와요)</small></h2>
+  <div class="pics" id="pics"></div>
+  <input type="file" id="file" accept="image/*" multiple hidden>
+
+  <div class="box ai-box" id="aiBox">
+    <b style="font-size:17px">🤖 AI로 사진 움직이기 <small style="font-weight:700;color:#6a4a00">(클링)</small></b>
+    <p class="note" style="margin-top:4px">사진 한 장을 진짜 움직이는 5초 장면으로 만들어 영상 맨 앞에 넣어요. 김이 모락모락, 지글지글처럼요. 1~3분 걸려요.</p>
+    <div id="aiOn">
+      <label class="f">어떤 사진을? <small>위 사진 중 번호</small></label>
+      <select id="aiPick"></select>
+      <label class="f">어떻게 움직일까요?</label>
+      <div class="chips" id="aiMotion"></div>
+      <div class="row" style="justify-content:flex-start"><button type="button" class="btn" id="aiGo">🤖 AI로 움직이기</button><button type="button" class="btn ghost" id="aiDel" hidden>AI 장면 빼기</button></div>
+    </div>
+    <div class="st" id="aiSt">확인하는 중…</div>
+  </div>
+
+  <h2>✍️ 글자</h2>
+  <div class="box">
+    <label class="f">상호·제목</label>
+    <input type="text" id="title" maxlength="24" placeholder="예) 압구정 순천만">
+    <label class="f">한 줄 소개 <small>(첫 장면 제목 아래)</small></label>
+    <input type="text" id="subtitle" maxlength="40" placeholder="예) 순천만 바다를 그대로, 남도 한 상">
+    <label class="f">사진마다 나올 글 <small>(2번 사진부터 한 줄씩 · 1번엔 상호가 나와요)</small></label>
+    <textarea id="lines" placeholder="예)&#10;짱뚱어탕 15,000원&#10;홍어삼합&#10;벌교 꼬막"></textarea>
+    <label class="f">전화번호 <small>(마지막 장면)</small></label>
+    <input type="tel" id="phone" maxlength="20" placeholder="02-000-0000">
+    <label class="f">주소 <small>(마지막 장면, 선택)</small></label>
+    <input type="text" id="addr" maxlength="40" placeholder="예) 서울 강남구 신사동">
+  </div>
+
+  <h2>🎨 꾸미기</h2>
+  <div class="box">
+    <label class="f" style="margin-top:0">색</label>
+    <div class="chips" id="colors"></div>
+    <label class="f">빠르기</label>
+    <div class="chips" id="tempo"></div>
+    <label class="f">음악</label>
+    <div class="chips" id="music"></div>
+    <p class="note">음악은 싸바가 직접 만든 곡이라 저작권 걱정 없이 올릴 수 있어요.</p>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var W = 1080, H = 1920, FADE = 0.45;
+  var cv = $('cv'), cx = cv.getContext('2d');
+  var FONT = '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
+  // 오방색에서 고른 바탕색 (한 영상엔 바탕 + 흰 글씨 + 강조 노랑, 2~3색만)
+  var COLORS = [
+    { id: 'red', c: '#B3132B', n: '체리 빨강' }, { id: 'blue', c: '#1A4FB0', n: '청' },
+    { id: 'green', c: '#13804A', n: '초록' }, { id: 'yellow', c: '#FFD400', n: '신호등 노랑', dark: 1 },
+    { id: 'black', c: '#1A1A1A', n: '흑' }
+  ];
+  var TEMPO = [{ id: 'calm', n: '🐢 잔잔하게', t: 3.4 }, { id: 'mid', n: '🙂 보통', t: 2.7 }, { id: 'fast', n: '⚡ 경쾌하게', t: 2.0 }];
+  var MUSIC = [{ id: 'bright', n: '☀️ 밝게' }, { id: 'calm', n: '🌙 잔잔하게' }, { id: 'up', n: '🎉 신나게' }, { id: 'off', n: '🔇 음악 없음' }];
+  var MOTIONS = [['steam', '♨️ 김 모락모락'], ['sizzle', '🔥 지글지글'], ['pour', '✨ 윤기 반짝'], ['push', '🎥 천천히 다가가기'], ['orbit', '🔄 빙 둘러보기'], ['life', '🌿 가게가 살아나게']];
+
+  var S = { color: 'red', tempo: 'mid', music: 'bright', motion: 'steam' };
+  var photos = []; // { src, img(그릴 것), thumb }
+  var clip = null; // { url, v(video), from(사진 번호) }
+
+  // ---------- 저장 ----------
+  function load(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  function keep(k, o) { try { localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }
+  var saved = load('sava-reel') || {};
+  var opts = load('sava-reel-opt') || {};
+  ['color', 'tempo', 'music'].forEach(function (k) { if (opts[k]) S[k] = opts[k]; });
+  var EXAMPLE = !saved.title && !(saved.images && saved.images.length);
+  if (EXAMPLE) {
+    saved = { title: '압구정 순천만', subtitle: '순천만 바다를 그대로, 남도 한 상', phone: '02-541-2125', addr: '서울 강남구 신사동 609-1',
+      lines: ['남도식 새콤 무침', '벌교 꼬막', '생선조림', '모둠전', '신사동에서 만나요'],
+      images: ['/img/ex/suncheon-tang.jpg', '/img/ex/suncheon-muchim.jpg', '/img/ex/suncheon-kkomak.jpg', '/img/ex/suncheon-jorim.jpg', '/img/ex/suncheon-jeon.jpg', '/img/ex/suncheon-sign2.jpg'] };
+    $('exNote').hidden = false;
+  }
+  $('title').value = saved.title || ''; $('subtitle').value = saved.subtitle || ''; $('phone').value = saved.phone || ''; $('addr').value = saved.addr || '';
+  $('lines').value = (saved.lines || []).join('\n');
+  ['title', 'subtitle', 'phone', 'addr', 'lines'].forEach(function (id) { $(id).addEventListener('input', function () { $('exNote').hidden = true; saveText(); drawStill(); }); });
+  function saveText() { keep('sava-reel', { title: $('title').value, subtitle: $('subtitle').value, phone: $('phone').value, addr: $('addr').value, lines: lines(), images: photos.filter(function (p) { return /^(https?:|\/)/.test(p.src); }).map(function (p) { return p.src; }) }); }
+  function lines() { return $('lines').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean); }
+
+  // ---------- 고르기 단추 ----------
+  function chips(box, list, key, sw) {
+    list.forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (sw ? ' sw' : '') + (S[key] === o.id ? ' on' : '');
+      if (sw) { b.style.background = o.c; b.title = o.n; b.setAttribute('aria-label', o.n); } else b.textContent = o.n;
+      b.addEventListener('click', function () { S[key] = o.id; [].forEach.call(box.children, function (x) { x.classList.remove('on'); }); b.classList.add('on'); keep('sava-reel-opt', { color: S.color, tempo: S.tempo, music: S.music }); plan(); drawStill(); });
+      box.appendChild(b);
+    });
+  }
+  chips($('colors'), COLORS, 'color', true); chips($('tempo'), TEMPO, 'tempo'); chips($('music'), MUSIC, 'music');
+  MOTIONS.forEach(function (m) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (S.motion === m[0] ? ' on' : ''); b.textContent = m[1];
+    b.addEventListener('click', function () { S.motion = m[0]; [].forEach.call($('aiMotion').children, function (x) { x.classList.remove('on'); }); b.classList.add('on'); });
+    $('aiMotion').appendChild(b);
+  });
+  function col() { return COLORS.filter(function (c) { return c.id === S.color; })[0] || COLORS[0]; }
+
+  // ---------- 사진 ----------
+  function viaPic(u) { return /^https?:\/\//.test(u) && !/^https:\/\/(www\.)?(sava|saba)\.kr\//.test(u) ? '/api/pic?u=' + encodeURIComponent(u) : u; }
+  function shrink(img) { // 큰 사진은 휴대폰이 버거우니 긴 쪽 1440으로
+    var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, k = Math.min(1, 1440 / Math.max(w, h));
+    var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return c;
+  }
+  function loadImg(src) {
+    return new Promise(function (ok) {
+      var i = new Image(); i.decoding = 'async';
+      i.onload = function () { try { ok(shrink(i)); } catch (e) { ok(null); } };
+      i.onerror = function () { ok(null); };
+      i.src = src;
+    });
+  }
+  function addSrcs(list) {
+    return Promise.all(list.map(function (s) { return loadImg(viaPic(s.url || s)).then(function (c) { return c ? { src: s.keep === false ? '' : (s.url || s), img: c, thumb: c.toDataURL('image/jpeg', .6) } : null; }); }))
+      .then(function (arr) { arr.forEach(function (p) { if (p && photos.length < 10) photos.push(p); }); paintPics(); plan(); drawStill(); });
+  }
+  function paintPics() {
+    var box = $('pics'); box.innerHTML = '';
+    photos.forEach(function (p, i) {
+      var d = document.createElement('div'); d.className = 'p' + (clip && clip.from === i ? ' ai' : ''); d.style.backgroundImage = 'url(' + p.thumb + ')';
+      var n = document.createElement('b'); n.textContent = clip && clip.from === i ? '🤖' : String(i + 1); d.appendChild(n);
+      var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', (i + 1) + '번 사진 빼기');
+      x.addEventListener('click', function () { photos.splice(i, 1); if (clip && clip.from === i) clip = null; else if (clip && clip.from > i) clip.from--; paintPics(); plan(); drawStill(); saveText(); });
+      d.appendChild(x); box.appendChild(d);
+    });
+    if (photos.length < 10) {
+      var a = document.createElement('div'); a.className = 'add'; a.textContent = '＋\n사진 넣기'; a.style.whiteSpace = 'pre-line';
+      a.addEventListener('click', function () { $('file').click(); }); box.appendChild(a);
+    }
+    var sel = $('aiPick'), cur = sel.value; sel.innerHTML = '';
+    photos.forEach(function (p, i) { var o = document.createElement('option'); o.value = i; o.textContent = (i + 1) + '번 사진'; sel.appendChild(o); });
+    if (cur && +cur < photos.length) sel.value = cur;
+  }
+  $('file').addEventListener('change', function () {
+    var fs = [].slice.call(this.files || [], 0, 10 - photos.length);
+    if (EXAMPLE && photos.length && fs.length) { photos = []; clip = null; EXAMPLE = false; $('exNote').hidden = true; }
+    addSrcs(fs.map(function (f) { return { url: URL.createObjectURL(f), keep: false }; }));
+    this.value = '';
+  });
+
+  // ---------- 장면 계획 ----------
+  var scenes = [], TOTAL = 0;
+  function plan() {
+    var T = (TEMPO.filter(function (t) { return t.id === S.tempo; })[0] || TEMPO[1]).t, L = lines(), k = 0;
+    scenes = [];
+    if (clip && clip.v) scenes.push({ type: 'clip', dur: 5, intro: 1 });
+    photos.forEach(function (p, i) {
+      if (clip && clip.v && clip.from === i) return;
+      var first = !scenes.length;
+      scenes.push({ type: 'photo', idx: i, dur: first ? T + 0.8 : T, intro: first ? 1 : 0, cap: first ? '' : (L[k++] || ''), dir: scenes.length % 4 });
+    });
+    if (!scenes.length) scenes.push({ type: 'blank', dur: 2.5, intro: 1 });
+    scenes.push({ type: 'end', dur: 3.4 });
+    var t = 0; scenes.forEach(function (s) { s.t0 = t; t += s.dur; }); TOTAL = t;
+    $('len').textContent = Math.round(TOTAL);
+  }
+
+  // ---------- 그리기 ----------
+  function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3); }
+  function cover(src, zoom, px, py) {
+    var sw = src.videoWidth || src.width, sh = src.videoHeight || src.height; if (!sw || !sh) return;
+    var k = Math.max(W / sw, H / sh) * zoom, dw = sw * k, dh = sh * k;
+    cx.drawImage(src, (W - dw) / 2 + px * (dw - W) / 2, (H - dh) / 2 + py * (dh - H) / 2, dw, dh);
+  }
+  function wrap(text, maxW) {
+    var out = [], line = '';
+    String(text).split('').forEach(function (ch) {
+      var test = line + ch;
+      if (cx.measureText(test).width > maxW && line) {
+        var sp = line.lastIndexOf(' ');
+        if (sp > 0 && ch !== ' ') { out.push(line.slice(0, sp)); line = line.slice(sp + 1) + ch; } else { out.push(line); line = ch === ' ' ? '' : ch; }
+      } else line = test;
+    });
+    if (line) out.push(line); return out;
+  }
+  function txt(s, x, y, size, color, align, shadow) {
+    cx.font = '900 ' + size + 'px ' + FONT; cx.textAlign = align || 'center'; cx.textBaseline = 'alphabetic';
+    // 흰 글씨엔 검은 그림자, 진한 글씨엔 흰 그림자
+    cx.shadowColor = shadow || (color === '#fff' || color === '#FFFFFF' || color === '#FFD400' ? 'rgba(0,0,0,.6)' : 'rgba(255,255,255,.7)');
+    cx.shadowBlur = size * 0.14; cx.shadowOffsetY = size * 0.04;
+    cx.fillStyle = color; cx.fillText(s, x, y);
+    cx.shadowColor = 'transparent'; cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+  }
+  function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
+  var cherry = new Image(); cherry.src = '/img/cherry-white.svg';
+  var cherryC = new Image(); cherryC.src = '/img/cherry.svg';
+
+  function introText(lt, dur) {
+    var C = col(), a = ease((lt - 0.25) / 0.6), title = $('title').value || '싸바', sub = $('subtitle').value;
+    var g = cx.createLinearGradient(0, H * 0.52, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.72)');
+    cx.fillStyle = g; cx.fillRect(0, H * 0.52, W, H * 0.48);
+    cx.save(); cx.globalAlpha *= a; cx.translate(0, (1 - a) * 60);
+    cx.font = '900 118px ' + FONT; var tl = wrap(title, W - 140).slice(0, 2);
+    var y = H - 330 - (tl.length - 1) * 130 - (sub ? 0 : -70);
+    cx.fillStyle = C.c; rr(70, y - 210, 150, 16, 8); cx.fill();
+    tl.forEach(function (l, i) { txt(l, 70, y + i * 130, 118, '#fff', 'left'); });
+    if (sub) { cx.font = '800 50px ' + FONT; wrap(sub, W - 140).slice(0, 2).forEach(function (l, i) { txt(l, 70, y + tl.length * 130 - 30 + i * 66, 50, '#FFD400', 'left'); }); }
+    cx.restore();
+  }
+  function capText(cap, lt) {
+    if (!cap) return;
+    var C = col(), a = ease((lt - 0.2) / 0.5);
+    cx.save(); cx.globalAlpha *= a;
+    cx.font = '900 78px ' + FONT; var ls = wrap(cap, W - 220).slice(0, 2), bw = 0;
+    ls.forEach(function (l) { bw = Math.max(bw, cx.measureText(l).width); });
+    var bh = ls.length * 96 + 56, x = 60 - (1 - a) * 80, y = H - 360 - bh;
+    cx.fillStyle = C.c; cx.shadowColor = 'rgba(0,0,0,.35)'; cx.shadowBlur = 30; rr(x, y, bw + 90, bh, 30); cx.fill(); cx.shadowColor = 'transparent'; cx.shadowBlur = 0;
+    ls.forEach(function (l, i) { txt(l, x + 45, y + 100 + i * 96, 78, C.dark ? '#1A1A1A' : '#fff', 'left'); });
+    cx.restore();
+  }
+  function endScene(lt) {
+    var C = col(), fg = C.dark ? '#1A1A1A' : '#fff';
+    cx.fillStyle = C.c; cx.fillRect(0, 0, W, H);
+    var rg = cx.createRadialGradient(W / 2, H * 0.36, 40, W / 2, H * 0.36, 900); rg.addColorStop(0, 'rgba(255,255,255,.22)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.fillStyle = rg; cx.fillRect(0, 0, W, H);
+    var a = ease(lt / 0.6), b = ease((lt - 0.35) / 0.6), c = ease((lt - 0.7) / 0.6);
+    var logo = C.dark ? cherryC : cherry;
+    if (logo.complete && logo.naturalWidth) { var s = 260 * (0.6 + 0.4 * a); cx.save(); cx.globalAlpha *= a; cx.drawImage(logo, W / 2 - s / 2, 430 - s / 2 + (1 - a) * -80, s, s); cx.restore(); }
+    cx.save(); cx.globalAlpha *= b;
+    cx.font = '900 110px ' + FONT; wrap($('title').value || '싸바', W - 140).slice(0, 2).forEach(function (l, i) { txt(l, W / 2, 760 + i * 124, 110, fg); });
+    cx.restore();
+    cx.save(); cx.globalAlpha *= c;
+    var ph = $('phone').value.trim(), ad = $('addr').value.trim(), y = 1080;
+    if (ph) {
+      cx.font = '900 76px ' + FONT; var pw = cx.measureText('📞 ' + ph).width + 100;
+      cx.fillStyle = C.dark ? '#1A1A1A' : '#FFD400'; rr(W / 2 - pw / 2, y - 80, pw, 120, 60); cx.fill();
+      txt('📞 ' + ph, W / 2, y + 6, 76, C.dark ? '#FFD400' : '#1A1A1A', 'center', 'transparent'); y += 170;
+    }
+    if (ad) { cx.font = '800 50px ' + FONT; wrap(ad, W - 160).slice(0, 2).forEach(function (l, i) { txt(l, W / 2, y + i * 66, 50, fg); }); }
+    txt('싸바로 만들었어요 · sava.kr', W / 2, H - 170, 38, fg);
+    cx.restore();
+  }
+  function drawScene(s, lt) {
+    var p = Math.max(0, Math.min(1, lt / s.dur));
+    if (s.type === 'clip') {
+      cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H);
+      if (clip && clip.v && clip.v.readyState >= 2) cover(clip.v, 1, 0, 0);
+      if (s.intro) introText(lt, s.dur);
+    } else if (s.type === 'photo') {
+      var ph = photos[s.idx]; cx.fillStyle = '#111'; cx.fillRect(0, 0, W, H);
+      if (ph) {
+        var zin = s.dir % 2 === 0, z = zin ? 1 + 0.13 * p : 1.13 - 0.13 * p;
+        var px = [-.6, .6, 0, 0][s.dir] * (p - .5), py = [0, 0, -.6, .6][s.dir] * (p - .5);
+        cover(ph.img, z, px, py);
+      }
+      if (s.intro) introText(lt, s.dur); else capText(s.cap, lt);
+    } else if (s.type === 'blank') {
+      cx.fillStyle = col().c; cx.fillRect(0, 0, W, H); introText(lt, s.dur);
+    } else endScene(lt);
+  }
+  function frame(t) {
+    var i = 0; while (i < scenes.length - 1 && t >= scenes[i + 1].t0) i++;
+    var s = scenes[i], lt = t - s.t0;
+    cx.globalAlpha = 1;
+    if (i > 0 && lt < FADE) { var pr = scenes[i - 1]; drawScene(pr, pr.dur + lt); cx.globalAlpha = ease(lt / FADE); drawScene(s, lt); cx.globalAlpha = 1; }
+    else drawScene(s, lt);
+    if (s.type === 'clip' && clip && clip.v && clip.v.paused && running) { try { clip.v.play(); } catch (e) {} }
+    $('prog').style.width = Math.min(100, t / TOTAL * 100) + '%';
+  }
+  function drawStill() { if (!running) frame(scenes.length && scenes[0].type === 'clip' ? 1.2 : Math.min(1.6, TOTAL)); }
+
+  // ---------- 음악 (싸바가 직접 만드는 곡 — 저작권 걱정 없음) ----------
+  var AC = null;
+  function audio() { if (!AC) { var A = window.AudioContext || window.webkitAudioContext; if (A) AC = new A(); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+  var NOTE = function (n) { return 440 * Math.pow(2, (n - 69) / 12); };
+  function music(style, dur, outs) {
+    var ac = AC; if (!ac || style === 'off') return null;
+    var t0 = ac.currentTime + 0.08, bpm = { bright: 100, calm: 72, up: 118 }[style] || 100, beat = 60 / bpm, bar = beat * 4;
+    var master = ac.createGain(); master.gain.setValueAtTime(0.0001, t0); master.gain.exponentialRampToValueAtTime(0.9, t0 + 0.6);
+    master.gain.setValueAtTime(0.9, t0 + Math.max(0.7, dur - 1.6)); master.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    outs.forEach(function (o) { master.connect(o); });
+    var lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = style === 'calm' ? 1400 : 2400; lp.connect(master);
+    // 화음: C - G - Am - F (따뜻하고 밝은 진행)
+    var CH = [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]], ROOT = [36, 43, 45, 41];
+    function tone(f, at, len, type, vol, dest, attack) {
+      var o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + (attack || 0.02)); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+      o.connect(g); g.connect(dest || lp); o.start(at); o.stop(at + len + 0.05);
+    }
+    var nb = Math.ceil(dur / bar) + 1, noise = null;
+    if (style === 'up') { noise = ac.createBuffer(1, ac.sampleRate * 0.1, ac.sampleRate); var d = noise.getChannelData(0); for (var j = 0; j < d.length; j++) d[j] = Math.random() * 2 - 1; }
+    for (var b = 0; b < nb; b++) {
+      var at = t0 + b * bar, c = CH[b % 4];
+      if (at > t0 + dur) break;
+      c.forEach(function (n) { tone(NOTE(n), at, bar * 1.02, 'triangle', style === 'calm' ? 0.05 : 0.04, null, style === 'calm' ? 0.5 : 0.08); });
+      if (style === 'calm') { tone(NOTE(ROOT[b % 4]), at, bar, 'sine', 0.12, null, 0.3); [0, 1, 2, 3].forEach(function (k) { tone(NOTE(c[(k * 2) % 3] + 12), at + k * beat, beat * 1.8, 'sine', 0.035, null, 0.03); }); }
+      else {
+        [0, 2].forEach(function (k) { tone(NOTE(ROOT[b % 4]), at + k * beat, beat * 1.6, 'sine', 0.16); });
+        for (var e = 0; e < 8; e++) tone(NOTE(c[e % 3] + 12 + (e >= 4 ? 12 : 0) * (style === 'up' ? 0 : 1) ), at + e * beat / 2, beat * 0.45, style === 'up' ? 'square' : 'triangle', style === 'up' ? 0.018 : 0.035);
+      }
+      if (style === 'up') for (var k = 0; k < 4; k++) {
+        var kt = at + k * beat, ko = ac.createOscillator(), kg = ac.createGain();
+        ko.frequency.setValueAtTime(140, kt); ko.frequency.exponentialRampToValueAtTime(45, kt + 0.14);
+        kg.gain.setValueAtTime(0.5, kt); kg.gain.exponentialRampToValueAtTime(0.0001, kt + 0.18); ko.connect(kg); kg.connect(master); ko.start(kt); ko.stop(kt + 0.2);
+        var hs = ac.createBufferSource(), hf = ac.createBiquadFilter(), hg = ac.createGain(); hs.buffer = noise; hf.type = 'highpass'; hf.frequency.value = 7000;
+        hg.gain.setValueAtTime(0.12, kt + beat / 2); hg.gain.exponentialRampToValueAtTime(0.0001, kt + beat / 2 + 0.06);
+        hs.connect(hf); hf.connect(hg); hg.connect(master); hs.start(kt + beat / 2);
+      }
+    }
+    return master;
+  }
+
+  // ---------- 재생·녹화 ----------
+  var running = false, raf = 0, recorder = null, chunks = [], mus = null, recDest = null;
+  function stopAll() {
+    running = false; cancelAnimationFrame(raf);
+    if (mus) { try { mus.gain.cancelScheduledValues(0); mus.gain.value = 0; mus.disconnect(); } catch (e) {} mus = null; }
+    if (clip && clip.v) { try { clip.v.pause(); } catch (e) {} }
+    $('play').textContent = '▶ 미리보기'; $('rec').disabled = false; $('play').disabled = false; $('badge').textContent = '미리보기';
+  }
+  function run(onEnd) {
+    plan(); running = true;
+    if (clip && clip.v) { try { clip.v.currentTime = 0; clip.v.play(); } catch (e) {} }
+    var start = performance.now();
+    (function loop() {
+      if (!running) return;
+      var t = (performance.now() - start) / 1000;
+      if (t >= TOTAL) { frame(TOTAL - 0.001); stopAll(); if (onEnd) onEnd(); return; }
+      frame(t); raf = requestAnimationFrame(loop);
+    })();
+  }
+  $('play').addEventListener('click', function () {
+    if (running) { stopAll(); drawStill(); return; }
+    var ac = audio(); if (ac) mus = music(S.music, TOTAL, [ac.destination]);
+    this.textContent = '■ 멈추기'; $('rec').disabled = true; run(function () { drawStill(); });
+  });
+  function pickType() {
+    var L = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+    for (var i = 0; i < L.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(L[i])) return L[i];
+    return '';
+  }
+  $('rec').addEventListener('click', function () {
+    if (!photos.length && !(clip && clip.v)) { alert('사진을 한 장 이상 넣어 주세요'); return; }
+    if (!window.MediaRecorder || !cv.captureStream) { alert('이 브라우저는 영상 만들기를 못 해요. 사파리나 크롬에서 sava.kr/reel 을 열어 주세요.'); return; }
+    var type = pickType(), ac = audio(), stream = cv.captureStream(30);
+    if (ac && S.music !== 'off') { recDest = ac.createMediaStreamDestination(); mus = music(S.music, TOTAL, [ac.destination, recDest]); recDest.stream.getAudioTracks().forEach(function (tr) { stream.addTrack(tr); }); }
+    try { recorder = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 8000000 } : { videoBitsPerSecond: 8000000 }); }
+    catch (e) { try { recorder = new MediaRecorder(stream); } catch (e2) { alert('영상 만들기를 시작하지 못했어요'); stopAll(); return; } }
+    chunks = []; recorder.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    recorder.onstop = function () { finish(recorder.mimeType || type || 'video/webm'); };
+    $('done').hidden = true; $('rec').disabled = true; $('play').disabled = true; $('badge').textContent = '🔴 만드는 중… 화면을 그대로 두세요';
+    recorder.start(500);
+    run(function () { setTimeout(function () { try { recorder.stop(); } catch (e) {} }, 250); });
+  });
+  var outFile = null;
+  function finish(mime) {
+    var mp4 = /mp4/.test(mime), blob = new Blob(chunks, { type: mp4 ? 'video/mp4' : 'video/webm' });
+    var name = ($('title').value || 'sava').replace(/[\\/:*?"<>|\s]+/g, '_') + '_릴스.' + (mp4 ? 'mp4' : 'webm');
+    outFile = new File([blob], name, { type: blob.type });
+    var u = URL.createObjectURL(blob); $('out').src = u; $('dl').href = u; $('dl').download = name;
+    $('done').hidden = false; $('done').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try { if (window.SavaCherry) SavaCherry.rain({ text: '🎬 릴스 영상 완성!' }); } catch (e) {}
+    drawStill();
+  }
+  $('save').addEventListener('click', function () {
+    if (!outFile) return;
+    if (navigator.canShare && navigator.canShare({ files: [outFile] })) navigator.share({ files: [outFile], title: $('title').value || '싸바 릴스' }).catch(function () {});
+    else $('dl').click();
+  });
+
+  // ---------- 🤖 클링으로 사진 움직이기 ----------
+  var AI = { can: false };
+  function aiSt(s) { $('aiSt').textContent = s; }
+  function clipFrom(url, from) {
+    var v = document.createElement('video'); v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.loop = false; v.src = url;
+    v.addEventListener('loadeddata', function () { clip = { url: url, v: v, from: from }; paintPics(); plan(); drawStill(); $('aiDel').hidden = false; aiSt('✅ AI 장면이 영상 맨 앞에 들어갔어요 (▶ 미리보기로 확인)'); }, { once: true });
+    v.load();
+  }
+  function prep(i) { // 9:16로 잘라 720×1280 JPG → 클링에 보냄 (영상도 9:16로 나옴)
+    var src = photos[i].img, c = document.createElement('canvas'); c.width = 720; c.height = 1280;
+    var g = c.getContext('2d'), k = Math.max(720 / src.width, 1280 / src.height), dw = src.width * k, dh = src.height * k;
+    g.drawImage(src, (720 - dw) / 2, (1280 - dh) / 2, dw, dh); return c.toDataURL('image/jpeg', 0.88);
+  }
+  function poll(id, from, n) {
+    fetch('/api/reel/kling?id=' + encodeURIComponent(id), { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (o) {
+      if (o.status === 'done') { keep('sava-reel-ai', { url: o.url, from: from }); localStorage.removeItem('sava-reel-job'); clipFrom(o.url, from); $('aiGo').disabled = false; return; }
+      if (o.status === 'fail' || o.error) { localStorage.removeItem('sava-reel-job'); aiSt('😢 AI가 이 사진을 못 움직였어요' + (o.why ? ' (' + o.why + ')' : '') + '. 다른 사진으로 해 보세요'); $('aiGo').disabled = false; return; }
+      aiSt('⏳ AI가 움직이는 중… ' + Math.floor(n * 6 / 60) + '분 ' + (n * 6 % 60) + '초 (다른 칸을 고쳐도 돼요)');
+      if (n > 80) { aiSt('조금 오래 걸려요. 나중에 이 화면을 다시 열면 이어서 받아요'); $('aiGo').disabled = false; return; }
+      setTimeout(function () { poll(id, from, n + 1); }, 6000);
+    }).catch(function () { setTimeout(function () { poll(id, from, n + 1); }, 8000); });
+  }
+  $('aiGo').addEventListener('click', function () {
+    var i = +$('aiPick').value || 0; if (!photos[i]) { alert('먼저 사진을 넣어 주세요'); return; }
+    if (!confirm((i + 1) + '번 사진을 AI로 움직일까요?\n(1~3분 걸려요' + (AI.left != null ? ' · 오늘 ' + AI.left + '번 남음' : '') + ')')) return;
+    this.disabled = true; aiSt('📤 사진을 AI에 보내는 중…');
+    fetch('/api/reel/kling', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image: prep(i), motion: S.motion }) })
+      .then(function (r) { return r.json(); }).then(function (o) {
+        if (!o.id) { aiSt('😢 ' + (o.error || '보내지 못했어요')); $('aiGo').disabled = false; return; }
+        if (AI.left) AI.left--;
+        keep('sava-reel-job', { id: o.id, from: i }); poll(o.id, i, 0);
+      }).catch(function () { aiSt('😢 인터넷 연결을 확인해 주세요'); $('aiGo').disabled = false; });
+  });
+  $('aiDel').addEventListener('click', function () { clip = null; localStorage.removeItem('sava-reel-ai'); this.hidden = true; paintPics(); plan(); drawStill(); aiSt('AI 장면을 뺐어요'); });
+  fetch('/api/reel/kling?check', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (o) {
+    AI = o || {}; AI.can = !!o.can;
+    if (!o.ready) { $('aiOn').hidden = true; aiSt('🛠 준비 중이에요. 곧 열려요!'); return; }
+    if (!o.can) { $('aiOn').hidden = true; aiSt(o.open ? '카카오 로그인하면 쓸 수 있어요' : '🧪 지금은 시험 중이라 싸바 대표만 써요. 곧 열려요!'); return; }
+    aiSt('오늘 ' + o.left + '번 쓸 수 있어요');
+    var job = load('sava-reel-job'); if (job && job.id) { $('aiGo').disabled = true; poll(job.id, job.from, 0); }
+  }).catch(function () { $('aiOn').hidden = true; aiSt('🛠 준비 중이에요'); });
+
+  // ---------- 시작 ----------
+  plan(); drawStill();
+  addSrcs(saved.images || []).then(function () {
+    var ai = load('sava-reel-ai'); if (ai && ai.url && ai.from < photos.length && !EXAMPLE) clipFrom(ai.url, ai.from);
+  });
+  cherry.onload = cherryC.onload = drawStill;
+  document.addEventListener('visibilitychange', function () { if (document.hidden && recorder && recorder.state === 'recording') { $('badge').textContent = '⚠️ 화면이 꺼져서 영상이 끊겼을 수 있어요. 다시 만들어 주세요'; } });
+})();
+</script>
+<script src="/js/cherry.js" defer></script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

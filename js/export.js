@@ -804,6 +804,7 @@
       out.shown = out.filter(function (r) { return !r.more; }).length;
       return out;
     }
+    var bo = items.boost || 1; o = Object.assign({}, o, { fs: o.fs * bo });
     var fs = o.fs, minFs = Math.max(o.min || 26, o.fs * 0.84), R = rows(fs);
     while (R.shown < items.length && fs > minFs) { fs = Math.max(minFs, fs - 2); R = rows(fs); }
     if (!R.length) { fs = minFs; R = rows(fs); if (!R.length) return o.y; }
@@ -899,7 +900,7 @@
     y2 = tBlock(ctx, D.title, { x: 80 * u, y: y2, w: W - 160 * u, size: (g.tall ? 104 : 92) * u, min: 50 * u, fam: fam, color: P.onBg, align: 'center', lines: 2 }) + 10 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: 90 * u, y: y2, w: W - 180 * u, size: 30 * u, min: 22 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 24 * u;
     var fl2 = foot(D), bottom = sf.bot - (fl2.length ? 90 * u : 40 * u);
-    var phH = (bottom - y2) * (g.sq ? 0.62 : g.tall ? 0.52 : 0.58), phW = Math.min(W * 0.62, phH * 0.82);
+    var phH = (bottom - y2) * (D.pf ? 0.8 : g.sq ? 0.62 : g.tall ? 0.52 : 0.58), phW = Math.min(W * (D.pf ? 0.8 : 0.62), phH * (D.pf ? 1.05 : 0.82));
     pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { shape: 'arch', stroke: P.accentLine, sw: 3 * u, pad: 10 * u, fill: P.paper, fam: fam });
     y2 += phH + 34 * u;
     iList(ctx, D.items, { x: 90 * u, y: y2, w: W - 180 * u, h: bottom - y2, fs: (g.tall ? 38 : 32) * u, min: 24 * u, fam: fam, color: P.onBg, align: 'center', gap: 1.75 });
@@ -930,7 +931,7 @@
       return;
     }
     var thumbs = D.imgs.slice(1).filter(Boolean).slice(0, 3), tn = thumbs.length, tw = tn ? (W - gp * (tn - 1)) / tn : 0;
-    var mainH = (sf.bot - top) * (g.sq ? 0.5 : g.tall ? 0.4 : 0.46);
+    var mainH = (sf.bot - top) * (D.pf ? (g.sq ? 0.56 : 0.54) : g.sq ? 0.5 : g.tall ? 0.4 : 0.46);
     pic(ctx, D.main, 0, top, W, mainH, D, { fill: P.accentLine, mono: 'rgba(255,255,255,.4)', fam: fam });
     var y2 = top + mainH + gp;
     if (tn >= 2) { var th = Math.min(tw * (g.sq ? 0.55 : 0.8), (sf.bot - top) * 0.2); thumbs.forEach(function (im, i) { pic(ctx, im, i * (tw + gp), y2, tw, th, D, { fam: fam }); }); y2 += th + gp; }
@@ -961,7 +962,7 @@
     ctx.fillStyle = P.onBg; ctx.fillRect(m, y2, 48 * u, 3 * u); y2 += 40 * u;
     y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 84 : 72) * u, min: 40 * u, fam: fam, weight: 500, color: P.onBg, lines: 2 }) + 12 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 400, color: P.subBg, lines: 1 }) + 36 * u;
-    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (g.sq ? 0.55 : 0.55);
+    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (D.pf ? 0.76 : 0.55);
     pic(ctx, D.main, m, y2, W - m * 2, phH, D, { fill: P.paper, mono: 'rgba(127,127,127,.3)', fam: fam });
     y2 += phH + 40 * u;
     iList(ctx, D.items, { x: m, y: y2, w: W - m * 2, h: bottom - y2, fs: (g.tall ? 34 : 28) * u, min: 20 * u, weight: 400, pw: 500, color: P.onBg, sep: 'rgba(127,127,127,.2)', gap: 2 });
@@ -994,7 +995,7 @@
     y2 = tBlock(ctx, D.title, { x: m * 1.3, y: y2, w: W - m * 2.6 - sz, size: (g.tall ? 96 : 84) * u, min: 44 * u, fam: fam, weight: 900, color: P.onBg, lines: 2 }) + 8 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: m * 1.3, y: y2, w: W - m * 2.6 - sz, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 30 * u;
     y2 = Math.max(y2, sf.top + m * 1.2 + sz + 30 * u);
-    var bottom = sf.bot - m * 1.2 - (fl.length ? 60 * u : 0), phH = (bottom - y2) * 0.56;
+    var bottom = sf.bot - m * 1.2 - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (D.pf ? 0.74 : 0.56);
     pic(ctx, D.main, m * 1.3, y2, W - m * 2.6, phH, D, { stroke: P.onBg, sw: 6 * u, pad: 12 * u, fill: P.paper, fam: fam });
     y2 += phH + 44 * u;
     iList(ctx, D.items, { x: m * 1.3, y: y2, w: W - m * 2.6, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, fam: fam, color: P.onBg, lead: 'rgba(60,50,40,.5)', bullet: function (c, x, yy, fs) { c.fillStyle = P.accent; c.fillRect(x, yy + fs * 0.4, fs * 0.3, fs * 0.3); }, gap: 1.8 });
@@ -1019,7 +1020,7 @@
       if (fl.length) tBlock(ctx, fl[0], { x: tx, y: cy + ch - pad - 34 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accent, lines: 1 });
       return;
     }
-    var bottom = cy + ch - pad - (fl.length ? 60 * u : 0), phH = (ch - pad * 2) * (g.sq ? 0.46 : 0.44);
+    var bottom = cy + ch - pad - (fl.length ? 60 * u : 0), phH = (ch - pad * 2) * (D.pf ? 0.62 : g.sq ? 0.46 : 0.44);
     pic(ctx, D.main, cx + pad, cy + pad, cw - pad * 2, phH, D, { shape: 'round', r: 36 * u, fill: P.c1, fam: fam });
     var y2 = cy + pad + phH + 30 * u;
     y2 = tBlock(ctx, D.title, { x: cx + pad, y: y2, w: cw - pad * 2, size: (g.tall ? 86 : 72) * u, min: 38 * u, fam: fam, weight: 900, color: P.ink, align: 'center', lines: 2 }) + 6 * u;
@@ -1045,7 +1046,7 @@
       return;
     }
     var y2 = sf.top + 110 * u, bottom = sf.bot - 100 * u - (fl.length ? 50 * u : 0);
-    var phH = (bottom - y2) * (g.sq ? 0.4 : 0.38), phW = phH * 0.8;
+    var phH = (bottom - y2) * (D.pf ? 0.54 : g.sq ? 0.4 : 0.38), phW = phH * (D.pf ? 1.1 : 0.8);
     pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { shape: 'oval', stroke: gl, sw: 3 * u, pad: 14 * u, fill: P.paper, mono: gl, fam: fam });
     y2 += phH + 46 * u;
     y2 = tBlock(ctx, D.title, { x: 120 * u, y: y2, w: W - 240 * u, size: (g.tall ? 92 : 80) * u, min: 42 * u, fam: fam, weight: 900, color: gl, align: 'center', lines: 2 }) + 8 * u;
@@ -1070,7 +1071,7 @@
       if (fl.length) tBlock(ctx, fl[0], { x: m, y: H - m - 20 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
       return;
     }
-    var phH = H * (g.sq ? 0.56 : g.tall ? 0.56 : 0.58);
+    var phH = H * (D.pf ? 0.7 : g.sq ? 0.56 : g.tall ? 0.56 : 0.58);
     pic(ctx, D.main, 0, 0, W, phH, D, { fill: P.paper, fam: fam });
     ctx.fillStyle = grad(ctx, 0, phH * 0.45, 0, phH, [[0, 'rgba(0,0,0,0)'], [1, P.bg]]); ctx.fillRect(0, phH * 0.45, W, phH * 0.55 + 2);
     var TT = { x: m, y: 0, w: W - m * 2, size: (g.tall ? 116 : 100) * u, min: 48 * u, fam: fam, weight: 900, color: P.onBg, lines: 2, lh: 1.08 };
@@ -1105,7 +1106,7 @@
       if (fl.length) tBlock(ctx, fl[0], { x: tx + 40 * u, y: m + ph - 60 * u, w: tw - 80 * u, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: tc, lines: 1 });
       return;
     }
-    var top = sf.top + m, phH = (sf.bot - top) * (g.sq ? 0.42 : 0.4), phW = W - m * 2.6;
+    var top = sf.top + m, phH = (sf.bot - top) * (D.pf ? 0.58 : g.sq ? 0.42 : 0.4), phW = W - m * 2.6;
     ctx.save(); ctx.shadowColor = 'rgba(20,10,40,.35)'; ctx.shadowBlur = 50 * u; ctx.shadowOffsetY = 24 * u; ctx.fillStyle = P.accent; round(ctx, (W - phW) / 2, top, phW, phH, 48 * u); ctx.fill(); ctx.restore();
     pic(ctx, D.main, (W - phW) / 2, top, phW, phH, D, { shape: 'round', r: 48 * u, fill: P.accent, fam: fam });
     var py = top + phH + 36 * u, pH = sf.bot - m - py; panel(m, py, W - m * 2, pH);
@@ -1144,7 +1145,7 @@
     var y2 = sf.top + cs + 40 * u;
     y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 120 : 104) * u, min: 50 * u, fam: fam, weight: 400, color: ink, shadow: P.accent, lines: 2, lh: 1.08, align: 'center' }) + 6 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 800, color: P.sub, lines: 1, align: 'center' }) + 26 * u;
-    var bottom = sf.bot - cs - 30 * u - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (g.sq ? 0.55 : 0.52);
+    var bottom = sf.bot - cs - 30 * u - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (D.pf ? 0.74 : g.sq ? 0.55 : 0.52);
     box(m, y2, W - m * 2 - 14 * u, phH); star(W - m - 60 * u, y2 + 20 * u, (g.sq ? 74 : 90) * u, hot);
     y2 += phH + 44 * u;
     iList(ctx, D.items, { x: m + 10 * u, y: y2, w: W - m * 2 - 20 * u, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, color: ink, pcolor: P.accent, bullet: sq, gap: 1.7 });
@@ -1167,7 +1168,7 @@
       return;
     }
     var y2 = sf.top + m;
-    var bottom = sf.bot - m - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (g.sq ? 0.46 : 0.45);
+    var bottom = sf.bot - m - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (D.pf ? 0.62 : g.sq ? 0.46 : 0.45);
     glowBox(m, y2, W - m * 2, phH); y2 += phH + 40 * u;
     y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 112 : 96) * u, min: 46 * u, fam: fam, weight: 900, color: '#ffffff', glow: P.accent, lines: 2, align: 'center' }) + 4 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 700, color: P.c1, glow: P.c1, lines: 1, align: 'center' }) + 24 * u;
@@ -1198,7 +1199,7 @@
     var y2 = top;
     y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 96 : 82) * u, min: 42 * u, fam: fam, weight: 600, color: P.onBg, align: 'center', lines: 2 }) + 4 * u;
     if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 22 * u;
-    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (g.sq ? 0.46 : 0.46), phW = Math.min(W - m * 2.4, phH * 1.25);
+    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (D.pf ? 0.68 : 0.46), phW = Math.min(W - m * 2.4, phH * (D.pf ? 1.5 : 1.25));
     pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { stroke: P.accentLine, sw: 2 * u, pad: 12 * u, fill: P.paper, fam: fam });
     y2 += phH + 34 * u; y2 = head(m, y2, W - m * 2);
     iList(ctx, D.items, { x: m * 1.4, y: y2, w: W - m * 2.8, h: bottom - y2, fs: (g.tall ? 34 : 28) * u, min: 20 * u, fam: fam, color: P.onBg, pcolor: P.accentLine, lead: P.accentLine, gap: 1.7 });
@@ -1220,7 +1221,7 @@
       if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - m - 34 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
       return;
     }
-    var phH = H * (g.sq ? 0.46 : g.tall ? 0.46 : 0.48);
+    var phH = H * (D.pf ? 0.64 : g.sq ? 0.46 : g.tall ? 0.46 : 0.48);
     pic(ctx, D.main, 0, 0, W, phH, D, { fill: P.c1, fam: fam });
     ctx.fillStyle = P.bg; ctx.beginPath(); ctx.moveTo(0, phH); ctx.quadraticCurveTo(W * 0.5, phH - 90 * u, W, phH - 10 * u); ctx.lineTo(W, phH + 2); ctx.lineTo(0, phH + 2); ctx.fill();
     blobs(0, phH, W, H - phH);
@@ -1235,7 +1236,9 @@
 
   // 크기마다 사진에 넣을 줄 수 (넘치면 앞에서부터 이만큼 + "외 N가지")
   var SNS_CAP = { sq: 4, p45: 6, story: 9, k43: 5, yt: 4, link: 3 };
-  function snsPlan(card, opts, sizeId) {
+  // 사진이 있는 인스타·피드(정사각 1:1·세로 4:5)는 사진이 주인공 — 메뉴는 대표 몇 개만 크게
+  var SNS_CAP_PHOTO = { sq: 2, p45: 3 };
+  function snsPlan(card, opts, sizeId, pf) {
     var fromMenu = !!(card.reserve && card.reserve.menu && card.reserve.menu.length) || !!(opts && opts.menu && opts.menu.length);
     var B = bodyItems(card.body), items = frameMenu(card, opts).map(function (m) { return { n: m.n, p: m.p }; });
     // 메뉴를 따로 적었으면 본문에서 '한정·할인·이벤트' 같은 한 줄을 꼬리표로 (머리말 줄 ■ 는 꼬리표로 안 씀)
@@ -1243,9 +1246,9 @@
     if (fromMenu) { var hot = B.items.filter(function (x) { return !x.p && /한정|할인|이벤트|신메뉴|오픈|모집|특강|무료|특선/.test(x.n); })[0]; tag = hot ? hot.n.replace(/^[^:：]{0,12}[:：]\s*/, '') : ''; hotLine = hot ? hot.n : ''; }
     // 메뉴를 따로 적었으면 본문의 안내 줄(배달 안 함·주차 등)도 자리가 남는 만큼 메뉴 뒤에
     if (fromMenu) B.items.forEach(function (x) { if (!x.p && x.n !== (tag ? hotLine : '')) items.push({ n: x.n, p: '' }); });
-    var cap = SNS_CAP[sizeId] || 6, cut = 0, total = items.length, unit = fromMenu || items.some(function (x) { return x.p; }) ? '메뉴' : '';
+    var cap = (pf && SNS_CAP_PHOTO[sizeId]) || SNS_CAP[sizeId] || 6, cut = 0, total = items.length, unit = fromMenu || items.some(function (x) { return x.p; }) ? '메뉴' : '';
     if (items.length > cap) { cut = items.length - cap; items = items.slice(0, cap); }
-    items.more = cut; items.unit = unit;
+    items.more = pf ? 0 : cut; items.pfCut = pf ? cut : 0; items.unit = unit; if (pf) items.boost = 1.3; // 사진 중심: '외 N가지' 없이 대표 메뉴만 큰 글씨로
     return { items: items, cut: cut, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag, head: B.head, total: total, cap: cap };
   }
   // 01029477775 → 010-2947-7775, 025412125 → 02-541-2125 (이미 - 가 있으면 그대로)
@@ -1256,13 +1259,13 @@
     return d.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
   }
   function snsData(card, design, opts, imgs, sizeId) {
-    var pl = snsPlan(card, opts, sizeId);
+    var pf = !!imgs[0] && !!SNS_CAP_PHOTO[sizeId], pl = snsPlan(card, opts, sizeId, pf);
     var title = String(card.title || '').trim() || '싸바';
     return {
       title: title, sub: String(card.subtitle || '').trim(), items: pl.items, tag: pl.tag,
       phone: telFmt(card.contact && card.contact.phone || ''), addr: frameAddr(card) || (card.place && card.place.name) || '',
       head: IND_HEAD[opts.industry] || pl.head || String(design.badge || '').replace(/\n/g, ' ') || TYPE_HEAD[card.template] || '안내', badge: design.badge || '',
-      imgs: imgs, main: imgs[0] || null, ip: card.image ? card.ip : null, fam: famStack(design)
+      pf: pf, imgs: imgs, main: imgs[0] || null, ip: card.image ? card.ip : null, fam: famStack(design)
     };
   }
   function drawSns(card, design, opts, imgs, size) {
@@ -1270,7 +1273,7 @@
     var D = snsData(card, design, opts, imgs, size.id), P = design.colors;
     (LAYS[design.style] || LAYS.minimal)(ctx, W, H, D, P);
     mark(ctx, W, H, lumOf(P.bg) > 0.5);
-    c._fit = { shown: D.items.shown == null ? D.items.length : D.items.shown, total: D.items.length + (D.items.more || 0) };
+    c._fit = { pf: D.pf, shown: D.items.shown == null ? D.items.length : D.items.shown, total: D.items.length + (D.items.more || 0) + (D.items.pfCut || 0) };
     return c;
   }
   // 디자인 1개 → 올릴 곳 크기 6가지 (opts.sizes 로 골라 그릴 수 있음)

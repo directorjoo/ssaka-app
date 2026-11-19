@@ -886,7 +886,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=85"></script>
+<script src="../js/export.js?v=86"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1106,7 +1106,7 @@
       if (g !== snsPvGen) return;
       if (r) { img.src = r.url; ld.textContent = ''; } else ld.textContent = '사진을 그리지 못했어요';
       var n = $('snsFitN'), f = r && r.fit;
-      if (n && f && f.total) n.innerHTML = n.dataset.w + ' ' + (f.shown < f.total ? f.total + '줄 중 <b>' + f.shown + '줄</b> 넣고 나머지는 "외 ' + (f.total - f.shown) + '가지"로' : f.total + '줄 <b>모두</b> 들어갔어요');
+      if (n && f && f.total) n.innerHTML = n.dataset.w + ' ' + (f.pf && f.shown < f.total ? f.total + '줄 중 대표 <b>' + f.shown + '줄</b>만 크게 — 사진이 주인공이에요' : f.shown < f.total ? f.total + '줄 중 <b>' + f.shown + '줄</b> 넣고 나머지는 "외 ' + (f.total - f.shown) + '가지"로' : f.total + '줄 <b>모두</b> 들어갔어요');
     }).catch(function () { if (g === snsPvGen) ld.textContent = '사진을 그리지 못했어요'; });
   }
   var mood = '';

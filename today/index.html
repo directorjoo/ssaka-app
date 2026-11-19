@@ -123,6 +123,19 @@
     .pl-t { margin: 0 2px 10px; color: #fff; font-size: 16px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
     .pl-v { position: relative; padding-top: 56.25%; border-radius: 14px; overflow: hidden; background: #000; }
     .pl-v iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .pl-b { display: flex; gap: 10px; margin-top: 14px; }
+    .pl-b .pl-x { margin-top: 0; flex: 1; }
+    .pl-f { flex: none; min-width: 108px; min-height: 58px; border: 0; border-radius: 16px; background: #FFD400; color: #3a0a12; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .pl-v:fullscreen, .pl-v:-webkit-full-screen { padding-top: 0; border-radius: 0; width: 100%; height: 100%; }
+    /* 휴대폰을 가로로 돌리면: 제목은 숨기고 화면 가득, 단추는 오른쪽 위에 작게 */
+    @media (orientation: landscape) and (max-height: 520px) {
+      .pl-bg { padding: 0; background: #000; }
+      .pl { max-width: none; width: 100vw; height: 100vh; height: 100dvh; position: relative; }
+      .pl-t { display: none; }
+      .pl-v { padding-top: 0; width: 100%; height: 100%; border-radius: 0; }
+      .pl-b { position: absolute; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); margin: 0; gap: 6px; opacity: .9; }
+      .pl-b .pl-x, .pl-b .pl-f { min-height: 40px; min-width: 0; padding: 0 12px; font-size: 14px; border-radius: 12px; }
+    }
     .pl-x { display: block; width: 100%; min-height: 58px; margin-top: 14px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
     .sendbar { display: flex; align-items: center; gap: 8px; margin: 6px 14px 8px; }
     .sendbar .btn { flex: 1; min-height: 50px; background: #FEE500; color: #191600; font-size: 16.5px; box-shadow: 0 6px 14px -10px rgba(0,0,0,.5); }
@@ -268,10 +281,14 @@
 
   // 싸바 안 동영상 창: 아래 [🍒 싸바로 돌아가기]로 언제든 닫고 돌아옴
   function player(id, title) {
-    var bg = el('div', 'pl-bg'); bg.innerHTML = '<div class="pl"><div class="pl-t"></div><div class="pl-v"><iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&playsinline=1&rel=0" title="동영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div><button type="button" class="pl-x">🍒 싸바로 돌아가기</button></div>';
+    var bg = el('div', 'pl-bg'); bg.innerHTML = '<div class="pl"><div class="pl-t"></div><div class="pl-v"><iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?autoplay=1&playsinline=1&rel=0" title="동영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div><div class="pl-b"><button type="button" class="pl-f">⛶ 전체화면</button><button type="button" class="pl-x">🍒 싸바로 돌아가기</button></div></div>';
     bg.querySelector('.pl-t').textContent = title || '';
-    function close() { bg.remove(); document.body.style.overflow = ''; }
-    bg.querySelector('.pl-x').addEventListener('click', close); bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
+    function close() { try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} bg.remove(); document.body.style.overflow = ''; }
+    bg.querySelector('.pl-x').addEventListener('click', close); bg.querySelector('.pl-f').addEventListener('click', function () {
+      var v = bg.querySelector('.pl-v'), f = v.requestFullscreen || v.webkitRequestFullscreen;
+      if (f) { try { var r = f.call(v); if (r && r.then) r.then(function () { try { screen.orientation.lock('landscape'); } catch (e) {} }).catch(function () {}); } catch (e) {} }
+      else alert('휴대폰을 옆으로 돌리면 화면 가득 나와요. 영상 안의 ⛶ 단추를 눌러도 돼요.');
+    }); bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
     document.body.appendChild(bg); document.body.style.overflow = 'hidden';
   }
 

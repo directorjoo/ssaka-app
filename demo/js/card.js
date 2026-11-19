@@ -299,7 +299,9 @@
         var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : ''); e1.textContent = '📝 입력칸';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
         bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
-        document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
+        document.body.appendChild(bar);
+        // 손님 반응은 화면에 떠 있지 않고 카드 바로 아래에 놓음 → 예약·전화 단추를 가리지 않음
+        if (app && app.parentNode) app.insertAdjacentElement('afterend', st); else bar.parentNode.insertBefore(st, bar);
       };
       var sidQ = new URLSearchParams(location.search).get('s');
       if (mine) {

@@ -137,11 +137,12 @@ async function build(k, city, env) {
     raw = [['💰', p2.map(x => ({ t: x.t, b: (x.org ? x.org + ' · ' : '') + (x.when ? '신청 ' + x.when : ''), url: x.url }))], ['🎪', f.map(x => ({ t: x.t, b: x.at + ' ' + x.addr, url: x.url }))], ['📰', a]];
     src = '[장사 뉴스]\n' + a.map(x => '- ' + x.t + ' ' + R(x.url)).join('\n') + '\n[2주 안 전국 축제·행사]\n' + (f.length ? f.map(x => '- ' + x.t + ' ' + x.at + ' ' + x.addr + ' ' + R(x.url)).join('\n') : '(자료 없음)') + '\n[지원사업]\n' + p2.map(x => '- ' + x.t + (x.org ? ' · ' + x.org : '') + (x.when ? ' 신청 ' + x.when : '') + ' ' + R(x.url)).join('\n') + '\n[지금 인기 검색어]\n' + tr.join(', ');
   } else {
-    const [a, b, m] = await Promise.all([news('오디션 모집 배우 when:7d', 10), news('배우 모집 OR 캐스팅 공고 OR 공개 오디션 when:10d', 8), news('뮤지컬 OR 연극 오디션 when:14d', 6)]);
-    const seen = {}, all = a.concat(b, m).filter(x => !seen[x.t] && (seen[x.t] = 1));
+    const qs = ['오디션 when:14d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '광고 모델 모집 OR 아역 오디션 when:30d'];
+    const got = await Promise.all(qs.map(q => news(q, 12)));
+    const seen = {}, all = [].concat(...got).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !seen[x.t] && (seen[x.t] = 1));
     // 배우 편지는 AI가 다시 쓰지 않고 제목 + 원문 링크만 — 배우가 직접 골라 봄
     const mm = d => { const t = new Date(d + 9 * 3600e3); return (t.getUTCMonth() + 1) + '/' + t.getUTCDate(); };
-    const list = all.sort((x, y) => y.d - x.d).slice(0, 15).map(x => ({ icon: /뮤지컬/.test(x.t) ? '🎤' : /연극/.test(x.t) ? '🎭' : /드라마/.test(x.t) ? '📺' : /광고|뮤직비디오|뮤비/.test(x.t) ? '📢' : '🎬', title: x.t, body: [x.src, x.d ? mm(x.d) : ''].filter(Boolean).join(' · '), url: x.url }));
+    const list = all.sort((x, y) => y.d - x.d).slice(0, 20).map(x => ({ icon: /뮤지컬/.test(x.t) ? '🎤' : /연극/.test(x.t) ? '🎭' : /드라마/.test(x.t) ? '📺' : /광고|뮤직비디오|뮤비/.test(x.t) ? '📢' : '🎬', title: x.t, body: [x.src, x.d ? mm(x.d) : ''].filter(Boolean).join(' · '), url: x.url }));
     return { k, city, date: ymd(today), w, list: true, hello: '싸바? 오늘의 오디션·모집 소식이에요. 제목을 누르면 원문이 열려요.', items: list, links: ACTOR_LINKS };
   }
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';

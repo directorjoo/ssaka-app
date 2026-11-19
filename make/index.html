@@ -352,6 +352,26 @@
   .tnav #tNext { border: 0; background: #B3132B; color: #fff; }
   .tnav button:disabled { opacity: .35; }
   .tp-head { margin: 0 0 10px; padding: 12px 14px; border-radius: 14px; background: #fff; border-left: 5px solid #B3132B; font-size: 15px; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+  /* 만들기 순서: ① 용도 → ② 디자인 → ③ 필요한 칸만 (한 단계씩 열림) */
+  .use-h { margin: 14px 0 8px; font-size: 15.5px; font-weight: 900; color: #1a1a1a; }
+  .use-h small { margin-left: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .dests { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 4px; }
+  .dests button { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 6px; min-height: 58px; padding: 8px 10px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font: inherit; text-align: left; cursor: pointer; color: var(--text); }
+  .dests button i { font-style: normal; font-size: 24px; text-align: center; }
+  .dests button b { display: block; font-size: 15px; font-weight: 900; line-height: 1.25; word-break: keep-all; }
+  .dests button small { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .dests button[aria-pressed="true"] { border-color: #B3132B; background: #FFF1F2; box-shadow: 0 0 0 1.5px #B3132B inset; }
+  .dests button[aria-pressed="true"] b { color: #B3132B; }
+  .use-go { margin: 6px 0 2px; font-size: 14px; font-weight: 700; color: #8E0A1C; }
+  #resumeBtn { display: block; width: 100%; min-height: 48px; margin: 4px 0 6px; border-radius: 14px; border: 1.5px dashed #B3132B; background: #fff; color: #8E0A1C; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+  #d2next { display: none; width: 100%; min-height: 56px; margin-top: 12px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 18px -10px rgba(179,19,43,.8); }
+  .mk-s2 #d2next { display: block; }
+  .d2dest { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; background: #EAF3FF; color: #1B3F7A; font-size: 14.5px; font-weight: 700; line-height: 1.45; word-break: keep-all; }
+  .mk-s1 #d2home, .mk-s1 #hLinks, .mk-s1 #exFillBox,
+  .mk-s1 #form > .sec-h, .mk-s1 #form > fieldset,
+  .mk-s2 #form > .sec-h, .mk-s2 #form > fieldset, .mk-s2 #exFillBox, .mk-s2 #hLinks,
+  .mk-s1 #bar, .mk-s2 #bar { display: none !important; }
+  @media (max-width: 859px) { .mk-s1 .preview, .mk-s2 .preview { display: none !important; } }
   .tp-head b { display: block; font-size: 18px; font-weight: 900; color: #1a1a1a; margin-bottom: 2px; }
 </style>
 <script src="/js/launch.js?v=3"></script>
@@ -366,7 +386,7 @@
       </a>
     </div>
     <h1>10초 만에 카드 만들기</h1>
-    <p>① 어떤 카드인지 고르고 ② 디자인 고르고 ③ 쭉 적으면 끝! 다 쓰면 다른 디자인·색과 비교해 보고 최종 결정해요.</p>
+    <p>① 용도를 고르면 ② 거기에 맞는 디자인이 나오고 ③ 그 카드에 필요한 질문만 나와요. 다 쓰면 다른 디자인·색과 비교해 보고 최종 결정해요.</p>
     <a class="mwrite" href="../survey/">✍️ <b>블로그 글쓰기</b> · 질문에 답하면 글 10가지 ›</a>
   </header>
 
@@ -374,8 +394,13 @@
     <form id="form" autocomplete="off" onsubmit="return false">
       <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>칸마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
       <div class="tp" data-tab="design">
-      <div class="step">1. 어떤 카드를 만들까요?</div>
-      <div class="inds" id="inds" role="group" aria-label="업종"></div>
+      <div class="step">1. 어떤 용도의 카드예요?</div>
+      <button type="button" id="resumeBtn" hidden></button>
+      <div class="use-h">어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></div>
+      <div class="dests" id="dests" role="group" aria-label="올릴 곳"></div>
+      <div class="use-h">무엇을 알릴까요?</div>
+      <div class="inds" id="inds" role="group" aria-label="용도"></div>
+      <div class="use-go" id="useGo">👆 고르면 거기에 맞는 디자인이 바로 아래에 나와요</div>
       <div class="hlinks" id="hLinks" hidden></div>
       </div>
       <div id="d2home">
@@ -388,8 +413,10 @@
         <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
       </div>
       <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
+      <div class="d2dest" id="d2dest" hidden></div>
       <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
       <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
+      <button type="button" id="d2next">✅ 이 디자인으로 — 다음: 내용 적기 ›</button>
       </div>
       </div>
 
@@ -792,7 +819,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=86"></script>
+<script src="../js/designs.js?v=87"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=82"></script>
 <script src="../js/reserve.js"></script>
@@ -862,7 +889,7 @@
   var IND_TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', insurance: '#E3E8F0', newcar: '#E3E8F0', usedcar: '#E3E8F0', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
     cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
     arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
-    greeting: '#E2EEFB', event: '#FFEFD1', kid: '#FFF5C7', senior: '#E6EEE0' };
+    greeting: '#E2EEFB', event: '#FFEFD1', wedding: '#FCE7F3', funeral: '#ECEDEF', news: '#EEF0F3', product: '#FFE3F1', kid: '#FFF5C7', senior: '#E6EEE0' };
   // 1. 업종 고르기 — 묶음 탭 없이 모든 업종을 동그라미로 한눈에
   function renderIndustries() {
     var box = $('inds'); box.innerHTML = ''; box.className = 'inds circ';
@@ -884,7 +911,7 @@
         if (IND_TINT[ind.id]) i.style.setProperty('--tint', IND_TINT[ind.id]);
         b.appendChild(i); b.appendChild(document.createTextNode(ind.label));
         b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
-        b.addEventListener('click', function () { setIndustry(ind.id, true); });
+        b.addEventListener('click', function () { setIndustry(ind.id, true); afterUse(); });
         grid.appendChild(b);
       });
       box.appendChild(grid);
@@ -1327,7 +1354,23 @@
     $('open2').href = c.url;
     if (window.SsakaStore) SsakaStore.saveMine(c.card, c.url);
     $('toast').classList.remove('show');
+    paintDoneDest();
     $('doneModal').hidden = false;
+  }
+  // 올릴 곳을 인스타·스토리·정사각으로 골랐으면 완성 화면에서 그 크기 사진 만들기를 맨 위로
+  var EXP2_TXT = null;
+  function paintDoneDest() {
+    var b = $('exp2'), box = b.parentNode, ds = DEST_BY[dest] || DEST_BY.kakao;
+    if (EXP2_TXT === null) EXP2_TXT = b.textContent;
+    if (dest !== 'kakao') {
+      b.textContent = ds.i + ' ' + ds.b + ' 사진 만들기 (' + ds.s + ')'; b.className = 'kakao big';
+      box.insertBefore(b, $('send2'));
+      $('send2').className = 'ghost big';
+    } else {
+      b.textContent = EXP2_TXT; b.className = 'ghost big';
+      box.insertBefore(b, $('open2'));
+      $('send2').className = 'kakao big';
+    }
   }
   var INV = [
     '바쁘신 중에도 귀한 걸음 하시어\n자리를 빛내 주시면 감사하겠습니다.',
@@ -2425,6 +2468,55 @@
     update();
     toast('예시를 채웠어요. 아래로 내려가며 보시고 내 내용으로 고치세요 (↩ 되돌리기 가능)');
   });
+  // ---------- ① 용도 → ② 디자인 → ③ 필요한 칸만 (한 단계씩 열기) ----------
+  var DESTS = [
+    { id: 'kakao', i: '💬', b: '카톡으로 보내기', s: '누르면 열리는 카드' },
+    { id: 'feed', i: '📷', b: '인스타 피드', s: '세로 4:5' },
+    { id: 'story', i: '📱', b: '스토리·릴스', s: '세로 9:16' },
+    { id: 'square', i: '🟩', b: '네이버·당근', s: '정사각 1:1' }
+  ];
+  var DEST_BY = {}; DESTS.forEach(function (d) { DEST_BY[d.id] = d; });
+  var dest = 'kakao';
+  try { var sd = localStorage.getItem('sava-dest'); if (DEST_BY[sd]) dest = sd; } catch (e) {}
+  function renderDests() {
+    var box = $('dests'); box.innerHTML = '';
+    DESTS.forEach(function (d) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.dest = d.id;
+      b.innerHTML = '<i aria-hidden="true">' + d.i + '</i><span><b>' + d.b + '</b><small>' + d.s + '</small></span>';
+      b.setAttribute('aria-pressed', d.id === dest ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        dest = d.id; try { localStorage.setItem('sava-dest', dest); } catch (e) {}
+        box.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.dest === dest ? 'true' : 'false'); });
+        paintDest();
+      });
+      box.appendChild(b);
+    });
+    paintDest();
+  }
+  function paintDest() {
+    var n = $('d2dest'), ds = DEST_BY[dest];
+    n.hidden = dest === 'kakao';
+    if (!n.hidden) n.textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 디자인을 고르고 다 쓰면, 완성 화면에서 ' + ds.b + ' 크기 사진이 맨 위에 나와요.';
+  }
+  var stage = 3;
+  function goStage(n, scrollTo) {
+    stage = n;
+    document.body.classList.toggle('mk-s1', n === 1);
+    document.body.classList.toggle('mk-s2', n === 2);
+    $('useGo').hidden = n !== 1;
+    if (scrollTo) setTimeout(function () { var el = typeof scrollTo === 'string' ? document.querySelector(scrollTo) : scrollTo; if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  }
+  // 무엇을 알릴지 고르면 → 그 용도에 맞는 디자인으로
+  function afterUse() {
+    if (stage < 2) goStage(2);
+    setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  }
+  // 디자인을 정하면 → 그 카드에 필요한 질문만
+  $('d2next').addEventListener('click', function () { goStage(3, '#form .sec-h[data-sec="basic"]'); toast('이 카드에 필요한 것만 물어볼게요 ✍️'); });
+  $('resumeBtn').addEventListener('click', function () { goStage(3, '#form .sec-h[data-sec="basic"]'); });
+
+  var hadDraft = false;
+  try { hadDraft = !!localStorage.getItem(DRAFT); } catch (e) {}
   industry = loadDraft();
   if (editCard) {
     loadCard(editCard); type = null;
@@ -2454,6 +2546,15 @@
   // 싸바알림 화면에서 '디자인 먼저'·'사진 한 장으로'를 눌러 들어오면 그 자리로
   var jump = /^#(gallery|ptile)$/.test(location.hash) && document.getElementById(location.hash.slice(1));
   showTab('basic');
+  renderDests();
+  // 새로 만들 때는 용도부터 (고치기·바로가기로 들어온 경우는 전부 펼침)
+  if (!editCard && !qInd && !jump) {
+    goStage(1);
+    var dt = v('title');
+    if (hadDraft && dt) { $('resumeBtn').hidden = false; $('resumeBtn').textContent = '✏️ 쓰던 카드 이어서 쓰기 — ' + dt; }
+    if (!hadDraft) document.querySelectorAll('.inds button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+  } else if (qInd && !editCard && !jump && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { goStage(2); afterUse(); }
+  else goStage(3);
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();
 </script>

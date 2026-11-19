@@ -189,6 +189,11 @@
       ex: { title: '싸바공인중개사', subtitle: '아파트 · 상가 · 원룸 매매·전월세', name: '싸바공인중개사', body: '이번 주 추천 매물: 역세권 30평대\n상담 예약 환영', copyLabel: '매물 목록', copyValue: 'https://example.com', place: '여수 웅천동' } },
     { id: 'restaurant', label: '음식점', emoji: '🍲', type: 'shop', styles: ['poster', 'sticker', 'cinema'], world: true,
       ex: { title: '압구정 순천만', subtitle: '11:30 – 22:00 (15–17시 쉬는 시간) · 일·공휴일 휴무', name: '압구정 순천만', phone: '02-541-2125', body: SC.line + '\n인기: 짱뚱어탕 · 홍어삼합 · 생선찜\n점심: 짱뚱어탕 15,000원 · 굴국밥 · 매생이 굴떡국 12,000원\n점심 생선구이: 고등어 · 갈치 13,000원\n배달은 하지 않아요', copyLabel: '주소 복사', copyValue: '서울 강남구 신사동 609-1 지하1층', place: '압구정 순천만', menu: '짱뚱어탕 15000\n갑오징어 무침 40000\n서대회 40000\n홍어삼합 60000\n생선찜 (서대·양태·민어) 50000\n모둠구이 (서대·양태·능성어) 45000\n고등어조림 35000\n굴국밥 12000\n매생이 굴떡국 12000\n고등어 구이 13000\n갈치 구이 13000' + SC.menu, account: 'OO은행 000-0000-0000 압구정 순천만', lkNv: 'https://m.place.naver.com/restaurant/11888959/home', image: 'https://sava.kr/img/ex/suncheon-kkomak.jpg', galUrls: 'https://sava.kr/img/ex/suncheon-muchim.jpg\nhttps://sava.kr/img/ex/suncheon-gul.jpg\nhttps://sava.kr/img/ex/suncheon-tang.jpg\nhttps://sava.kr/img/ex/suncheon-gui.jpg\nhttps://sava.kr/img/ex/suncheon-jorim.jpg\nhttps://sava.kr/img/ex/suncheon-jeon.jpg\nhttps://sava.kr/img/ex/suncheon-jeoneo.jpg\nhttps://sava.kr/img/ex/suncheon-banchan.jpg\nhttps://sava.kr/img/ex/suncheon-menu-a6.jpg\nhttps://sava.kr/img/ex/suncheon-menu-b6.jpg' } },
+    { id: 'product', label: '상품 홍보', emoji: '🛍️', type: 'shop', styles: ['magazine', 'poster', 'glass'],
+      L: { title: '상품 이름', subtitle: '가격 · 한 줄 소개', contact: '주문 연락처', name: '파는 곳 (가게·이름)', phone: '주문 전화번호', body: '특징 · 구성 · 배송 안내 (한 줄에 하나씩)' },
+      form: { hide: ['resv', 'find'], gal: true,
+        copy: ['💳 입금 계좌 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요.', '입금 계좌', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'] },
+      ex: { title: '여수 돌산 갓김치 3kg', subtitle: '35,000원 · 산지 직송', name: '싸바 상회', body: '돌산 갓으로 담근 햇김치\n3kg · 5kg 두 가지\n주문 다음 날 택배 출발 (제주 제외)\n10장 사진으로 담그는 과정을 보여 드려요', copyLabel: '입금 계좌', copyValue: 'OO은행 000-0000-0000 싸바상회' } },
     { id: 'cafe', label: '카페·베이커리', emoji: '☕', type: 'shop', styles: ['sticker', 'glass', 'magazine'], world: true,
       ex: { title: '카페 싸바', subtitle: '매일 10:00 – 21:00', name: '카페 싸바', body: '오늘 갓 구운 소금빵\n아메리카노 2+1 (오후 3시까지)', copyLabel: '주소 복사', copyValue: '여수시 (예시)', place: '여수 낭만포차', menu: '아메리카노 4500\n카페라떼 5000\n소금빵 3500\n홀케이크 (예약) 32000', account: 'OO은행 000-0000-0000 카페 싸바' } },
     { id: 'beauty', label: '미용·네일', emoji: '💅', type: 'shop', styles: ['glass', 'magazine', 'cinema'],
@@ -230,16 +235,44 @@
       L: { body: '객실 · 시설 · 이벤트 (한 줄에 하나씩)', menu: '객실과 1박 요금 (한 줄에 하나, 선택)', menuHint: '"객실 이름 요금" 순서로 적으면 손님이 객실을 고르고 예상 금액이 계산돼요.', resv: '손님이 카드에서 바로 객실 예약할 수 있게 하기' },
       res: { label: '객실 예약', word: '객실' },
       ex: { title: '오션뷰 펜션 싸바', subtitle: '체크인 15:00 · 체크아웃 11:00', name: '펜션 싸바', body: '전 객실 바다 전망\n바비큐 · 개별 스파', copyLabel: '예약 링크', copyValue: 'https://example.com', place: '여수 돌산', menu: '오션 스탠다드 (1박) 120000\n오션 스위트 (1박) 180000\n바비큐 세트 30000', account: 'OO은행 000-0000-0000 펜션 싸바' } },
+    // form: 입력 화면에 그 모임에 필요한 칸만 나오게 — hide(감출 칸) · gisu(기수 받기 기본) · kick(맨 위 한마디 고르기) · copy(복사 단추 안내) · roster(명단 안내)
     { id: 'club', label: '산악회·동호회', emoji: '⛰️', type: 'club', styles: ['ticket', 'poster', 'sticker'],
+      form: { hide: ['find'], gisu: true, kick: ['정기산행', '함께 가요', '모십니다', '없음'],
+        roster: ['🙋 참석 명단 받기', '받는 사람이 이름·기수·탑승지·동반 인원을 고르면 "01.홍길동28 교대"처럼 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       ex: { title: '재경순천중·고 동문산악회 제229차 오대산 선재길', subtitle: '11월 14일(토) 오전 7시 출발', name: '산악회 총무', body: '코스: A 선재길 트레킹 / B 전나무숲길·동피골 (편도 약 9km, 3시간 30분)\n차량: 뉴그랜드관광 (월정사 주차장 하차)\n점심: 선재길 식당\n회비: 5만원 (가족 3만원)', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 산악회', place: '당산역 8번 출구', stops: '07:00 당산역 8번 출구\n07:20 교대역 14번 출구' } },
     { id: 'alumni', label: '동문회·향우회', emoji: '🎓', type: 'club', styles: ['ticket', 'magazine', 'cinema'],
+      form: { hide: ['find', 'stops'], gisu: true, kick: ['모십니다', '반가운 얼굴', '함께해요', '없음'],
+        roster: ['🙋 참석 명단 받기', '받는 사람이 이름·기수·동반 인원을 적으면 "01.홍길동28"처럼 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       ex: { title: '순천중고 동창회 송년회', subtitle: '12월 20일(토) 저녁 7시', name: '이정민', body: '회비 3만원 (현장 납부 가능)\n2차 노래방 예정', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고동창회', place: '압구정 순천만', phone: '02-541-2125' } },
     { id: 'party', label: '송년회·신년회', emoji: '🥂', type: 'club', styles: ['ticket', 'glass', 'cinema'], season: 'yearend',
+      form: { hide: ['find', 'stops', 'gisu'], kick: ['함께해요', '모십니다', '초대합니다', '없음'],
+        roster: ['🙋 참석 명단 받기', '받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       L: { title: '모임 이름', subtitle: '날짜 · 시간', body: '회비 · 순서 · 드레스코드 (한 줄에 하나씩)' },
       ex: { title: '2026 우리 송년회', subtitle: '12월 19일(토) 저녁 6시 30분', name: '김민지', body: '회비 3만원 (현장 납부 가능)\n1부 식사 · 2부 한 해 돌아보기\n드레스코드: 빨간 포인트 하나', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 송년회', place: '여수 이순신광장' } },
     { id: 'greeting', label: '연말·새해 인사', emoji: '❄️', type: 'greet', styles: ['glass', 'magazine', 'sticker'], season: 'snow',
+      form: { kick: ['고마워요', '새해 복 많이 받으세요', '안부 전해요', '없음'],
+        copy: ['🔗 함께 보낼 것 (선택)', '누르면 적은 내용이 그대로 복사돼요. 연락처나 링크를 넣어 두세요.', '내 연락처', '복사될 내용', '예: 010-0000-0000'] },
       ex: { title: '올 한 해 고마웠어요', subtitle: '2026년 겨울, 김싸바 드림', name: '김싸바', body: '함께여서 든든한 한 해였어요\n새해에도 건강하고 웃는 일만 가득하길\n싸바? 우리 곧 만나요!', copyLabel: '내 연락처', copyValue: '010-0000-0000' } },
+    { id: 'wedding', label: '청첩장', emoji: '💍', type: 'club', styles: ['glass', 'magazine', 'ticket'], gallery: true,
+      L: { title: '신랑 ♥ 신부', subtitle: '날짜 · 시간', contact: '보내는 사람', name: '보내는 사람 (혼주·신랑·신부)', phone: '연락받을 전화번호', body: '인사말 · 식사 · 주차 안내 (한 줄에 하나씩)' },
+      form: { hide: ['find', 'stops', 'gisu', 'pre', 'season'], kick: ['결혼합니다', '저희 결혼해요', '모십니다', '없음'],
+        copy: ['💝 마음 전하실 곳 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요. 신랑 측·신부 측은 카드를 따로 만드셔도 돼요.', '마음 전하실 곳', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'],
+        roster: ['💌 참석 여부 받기', '받는 사람이 이름·동반 인원을 적고 참석·불참을 고르면, 식사 준비에 쓸 인원이 정리돼요.'] },
+      ex: { title: '김싸바 ♥ 이체리', subtitle: '2027년 4월 17일(토) 낮 12시 30분', name: '김싸바', body: '서로의 기쁨이 되겠습니다\n오셔서 축복해 주시면 감사하겠습니다\n식사: 1층 연회장 뷔페\n주차: 지하 2시간 무료', copyLabel: '마음 전하실 곳', copyValue: 'OO은행 000-0000-0000 김싸바', place: '여수 엑스포 컨벤션 웨딩홀' } },
+    { id: 'funeral', label: '부고', emoji: '🕯️', type: 'club', styles: ['magazine', 'ticket', 'glass'], calm: true,
+      L: { title: '故 고인 이름', subtitle: '별세 날짜 · 향년', contact: '알리는 사람', name: '상주 (알리는 사람)', phone: '연락받을 전화번호', body: '빈소 · 발인 · 장지 · 상주 (한 줄에 하나씩)' },
+      form: { hide: ['find', 'roster', 'season', 'motion'], noRsvp: true, sound: '', kick: ['부고', '삼가 알려 드립니다', '없음'],
+        copy: ['🤍 부의금 전하실 곳 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요.', '부의금 계좌', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'] },
+      ex: { title: '故 김싸바', subtitle: '2026년 11월 19일 별세 · 향년 88세', name: '상주 김체리', body: '빈소: 여수 성심병원 장례식장 2호실\n발인: 11월 21일(토) 오전 7시\n장지: 여수 시립공원묘지\n상주: 김체리 · 김바다', copyLabel: '부의금 계좌', copyValue: 'OO은행 000-0000-0000 김체리', place: '여수 성심병원 장례식장' } },
+    { id: 'news', label: '뉴스·소식지', emoji: '📰', type: 'greet', styles: ['magazine', 'glass', 'ticket'], gallery: true,
+      L: { title: '소식 제목', subtitle: '날짜 · 몇 호', contact: '보내는 사람', name: '보내는 곳 (모임·가게·이름)', phone: '전화번호 (선택)', body: '소식 내용 — 길게 써도 다 들어가요 (한 줄에 하나씩)' },
+      form: { gal: true, kick: ['이번 주 소식', '이달의 소식', '알려 드려요', '없음'],
+        copy: ['🔗 자세히 보기 링크 (선택)', '누르면 적은 링크가 복사돼요. 원문 기사·블로그 주소를 넣어 두세요.', '원문 보기', '링크', 'https://…'] },
+      ex: { title: '순천중고 동창회 11월 소식', subtitle: '2026년 11월 · 제12호', name: '순천중고 동창회', body: '■ 송년회: 12월 20일(토) 저녁 7시, 압구정 순천만\n■ 산악회 229차 오대산 선재길 잘 다녀왔어요 (42명)\n■ 회원 소식: 28회 박싸바 동문 장남 결혼\n■ 회비 납부 현황은 총무에게 물어보세요', copyLabel: '원문 보기', copyValue: 'https://sava.kr' } },
     { id: 'event', label: '행사·초대', emoji: '🎉', type: 'club', styles: ['ticket', 'glass', 'sticker'],
+      form: { hide: ['find', 'stops', 'gisu'], kick: ['초대합니다', '모십니다', "You're Invited", '없음'],
+        copy: ['💰 마음 전하실 곳 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요.', '마음 전하실 곳', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'],
+        roster: ['🙋 참석 여부 받기', '받는 사람이 이름·동반 인원을 적고 참석·불참을 고르면 명단이 만들어져요.'] },
       ex: { title: '첫 돌잔치에 초대합니다', subtitle: '12월 7일(토) 낮 12시', name: '싸바 아빠', body: '귀한 걸음 해주시면 감사하겠습니다\n주차 2시간 무료', copyLabel: '마음 전하실 곳', copyValue: 'OO은행 000-0000-0000', place: '여수 엑스포 컨벤션' } },
     { id: 'kid', label: '어린이 안심', emoji: '🐥', type: 'safe', styles: ['safe'], count: 6, offset: 3,
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', phone: '010-0000-0000', body: '집 주소: ○○시 ○○동', sosLabel: '엄마한테 전화', locMsg: '나 지금 여기야!' } },
@@ -319,6 +352,7 @@
   // 같은 12가지가 SNS 이미지(인스타·카톡 채널·네이버·당근·블로그·유튜브…)에도 똑같은 모양으로 나옵니다 (js/export.js).
   // 예전 1~12번 · -w1~36 · 순천만 시안 번호는 쓰지 않아요. 예전 링크는 그 업종의 1번 디자인으로 보여 줍니다.
   var TWELVE = ['sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
+  var CALM = ['minimal', 'hanji', 'nordic', 'paris', 'gold'];
   var COLOR_NAMES = {
     sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
     minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],
@@ -331,7 +365,7 @@
   var BADGE = { restaurant: '오늘의\n맛', cafe: '오늘의\n디저트', beauty: '이달의\n스타일', fitness: '오늘도\n운동', flower: '오늘의\n꽃', stay: '오늘의\n바다',
     realty: '추천\n매물', toefl: '이번 달\n특강', bigacademy: '신규생\n모집', academy: '시험\n대비', entrance: '합격\n전략', tutor: '첫 수업\n상담', arts: '체험\n수업',
     actor: 'NEW\nFACE', director: 'NEW\nWORK', freelancer: '강의\n문의', insurance: '무료\n상담', newcar: '이달\n혜택', usedcar: '오늘의\n차', sales: '상담\n환영',
-    club: '함께\n가요', alumni: '반가운\n얼굴', party: '함께\n해요', greeting: '고마운\n마음', event: '초대\n합니다' };
+    club: '함께\n가요', alumni: '반가운\n얼굴', party: '함께\n해요', greeting: '고마운\n마음', event: '초대\n합니다', wedding: '결혼\n합니다', funeral: '', news: '이번\n소식', product: '추천\n상품' };
   var BY_ID = {}, BY_INDUSTRY = {}, FAMILY_OF = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
@@ -344,6 +378,7 @@
       return;
     }
     TWELVE.forEach(function (fk, fi) {
+      if (ind.calm && CALM.indexOf(fk) < 0) return; // 부고는 차분한 모양만
       var st = STYLES[fk], ids = [];
       var pals = fk === 'glass' ? GLASS_PICK.map(function (k) { return st.palettes[k]; }) : st.palettes;
       var first = ind.id === 'restaurant' ? 0 : (n + fi) % 3; // 업종마다 처음 보이는 색을 돌려서 같은 디자인도 업종별로 다르게
@@ -407,14 +442,14 @@
 
   // 업종 4묶음 (홈·만들기 화면에서 묶어서 보여줌)
   var GROUPS = [
-    { id: 'shop', label: '가게·매장', emoji: '🏪', ids: ['restaurant', 'cafe', 'beauty', 'fitness', 'flower', 'stay'] },
+    { id: 'shop', label: '가게·매장', emoji: '🏪', ids: ['restaurant', 'product', 'cafe', 'beauty', 'fitness', 'flower', 'stay'] },
     { id: 'edu', label: '교육·학원', emoji: '📚', ids: ['toefl', 'bigacademy', 'academy', 'entrance', 'tutor', 'arts'] },
     { id: 'pro', label: '영업·전문직', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
-    { id: 'meet', label: '모임·행사·안부', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event', 'greeting', 'kid', 'senior'] }
+    { id: 'meet', label: '모임·행사·안부', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting', 'kid', 'senior'] }
   ];
   // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
   // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
-  var OPEN = ['restaurant', 'party', 'club', 'alumni', 'event', 'greeting'];
+  var OPEN = ['restaurant', 'product', 'party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting'];
   var showAll = false;
   try {
     var qa = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('all') : null;

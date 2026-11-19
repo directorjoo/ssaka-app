@@ -79,10 +79,10 @@
 </div>
 <nav class="bar"><a href="../">🏠 싸바 홈</a><a class="go" id="mk" href="../make/">✏️ 내 내용으로 만들기</a></nav>
 
-<script src="../js/designs.js?v=85"></script>
+<script src="../js/designs.js?v=86"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/export.js?v=83"></script>
-<script src="../js/pack.js?v=2"></script>
+<script src="../js/pack.js?v=3"></script>
 <script>
 (function () {
   var D = window.SsakaDesigns, K = window.SsakaPack;
@@ -129,7 +129,7 @@
         row.querySelector('h2').textContent = pp.label; var sm = document.createElement('small'); sm.textContent = pp.en; row.querySelector('h2').appendChild(sm);
         row.querySelector('p').textContent = '눌러서 6가지 크기로 만들기 · 글씨 고치기';
         var th = row.querySelector('.thumbs');
-        K.pals(pp.tpl).forEach(function (pl) {
+        K.pals(pp.tpl, ind).forEach(function (pl) {
           var b = document.createElement('button'); b.type = 'button';
           var c = K.draw(card, pp.id, pl.id, opts, imgs, { w: 540, h: 675, id: 'p45' });
           if (c) b.appendChild(c);
@@ -151,7 +151,7 @@
     $('eh').value = pp.head; $('el').value = '';
     $('el').placeholder = '비워 두면 카드 내용에서 알아서 골라요';
     var mp = $('mp'); mp.innerHTML = '';
-    K.pals(pp.tpl).forEach(function (pl) {
+    K.pals(pp.tpl, ind).forEach(function (pl) {
       var b = document.createElement('button'); b.type = 'button';
       var i = document.createElement('i'); [pl.bg, pl.ink, pl.acc].forEach(function (c) { var x = document.createElement('b'); x.style.background = c; i.appendChild(x); });
       b.appendChild(i); b.appendChild(document.createTextNode(pl.name));

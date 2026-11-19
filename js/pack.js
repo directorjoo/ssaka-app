@@ -27,8 +27,13 @@
     KY: { name: '흑·황·백', bg: C.K, ink: C.W, acc: C.Y },
     WR: { name: '백·흑·적', bg: C.W, ink: C.K, acc: C.R },
     WB: { name: '백·청·적', bg: C.W, ink: C.B, acc: C.R },
-    YK: { name: '황·흑·적', bg: C.Y, ink: C.K, acc: C.R }
+    YK: { name: '황·흑·적', bg: C.Y, ink: C.K, acc: C.R },
+    // 부고는 흑·백만
+    WK: { name: '백·흑', bg: C.W, ink: C.K, acc: C.K },
+    KW: { name: '흑·백', bg: C.K, ink: C.W, acc: C.W },
+    GK: { name: '회·흑', bg: '#E9E9E9', ink: C.K, acc: C.K }
   };
+  var MOURN = ['WK', 'KW', 'GK'];
   var TPL_PALS = {
     hero: ['WR', 'KY', 'BW'], neu: ['YK', 'KY', 'RW'], sale: ['RW', 'YK', 'KY'], notice: ['WB', 'BW', 'WR'],
     resv: ['BW', 'KY', 'WR'], board: ['KY', 'WR', 'WB'], collage: ['WR', 'YK', 'BW'], map: ['WB', 'BW', 'YK']
@@ -75,13 +80,23 @@
     ['collage', '함께한 순간', '함께한 순간', 'MOMENTS'], ['map', '모이는 곳', '모이는 곳', 'PLACE']];
   var GREET = [['hero', '마음을 전해요', '고마운 마음', 'WITH LOVE'], ['notice', '새해 인사', '새해 복 많이 받으세요', 'HAPPY NEW YEAR'],
     ['board', '전하는 말', '전하는 말', 'MESSAGE'], ['collage', '함께한 순간', '함께한 순간', 'MEMORIES']];
+  var KIND = {
+    wedding: [['hero', '청첩장', '결혼합니다', 'WEDDING'], ['board', '예식 안내', '예식 안내', 'INVITATION'], ['collage', '우리 사진', '우리 두 사람', 'OUR MOMENTS'], ['map', '오시는 길', '오시는 길', 'LOCATION']],
+    funeral: [['notice', '부고', '부고', 'OBITUARY'], ['board', '장례 일정', '장례 일정', 'SCHEDULE'], ['map', '빈소 오시는 길', '빈소 오시는 길', 'LOCATION']],
+    news: [['hero', '이번 소식', '이번 소식', 'NEWS'], ['board', '소식 모음', '소식 모음', 'HEADLINES'], ['collage', '사진 소식', '사진 소식', 'PHOTOS'], ['notice', '알려 드려요', '알려 드려요', 'NOTICE']],
+    product: [['hero', '추천 상품', '추천 상품', 'BEST'], ['neu', '새 상품', '새로 나왔어요', 'NEW'], ['sale', '할인·이벤트', '이벤트', 'SALE'],
+      ['board', '가격표', '가격표', 'PRICE'], ['collage', '상품 사진', '상품 사진', 'GALLERY'], ['notice', '배송 안내', '배송 안내', 'DELIVERY']],
+    party: [['hero', '모임 안내', '함께해요', 'PARTY'], ['notice', '공지', '공지', 'NOTICE'], ['resv', '참석 신청', '참석 신청 받아요', 'RSVP'], ['board', '순서 안내', '순서 안내', 'PROGRAM'], ['collage', '함께한 순간', '함께한 순간', 'MOMENTS'], ['map', '모이는 곳', '모이는 곳', 'PLACE']],
+    event: [['hero', '초대합니다', '초대합니다', 'INVITATION'], ['notice', '공지', '공지', 'NOTICE'], ['resv', '참석 신청', '참석 신청 받아요', 'RSVP'], ['board', '프로그램', '프로그램', 'PROGRAM'], ['collage', '행사 사진', '행사 사진', 'MOMENTS'], ['map', '오시는 길', '오시는 길', 'LOCATION']]
+  };
   var GROUP = { toefl: 'edu', bigacademy: 'edu', academy: 'edu', entrance: 'edu', arts: 'edu' };
   function purposes(ind, type) {
-    var rows = SHOP[GROUP[ind] || ind] || (ind === 'actor' || ind === 'director' ? ACTOR : null)
+    var rows = KIND[ind] || SHOP[GROUP[ind] || ind] || (ind === 'actor' || ind === 'director' ? ACTOR : null)
       || (type === 'club' ? CLUB : type === 'greet' ? GREET : type === 'profile' ? PROFILE : type === 'shop' ? SHOP.restaurant : []);
     return rows.map(function (r) { return { id: r[0], tpl: r[0], label: r[1], head: r[2], en: r[3] }; });
   }
-  function pals(tpl) { return (TPL_PALS[tpl] || TPL_PALS.hero).map(pal); }
+  function palIds(tpl, ind) { return ind === 'funeral' ? MOURN : (TPL_PALS[tpl] || TPL_PALS.hero); }
+  function pals(tpl, ind) { return palIds(tpl, ind).map(pal); }
 
   // ---------- 카드 내용 → 템플릿 재료 ----------
   var HOT = /한정|할인|이벤트|신메뉴|신규|새로|오픈|모집|특강|무료|쿠폰|증정|선착순|%|1\+1|2\+1/;
@@ -486,7 +501,7 @@
   function draw(card, purposeId, palId, opts, imgs, size) {
     opts = opts || {};
     var pp = purposeOf(card, opts, purposeId); if (!pp) return null;
-    var P = pal(palId && TPL_PALS[pp.tpl].indexOf(palId) >= 0 ? palId : TPL_PALS[pp.tpl][0]);
+    var ids = palIds(pp.tpl, opts.industry), P = pal(palId && ids.indexOf(palId) >= 0 ? palId : ids[0]);
     var c = H.canvas(size.w, size.h), ctx = c.getContext('2d');
     var r = TPL[pp.tpl](ctx, size.w, size.h, data(card, pp, opts, imgs), P);
     mark(ctx, size.w, size.h, (r && r.markBg) || P.bg);

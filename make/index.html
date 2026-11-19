@@ -284,6 +284,23 @@
       .bar-undo { font-size: 13px !important; line-height: 1.15; white-space: normal !important; width: 64px; padding: 0 4px !important; }
     }
     @media (min-width: 860px) { .bar-pv { display: none; } }
+    .tcard .tname { display: none; }
+    #cmpModal, #pvModal { z-index: 9990; }
+    .cmp-box { max-height: 92dvh; overflow-y: auto; padding: 14px 14px calc(14px + env(safe-area-inset-bottom)); }
+    .cmp-head { display: grid; gap: 2px; padding: 4px 4px 10px; font-size: 18px; }
+    .cmp-head b { font-size: 20px; font-weight: 900; }
+    .cmp-head small { font-size: 14.5px; color: #555; font-weight: 600; }
+    #cmpBody .tp[data-tab="design2"] { margin-top: 0; }
+    #cmpBody #d2step, #cmpBody #d2hint { display: none; }
+    .cmp-row { display: flex; gap: 8px; margin-top: 12px; position: sticky; bottom: 0; background: var(--surface); padding-top: 6px; }
+    .cmp-row button { flex: 1; min-height: 52px; font-size: 16.5px; font-weight: 900; border-radius: 999px; }
+    .cmp-row button.kakao { flex: 1.6; }
+    .cmp-ask { margin-top: 12px; padding: 14px; border-radius: 16px; background: #FFF6F7; border: 2px solid #B3132B; text-align: center; font-size: 17px; }
+    .cmp-ask .cmp-row { position: static; background: none; }
+    .pv-box { height: 94dvh; display: flex; flex-direction: column; padding: 12px 12px calc(12px + env(safe-area-inset-bottom)); }
+    .pv-phone { flex: 1; min-height: 0; border-radius: 16px; overflow: hidden; border: 2px solid #eee; }
+    .pv-phone iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .modal[hidden] { display: none !important; }
     .done-box { text-align: center; display: grid; gap: 10px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
     .done-head { font-size: 22px; font-weight: 800; }
     .done-sub { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
@@ -349,7 +366,7 @@
       </a>
     </div>
     <h1>10초 만에 카드 만들기</h1>
-    <p>위에서부터 차례로 적으면 미리보기에 바로 보여요. 디자인은 맨 마지막에 골라요. 다 되면 카톡으로 보내기를 누르세요.</p>
+    <p>① 어떤 카드인지 고르고 ② 디자인 고르고 ③ 쭉 적으면 끝! 다 쓰면 다른 디자인·색과 비교해 보고 최종 결정해요.</p>
     <a class="mwrite" href="../survey/">✍️ <b>블로그 글쓰기</b> · 질문에 답하면 글 10가지 ›</a>
   </header>
 
@@ -357,15 +374,29 @@
     <form id="form" autocomplete="off" onsubmit="return false">
       <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>칸마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
       <div class="tp" data-tab="design">
-      <div class="step">1. 업종 고르기</div>
+      <div class="step">1. 어떤 카드를 만들까요?</div>
       <div class="inds" id="inds" role="group" aria-label="업종"></div>
       <div class="hlinks" id="hLinks" hidden></div>
       </div>
+      <div id="d2home">
+      <div class="tp" data-tab="design2">
+      <div class="step" id="d2step">2. 디자인 고르기 <span id="designInfo"></span></div>
+      <div class="hint" id="d2hint" style="margin:-4px 0 10px">눈으로 보고 마음에 드는 걸 누르세요. 다 쓰고 나서 다른 디자인·색과 다시 비교해 볼 수 있어요.</div>
+      <div class="phsug" id="phSug" hidden>
+        <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
+        <div class="phsug-cols" id="phCols"></div>
+        <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
+      </div>
+      <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
+      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
+      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
+      </div>
+      </div>
 
-      <h2 class="sec-h" data-sec="basic"><span>2</span><b></b><small></small></h2>
+      <h2 class="sec-h" data-sec="basic"><span>3</span><b></b><small></small></h2>
       <fieldset data-for="club" data-tab="basic">
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
-        <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·프로그램·회비 계좌·탑승지·참석자 명단을 알아서 채워 드려요.</div>
+        <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·내용·계좌를 알아서 채워 드려요.</div>
         <textarea id="noticeIn" maxlength="6000" placeholder="👉 여기를 길게 눌러 [붙여넣기]&#10;(공지·초대장 글 전체를 복사해 오세요)"></textarea>
         <button type="button" class="kakao big" id="noticeGo" style="margin-top:8px">✨ 붙여넣은 글로 카드 채우기</button>
       </fieldset>
@@ -385,7 +416,7 @@
 
       <fieldset data-tab="basic">
         <legend data-l="contact">연락처</legend>
-        <div class="quick" data-for="profile shop club">
+        <div class="quick" data-for="profile shop club" data-part="find">
           <button type="button" class="mini" id="findBiz">🔍 가게 이름으로 찾아서 자동 채우기</button>
           <button type="button" class="mini" id="fillMe" hidden>👤 내 정보 불러오기</button>
         </div>
@@ -429,8 +460,8 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="club shop" data-tab="basic">
-        <legend>장소</legend>
+      <fieldset data-for="club shop" data-tab="basic" data-part="place">
+        <legend id="placeLeg">장소</legend>
         <label for="place">장소 이름 또는 주소</label>
         <div class="addr">
           <input id="place" maxlength="60" placeholder="예: 북한산 우이역 2번 출구">
@@ -453,7 +484,7 @@
         <input id="lkIg" type="url" inputmode="url" placeholder="https://instagram.com/…">
       </fieldset>
 
-      <h2 class="sec-h" data-sec="photo"><span>3</span><b></b><small></small></h2>
+      <h2 class="sec-h" data-sec="photo"><span>4</span><b></b><small></small></h2>
       <fieldset data-tab="photo">
         <legend id="phLeg">📷 대표 사진 · 사진첩</legend>
         <div data-for="profile club shop greet">
@@ -492,7 +523,7 @@
         </div>
       </fieldset>
 
-      <h2 class="sec-h" data-sec="video"><span>4</span><b></b><small></small></h2>
+      <h2 class="sec-h" data-sec="video"><span>5</span><b></b><small></small></h2>
       <fieldset data-tab="video">
         <legend>📹 동영상 올리기 (선택)</legend>
         <div class="clipbox">
@@ -505,7 +536,7 @@
         <div class="hint">대표 사진 자리에서 영상이 소리 없이 반복돼요(눌러서 소리 켜기). 카톡 말풍선에는 대표 사진이 보이니 사진도 함께 넣어 주세요.</div>
       </fieldset>
 
-      <h2 class="sec-h" data-sec="content"><span>5</span><b></b><small></small></h2>
+      <h2 class="sec-h" data-sec="content"><span>6</span><b></b><small></small></h2>
       <fieldset data-tab="content">
         <legend id="bodyLeg">내용</legend>
         <label for="body" data-l="body">한 줄에 하나씩</label>
@@ -534,7 +565,7 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="profile club shop greet" id="copyFs" data-tab="content">
+      <fieldset data-for="profile club shop greet" id="copyFs" data-tab="content" data-part="copy">
         <legend id="copyLeg">복사 버튼 (선택)</legend>
         <div class="hint" id="copyHint">받는 사람이 단추를 누르면 적은 내용이 그대로 복사돼요.</div>
         <div class="row">
@@ -549,7 +580,7 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="shop" data-tab="content">
+      <fieldset data-for="shop" data-tab="content" data-part="resv">
         <legend>예약 받기</legend>
         <label class="switch"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
         <div id="resvBox" hidden>
@@ -574,23 +605,27 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="club" data-tab="content">
-        <legend>🙋 참석 명단 받기</legend>
+      <fieldset data-for="club" data-tab="content" data-part="roster">
+        <legend id="rosterLeg">🙋 참석 명단 받기</legend>
         <label class="switch"><input type="checkbox" id="rosterOn" checked> <span>카드에서 참석 신청 받고, 번호 매긴 명단 자동으로 만들기</span></label>
         <div id="rosterBox">
+          <div data-part="stops">
           <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
           <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
-          <label class="switch"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
+          </div>
+          <label class="switch" data-part="gisu"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
           <label class="switch"><input type="checkbox" id="privOn" checked> <span>🔒 참석자 명단(이름·전화번호)은 나만 보기 — 받는 사람은 [참석할게요][못 가요]만 봐요</span></label>
+          <div data-part="pre">
           <label for="pre">카톡방에서 이미 받은 참석자 (한 줄에 한 명, 선택)</label>
-          <textarea id="pre" maxlength="3000" placeholder="정병회34 교대&#10;이호영36+1 당산"></textarea>
+          <textarea id="pre" maxlength="3000" placeholder="홍길동&#10;김싸바+1"></textarea>
           <div class="hint">여기 적은 사람이 명단 맨 앞에 먼저 들어가고, 싸바로 신청한 사람이 그 뒤로 번호가 이어져요.</div>
-          <div class="hint">받는 사람이 이름·기수·탑승지·동반 인원을 고르면 "01.홍길동28 교대"처럼 번호가 자동으로 붙은 명단이 카드에 보여요. 신청할 때 위 전화번호(총무님)로 문자도 보낼 수 있고, 명단은 카톡방에 붙여넣게 한 번에 복사돼요.</div>
+          </div>
+          <div class="hint" id="rosterHint">받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.</div>
         </div>
       </fieldset>
 
-      <h2 class="sec-h" data-sec="deco"><span>6</span><b></b><small></small></h2>
-      <fieldset data-tab="photo">
+      <h2 class="sec-h" data-sec="deco"><span>7</span><b></b><small></small></h2>
+      <fieldset data-tab="photo" data-part="motion">
         <legend>🎬 움직이는 카드 (짧은 영상처럼)</legend>
         <select id="motion">
           <option value="">움직임 없음</option>
@@ -603,7 +638,7 @@
         <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
       </fieldset>
 
-      <fieldset data-for="profile club shop greet" data-tab="deco">
+      <fieldset data-for="profile club shop greet" data-tab="deco" data-part="season">
         <legend>시즌 테마</legend>
         <select id="season">
           <option value="">없음</option>
@@ -624,18 +659,6 @@
         <div class="hint">받는 사람에 맞춰 고르세요. 손님·어른께는 정중하게, 친구·후배에겐 재미있게. 카드를 열자마자 나오고, 휴대폰이 막으면 첫 탭에 나와요.</div>
       </fieldset>
 
-      <div class="tp" data-tab="design2">
-      <div class="step">7. 마지막으로 디자인 고르기 <span id="designInfo"></span></div>
-      <div class="hint" style="margin:-4px 0 10px">이것저것 눌러 보고 미리보기에서 확인하세요. 디자인을 바꿔도 적은 내용·사진은 그대로예요.</div>
-      <div class="phsug" id="phSug" hidden>
-        <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
-        <div class="phsug-cols" id="phCols"></div>
-        <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
-      </div>
-      <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
-      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
-      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
-      </div>
     </form>
 
     <section class="preview" aria-label="미리보기">
@@ -657,7 +680,22 @@
     <button type="button" class="bar-undo" id="undo" disabled aria-label="방금 고친 것 되돌리기">↩ 되돌리기</button>
     <button type="button" class="bar-pv" id="goPreview">👀 보기</button>
     <button type="button" class="bar-ed" id="goEdit">✏️ 수정</button>
-    <button type="button" class="bar-done" id="finish">✅ 완료</button>
+    <button type="button" class="bar-done" id="finish">✅ 완성</button>
+  </div>
+</div>
+<div class="modal" id="cmpModal" hidden>
+  <div class="modal-box cmp-box">
+    <div class="cmp-head">🎉 <b>다 썼어요!</b><small>다른 디자인·색으로도 비교해 보세요. 누르면 바로 바뀌어요</small></div>
+    <div id="cmpBody"></div>
+    <div class="cmp-ask" id="cmpAsk" hidden><b>이 디자인으로 최종 결정할까요?</b><div class="cmp-row"><button type="button" class="ghost" id="cmpNo">더 볼래요</button><button type="button" class="kakao" id="cmpYes">네, 결정!</button></div></div>
+    <div class="cmp-row" id="cmpActs"><button type="button" class="ghost" id="cmpBack">✏️ 더 고치기</button><button type="button" class="kakao" id="cmpPick">✅ 이 디자인으로 결정</button></div>
+  </div>
+</div>
+<div class="modal pv-modal" id="pvModal" hidden>
+  <div class="modal-box pv-box">
+    <div class="cmp-head">👀 <b>마지막으로 확인해 보세요</b><small>위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]</small></div>
+    <div class="pv-phone"><iframe id="pvFrame" title="완성 카드 확인"></iframe></div>
+    <div class="cmp-row"><button type="button" class="ghost" id="pvFix">✏️ 다시 고치기</button><button type="button" class="kakao" id="pvOk">👍 OK, 완성!</button></div>
   </div>
 </div>
 <div class="modal" id="doneModal" hidden>
@@ -754,7 +792,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=85"></script>
+<script src="../js/designs.js?v=86"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=82"></script>
 <script src="../js/reserve.js"></script>
@@ -762,7 +800,7 @@
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
 <script src="../js/export.js?v=83"></script>
-<script src="../js/pack.js?v=2"></script>
+<script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -951,7 +989,7 @@
     vs.forEach(function (d) {
       var b = document.createElement('button'); b.type = 'button';
       var i = document.createElement('i'); i.style.background = 'linear-gradient(135deg,' + d.colors.bg + ' 50%,' + d.colors.accent + ' 50%)';
-      b.appendChild(i); b.appendChild(document.createTextNode(d.colorName || ''));
+      b.appendChild(i); b.setAttribute('aria-label', '색 ' + (d.c || ''));
       b.setAttribute('aria-pressed', d.id === design ? 'true' : 'false');
       b.addEventListener('click', function () {
         var t = document.querySelector('.tcard[data-id="' + design + '"]');
@@ -962,7 +1000,7 @@
       box.appendChild(b);
     });
   }
-  function designInfoText(id) { var d = D.get(id); return /^ph-/.test(id) ? '📸 사진 색 디자인' : D.list(industry).length + '개 중 ' + designNo(id) + '번' + (d && d.colorName ? ' · ' + d.colorName : ''); }
+  function designInfoText(id) { var d = D.get(id); return /^ph-/.test(id) ? '📸 사진 색 디자인' : D.list(industry).length + '가지 중 ' + designNo(id) + '번'; }
   function renderGallery() {
     var box = $('gallery'); box.innerHTML = '';
     var list = moodList(), ex = EX();
@@ -1031,7 +1069,22 @@
       });
       hl.hidden = false;
     } else hl.hidden = true;
-    var showGal = type === 'profile' || type === 'shop' || type === 'club';
+    // 그 카드 종류에 필요한 칸만 (동문회만 기수, 산악회만 탑승지, 부고엔 참석 신청·시즌·움직임 없음…)
+    var F = ind.form || {}, HIDE = F.hide || [];
+    document.querySelectorAll('[data-part]').forEach(function (el) {
+      if (HIDE.indexOf(el.dataset.part) >= 0) el.hidden = true;
+      else if (el.dataset.for) el.hidden = el.dataset.for.split(' ').indexOf(type) < 0;
+      else el.hidden = false;
+    });
+    var KP = F.kick || (type === 'club' ? ['초대합니다', '모십니다', '함께해요', "You're Invited", '없음'] : ['고마워요', '안부 전해요', '없음']);
+    $('kickPick').innerHTML = ''; KP.forEach(function (k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = k; $('kickPick').appendChild(b); });
+    $('kick').placeholder = '예: ' + KP[0];
+    if (F.copy) { $('copyLeg').textContent = F.copy[0]; $('copyHint').textContent = F.copy[1]; $('copyValLab').textContent = F.copy[3]; $('copyLabel').placeholder = F.copy[2]; $('copyValue').placeholder = F.copy[4]; }
+    if (F.roster) { $('rosterLeg').textContent = F.roster[0]; $('rosterHint').textContent = F.roster[1]; }
+    if (type === 'club') $('gisuOn').checked = !!F.gisu;
+    $('placeLeg').textContent = ind.id === 'funeral' ? '빈소' : ind.id === 'wedding' ? '예식장' : '장소';
+    if (F.sound !== undefined && typeof soundTouched !== 'undefined' && !soundTouched && $('sound')) $('sound').value = F.sound;
+    var showGal = type === 'profile' || type === 'shop' || type === 'club' || !!F.gal;
     $('galBox').hidden = !showGal;
     $('galTitle').textContent = ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
     update();
@@ -1096,7 +1149,7 @@
       template: type,
       design: design,
       theme: cfg.theme,
-      kick: type === 'club' || type === 'greet' ? (v('kick') === '없음' ? '' : (v('kick') || (industry === 'event' ? '초대합니다' : ''))) : undefined,
+      kick: type === 'club' || type === 'greet' ? (v('kick') === '없음' ? '' : (v('kick') || ({ event: '초대합니다', wedding: '결혼합니다', funeral: '부고' }[industry] || ''))) : undefined,
       title: g('title'),
       subtitle: g('subtitle'),
       image: g('image'),
@@ -1133,12 +1186,14 @@
       var ci = card.buttons.indexOf('call');
       card.buttons.splice(ci >= 0 ? ci + 1 : 0, 0, 'reserve');
     }
-    if (type === 'club' && $('rosterOn').checked) {
+    var FORM = (D.industry(industry) || {}).form || {};
+    if (FORM.noRsvp) card.buttons = card.buttons.filter(function (b) { return b !== 'rsvp'; });
+    if (type === 'club' && $('rosterOn').checked && (FORM.hide || []).indexOf('roster') < 0) {
       // 같은 제목이면 같은 명단(고쳐서 다시 보내도 신청자가 그대로), 제목이 바뀌면 새 명단
       var rkey = 'sava-roster-ids', rmap = {}, rt = (card.title || '').trim() || '모임';
       try { rmap = JSON.parse(localStorage.getItem(rkey) || '{}'); } catch (e) {}
       if (!rmap[rt]) { var ra = 'abcdefghjkmnpqrstuvwxyz23456789', rb = crypto.getRandomValues(new Uint8Array(10)), rs = ''; for (var ri = 0; ri < 10; ri++) rs += ra[rb[ri] % ra.length]; rmap[rt] = rs; if (!isEmpty) try { localStorage.setItem(rkey, JSON.stringify(rmap)); } catch (e) {} }
-      card.roster = { id: rmap[rt], st: g('stops').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8), g: $('gisuOn').checked ? 1 : 0 };
+      card.roster = { id: rmap[rt], st: g('stops').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8), g: $('gisuOn').checked && (FORM.hide || []).indexOf('gisu') < 0 ? 1 : 0 };
       if ($('privOn').checked) {
         card.roster.priv = 1;
         var kk = 'sava-roster-key-' + rmap[rt];
@@ -1220,7 +1275,7 @@
     $('progFill').style.width = (done / REQUIRED.length * 100) + '%';
     var btn = $('finish'), was = btn.classList.contains('ready');
     btn.classList.toggle('ready', !miss.length);
-    btn.textContent = miss.length ? '✅ 완료' : '✅ 보내기';
+    btn.textContent = miss.length ? '✅ 완성' : '✅ 완성';
     if (!was && !miss.length) { btn.style.animation = 'none'; void btn.offsetWidth; btn.style.animation = ''; }
     REQUIRED.forEach(function (f) { if (v(f)) $(f).classList.remove('missing'); });
   }
@@ -1254,7 +1309,7 @@
     var w = inApp ? null : window.open('about:blank', '_blank');
     ensureShort(c).then(function (u) { u = u || c.url; if (w) w.location.href = u; else location.href = u; });
   });
-  function openDone() { try { if (window.SavaCherry) SavaCherry.rain({ text: '🎉 카드 완성!' }); } catch (e) {} try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
+  function openDone() { try { if (window.SavaCherry) SavaCherry.rain({ text: '🎉 카드 만들기 성공!' }); } catch (e) {} try { var c0 = current(); if (c0) shareImage(c0.card); } catch (e) {} 
     var c = current(); if (!c) return;
     ensureShort(c).then(function (u) { $('open2').href = u; });
     // 비공개 명단: 주최자에게 따로 보낼 '명단 보기' 링크 (명단을 비공개로 잠금)
@@ -1388,8 +1443,31 @@
       toast('아직 비어 있어요: ' + miss.map(function (f) { return names[f]; }).join(', '));
       return;
     }
-    openDone();
+    openCompare();
   });
+  // ---------- 완성 → 다른 디자인·색 비교 → 최종 결정? → 미리보기 확인 → OK → 체리 팡파레 ----------
+  function d2Back() { var b = document.querySelector('.tp[data-tab="design2"]'); if (b && b.parentNode !== $('d2home')) $('d2home').appendChild(b); }
+  function openCompare() {
+    var b = document.querySelector('.tp[data-tab="design2"]');
+    renderGallery();
+    if (b) $('cmpBody').appendChild(b);
+    $('cmpAsk').hidden = true; $('cmpActs').hidden = false;
+    $('cmpModal').hidden = false;
+    try { if (window.SavaCherry) SavaCherry.rain({ text: '✨ 완성!', n: 18, ms: 2200 }); } catch (e) {}
+  }
+  function closeCompare() { $('cmpModal').hidden = true; d2Back(); }
+  $('cmpBack').addEventListener('click', function () { closeCompare(); var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $('cmpPick').addEventListener('click', function () { $('cmpActs').hidden = true; $('cmpAsk').hidden = false; $('cmpAsk').scrollIntoView({ behavior: 'smooth', block: 'end' }); });
+  $('cmpNo').addEventListener('click', function () { $('cmpAsk').hidden = true; $('cmpActs').hidden = false; });
+  $('cmpYes').addEventListener('click', function () {
+    closeCompare();
+    var r = buildCard();
+    $('pvFrame').src = viewer + '?d=' + SsakaCodec.encode(r.card);
+    $('pvModal').hidden = false;
+  });
+  $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고칠 곳을 고친 뒤 다시 [✅ 완성]을 누르세요'); });
+  $('pvOk').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; openDone(); });
+  $('cmpModal').addEventListener('click', function (e) { if (e.target === this) closeCompare(); });
   // ---------- ✏️ 수정하기: 미리보기 카드에서 바로 고치는 모드 ----------
   function editMode(on) {
     $('goEdit').classList.toggle('on', on);
@@ -2081,7 +2159,7 @@
     box.hidden = false; packCard = c.card;
     if (fresh || !list.some(function (x) { return x.id === packSel.pur; })) { packSel.pur = list[0].id; packSel.pal = ''; $('packHead').value = list[0].head; $('packLine').value = ''; }
     var pp = list.filter(function (x) { return x.id === packSel.pur; })[0];
-    var pals = K.pals(pp.tpl); if (!pals.some(function (x) { return x.id === packSel.pal; })) packSel.pal = pals[0].id;
+    var pals = K.pals(pp.tpl, industry); if (!pals.some(function (x) { return x.id === packSel.pal; })) packSel.pal = pals[0].id;
     var pb = $('packPur'); pb.innerHTML = '';
     list.forEach(function (x) {
       var b = document.createElement('button'); b.type = 'button'; b.textContent = x.label;

@@ -585,7 +585,7 @@
       <button type="button" class="tile t-loc" id="hereBtn"><i>📍</i><b>위치 보내기</b><small>지도로 바로 찾아와요</small></button>
     </div>
     <div class="mini3">
-      <button type="button" class="mini" id="callBtn"><i>📞</i><b>통화하기</b></button>
+      <button type="button" class="mini" id="callBtn"><i>📞</i><b id="callLbl">전화 줘!</b></button>
       <button type="button" class="mini" id="photoBtn"><i>📷</i><b>사진 9장</b></button>
       <button type="button" class="mini" id="playBtn"><i>🍻</i><b>놀자</b></button>
     </div>
@@ -595,6 +595,7 @@
     <div class="rtitle">💬 문자·안부 고르기 <span class="gcount" id="rCount">(직접 쓰거나, 아래 말을 누르면 글칸에 들어가요)</span></div>
     <div class="rta"><textarea id="hereText" maxlength="100" rows="3" placeholder="여기에 답장을 쓰세요&#10;(예: 회의 중, 30분 뒤 연락할게)"></textarea><button type="button" id="rClear" hidden>지우기</button></div>
     <div class="bubble" id="rPrev" hidden></div>
+    <div class="gsubs" id="rWho" aria-label="누구에게 답하나요"></div>
     <div class="gtabs" id="rTabs"></div>
     <div class="chips" id="rChips"></div>
     <button type="button" class="big red" id="rSend" style="margin-top:12px;width:100%;display:block">💬 답장 보내기</button>
@@ -851,15 +852,36 @@
       var qlen = qs.join(' ').length, h1q = document.querySelector('#viewAsk h1.q'); if (qlen > 7) { h1q.style.fontSize = qlen > 18 ? '30px' : '40px'; h1q.style.lineHeight = '1.25'; h1q.style.wordBreak = 'keep-all'; }
       document.title = qs.join(' ') + ' · 싸바';
       // 답장은 질문과 상관없이 마음대로 골라요 (탭만 질문에 맞춰 먼저 열어 줌)
-      var RT = [
-        { t: '💛 안부', items: ['응, 잘 지내! 😊', '그럭저럭 지내~', '별일 없어, 고마워', '밥 먹었어! 너는?', '나는 싸바! 너는 싸바? 🍒', '보고 싶다'] },
-        { t: '📍 약속', items: ['지금 가는 중! 🏃', '10분 뒤 도착해요', '도착했어! 어디 있어?', '조금 늦어요, 미안해요 🙏', '집이야 🏠', '밖이야 🚶'] },
-        { t: '📞 통화', items: ['지금 통화 돼! 전화해 📞', '10분 뒤에 통화하자', '이따 내가 전화할게', '통화는 어렵고 문자로 해줘'] },
-        { t: '😄 재밌게', items: ['싸바 싸바! 나 완전 잘 지내 🍒', '나야 늘 잘 지내지 😎', '방금 라면 먹었어 🍜', '이불 밖은 위험해 🛌', '회의 중이라 몰래 답장 중 🤫', '돈 빼고 다 있어 ㅋㅋ 💸', '커피 사주면 나갈게 ☕', '강아지랑 산책 중 🐶', '자다 깼어… 무슨 일이야? 💤', '목소리 듣고 싶다, 전화해 📞', '오늘은 쉴래, 다음에 꼭! 🙏', '그런 김에 오늘 한잔 콜? 🍻'] },
-        { t: '📷 사진', items: ['잠깐만, 사진 찾아볼게 📷', '많이 컸어! 보고 싶지? 😍', '사진 보내줄게, 기다려!'] },
-        { t: '🌏 세계 인사', items: ['Hi! (하이 · 안녕!) 👋', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va! (싸바 · 잘 지내!)', 'Ciao! (차오 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Merci! (메르시 · 고마워!)', 'Thank you! (땡큐 · 고마워!)'] }
+      // 답장 대상: 친구 / 아랫사람 / 윗사람 — 보내는 화면과 같은 세 갈래, 말투가 다름
+      var WORLD = ['Hi! (하이 · 안녕!) 👋', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va! (싸바 · 잘 지내!)', 'Ciao! (차오 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Merci! (메르시 · 고마워!)', 'Thank you! (땡큐 · 고마워!)'];
+      var RW = [
+        { t: '🤝 친구에게', call: ['전화 줘!', '지금 통화 돼! 전화해 📞'], tabs: [
+          { k: 'hi', t: '💛 안부', items: ['응, 잘 지내! 😊', '그럭저럭 지내~', '별일 없어, 고마워', '밥 먹었어! 너는?', '나는 싸바! 너는 싸바? 🍒', '보고 싶다'] },
+          { k: 'loc', t: '📍 약속', items: ['지금 가는 중! 🏃', '10분 뒤 도착해', '도착했어! 어디 있어?', '조금 늦어, 미안해 🙏', '집이야 🏠', '밖이야 🚶'] },
+          { k: 'call', t: '📞 전화 약속', items: ['지금 통화 돼! 전화해 📞', '10분 뒤에 통화하자', '이따 내가 전화할게', '통화는 어렵고 문자로 해줘'] },
+          { k: 'fun', t: '😄 재밌게', items: ['싸바 싸바! 나 완전 잘 지내 🍒', '나야 늘 잘 지내지 😎', '방금 라면 먹었어 🍜', '이불 밖은 위험해 🛌', '회의 중이라 몰래 답장 중 🤫', '돈 빼고 다 있어 ㅋㅋ 💸', '커피 사주면 나갈게 ☕', '강아지랑 산책 중 🐶', '자다 깼어… 무슨 일이야? 💤', '목소리 듣고 싶다, 전화해 📞', '오늘은 쉴래, 다음에 꼭! 🙏', '그런 김에 오늘 한잔 콜? 🍻'] },
+          { k: 'pic', t: '📷 사진', items: ['잠깐만, 사진 찾아볼게 📷', '많이 컸어! 보고 싶지? 😍', '사진 보내줄게, 기다려!'] },
+          { k: 'world', t: '🌏 세계 인사', items: WORLD }
+        ] },
+        { t: '🌱 아랫사람에게', call: ['전화해라', '지금 전화해도 된다 📞'], tabs: [
+          { k: 'hi', t: '💛 안부', items: ['그래, 잘 지낸다 😊', '나는 별일 없다. 너는 잘 지내지?', '연락 줘서 고맙다', '밥 잘 챙겨 먹고 다녀라', '보고 싶구나', '감기 조심하고 건강 잘 챙겨라', '늘 응원한다'] },
+          { k: 'loc', t: '📍 약속', items: ['지금 가고 있다 🚶', '10분이면 도착한다', '도착했다. 어디 있니?', '조금 늦겠다, 기다려라', '집에 있다 🏠', '밖에 나와 있다'] },
+          { k: 'call', t: '📞 전화 약속', items: ['지금 전화해도 된다 📞', '조금 있다 전화해라', '내가 이따 전화하마', '지금은 통화가 어렵다, 문자로 해라'] },
+          { k: 'pic', t: '📷 사진', items: ['사진 찾아서 보내 주마 📷', '너도 사진 좀 보내 봐라', '아이고, 많이 컸구나! 😍'] }
+        ] },
+        { t: '🙇 윗사람께', call: ['전화 주세요', '지금 통화 괜찮습니다. 전화 주세요 📞'], tabs: [
+          { k: 'hi', t: '💛 안부', items: ['네, 잘 지내고 있습니다 😊', '덕분에 별일 없습니다', '식사했습니다. 식사하셨어요?', '연락 주셔서 감사합니다', '찾아뵙고 싶습니다', '늘 건강 챙기세요', '자주 연락 못 드려 죄송합니다'] },
+          { k: 'loc', t: '📍 약속', items: ['지금 가고 있습니다 🏃', '10분 뒤 도착합니다', '도착했습니다. 어디 계세요?', '조금 늦습니다, 죄송합니다 🙏', '집에 있습니다 🏠', '밖에 나와 있습니다'] },
+          { k: 'call', t: '📞 전화 약속', items: ['지금 통화 괜찮습니다. 전화 주세요 📞', '10분 뒤에 전화드리겠습니다', '이따 제가 전화드리겠습니다', '지금은 통화가 어려워 문자 드립니다'] },
+          { k: 'pic', t: '📷 사진', items: ['사진 찾아서 보내 드릴게요 📷', '잠시만요, 사진 보내 드리겠습니다'] }
+        ] }
       ];
-      var rTab = ks.indexOf('call') >= 0 ? 2 : hasLoc ? 1 : ks.indexOf('pic') >= 0 ? 4 : ks.indexOf('world') >= 0 ? 5 : 0;
+      // 묻는 말이 존댓말이면(받는 내가 윗사람) 아랫사람에게, 아니면 친구에게부터
+      var rWho = /(시죠|세요|셔요|십니까|습니까|셨어요|으세요|드셨|잡수)/.test(qs.join(' ')) ? 1 : 0;
+      var rKey = ks.indexOf('call') >= 0 ? 'call' : hasLoc ? 'loc' : ks.indexOf('pic') >= 0 ? 'pic' : ks.indexOf('world') >= 0 ? 'world' : 'hi';
+      function rTabsNow() { return RW[rWho].tabs; }
+      function rIdx() { var T = rTabsNow(); for (var i = 0; i < T.length; i++) if (T[i].k === rKey) return i; return 0; }
+      function callText() { return RW[rWho].call[1]; }
       function rText() { return $('hereText').value.replace(/\s+/g, ' ').trim(); }
       // 예시 말을 누르면 글칸 끝에 이어 붙임 → 그대로 보내도 되고 고쳐 써도 됨
       function addText(t) {
@@ -874,10 +896,14 @@
         if (tx && window.SavaMsgImg && !card.phone) SavaMsgImg.soon(tx.slice(0, 100), { kind: 'reply' });
       }
       function paintR() {
+        var wb = $('rWho'); wb.innerHTML = '';
+        RW.forEach(function (w, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; b.textContent = w.t; b.setAttribute('aria-pressed', i === rWho ? 'true' : 'false'); b.addEventListener('click', function () { rWho = i; paintR(); }); wb.appendChild(b); });
+        $('callLbl').textContent = RW[rWho].call[0];
+        var T = rTabsNow(), ri = rIdx(); rKey = T[ri].k;
         var tb = $('rTabs'); tb.innerHTML = '';
-        RT.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === rTab ? 'true' : 'false'); b.addEventListener('click', function () { rTab = i; paintR(); }); tb.appendChild(b); });
+        T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === ri ? 'true' : 'false'); b.addEventListener('click', function () { rKey = g.k; paintR(); }); tb.appendChild(b); });
         var cb = $('rChips'); cb.innerHTML = '';
-        RT[rTab].items.forEach(function (t) {
+        T[ri].items.forEach(function (t) {
           var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t;
           b.addEventListener('click', function () { if (addText(t)) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
           cb.appendChild(b);
@@ -894,15 +920,15 @@
       // 💬 문자 · 📍 위치 · 📷 사진은 같은 크기로 나란히 — 무엇으로 답할지는 받는 사람 마음
       $('msgBtn').addEventListener('click', function () { var t = $('rBox'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       $('photoBtn').addEventListener('click', function () { $('photoIn').click(); });
-      // 📞 통화하기: 보낸 사람 번호가 있으면 바로 전화 (사업자 등록 뒤 번호 인증 회원), 없으면 "통화 돼! 전화해" 답장
+      // 📞 전화 줘!: 보낸 사람 번호가 있으면 바로 전화 (사업자 등록 뒤 번호 인증 회원), 없으면 "전화 줘" 답장 (말투는 대상에 따라)
       $('callBtn').addEventListener('click', function () {
         var tel = String(card.tel || card.phone || '').replace(/[^\d+]/g, '');
         if (tel.length >= 9) { location.href = 'tel:' + tel; return; }
-        var t = '지금 통화 돼! 전화해 📞';
+        var t = callText();
         if (card.phone) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); return; }
         withMsgImg(t, { kind: 'reply' }, function (mi) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
       });
-      if (window.SavaMsgImg) SavaMsgImg.soon('지금 통화 돼! 전화해 📞', { kind: 'reply' });
+      if (window.SavaMsgImg) SavaMsgImg.soon(callText(), { kind: 'reply' });
       // 🍻 놀자: 나도 "친구야 놀자!" 보내기 화면으로
       $('playBtn').addEventListener('click', function () { location.href = BASE + '#play'; });
       // 📷 사진 최대 9장: 각각 줄여서 카카오에 올림 → 바둑판 모음 그림을 말풍선으로, 누르면 사진 모음 화면

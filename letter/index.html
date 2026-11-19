@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B3132B">
-  <title>싸바 아침편지</title>
-  <meta property="og:title" content="💌 싸바 아침편지 — 오늘 바로 쓸 수 있는 정보만">
+  <title>싸바 아침카드</title>
+  <meta property="og:title" content="💌 싸바 아침카드 — 오늘 바로 쓸 수 있는 정보만">
   <meta property="og:description" content="어르신은 건강, 대표님은 매출, 배우는 오디션. 매일 아침 쓸모 있는 것만 골라 드려요.">
   <meta property="og:image" content="https://sava.kr/img/eodiya-hi.png?v=1">
   <link rel="icon" href="../img/favicon.png?v=3">
@@ -71,18 +71,18 @@
 </head>
 <body>
 <div class="w">
-  <h1>💌 싸바 아침편지</h1>
+  <h1>💌 싸바 아침카드</h1>
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
   <div class="who" id="who"></div>
   <div class="cities" id="cities"></div>
   <div class="sv" id="svTop" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a></div>
-  <article class="paper writing" id="paper"><div class="msg">편지를 쓰는 중이에요…</div></article>
+  <article class="paper writing" id="paper"><div class="msg">카드를 만드는 중이에요…</div></article>
   <div class="sv" id="svBot" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a><a class="mk" id="svMake" href="/make/">✨ 싸바에서 내 카드 만들어 보세요</a></div>
   <div class="acts">
     <button type="button" class="k" id="send">💬 단톡방에 보내기</button>
     <a class="l" href="../today/">☀️ 오늘의 싸바 더 보기</a>
   </div>
-  <p class="note">뉴스는 제목과 원문 링크만 모아 오고, 편지는 AI가 오늘 자료로 정리해요. 신청·지원 조건은 꼭 원문에서 확인해 주세요.</p>
+  <p class="note">뉴스는 제목과 원문 링크만 모아 오고, 카드는 AI가 오늘 자료로 정리해요. 신청·지원 조건은 꼭 원문에서 확인해 주세요.</p>
 </div>
 <script src="../js/share.js"></script>
 <script>
@@ -100,7 +100,7 @@
   city = OLD[city] || city;
   if (CITIES.indexOf(city) < 0) city = '광주';
   var last = null;
-  // 받는 사람 화면(카톡으로 받은 링크 ?r=1): 위의 어르신·대표님·배우·지역 고르기는 감추고 편지만 보여 줌
+  // 받는 사람 화면(카톡으로 받은 링크 ?r=1): 위의 어르신·대표님·배우·지역 고르기는 감추고 카드만 보여 줌
   var rcv = qs.get('r') === '1';
   if (rcv) {
     document.body.classList.add('rcv');
@@ -125,12 +125,12 @@
     var MK = { senior: ['greeting', '💌 싸바에서 안부 카드 만들어 보세요'], boss: ['restaurant', '✨ 싸바에서 우리 가게 카드 만들어 보세요'], actor: ['actor', '🎬 싸바에서 내 프로필 만들어 보세요'] }[k];
     $('svMake').href = '/make/?ind=' + MK[0]; $('svMake').textContent = MK[1];
     bar(); last = null;
-    var p = $('paper'); p.classList.add('writing'); p.innerHTML = '<div class="msg"><span class="pen">✍️</span><br>오늘 편지를 쓰는 중이에요<span class="dots"><i>.</i><i>.</i><i>.</i></span><br><small>처음엔 20초쯤 걸릴 수 있어요</small></div>';
+    var p = $('paper'); p.classList.add('writing'); p.innerHTML = '<div class="msg"><span class="pen">✍️</span><br>오늘 카드를 만드는 중이에요<span class="dots"><i>.</i><i>.</i><i>.</i></span><br><small>처음엔 20초쯤 걸릴 수 있어요</small></div>';
     var want = k + city;
     fetch('/api/letter?k=' + k + '&city=' + encodeURIComponent(city)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       if (want !== k + city) return; last = d;
       var dt = new Date(d.date + 'T00:00:00'), DAYS = '일월화수목금토';
-      var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + ' 아침편지</div>';
+      var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + ' 아침카드</div>';
       h += '<div class="hello">' + esc(d.hello) + '</div>';
       if (d.list) {
         if (d.summary) h += '<p class="sum">' + esc(d.summary) + '</p>';
@@ -142,13 +142,13 @@
       h += d.items.map(function (x) { return '<div class="it"><i>' + esc(x.icon || '•') + '</i><div><b>' + esc(x.title) + '</b><p>' + esc(x.body) + '</p>' + (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">원문 보기 ›</a>' : '') + '</div></div>'; }).join('');
       h += '<div class="sign">— 🍒 싸바 드림</div>';
       p.classList.remove('writing'); p.innerHTML = h;
-    }).catch(function () { if (want === k + city) { p.classList.remove('writing'); } if (want === k + city) p.innerHTML = '<div class="msg">편지를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
+    }).catch(function () { if (want === k + city) { p.classList.remove('writing'); } if (want === k + city) p.innerHTML = '<div class="msg">카드를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
   }
   $('send').addEventListener('click', function () {
     var who = WHO.filter(function (w) { return w[0] === k; })[0];
     var url = location.origin + '/letter/?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)) + '&r=1';
     var desc = last && last.summary ? (last.hello + ' ' + last.summary) : last ? (last.hello + ' · ' + last.items.slice(0, 3).map(function (x) { return x.icon + ' ' + x.title; }).join(' · ')) : '오늘 바로 쓸 수 있는 정보만 골라 드려요';
-    var opt = { title: '💌 싸바 아침편지 · ' + who[1] + ' ' + who[2], description: desc.slice(0, 120), url: url, buttonTitle: '카드 열기', noButtons: true };
+    var opt = { title: '💌 싸바 아침카드 · ' + who[1] + ' ' + who[2], description: desc.slice(0, 120), url: url, buttonTitle: '카드 열기', noButtons: true };
     if (window.SsakaShare) SsakaShare(opt); else if (navigator.share) navigator.share({ title: opt.title, text: desc, url: url });
   });
   go();

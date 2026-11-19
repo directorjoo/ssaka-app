@@ -121,6 +121,15 @@
     .wr b { display: block; font-size: 22px; font-weight: 900; letter-spacing: -.03em; }
     .wr span { display: block; font-size: 15.5px; opacity: .92; margin-top: 3px; line-height: 1.4; word-break: keep-all; }
     .wr em { margin-left: auto; font-style: normal; flex: none; padding: 9px 12px; border-radius: 14px; background: #fff; color: #1B3F7A; font-size: 16px; font-weight: 900; }
+    .half { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 18px 12px; }
+    .hb { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px 14px; border-radius: 20px; color: #fff; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    .hb:active { transform: scale(.98); }
+    .hb i { font-style: normal; font-size: 26px; line-height: 1.1; }
+    .hb b { font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
+    .hb span { font-size: 15px; opacity: .92; line-height: 1.3; word-break: keep-all; }
+    .hb.blog { background: linear-gradient(135deg, #2E5FA8, #1B3F7A); box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); }
+    .hb.lux { background: linear-gradient(135deg, #2a2218, #0f0c08); color: #E9CC86; box-shadow: 0 14px 30px -20px rgba(60,40,10,.9); }
+    .hb.lux span { color: #f3e3bd; }
     .mk p small { display: block; margin-top: 2px; font-size: 17px; line-height: 1.15; font-weight: 900; opacity: 1; }
     .mk .kk { font-size: 12px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
     .mk h2 { color: #F4E7C8; margin: 0; font-size: 30px; line-height: 1.05; font-weight: 900; letter-spacing: -0.04em; }
@@ -533,14 +542,15 @@
       '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M25.8 3.2a3 3 0 0 1 4.2 4.2L10.2 27.2 3 29l1.8-7.2L25.8 3.2Z" fill="#76552b"/><path d="m4.8 21.8 5.4 5.4L3 29l1.8-7.2Z" fill="#e9c99a"/><path d="m25.8 3.2 4.2 4.2-3.8 3.8L22 7l3.8-3.8Z" fill="#b78b50"/><path d="m22 7 4.2 4.2" stroke="#f5e5c7" stroke-width="1.2"/></svg></span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
       '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
     v.appendChild(mk);
-    // 블로그 글쓰기
-    var wr = el('a', 'wr'); wr.href = '../survey/'; wr.setAttribute('aria-label', '블로그 글쓰기');
-    wr.innerHTML = '<i aria-hidden="true">✍️</i><div><b>블로그 글쓰기</b><span>질문에 답만 하면 네이버 블로그 글 10가지</span></div><em>쓰기 ›</em>';
-    v.appendChild(wr);
     // 오늘의 싸바: 뉴스 요약·날씨·인기 검색어·유튜브·건강·정부 혜택·환율·라디오TV (동그라미 탭)
     var rd = el('a', 'wr'); rd.style.background = 'linear-gradient(135deg, #6a3a9c, #43206e)'; rd.href = '../today/'; rd.setAttribute('aria-label', '오늘의 싸바');
     rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘의 싸바</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
     v.appendChild(rd);
+    // 반쪽 두 칸: 왼쪽 블로그 쓰기 · 오른쪽 싸바비앙 (싸바비앙이 잘되면 홈 위쪽으로 올림)
+    var hf = el('div', 'half');
+    hf.innerHTML = '<a class="hb blog" href="../survey/" aria-label="블로그 쓰기"><i aria-hidden="true">✍️</i><b>블로그 쓰기</b><span>답만 하면 글 10가지</span></a>' +
+      '<a class="hb lux" href="../savabien/" aria-label="싸바비앙 명인 명품관"><i aria-hidden="true">👑</i><b>싸바비앙</b><span>명인 명품관</span></a>';
+    v.appendChild(hf);
     v.appendChild(secHead('지금 보내기 좋은 카드'));
     v.appendChild(campaigns());
     v.appendChild(el('div', 'divider'));

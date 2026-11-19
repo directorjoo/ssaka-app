@@ -94,7 +94,7 @@
       <h2>💬 Claude에게 바로 수정 요청</h2>
       <select id="where" aria-label="어느 화면">
         <option>싸바 전체 디자인</option><option>홈 (sava.kr/app/)</option><option>어디야? (/eodiya/)</option><option>싸바알림 · 카드 만들기 (/make/)</option>
-        <option>싸바카드 화면 (/c/)</option><option>오늘의 싸바 · 생활 채널 (/today/)</option><option>아침편지 (/letter/)</option><option>블로그 글쓰기 (/survey/)</option>
+        <option>싸바카드 화면 (/c/)</option><option>오늘의 싸바 · 생활 채널 (/today/)</option><option>아침카드 (/letter/)</option><option>블로그 글쓰기 (/survey/)</option>
         <option>설정 · 관리 탭</option><option>회원가입 · 로그인 (/join/)</option><option>싸바비앙</option><option>싸바스타</option><option>기타</option>
       </select>
       <textarea id="ask" placeholder="예: 홈 화면 어디야 버튼을 조금 더 크게, 글씨는 진하게 해 줘"></textarea>
@@ -201,7 +201,7 @@
     T.appendChild(tile('💡 읽을 의견', num(o.ideasNew), '새로 온 것'));
     T.appendChild(tile('📋 참석 명단', num(o.rosters), '신청 ' + num(o.rosterPeople) + '명'));
     if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일'));
-    T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '아침편지 받을 수 있는 회원'));
+    T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '아침카드 받을 수 있는 회원'));
     $('lkIdea').textContent = o.ideasNew ? '읽을 것 ' + o.ideasNew + '개' : '채택 · 쿠폰';
     chart(); top(); reports(); reqs(); setup();
   }

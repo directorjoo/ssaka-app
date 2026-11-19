@@ -134,7 +134,8 @@ async function build(k, city, env) {
   const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();
   let groups = [], extra = '', links = [];
   if (k === 'senior') {
-    const [a, b, s] = await Promise.all([news('독감 OR 감기 OR 유행 주의보 when:7d', 6), news('어르신 무료 접종 OR 건강검진 OR 보건소 OR 노인 혜택 when:14d', 6), news('노인 사기 OR 보이스피싱 수법 when:14d', 4)]);
+    const N = async (qs, n) => uniq([].concat(...await Promise.all(qs.map(q => news(q, 6))))).sort((x, y) => y.d - x.d).slice(0, n);
+    const [a, b, s] = await Promise.all([N(['독감 유행 when:7d', '감기 유행 when:7d', '주의보 질병관리청 when:7d', '노로바이러스 when:7d'], 5), N(['어르신 무료 접종 when:14d', '노인 무료 건강검진 when:14d', '보건소 무료 when:14d', '노인 혜택 when:14d'], 5), N(['보이스피싱 수법 when:14d', '노인 사기 when:14d', '스미싱 주의 when:14d'], 4)]);
     groups = [['🤧', '유행·질병', a], ['🆓', '무료·혜택', b], ['🚨', '사기 조심', s]];
   } else if (k === 'boss') {
     const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 6), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
@@ -145,7 +146,7 @@ async function build(k, city, env) {
   } else {
     const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d'];
     const got = await Promise.all(qs.map(q => news(q, 12)));
-    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src)).sort((x, y) => y.d - x.d).slice(0, 20);
+    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).slice(0, 20);
     const ic = t => /뮤지컬/.test(t) ? '🎤' : /연극/.test(t) ? '🎭' : /드라마/.test(t) ? '📺' : /광고|모델|뮤직비디오|뮤비/.test(t) ? '📢' : '🎬';
     groups = [['🎬', '오디션·모집', all.map(x => Object.assign({ icon: ic(x.t) }, x))]];
     links = ACTOR_LINKS;
@@ -191,7 +192,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter2/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter3/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);

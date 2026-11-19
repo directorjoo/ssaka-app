@@ -886,7 +886,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=86"></script>
+<script src="../js/export.js?v=87"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1539,6 +1539,7 @@
     var ds = DEST_BY[dest] || DEST_BY.kakao, dd = destSns();
     if (madeDests.indexOf(dest) < 0) madeDests.push(dest);
     $('doneSns').hidden = !dd;
+    if (dd) { var gn = Math.min(8, (buildCard().card.gallery || []).length), multi = (dd.sz === 'sq' || dd.sz === 'p45') && gn; $('doneSnsSave').textContent = multi ? '📥 사진 묶음 저장하기 (넘겨 보기 최대 ' + (gn + 2) + '장)' : '📥 이 사진 저장하기'; }
     $('send2').className = dd ? 'ghost big' : 'kakao big';
     if (dd) {
       $('doneHead').textContent = '🎉 ' + ds.b + ' 사진이 완성됐어요!';
@@ -1575,11 +1576,17 @@
   $('doneSnsSave').addEventListener('click', function () {
     makeSnsImg(buildCard().card).then(function (r) {
       if (!r) { toast('사진을 아직 그리는 중이에요. 잠시 뒤 다시 눌러 주세요'); return; }
-      var f = new File([r.blob], 'sava-' + dest + '.jpg', { type: 'image/jpeg' });
-      if (navigator.canShare && navigator.canShare({ files: [f] })) { navigator.share({ files: [f] }).catch(function () {}); return; }
-      var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name;
-      document.body.appendChild(a); a.click(); a.remove();
-      toast('사진을 내려받았어요');
+      var f = new File([r.blob], 'sava-' + dest + '-1.jpg', { type: 'image/jpeg' }), dd = destSns(), card = buildCard().card;
+      // 인스타 피드(1:1·4:5)는 사진을 여러 장 올렸으면 넘겨 보는 묶음(최대 10장)으로: 첫 장 디자인 + 사진 한 장씩 + 마지막 안내 장
+      var more = dd && (dd.sz === 'sq' || dd.sz === 'p45') && SsakaExport.slides && (card.gallery || []).length
+        ? SsakaExport.slides(card, curDesign(), { pics: localPics, industry: industry, menu: snsMenu() }, dd.sz).catch(function () { return []; }) : Promise.resolve([]);
+      toast('🍒 사진 준비 중');
+      more.then(function (ls) {
+        var files = [f].concat(ls.map(function (x) { return new File([x.blob], 'sava-' + dest + '-' + x.name.replace(/^.*-(\d+)\.jpg$/, '$1') + '.jpg', { type: 'image/jpeg' }); }));
+        if (navigator.canShare && navigator.canShare({ files: files })) { navigator.share({ files: files }).catch(function () {}); return; }
+        files.forEach(function (ff, k) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(ff); a.download = ff.name; document.body.appendChild(a); a.click(); a.remove(); }, k * 400); });
+        toast(files.length > 1 ? '사진 ' + files.length + '장을 내려받았어요 — 인스타에 한꺼번에 올리면 넘겨 보는 묶음이 돼요' : '사진을 내려받았어요');
+      });
     });
   });
   var INV = [

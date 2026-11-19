@@ -1297,8 +1297,70 @@
     });
   }
 
+  // =====================================================================
+  // 인스타 여러 장 넘기기(캐러셀) (2026-11-20) — 첫 장은 위 디자인, 다음 장부터 올린 사진을 한 장씩 꽉 차게,
+  // 마지막 장은 찾아오는 길(전화·주소·시간). 인스타는 한 번에 최대 10장 → 사진은 최대 8장 더.
+  // SsakaExport.slides(card, design, opts, sizeId) → Promise<[{ name, blob, w, h }]>  (첫 장은 빼고 2장째부터)
+  // =====================================================================
+  function drawSlide(card, design, img, i, n, size) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), P = design.colors, u = W / 1080;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    cover(ctx, img, 0, 0, W, H, null);
+    // 아래 어둠 띠 + 제목 · 쪽수 (흰 글씨엔 검은 그림자)
+    var bh = 170 * u; ctx.fillStyle = grad(ctx, 0, H - bh * 1.6, 0, H, [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.62)']]); ctx.fillRect(0, H - bh * 1.6, W, bh * 1.6);
+    ctx.fillStyle = P.accentLine || P.accent; ctx.fillRect(56 * u, H - 112 * u, 56 * u, 6 * u);
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 8 * u; ctx.shadowOffsetY = 2 * u;
+    tBlock(ctx, String(card.title || '싸바'), { x: 56 * u, y: H - 92 * u, w: W - 300 * u, size: 44 * u, min: 30 * u, fam: famStack(design), weight: 800, color: '#ffffff', lines: 1 });
+    ctx.font = '800 ' + Math.round(34 * u) + 'px ' + FONT; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillText(i + ' / ' + n, W - 56 * u, H - 88 * u); ctx.textAlign = 'left'; ctx.restore();
+    return c;
+  }
+  function drawInfoSlide(card, design, opts, i, n, size) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d'), P = design.colors, u = W / 1080, m = 90 * u, fam = famStack(design);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = P.accentLine || P.accent; ctx.fillRect(m, m, 70 * u, 8 * u);
+    var y = m + 50 * u;
+    y = tBlock(ctx, String(card.title || '싸바'), { x: m, y: y, w: W - m * 2, size: 84 * u, min: 48 * u, fam: fam, weight: 900, color: P.onBg, lines: 2 }) + 20 * u;
+    if (card.subtitle) y = tBlock(ctx, String(card.subtitle), { x: m, y: y, w: W - m * 2, size: 36 * u, min: 28 * u, fam: FONT, weight: 600, color: P.subBg, lines: 3 }) + 50 * u;
+    var rows = [], ph = telFmt(card.contact && card.contact.phone || ''), ad = frameAddr(card) || (card.place && card.place.name) || '';
+    if (ph) rows.push(['전화', ph]); if (ad) rows.push([card.template === 'club' ? '모이는 곳' : '주소', ad]);
+    var w = words(opts.industry, card.template);
+    rows.forEach(function (r) {
+      ctx.fillStyle = P.accentLine || P.accent; ctx.font = '800 ' + Math.round(32 * u) + 'px ' + FONT; ctx.textBaseline = 'top'; ctx.fillText(r[0], m, y);
+      y = tBlock(ctx, r[1], { x: m, y: y + 50 * u, w: W - m * 2, size: 48 * u, min: 32 * u, fam: FONT, weight: 800, color: P.onBg, lines: 2 }) + 44 * u;
+    });
+    // 남는 자리에 대표 메뉴(내용) 몇 줄
+    var it = frameMenu(card, opts).slice(0, 5), end = H - m - 160 * u;
+    if (it.length && end - y > 160 * u) {
+      ctx.fillStyle = 'rgba(127,127,127,.25)'; ctx.fillRect(m, y, W - m * 2, 2 * u); y += 34 * u;
+      ctx.fillStyle = P.accentLine || P.accent; ctx.font = '800 ' + Math.round(32 * u) + 'px ' + FONT; ctx.textBaseline = 'top'; ctx.fillText(w.sig || '대표 메뉴', m, y); y += 56 * u;
+      iList(ctx, it, { x: m, y: y, w: W - m * 2, h: end - y, fs: 42 * u, min: 30 * u, color: P.onBg, pcolor: P.accentLine || P.accent, gap: 1.7 });
+    }
+    var cta = w.cta || '자세한 안내는 프로필 링크에서 👆';
+    ctx.fillStyle = P.accent; round(ctx, m, H - m - 110 * u, W - m * 2, 110 * u, 55 * u); ctx.fill();
+    tBlock(ctx, cta, { x: m + 30 * u, y: H - m - 76 * u, w: W - m * 2 - 60 * u, size: 38 * u, min: 26 * u, fam: FONT, weight: 800, color: P.onAccent || '#fff', align: 'center', lines: 1 });
+    ctx.font = '800 ' + Math.round(30 * u) + 'px ' + FONT; ctx.fillStyle = P.subBg; ctx.textAlign = 'right'; ctx.fillText(i + ' / ' + n, W - m, m - 10 * u); ctx.textAlign = 'left';
+    mark(ctx, W, H, lumOf(P.bg) > 0.5);
+    return c;
+  }
+  function buildSlides(card, design, opts, sizeId) {
+    opts = opts || {};
+    var size = SNS_SIZES.filter(function (s) { return s.id === sizeId; })[0] || SNS_SIZES[0], pics = opts.pics || {};
+    var srcs = [card.image].concat(card.gallery || []).filter(Boolean);
+    srcs = srcs.filter(function (s, i) { return srcs.indexOf(s) === i; }).slice(1, 9); // 대표 사진은 첫 장에 이미 있음
+    var info = !!((card.contact && card.contact.phone) || frameAddr(card));
+    return Promise.all([(document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function () {}) : null].concat(srcs.map(function (s) { return loadImg(s, pics[s]); }))).then(function (r) {
+      var imgs = r.slice(1).filter(usable), n = 1 + imgs.length + (info ? 1 : 0);
+      if (n === 1) return [];
+      var cs = imgs.map(function (im, k) { return drawSlide(card, design, im, k + 2, n, size); });
+      if (info) cs.push(drawInfoSlide(card, design, opts, n, n, size));
+      var base = String(card.title || '싸바').replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 16);
+      return Promise.all(cs.map(toBlob)).then(function (bl) { return bl.map(function (b, k) { return { name: base + '-' + (k + 2) + '.jpg', blob: b, w: size.w, h: size.h }; }); });
+    });
+  }
+
   // 업종별 템플릿(js/pack.js)이 같은 도구로 그리도록 내어 줌
   var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, viaPic: viaPic, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
     tBlock: tBlock, iList: iList, pic: pic, geo: geo, safeY: safeY, lumOf: lumOf, frameMenu: frameMenu, frameAddr: frameAddr, loadSerif: loadSerif, sizes: SNS_SIZES };
-  global.SsakaExport = { plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
+  global.SsakaExport = { plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, slides: buildSlides, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

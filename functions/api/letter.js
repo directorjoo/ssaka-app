@@ -109,7 +109,7 @@ async function programs(env, c, diag) {
 }
 
 // 편지 모양: 맨 위 인사 + 요점 정리(AI가 몇 문장으로) → 아래에 기사·공고 제목과 출처, 원문 링크 목록
-const COMMON = '규칙: 아래 자료 제목들을 읽고 받는 사람에게 오늘 꼭 알릴 것만 골라 요점을 정리한다. 자료에 있는 이름(회사·작품·기관·행사)과 날짜를 그대로 짚어 준다. 자료에 없는 숫자·날짜·사실은 지어내지 않는다. 명언·고사성어·좋은 글귀·교훈, 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)와 마크다운 금지.\n답은 JSON 하나만: {"hello":"첫 인사 한 줄","summary":"요점 3~5문장(한 문단)"}';
+const COMMON = '규칙: 아래 자료 제목들을 읽고 받는 사람에게 오늘 꼭 알릴 것만 골라 요점을 정리한다. 자료에 있는 이름(회사·작품·기관·행사)과 날짜를 그대로 짚어 준다. 자료에 없는 숫자·날짜·사실은 지어내지 않는다. 명언·고사성어·좋은 글귀·교훈, 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)와 마크다운 금지.\n답 형식(다른 말 없이): 첫 줄에 인사 한 줄, 그다음 줄에 요점 3~5문장을 한 문단으로.';
 const RULES = {
   senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. hello는 날씨를 넣어서(예: 어르신, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨에 맞춘 몸 관리 한 마디 + 자료에서 유행 질병, 무료 접종·검진·혜택, 조심할 사기 수법의 요점. ' + COMMON,
   boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. hello는 날씨를 넣어서(예: 대표님, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨로 잘 팔릴 것 한 마디 + 자료에서 마감 가까운 지원사업, 사람 몰리는 축제·행사, 장사에 닿는 뉴스의 요점. ' + COMMON,
@@ -168,7 +168,9 @@ async function build(k, city, env) {
       });
       if (r.ok) {
         const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '';
-        out = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+        // JSON 대신 줄글로 받음 — 기사 제목의 따옴표 때문에 JSON이 깨지는 일을 막음
+        const lines = txt.split('\n').map(x => x.trim()).filter(Boolean);
+        if (lines.length >= 2) out = { hello: lines[0], summary: lines.slice(1).join(' ') };
       }
     } catch (e) { out = null; }
   }
@@ -192,7 +194,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter3/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter4/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);

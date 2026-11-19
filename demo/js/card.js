@@ -381,7 +381,7 @@
     bar.style.display = 'none'; if (st) st.style.display = 'none';
     var addr = (card.body || []).length > (orig.body || []).length ? card.body.slice((orig.body || []).length) : [];
     var lines = (orig.body || []).slice();
-    var tip = h('div', { class: 'sk-edtip', text: '✏️ 글자는 눌러서 고치고, 사진·전화·주소는 카드 아래에서 고치세요' });
+    var tip = h('div', { class: 'sk-edtip', text: '✏️ 글자는 눌러서, 나머지는 카드 아래에서 고치세요' });
     var foot = h('div', { class: 'sk-edbar' });
     var bNo = h('button', { type: 'button', class: 'no', text: '취소' });
     var bUn = h('button', { type: 'button', class: 'no un', text: '↩ 되돌리기' });
@@ -400,7 +400,12 @@
     // ---------- 사진·전화·주소도 이 화면에서 한 번에 (입력칸으로 갈 필요 없음) ----------
     var oc = orig.contact || {};
     var W = { image: orig.image || '', ip: orig.ip || null, gallery: (orig.gallery || []).filter(Boolean).slice(0, 10),
-      phone: oc.phone || '', street: oc.address && oc.address.street || '' };
+      phone: oc.phone || '', street: oc.address && oc.address.street || '',
+      design: orig.design || (design && design.id) || '', pal: orig.pal || null,
+      clip: orig.clip || '', video: orig.video || '', links: Object.assign({}, orig.links || {}) };
+    var DS = window.SsakaDesigns;
+    function curDesign() { return DS ? DS.forCard(Object.assign({}, card, { design: W.design, pal: W.pal })) : design; }
+    var IND = (design && design.industry) || (DS && DS.fallback(card) || {}).industry || '';
     var pan = h('section', { class: 'sk-edpan' });
     function upPic(file) {
       return new Promise(function (ok) {
@@ -443,22 +448,50 @@
           .then(function () { applyW(); push(); toast('사진을 올렸어요 ✓'); });
       });
     }
+    function addClip() {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'video/mp4,video/quicktime,video/webm,video/*';
+      inp.addEventListener('change', function () {
+        var f = inp.files && inp.files[0]; if (!f) return;
+        if (f.size > 30 * 1024 * 1024) { toast('영상이 너무 커요 (30MB까지). 15초 안으로 잘라 주세요'); return; }
+        var type = f.type || (/\.mov$/i.test(f.name) ? 'video/quicktime' : /\.webm$/i.test(f.name) ? 'video/webm' : 'video/mp4');
+        var probe = document.createElement('video'); probe.preload = 'metadata'; probe.muted = true;
+        var ou = URL.createObjectURL(f);
+        probe.onloadedmetadata = function () { URL.revokeObjectURL(ou); if (probe.duration > 20.5) { toast(Math.round(probe.duration) + '초 영상이에요. 15초 안으로 잘라서 올려 주세요'); return; } send(); };
+        probe.onerror = function () { URL.revokeObjectURL(ou); send(); };
+        probe.src = ou;
+        function send() {
+          var stEl = pan.querySelector('.sk-edclipst'); var say = function (m) { if (stEl) stEl.textContent = m; };
+          say('⏫ 영상 올리는 중… 0%');
+          var x = new XMLHttpRequest(); x.open('POST', '/api/video'); x.setRequestHeader('content-type', type);
+          x.upload.onprogress = function (e) { if (e.lengthComputable) say('⏫ 영상 올리는 중… ' + Math.round(e.loaded / e.total * 100) + '%'); };
+          x.onload = function () {
+            var j = {}; try { j = JSON.parse(x.responseText); } catch (e) {}
+            if (x.status === 200 && j.url) { W.clip = j.url; applyW(); push(); toast('영상이 들어갔어요 🎬'); }
+            else say('❌ ' + (j.error || '영상을 못 올렸어요. 잠시 뒤 다시 해 주세요'));
+          };
+          x.onerror = function () { say('❌ 인터넷이 끊겼어요. 다시 해 주세요'); };
+          x.send(f);
+        }
+      });
+      inp.click();
+    }
     function applyW() {
-      // 대표 사진
-      var ph = root.querySelector('.sk-photo');
-      if (ph) {
-        var im = ph.querySelector('img:not(.sk-photo-blur)'), bl = ph.querySelector('.sk-photo-blur');
-        if (W.image) {
-          if (!im) { var mono = ph.querySelector('.sk-mono'); if (mono) mono.remove(); im = document.createElement('img'); ph.insertBefore(im, ph.firstChild); ph.classList.remove('sk-nophoto'); }
-          im.src = W.image; if (bl) bl.src = W.image;
-          if (!W.ip) { im.removeAttribute('style'); if (bl) bl.remove(); ph.classList.remove('sk-fit'); }
-        } else if (im) { im.remove(); if (bl) bl.remove(); }
+      // 디자인 (색·글꼴·모양) — 카드 전체에 바로 입힘
+      var cd = curDesign();
+      if (cd && DS) {
+        DS.apply(root, cd);
+        document.documentElement.style.background = cd.colors.bg; document.body.style.background = cd.colors.bg;
       }
-      // 사진 여러 장
-      var tmp = SsakaRender.build(Object.assign({}, card, { image: W.image, gallery: W.gallery }), design, ctx);
-      var ng = tmp.querySelector('.sk-gal'), og = root.querySelector('.sk-gal');
-      if (og && ng) og.replaceWith(ng); else if (og) og.remove();
-      else if (ng) { var hero = root.querySelector('.sk-hero'); if (hero) hero.insertAdjacentElement('afterend', ng); }
+      // 대표 사진·내 영상·사진 여러 장·영상 링크·가게 링크: 새로 그려서 바꿔 끼움
+      var tmp = SsakaRender.build(Object.assign({}, card, { image: W.image, ip: W.ip, gallery: W.gallery, clip: W.clip, video: W.video, links: W.links }), cd || design, ctx);
+      var swap = function (sel, place) {
+        var n = tmp.querySelector(sel), o = root.querySelector(sel);
+        if (o && n) o.replaceWith(n); else if (o) o.remove(); else if (n) place(n);
+      };
+      swap('.sk-photo', function (n) { var hero = root.querySelector('.sk-hero'); if (hero) hero.insertBefore(n, hero.firstChild); });
+      swap('.sk-gal', function (n) { var hero = root.querySelector('.sk-hero'); if (hero) hero.insertAdjacentElement('afterend', n); });
+      swap('.sk-video', function (n) { var m = root.querySelector('.sk-main'); if (m) m.insertAdjacentElement('afterend', n); });
+      swap('.sk-links', function (n) { var sh = root.querySelector('.sk-share'); if (sh) sh.insertAdjacentElement('beforebegin', n); else { var w = root.querySelector('.sk-wrap'); if (w) w.appendChild(n); } });
       // 주소 줄
       addr = W.street ? ['📍 ' + W.street] : [];
       if (!root.querySelector('.sk-edta')) redrawList();
@@ -466,7 +499,7 @@
     }
     function drawPan() {
       pan.innerHTML = '';
-      pan.appendChild(h('h3', { text: '📷 사진·전화·주소 고치기' }));
+      pan.appendChild(h('h3', { text: '📷 사진·디자인·영상·링크·전화·주소 고치기' }));
       // 대표 사진
       var r1 = h('div', { class: 'sk-edrow' });
       var th = h('div', { class: 'sk-edmain' }); if (W.image) { var ti = h('img', { alt: '' }); ti.src = W.image; th.appendChild(ti); } else th.textContent = '사진 없음';
@@ -494,6 +527,59 @@
       var ip2 = h('input', { type: 'text', maxlength: '80', placeholder: '예: 서울 강남구 신사동 609-1 지하1층' }); ip2.value = W.street;
       ip2.addEventListener('change', function () { W.street = ip2.value.trim(); applyW(); push(); });
       f2.appendChild(ip2); pan.appendChild(f2);
+      // 🎨 디자인 바꾸기: 같은 업종의 디자인 + 색깔 (적은 글자·사진은 그대로)
+      var dl = DS && IND ? DS.list(IND) : [];
+      if (dl.length) {
+        var cur = curDesign() || {};
+        pan.appendChild(h('h4', { class: 'sk-edsec', text: '🎨 디자인 바꾸기' }));
+        pan.appendChild(h('p', { class: 'sk-edhint', text: '눌러 보면 카드에 바로 입혀져요. 글자·사진은 그대로예요' }));
+        var dg = h('div', { class: 'sk-eddes' });
+        dl.forEach(function (d) {
+          var on = cur.id === d.id || (cur.style && cur.style === d.style && cur.industry === d.industry);
+          var b = h('button', { type: 'button', class: on ? 'on' : '', text: d.name || d.id, onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
+          b.style.background = d.colors.bg; b.style.color = d.colors.onBg || d.colors.ink; b.style.borderColor = d.colors.accent;
+          dg.appendChild(b);
+        });
+        pan.appendChild(dg);
+        var cs = cur.id && DS.colorsOf ? DS.colorsOf(cur.id) : [];
+        if (cs.length > 1) {
+          pan.appendChild(h('p', { class: 'sk-edlab', text: '색깔 고르기' }));
+          var cg = h('div', { class: 'sk-edcol' });
+          cs.forEach(function (d) {
+            var b = h('button', { type: 'button', class: cur.id === d.id ? 'on' : '', text: d.colorName || d.name, onclick: function () { W.design = d.id; W.pal = null; applyW(); push(); } });
+            b.style.background = d.colors.bg; b.style.color = d.colors.onBg || d.colors.ink; b.style.borderColor = d.colors.accent;
+            cg.appendChild(b);
+          });
+          pan.appendChild(cg);
+        }
+      }
+      // 🎬 영상: 내 영상(대표 사진 자리에서 반복) + 영상 링크(유튜브·인스타)
+      pan.appendChild(h('h4', { class: 'sk-edsec', text: '🎬 영상' }));
+      var vb = h('div', { class: 'sk-edbtns' });
+      vb.appendChild(h('button', { type: 'button', text: W.clip ? '📹 내 영상 바꾸기' : '📹 내 영상 넣기 (15초·30MB까지)', onclick: addClip }));
+      if (W.clip) vb.appendChild(h('button', { type: 'button', class: 'del', text: '영상 빼기', onclick: function () { W.clip = ''; applyW(); push(); } }));
+      pan.appendChild(vb);
+      pan.appendChild(h('p', { class: 'sk-edhint sk-edclipst', text: W.clip ? '✅ 영상이 들어가 있어요 (대표 사진 자리에서 소리 없이 반복)' : '대표 사진 자리에서 소리 없이 반복돼요' }));
+      var f3 = h('label', { class: 'sk-edfld' }, [h('span', { text: '▶️ 영상 링크 (유튜브·인스타)' })]);
+      var ip3 = h('input', { type: 'url', inputmode: 'url', maxlength: '300', placeholder: 'https://youtu.be/…' }); ip3.value = W.video;
+      ip3.addEventListener('change', function () {
+        var u = ip3.value.trim(); if (u && !/^https:\/\/\S+$/.test(u)) { toast('https:// 로 시작하는 주소를 넣어 주세요'); ip3.value = W.video; return; }
+        W.video = u; applyW(); push();
+      });
+      f3.appendChild(ip3); pan.appendChild(f3);
+      // 🔗 링크: 당근·네이버·카톡 채널·인스타
+      pan.appendChild(h('h4', { class: 'sk-edsec', text: '🔗 링크' }));
+      [['dg', '🥕 당근 비즈프로필', 'https://www.daangn.com/…'], ['nv', '🟢 네이버 플레이스·예약', 'https://naver.me/…'], ['kc', '💬 카카오톡 채널', 'https://pf.kakao.com/…'], ['ig', '📷 인스타그램', 'https://instagram.com/…']].forEach(function (x) {
+        var f = h('label', { class: 'sk-edfld' }, [h('span', { text: x[1] })]);
+        var ip = h('input', { type: 'url', inputmode: 'url', maxlength: '300', placeholder: x[2] }); ip.value = W.links[x[0]] || '';
+        ip.addEventListener('change', function () {
+          var u = ip.value.trim();
+          if (u && !/^https:\/\/\S+$/.test(u)) { toast('https:// 로 시작하는 주소를 넣어 주세요'); ip.value = W.links[x[0]] || ''; return; }
+          if (u) W.links[x[0]] = u.slice(0, 300); else delete W.links[x[0]];
+          applyW(); push();
+        });
+        f.appendChild(ip); pan.appendChild(f);
+      });
       pan.appendChild(h('p', { class: 'sk-edlab', text: '다 고치셨으면 맨 아래 ✅ 수정 완료를 누르세요' }));
     }
     drawPan();
@@ -562,6 +648,11 @@
       if (W.gallery.length) nc.gallery = W.gallery.slice(0, 10); else delete nc.gallery;
       nc.contact = nc.contact || {};
       nc.contact.phone = W.phone;
+      if (W.design) nc.design = W.design;
+      if (W.pal) nc.pal = W.pal; else delete nc.pal;
+      if (W.clip) nc.clip = W.clip; else delete nc.clip;
+      if (W.video) nc.video = W.video; else delete nc.video;
+      if (Object.keys(W.links).length) nc.links = W.links; else delete nc.links;
       if (W.street) { var oa = nc.contact.address || {}; nc.contact.address = oa.street === W.street ? oa : { street: W.street }; } else delete nc.contact.address;
       bOk.disabled = true; bOk.textContent = '저장하는 중…';
       var d = SsakaCodec.encode(nc), api = new URL('../api/card', location.href).href;

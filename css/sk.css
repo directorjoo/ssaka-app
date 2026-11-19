@@ -681,3 +681,11 @@
 .sk-edfld { display: block; margin-top: 14px; }
 .sk-edfld span { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 800; color: #5a4a42; }
 .sk-edfld input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 0 12px; border: 1.5px solid #e2d4ca; border-radius: 12px; font: 600 16.5px system-ui, sans-serif; color: #222; background: #fff; }
+/* 수정하기: 디자인·영상·링크 */
+.sk-edsec { margin: 26px 0 6px; padding-top: 16px; border-top: 1.5px solid #f0e2d8; font-size: 18px; font-weight: 900; color: #B3132B; }
+.sk-edhint { margin: 0 0 10px; font-size: 14.5px; color: #6b5d55; }
+.sk-eddes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sk-edcol { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sk-edpan .sk-eddes button, .sk-edpan .sk-edcol button { min-height: 54px; padding: 6px 4px; border: 2.5px solid; font-size: 14.5px; word-break: keep-all; }
+.sk-edpan .sk-eddes button.on, .sk-edpan .sk-edcol button.on { outline: 3px solid #B3132B; outline-offset: 2px; }
+.sk-edpan .sk-edbtns + .sk-edhint { margin-top: 8px; }

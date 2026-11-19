@@ -873,7 +873,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=84"></script>
+<script src="../js/export.js?v=85"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1146,7 +1146,7 @@
       try { var cols = photoColors(im); PHPAL = D.photoPalettes(cols); PHPAL._show = cols.show; PHFOR = u; paintPhotoSug(); } catch (e) { $('phSug').hidden = true; }
     };
     im.onerror = function () { $('phSug').hidden = true; };
-    if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = u; }
+    if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = (window.SsakaExport && SsakaExport._h.viaPic) ? SsakaExport._h.viaPic(u) : u; }
   }
   function paintPhotoSug() {
     if (!PHPAL || !D.photoDesign) return;
@@ -1750,7 +1750,7 @@
     return new Promise(function (ok, no) {
       var blob = localPics[u], im = new Image();
       im.onload = function () { ok(im); }; im.onerror = no;
-      if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = u; }
+      if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = (window.SsakaExport && SsakaExport._h.viaPic) ? SsakaExport._h.viaPic(u) : u; }
       setTimeout(function () { no(new Error('t')); }, 5000);
     });
   }

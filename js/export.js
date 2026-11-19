@@ -8,9 +8,15 @@
   var FONT = "'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif";
   var SEASON = { snow: '첫눈 오는 날', xmas: 'Merry Christmas', yearend: '올해도 고마웠어요', newyear: '새해 복 많이 받으세요' };
 
+  // 카톡에 올린 사진(kakaocdn)처럼 다른 주소의 사진은 캔버스에 그리면 막히므로 sava.kr 중계(/api/pic)로 받음
+  function viaPic(u) {
+    u = String(u || '');
+    if (!/^https?:\/\//.test(u) || typeof location === 'undefined' || u.indexOf(location.origin) === 0) return u;
+    return '/api/pic?u=' + encodeURIComponent(u);
+  }
   function loadImg(src, blob) {
     return new Promise(function (resolve) {
-      var img = new Image(), url = blob ? URL.createObjectURL(blob) : src;
+      var img = new Image(), url = blob ? URL.createObjectURL(blob) : viaPic(src);
       if (!blob) img.crossOrigin = 'anonymous';
       img.onload = function () { resolve(img); };
       img.onerror = function () { resolve(null); };
@@ -1289,7 +1295,7 @@
   }
 
   // 업종별 템플릿(js/pack.js)이 같은 도구로 그리도록 내어 줌
-  var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
+  var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, viaPic: viaPic, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
     tBlock: tBlock, iList: iList, pic: pic, geo: geo, safeY: safeY, lumOf: lumOf, frameMenu: frameMenu, frameAddr: frameAddr, loadSerif: loadSerif, sizes: SNS_SIZES };
   global.SsakaExport = { plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

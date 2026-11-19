@@ -651,7 +651,7 @@
   function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
   $('send').addEventListener('click', function () {
     var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '오늘의 싸바' };
-    var info = { title: xx.i + ' ' + xx.t + ' · 싸바', description: SENDT[cur] || '매일 보는 생활 정보를 싸바 안에서 한 번에', url: link(), imageUrl: 'https://sava.kr/img/today-share.jpg?v=1', imageWidth: 800, imageHeight: 400, buttonTitle: '이 화면 열기', installTitle: '싸바 둘러보기', installUrl: 'https://sava.kr/app/' };
+    var info = { title: xx.i + ' ' + xx.t + ' · 싸바', description: SENDT[cur] || '매일 보는 생활 정보를 싸바 안에서 한 번에', url: link(), imageUrl: 'https://sava.kr/img/today-share.jpg?v=1', imageWidth: 800, imageHeight: 400, buttonTitle: '이 화면 열기', noButtons: true };
     if (window.SsakaShare) window.SsakaShare(info);
     else if (navigator.share) navigator.share({ title: info.title, text: info.description, url: info.url }).catch(function () {});
     else prompt('아래 링크를 복사해서 카톡에 붙여 넣으세요', info.url);

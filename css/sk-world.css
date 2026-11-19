@@ -471,7 +471,8 @@
 .sk[data-style="insta"] .sk-wrap { padding-top: 0; }
 .sk[data-style="insta"] .sk-hero { display: flex; flex-direction: column; margin: 0 -20px; }
 .sk[data-style="insta"] .sk-titles { order: -1; padding: 22px 84px 20px 20px; background: var(--accent); color: var(--on-accent); }
-.sk[data-style="insta"] .sk-titles::after { content: "오늘의\A맛"; white-space: pre; position: absolute; right: 18px; top: 50%; transform: translateY(-50%) rotate(-8deg);
+.sk[data-style="insta"]:not([data-badge]) .sk-titles::after { display: none; }
+.sk[data-style="insta"] .sk-titles::after { content: var(--badge, ""); white-space: pre; position: absolute; right: 18px; top: 50%; transform: translateY(-50%) rotate(-8deg);
   width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; text-align: center; font-size: 13px; font-weight: 700; line-height: 1.2; }
 .sk[data-style="insta"] .sk-title { font-size: clamp(30px, 9vw, 40px); font-weight: 900; letter-spacing: -0.03em; color: inherit; }
 .sk[data-style="insta"] .sk-sub { color: inherit; opacity: .88; font-size: 14px; margin-top: 8px; }

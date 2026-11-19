@@ -667,5 +667,527 @@
     return lines.join('\n');
   }
 
-  global.SsakaExport = { build: build, text: postText, frame: buildFrame, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
+
+  // =====================================================================
+  // SNS 이미지 v2 (2026-11-19) — 카드 디자인 12가지와 똑같은 모양으로, 올릴 곳마다 맞는 크기로
+  // SsakaExport.sns(card, design, opts) → Promise<[{ name, label, places, blob, w, h }]>
+  // =====================================================================
+  var SNS_SIZES = [
+    { id: 'p45', w: 1080, h: 1350, label: '세로 4:5', places: ['인스타 피드', '카톡 채널 소식', '스레드', '페이스북 피드'] },
+    { id: 'sq', w: 1080, h: 1080, label: '정사각 1:1', places: ['인스타 정사각', '네이버 플레이스 새소식', '네이버 블로그 대표사진', '당근 비즈프로필 소식'] },
+    { id: 'story', w: 1080, h: 1920, label: '세로 9:16', places: ['인스타 스토리·릴스', '유튜브 쇼츠', '틱톡', '카톡 프로필 배경'] },
+    { id: 'k43', w: 1200, h: 900, label: '가로 4:3', places: ['카톡 채널 메시지', '밴드'] },
+    { id: 'yt', w: 1280, h: 720, label: '가로 16:9', places: ['유튜브 썸네일', '블로그 본문 사진'] },
+    { id: 'link', w: 1200, h: 630, label: '가로 링크형', places: ['페이스북·X 링크 공유'] }
+  ];
+  var TYPE_HEAD = { shop: '오늘의 안내', profile: 'PROFILE', club: '모임 안내', greet: '마음을 전해요', safe: '안심 카드' };
+  function famStack(design) { var F = global.SsakaDesigns && SsakaDesigns.FONTS; return (F && F[design.font] && F[design.font].stack) || FONT; }
+
+  // 제목: 정해진 줄 수 안에 들어가게 글씨를 줄여 가며 그림 → 끝 y
+  function tBlock(ctx, str, o) {
+    str = String(str || '').trim(); if (!str) return o.y;
+    var n = o.lines || 2, sz = o.size, lh = o.lh || 1.18, ls;
+    for (;;) { ctx.font = (o.weight || 800) + ' ' + sz + 'px ' + o.fam; ls = wrap(ctx, str, o.w); if (ls.length <= n || sz <= o.min) break; sz = Math.max(o.min, Math.round(sz * 0.92)); }
+    ls = wrap(ctx, str, o.w, n);
+    if (o.maxH) while (ls.length * sz * lh > o.maxH && sz > o.min) { sz = Math.max(o.min, Math.round(sz * 0.92)); ctx.font = (o.weight || 800) + ' ' + sz + 'px ' + o.fam; ls = wrap(ctx, str, o.w, n); }
+    if (o.dry) return o.y + ls.length * sz * lh;
+    var al = o.align || 'left', x = al === 'center' ? o.x + o.w / 2 : al === 'right' ? o.x + o.w : o.x;
+    ctx.textAlign = al; ctx.textBaseline = 'top';
+    ls.forEach(function (l, i) {
+      var yy = o.y + i * sz * lh;
+      if (o.shadow) { ctx.fillStyle = o.shadow; ctx.fillText(l, x + sz * 0.06, yy + sz * 0.06); }
+      if (o.glow) { ctx.save(); ctx.shadowColor = o.glow; ctx.shadowBlur = sz * 0.45; ctx.fillStyle = o.color; ctx.fillText(l, x, yy); ctx.fillText(l, x, yy); ctx.restore(); }
+      ctx.fillStyle = o.color; ctx.fillText(l, x, yy);
+    });
+    ctx.textAlign = 'left';
+    return o.y + ls.length * sz * lh;
+  }
+  // 목록(메뉴·가격 / 출연작 / 일정 / 인사 글): 칸 높이 안에 들어가는 만큼 → 끝 y
+  // 가격 없는 긴 글(모임 일정·인사말)은 두 줄까지 접어서 보여 줌. 글씨는 조금만 줄이고, 그래도 넘치면 줄 수를 줄임
+  function iList(ctx, items, o) {
+    if (!items.length || o.h < 30) return o.y;
+    var fam = o.fam || FONT, al = o.align || 'left', gap = o.gap || 1.9;
+    var bw = o.bullet ? 1.1 : 0;
+    function rows(fs) {
+      ctx.font = (o.weight || 700) + ' ' + fs + 'px ' + fam;
+      var out = [], used = 0;
+      for (var i = 0; i < items.length; i++) {
+        var m = items[i], name = typeof m === 'string' ? m : m.n, price = typeof m === 'string' ? '' : (m.p || '');
+        var room = o.w - fs * bw, ls = price ? [name] : wrap(ctx, name, room, 2);
+        var rh = fs * gap + (ls.length - 1) * fs * 1.22;
+        if (used + rh > o.h) break;
+        out.push({ name: name, price: price, ls: ls, rh: rh }); used += rh;
+      }
+      return out;
+    }
+    var fs = o.fs, minFs = Math.max(o.min || 26, o.fs * 0.84), R = rows(fs);
+    while (R.length < items.length && fs > minFs) { fs = Math.max(minFs, fs - 2); R = rows(fs); }
+    if (!R.length) { fs = minFs; R = rows(fs); if (!R.length) return o.y; }
+    // 줄이 적어 자리가 남으면 글씨를 키움 (최대 1.3배)
+    if (R.length === items.length) { var big = fs, R2; while (big < o.fs * 1.3) { R2 = rows(big + 2); if (R2.length < items.length) break; big += 2; R = R2; } fs = big; }
+    var y = o.y;
+    R.forEach(function (r, i) {
+      var ty = y + (fs * gap - fs) / 2, bx = o.x, room = o.w;
+      ctx.textBaseline = 'top';
+      ctx.font = (o.pw || 800) + ' ' + fs + 'px ' + fam; var pw = r.price ? ctx.measureText(r.price).width : 0;
+      ctx.font = (o.weight || 700) + ' ' + fs + 'px ' + fam;
+      if (o.bullet) { o.bullet(ctx, o.x, ty, fs, i); bx += fs * bw; room -= fs * bw; }
+      if (al === 'center') {
+        ctx.textAlign = 'center'; ctx.fillStyle = o.color;
+        if (r.price) { var whole = r.name + '  ' + r.price, t = whole; while (ctx.measureText(t).width > room && t.length > 2) t = t.slice(0, -1); if (t !== whole) t = t.slice(0, -1) + '…'; ctx.fillText(t, o.x + o.w / 2, ty); }
+        else r.ls.forEach(function (l, k) { ctx.fillText(l, o.x + o.w / 2, ty + k * fs * 1.22); });
+        ctx.textAlign = 'left';
+      } else if (!r.price) {
+        ctx.fillStyle = o.color; r.ls.forEach(function (l, k) { ctx.fillText(l, bx, ty + k * fs * 1.22); });
+      } else {
+        var nm = r.name, lim = room - pw - fs * 1.2;
+        while (ctx.measureText(nm).width > lim && nm.length > 2) nm = nm.slice(0, -1);
+        if (nm !== r.name) nm = nm.slice(0, -1) + '…';
+        ctx.fillStyle = o.color; ctx.fillText(nm, bx, ty);
+        var nw = ctx.measureText(nm).width;
+        ctx.font = (o.pw || 800) + ' ' + fs + 'px ' + fam; ctx.fillStyle = o.pcolor || o.color; ctx.textAlign = 'right'; ctx.fillText(r.price, o.x + o.w, ty); ctx.textAlign = 'left';
+        if (o.lead) { ctx.strokeStyle = o.lead; ctx.lineWidth = Math.max(2, fs * 0.06); ctx.setLineDash([2, fs * 0.28]); ctx.beginPath(); ctx.moveTo(bx + nw + fs * 0.4, ty + fs * 0.62); ctx.lineTo(o.x + o.w - pw - fs * 0.4, ty + fs * 0.62); ctx.stroke(); ctx.setLineDash([]); }
+      }
+      if (o.sep && i < R.length - 1) { ctx.fillStyle = o.sep; ctx.fillRect(o.x, y + r.rh - 1, o.w, 2); }
+      y += r.rh;
+    });
+    return y;
+  }
+  // 사진 자리: 모양(rect·round·arch·oval·circle) 따라 자르고, 사진이 없으면 첫 글자
+  function shapePath(ctx, x, y, w, h, shape, r) {
+    ctx.beginPath();
+    if (shape === 'oval' || shape === 'circle') ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+    else if (shape === 'arch') { var a = Math.min(w / 2, h / 2); ctx.moveTo(x, y + h); ctx.lineTo(x, y + a); ctx.arc(x + w / 2, y + a, w / 2, Math.PI, 0); ctx.lineTo(x + w, y + h); ctx.closePath(); }
+    else if (shape === 'round') { round(ctx, x, y, w, h, r || 32); }
+    else ctx.rect(x, y, w, h);
+  }
+  function pic(ctx, img, x, y, w, h, D, o) {
+    o = o || {};
+    ctx.save(); shapePath(ctx, x, y, w, h, o.shape, o.r); ctx.clip();
+    if (img) cover(ctx, img, x, y, w, h, img === D.main ? D.ip : null);
+    else {
+      // 사진이 없으면: 빗금 무늬 + 카드 머리말(모임 안내·마음을 전해요…)
+      ctx.fillStyle = o.fill || '#888'; ctx.fillRect(x, y, w, h);
+      var lt = lumOf(String(o.fill || '#888').charAt(0) === '#' ? o.fill : '#888') > 0.55, ink = lt ? 'rgba(0,0,0,' : 'rgba(255,255,255,';
+      ctx.strokeStyle = ink + '.07)'; ctx.lineWidth = Math.max(6, Math.min(w, h) * 0.02);
+      for (var k = -h; k < w; k += Math.max(24, Math.min(w, h) * 0.07)) { ctx.beginPath(); ctx.moveTo(x + k, y + h); ctx.lineTo(x + k + h, y); ctx.stroke(); }
+      var lab = D.head || D.title, fs = Math.min(h * 0.2, w * 0.16);
+      ctx.font = '800 ' + Math.round(fs) + 'px ' + (o.fam || FONT); while (ctx.measureText(lab).width > w * 0.8 && fs > 14) { fs -= 2; ctx.font = '800 ' + Math.round(fs) + 'px ' + (o.fam || FONT); }
+      ctx.fillStyle = ink + '.5)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x + w / 2, y + h / 2); ctx.textAlign = 'left';
+    }
+    ctx.restore();
+    if (o.stroke) { ctx.strokeStyle = o.stroke; ctx.lineWidth = o.sw || 4; shapePath(ctx, x - (o.pad || 0), y - (o.pad || 0), w + (o.pad || 0) * 2, h + (o.pad || 0) * 2, o.shape, o.r ? o.r + (o.pad || 0) : 0); ctx.stroke(); }
+  }
+  function foot(D) { return [D.phone ? '☎ ' + D.phone : '', D.addr].filter(Boolean); }
+  // 가로 이미지(유튜브 썸네일 등)는 작게 보이므로 글씨를 키움
+  function geo(W, H) { var r = W / H, land = r > 1.2; return { land: land, tall: r < 0.62, sq: r >= 0.9 && r <= 1.2, port: r < 0.9, wide: r > 1.6, u: land ? Math.min(H / 760, W / 1350) : Math.min(W, H) / 1080 }; }
+  // 스토리·쇼츠는 위아래에 앱 버튼이 덮어서 글자를 안쪽에
+  function safeY(W, H) { var g = geo(W, H); return g.tall ? { top: Math.round(H * 0.1), bot: Math.round(H * 0.86) } : { top: 0, bot: H }; }
+
+  var LAYS = {};
+  // 1. 순천만 노을 — 하늘·해·물결·갈대, 아치 사진, 가운데 명조
+  LAYS.sunset = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    var skyH = g.land ? H * 0.42 : Math.max(sf.top + 120 * u, H * (g.tall ? 0.2 : 0.2));
+    ctx.fillStyle = grad(ctx, 0, 0, 0, skyH, [[0, P.paper], [1, P.bg]]); ctx.fillRect(0, 0, W, skyH);
+    var sx = W * (g.land ? 0.82 : 0.7), sy = skyH * 0.72, sr = 70 * u;
+    ctx.fillStyle = P.accent; ctx.beginPath(); ctx.arc(sx, sy, sr, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = P.c2; ctx.fillRect(0, sy, W, skyH * 0.32);
+    ctx.fillStyle = P.accent; for (var k = 0; k < 5; k++) { ctx.globalAlpha = 0.85 - k * 0.15; ctx.fillRect(sx - sr * (0.9 - k * 0.12), sy + 10 * u + k * 12 * u, sr * 2 * (0.9 - k * 0.12), 4 * u); } ctx.globalAlpha = 1;
+    ctx.strokeStyle = P.c1; ctx.lineWidth = 3 * u;
+    [0, 1].forEach(function (side) { for (var i = 0; i < 9; i++) { var bx = side ? W - 20 * u - i * 13 * u : 20 * u + i * 13 * u, top = sy - (60 + (i % 3) * 30) * u; ctx.beginPath(); ctx.moveTo(bx, skyH + 10 * u); ctx.quadraticCurveTo(bx + (side ? -1 : 1) * 10 * u, (top + skyH) / 2, bx + (side ? -1 : 1) * 18 * u, top); ctx.stroke(); ctx.fillStyle = P.c1; ctx.beginPath(); ctx.ellipse(bx + (side ? -1 : 1) * 18 * u, top, 5 * u, 16 * u, side ? 0.3 : -0.3, 0, Math.PI * 2); ctx.fill(); } });
+    if (g.land) {
+      var ph = H - skyH * 0.55 - 40 * u, pw = Math.min(W * 0.36, ph * 0.8), px = 70 * u, py = H - ph - 40 * u;
+      pic(ctx, D.main, px, py, pw, ph, D, { shape: 'arch', stroke: P.accentLine, sw: 3 * u, pad: 8 * u, fill: P.paper, fam: fam });
+      var tx = px + pw + 70 * u, tw = W - tx - 70 * u, y = skyH + 10 * u;
+      ctx.fillStyle = P.accentLine; ctx.fillRect(tx + tw / 2 - 24 * u, y, 48 * u, 3 * u); y += 22 * u;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 76 * u, min: 40 * u, fam: fam, color: P.onBg, align: 'center', lines: 2 }) + 10 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 26 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 14 * u;
+      var fl = foot(D);
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: H - y - (fl.length ? 70 * u : 30 * u), fs: 30 * u, min: 22 * u, fam: fam, color: P.onBg, align: 'center', gap: 1.7 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - 60 * u, w: tw, size: 30 * u, min: 22 * u, fam: FONT, color: P.accentLine, align: 'center', lines: 1 });
+      return;
+    }
+    var y2 = skyH + 24 * u;
+    ctx.fillStyle = P.accentLine; ctx.fillRect(W / 2 - 26 * u, y2, 52 * u, 3 * u); y2 += 26 * u;
+    y2 = tBlock(ctx, D.title, { x: 80 * u, y: y2, w: W - 160 * u, size: (g.tall ? 104 : 92) * u, min: 50 * u, fam: fam, color: P.onBg, align: 'center', lines: 2 }) + 10 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: 90 * u, y: y2, w: W - 180 * u, size: 30 * u, min: 22 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 24 * u;
+    var fl2 = foot(D), bottom = sf.bot - (fl2.length ? 90 * u : 40 * u);
+    var phH = (bottom - y2) * (g.sq ? 0.62 : g.tall ? 0.52 : 0.58), phW = Math.min(W * 0.62, phH * 0.82);
+    pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { shape: 'arch', stroke: P.accentLine, sw: 3 * u, pad: 10 * u, fill: P.paper, fam: fam });
+    y2 += phH + 34 * u;
+    iList(ctx, D.items, { x: 90 * u, y: y2, w: W - 180 * u, h: bottom - y2, fs: (g.tall ? 38 : 32) * u, min: 24 * u, fam: fam, color: P.onBg, align: 'center', gap: 1.75 });
+    if (fl2.length) tBlock(ctx, fl2.join('  ·  '), { x: 70 * u, y: sf.bot - 70 * u, w: W - 140 * u, size: 32 * u, min: 22 * u, fam: FONT, color: P.accentLine, align: 'center', lines: 1 });
+  };
+  // 2. 인스타 매거진 — 색 머리띠 + 동그라미 도장, 꽉 찬 사진, 3칸 사진판, 캡션
+  LAYS.insta = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    var bx = 56 * u, br = 64 * u, by = sf.top, TT = { x: bx, y: by + 34 * u, w: W - bx * 2 - br * 2.4, size: (g.land ? 64 : 76) * u, min: 40 * u, fam: fam, weight: 900, color: P.onAccent, lines: 2, lh: 1.1 };
+    var bandH = Math.max((g.land ? 150 : 210) * u, tBlock(ctx, D.title, Object.assign({ dry: 1 }, TT)) - by + (D.sub ? 70 : 34) * u);
+    ctx.fillStyle = P.accent; ctx.fillRect(0, 0, W, by + bandH);
+    var ty = tBlock(ctx, D.title, TT);
+    if (D.sub) tBlock(ctx, D.sub, { x: bx, y: ty + 8 * u, w: W - bx * 2 - br * 2.4, size: 26 * u, min: 20 * u, fam: FONT, weight: 600, color: P.onAccent, lines: 1 });
+    if (D.badge) {
+      var cx = W - bx - br, cy = by + bandH / 2;
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(-0.14); ctx.strokeStyle = P.onAccent; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(0, 0, br, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = P.onAccent; ctx.font = '800 ' + Math.round(24 * u) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      D.badge.split('\n').forEach(function (l, i, a) { ctx.fillText(l, 0, (i - (a.length - 1) / 2) * 30 * u); }); ctx.restore(); ctx.textAlign = 'left';
+    }
+    var top = by + bandH, fl = foot(D), gp = 6 * u;
+    if (g.land) {
+      var mw = W * 0.5; pic(ctx, D.main, 0, top, mw, H - top, D, { fill: P.accentLine, mono: 'rgba(255,255,255,.4)', fam: fam });
+      var rx = mw + 50 * u, rw = W - rx - 50 * u, y = top + 36 * u;
+      if (D.tag) y = tBlock(ctx, '“' + D.tag + '”', { x: rx, y: y, w: rw, size: 34 * u, min: 24 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 2 }) + 16 * u;
+      y = iList(ctx, D.items, { x: rx, y: y, w: rw, h: H - y - (fl.length ? 80 * u : 30 * u), fs: 30 * u, min: 22 * u, color: P.onBg, pcolor: P.accentLine, sep: 'rgba(127,127,127,.25)', gap: 1.8 });
+      if (fl.length) tBlock(ctx, fl[0], { x: rx, y: H - 64 * u, w: rw, size: 30 * u, min: 22 * u, fam: FONT, color: P.onBg, lines: 1 });
+      return;
+    }
+    var thumbs = D.imgs.slice(1).filter(Boolean).slice(0, 3), tn = thumbs.length, tw = tn ? (W - gp * (tn - 1)) / tn : 0;
+    var mainH = (sf.bot - top) * (g.sq ? 0.5 : g.tall ? 0.4 : 0.46);
+    pic(ctx, D.main, 0, top, W, mainH, D, { fill: P.accentLine, mono: 'rgba(255,255,255,.4)', fam: fam });
+    var y2 = top + mainH + gp;
+    if (tn >= 2) { var th = Math.min(tw * (g.sq ? 0.55 : 0.8), (sf.bot - top) * 0.2); thumbs.forEach(function (im, i) { pic(ctx, im, i * (tw + gp), y2, tw, th, D, { fam: fam }); }); y2 += th + gp; }
+    var cx2 = 46 * u, cw = W - cx2 * 2, cy2 = y2 + 24 * u, ch = sf.bot - cy2 - 30 * u;
+    if (ch > 80 * u) {
+      ctx.fillStyle = P.paper; round(ctx, cx2, cy2, cw, ch, 26 * u); ctx.fill();
+      var yy = cy2 + 26 * u, ix = cx2 + 34 * u, iw = cw - 68 * u, end = cy2 + ch - (fl.length ? 70 * u : 20 * u);
+      if (D.tag) yy = tBlock(ctx, '“' + D.tag + '”', { x: ix, y: yy, w: iw, size: 36 * u, min: 24 * u, fam: FONT, weight: 800, color: P.accent, lines: 1 }) + 8 * u;
+      iList(ctx, D.items, { x: ix, y: yy, w: iw, h: end - yy, fs: (g.tall ? 34 : 30) * u, min: 22 * u, color: P.ink, pcolor: P.accent, sep: 'rgba(127,127,127,.18)', gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: ix, y: cy2 + ch - 56 * u, w: iw, size: 28 * u, min: 20 * u, fam: FONT, weight: 700, color: P.sub, lines: 1 });
+    }
+  };
+  // 3. 미니멀 — 넓은 여백, 가는 글씨, 직사각 사진, 얇은 선
+  LAYS.minimal = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), m = 80 * u, fl = foot(D);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    if (g.land) {
+      var pw = W * 0.46; pic(ctx, D.main, W - pw, 0, pw, H, D, { fill: P.paper, mono: 'rgba(127,127,127,.3)', fam: fam });
+      var tw = W - pw - m * 2, y = m;
+      ctx.fillStyle = P.onBg; ctx.fillRect(m, y, 40 * u, 3 * u); y += 36 * u;
+      y = tBlock(ctx, D.title, { x: m, y: y, w: tw, size: 64 * u, min: 36 * u, fam: fam, weight: 500, color: P.onBg, lines: 2 }) + 10 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: m, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 400, color: P.subBg, lines: 1 }) + 30 * u;
+      y = iList(ctx, D.items, { x: m, y: y, w: tw, h: H - y - (fl.length ? 90 * u : m), fs: 26 * u, min: 20 * u, weight: 400, pw: 500, color: P.onBg, sep: 'rgba(127,127,127,.2)', gap: 2 });
+      if (fl.length) tBlock(ctx, fl[0], { x: m, y: H - m - 20 * u, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 500, color: P.subBg, lines: 1 });
+      return;
+    }
+    var y2 = sf.top + m;
+    ctx.fillStyle = P.onBg; ctx.fillRect(m, y2, 48 * u, 3 * u); y2 += 40 * u;
+    y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 84 : 72) * u, min: 40 * u, fam: fam, weight: 500, color: P.onBg, lines: 2 }) + 12 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 400, color: P.subBg, lines: 1 }) + 36 * u;
+    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (g.sq ? 0.55 : 0.55);
+    pic(ctx, D.main, m, y2, W - m * 2, phH, D, { fill: P.paper, mono: 'rgba(127,127,127,.3)', fam: fam });
+    y2 += phH + 40 * u;
+    iList(ctx, D.items, { x: m, y: y2, w: W - m * 2, h: bottom - y2, fs: (g.tall ? 34 : 28) * u, min: 20 * u, weight: 400, pw: 500, color: P.onBg, sep: 'rgba(127,127,127,.2)', gap: 2 });
+    if (fl.length) tBlock(ctx, fl.join('   '), { x: m, y: sf.bot - m - 26 * u, w: W - m * 2, size: 26 * u, min: 18 * u, fam: FONT, weight: 500, color: P.subBg, lines: 1 });
+  };
+  // 4. 한지·먹 — 한지 결, 먹 테두리 사진, 붉은 낙관
+  LAYS.hanji = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), m = 70 * u, fl = foot(D);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    for (var i = 0; i < 260; i++) { ctx.strokeStyle = 'rgba(120,100,70,' + (0.03 + (i % 4) * 0.012) + ')'; ctx.lineWidth = 1 + (i % 3); var x0 = (i * 397) % W, y0 = (i * 263) % H; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo(x0 + 30, y0 + 8, x0 + 60 + (i % 5) * 14, y0 + (i % 2 ? 12 : -10)); ctx.stroke(); }
+    ctx.strokeStyle = P.onBg; ctx.lineWidth = 2 * u; ctx.strokeRect(m * 0.5, m * 0.5, W - m, H - m);
+    function seal(x, y, s) {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(-0.05); ctx.fillStyle = P.accent; round(ctx, 0, 0, s, s, 8 * u); ctx.fill();
+      ctx.fillStyle = P.onAccent; ctx.font = '900 ' + Math.round(s * 0.36) + 'px ' + fam; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var t = D.title.replace(/\s/g, ''); ctx.fillText(t.charAt(0), s * 0.5, s * 0.3); ctx.fillText(t.charAt(1) || '', s * 0.5, s * 0.72); ctx.restore(); ctx.textAlign = 'left';
+    }
+    if (g.land) {
+      var ph = H - m * 2.2, pw = Math.min(W * 0.42, ph * 1.0), px = m, py = (H - ph) / 2;
+      pic(ctx, D.main, px, py, pw, ph, D, { stroke: P.onBg, sw: 6 * u, pad: 10 * u, fill: P.paper, fam: fam });
+      var tx = px + pw + 60 * u, tw = W - tx - m, y = m;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw - 110 * u, size: 70 * u, min: 38 * u, fam: fam, weight: 900, color: P.onBg, lines: 2 }) + 8 * u;
+      seal(W - m - 90 * u, m, 90 * u);
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 20 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: H - y - (fl.length ? 90 * u : m), fs: 28 * u, min: 20 * u, fam: fam, color: P.onBg, lead: 'rgba(60,50,40,.5)', bullet: function (c, x, yy, fs) { c.fillStyle = P.accent; c.fillRect(x, yy + fs * 0.4, fs * 0.3, fs * 0.3); }, gap: 1.8 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - m - 20 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, color: P.onBg, lines: 1 });
+      return;
+    }
+    var y2 = sf.top + m * 1.2, sz = (g.tall ? 120 : 104) * u;
+    seal(W - m - sz - 10 * u, y2 - 10 * u, sz);
+    y2 = tBlock(ctx, D.title, { x: m * 1.3, y: y2, w: W - m * 2.6 - sz, size: (g.tall ? 96 : 84) * u, min: 44 * u, fam: fam, weight: 900, color: P.onBg, lines: 2 }) + 8 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m * 1.3, y: y2, w: W - m * 2.6 - sz, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 30 * u;
+    y2 = Math.max(y2, sf.top + m * 1.2 + sz + 30 * u);
+    var bottom = sf.bot - m * 1.2 - (fl.length ? 60 * u : 0), phH = (bottom - y2) * 0.56;
+    pic(ctx, D.main, m * 1.3, y2, W - m * 2.6, phH, D, { stroke: P.onBg, sw: 6 * u, pad: 12 * u, fill: P.paper, fam: fam });
+    y2 += phH + 44 * u;
+    iList(ctx, D.items, { x: m * 1.3, y: y2, w: W - m * 2.6, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, fam: fam, color: P.onBg, lead: 'rgba(60,50,40,.5)', bullet: function (c, x, yy, fs) { c.fillStyle = P.accent; c.fillRect(x, yy + fs * 0.4, fs * 0.3, fs * 0.3); }, gap: 1.8 });
+    if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: m * 1.3, y: sf.bot - m * 1.2 - 30 * u, w: W - m * 2.6, size: 28 * u, min: 20 * u, fam: FONT, color: P.onBg, lines: 1 });
+  };
+  // 5. 파스텔 — 몽글한 동그라미 배경, 둥근 흰 카드, 알약 모양 목록
+  LAYS.pastel = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    [[0.12, 0.1, 0.32, P.blob1], [0.92, 0.3, 0.28, P.blob2], [0.2, 0.92, 0.36, P.blob3], [0.85, 0.85, 0.2, P.blob1]].forEach(function (b) { ctx.globalAlpha = 0.7; ctx.fillStyle = b[3]; ctx.beginPath(); ctx.arc(W * b[0], H * b[1], Math.min(W, H) * b[2], 0, Math.PI * 2); ctx.fill(); });
+    ctx.globalAlpha = 1;
+    var m = 54 * u, cx = m, cy = sf.top + m, cw = W - m * 2, ch = sf.bot - cy - m;
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.12)'; ctx.shadowBlur = 40 * u; ctx.shadowOffsetY = 12 * u; ctx.fillStyle = P.paper; round(ctx, cx, cy, cw, ch, 48 * u); ctx.fill(); ctx.restore();
+    var pad = 34 * u;
+    function pill(c, x, yy, fs, i) { c.fillStyle = [P.c1, P.c2, P.c3][i % 3]; c.beginPath(); c.arc(x + fs * 0.35, yy + fs * 0.55, fs * 0.3, 0, Math.PI * 2); c.fill(); }
+    if (g.land) {
+      var pw = ch - pad * 2; pic(ctx, D.main, cx + pad, cy + pad, Math.min(pw, cw * 0.42), pw, D, { shape: 'round', r: 36 * u, fill: P.c1, fam: fam });
+      var tx = cx + pad * 2 + Math.min(pw, cw * 0.42), tw = cx + cw - pad - tx, y = cy + pad + 6 * u;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 60 * u, min: 34 * u, fam: fam, weight: 900, color: P.ink, lines: 2 }) + 6 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: P.sub, lines: 1 }) + 18 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: cy + ch - pad - y - (fl.length ? 50 * u : 0), fs: 28 * u, min: 20 * u, color: P.ink, pcolor: P.accent, bullet: pill, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: cy + ch - pad - 34 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accent, lines: 1 });
+      return;
+    }
+    var bottom = cy + ch - pad - (fl.length ? 60 * u : 0), phH = (ch - pad * 2) * (g.sq ? 0.46 : 0.44);
+    pic(ctx, D.main, cx + pad, cy + pad, cw - pad * 2, phH, D, { shape: 'round', r: 36 * u, fill: P.c1, fam: fam });
+    var y2 = cy + pad + phH + 30 * u;
+    y2 = tBlock(ctx, D.title, { x: cx + pad, y: y2, w: cw - pad * 2, size: (g.tall ? 86 : 72) * u, min: 38 * u, fam: fam, weight: 900, color: P.ink, align: 'center', lines: 2 }) + 6 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: cx + pad, y: y2, w: cw - pad * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.sub, align: 'center', lines: 1 }) + 20 * u;
+    iList(ctx, D.items, { x: cx + pad * 1.5, y: y2, w: cw - pad * 3, h: bottom - y2, fs: (g.tall ? 34 : 29) * u, min: 20 * u, color: P.ink, pcolor: P.accent, bullet: pill, gap: 1.75 });
+    if (fl.length) { var fw = cw - pad * 4; ctx.fillStyle = P.accent; round(ctx, cx + pad * 2, cy + ch - pad - 56 * u, fw, 56 * u, 28 * u); ctx.fill(); tBlock(ctx, fl.join(' · '), { x: cx + pad * 2 + 20 * u, y: cy + ch - pad - 46 * u, w: fw - 40 * u, size: 28 * u, min: 18 * u, fam: FONT, weight: 800, color: P.onAccent, align: 'center', lines: 1 }); }
+  };
+  // 6. 럭셔리 골드 — 진한 바탕, 금색 겹테두리·모서리 장식, 타원 사진, 마름모 구분선
+  LAYS.gold = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), gl = P.accentLine;
+    ctx.fillStyle = grad(ctx, 0, 0, 0, H, [[0, P.paper], [1, P.bg]]); ctx.fillRect(0, 0, W, H);
+    var m = 34 * u; ctx.strokeStyle = gl; ctx.lineWidth = 2 * u; ctx.strokeRect(m, m, W - m * 2, H - m * 2); ctx.lineWidth = 1 * u; ctx.strokeRect(m + 12 * u, m + 12 * u, W - m * 2 - 24 * u, H - m * 2 - 24 * u);
+    corner(ctx, m + 22 * u, m + 22 * u, 1, 1, gl); corner(ctx, W - m - 22 * u, m + 22 * u, -1, 1, gl); corner(ctx, m + 22 * u, H - m - 22 * u, 1, -1, gl); corner(ctx, W - m - 22 * u, H - m - 22 * u, -1, -1, gl);
+    if (g.land) {
+      var ph = H - 200 * u, pw = ph * 0.78, px = 120 * u, py = (H - ph) / 2;
+      pic(ctx, D.main, px, py, pw, ph, D, { shape: 'oval', stroke: gl, sw: 3 * u, pad: 12 * u, fill: P.paper, mono: gl, fam: fam });
+      var tx = px + pw + 80 * u, tw = W - tx - 110 * u, y = 110 * u;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 70 * u, min: 38 * u, fam: fam, weight: 900, color: gl, align: 'center', lines: 2 }) + 8 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 16 * u;
+      diamond(ctx, tx + tw / 2, y + 8 * u, tw / 2 - 20 * u, gl); y += 34 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: H - y - (fl.length ? 110 * u : 90 * u), fs: 28 * u, min: 20 * u, fam: fam, color: P.onBg, pcolor: gl, lead: gl, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - 100 * u, w: tw, size: 28 * u, min: 18 * u, fam: FONT, weight: 700, color: P.onBg, align: 'center', lines: 1 });
+      return;
+    }
+    var y2 = sf.top + 110 * u, bottom = sf.bot - 100 * u - (fl.length ? 50 * u : 0);
+    var phH = (bottom - y2) * (g.sq ? 0.4 : 0.38), phW = phH * 0.8;
+    pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { shape: 'oval', stroke: gl, sw: 3 * u, pad: 14 * u, fill: P.paper, mono: gl, fam: fam });
+    y2 += phH + 46 * u;
+    y2 = tBlock(ctx, D.title, { x: 120 * u, y: y2, w: W - 240 * u, size: (g.tall ? 92 : 80) * u, min: 42 * u, fam: fam, weight: 900, color: gl, align: 'center', lines: 2 }) + 8 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: 120 * u, y: y2, w: W - 240 * u, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 16 * u;
+    diamond(ctx, W / 2, y2 + 10 * u, W / 2 - 170 * u, gl); y2 += 44 * u;
+    iList(ctx, D.items, { x: 140 * u, y: y2, w: W - 280 * u, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, fam: fam, color: P.onBg, pcolor: gl, lead: gl, gap: 1.75 });
+    if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: 120 * u, y: sf.bot - 130 * u, w: W - 240 * u, size: 30 * u, min: 20 * u, fam: FONT, weight: 700, color: P.onBg, align: 'center', lines: 1 });
+  };
+  // 7. 모던 다크 — 꽉 찬 사진 + 어두운 그라데이션, 큰 굵은 제목, 01·02 번호 목록
+  LAYS.mdark = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), m = 64 * u;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    function num(c, x, yy, fs, i) { c.font = '900 ' + Math.round(fs * 0.8) + 'px ' + FONT; c.fillStyle = P.accentLine; c.fillText((i < 9 ? '0' : '') + (i + 1), x, yy + fs * 0.12); }
+    if (g.land) {
+      var pw = W * 0.58; pic(ctx, D.main, W - pw, 0, pw, H, D, { fill: P.paper, fam: fam });
+      ctx.fillStyle = grad(ctx, W - pw, 0, W - pw + pw * 0.5, 0, [[0, P.bg], [1, 'rgba(0,0,0,0)']]); ctx.fillRect(W - pw, 0, pw * 0.5, H);
+      var tw = W * 0.5, y = m;
+      ctx.fillStyle = P.accent; ctx.fillRect(m, y, 10 * u, 90 * u);
+      y = tBlock(ctx, D.title, { x: m + 30 * u, y: y - 4 * u, w: tw - 30 * u, size: 80 * u, min: 40 * u, fam: fam, weight: 900, color: P.onBg, lines: 2, lh: 1.08 }) + 10 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: m + 30 * u, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 22 * u;
+      y = iList(ctx, D.items, { x: m, y: y, w: tw, h: H - y - (fl.length ? 80 * u : m), fs: 28 * u, min: 20 * u, color: P.onBg, pcolor: P.accentLine, bullet: num, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: m, y: H - m - 20 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
+      return;
+    }
+    var phH = H * (g.sq ? 0.56 : g.tall ? 0.56 : 0.58);
+    pic(ctx, D.main, 0, 0, W, phH, D, { fill: P.paper, fam: fam });
+    ctx.fillStyle = grad(ctx, 0, phH * 0.45, 0, phH, [[0, 'rgba(0,0,0,0)'], [1, P.bg]]); ctx.fillRect(0, phH * 0.45, W, phH * 0.55 + 2);
+    var TT = { x: m, y: 0, w: W - m * 2, size: (g.tall ? 116 : 100) * u, min: 48 * u, fam: fam, weight: 900, color: P.onBg, lines: 2, lh: 1.08 };
+    var y2 = phH - tBlock(ctx, D.title, Object.assign({ dry: 1 }, TT)) - 10 * u; TT.y = y2;
+    ctx.fillStyle = P.accent; ctx.fillRect(m, y2 - 30 * u, 120 * u, 10 * u);
+    y2 = tBlock(ctx, D.title, TT) + 10 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 26 * u;
+    var bottom = sf.bot - m - (fl.length ? 56 * u : 0);
+    iList(ctx, D.items, { x: m, y: y2, w: W - m * 2, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, color: P.onBg, pcolor: P.accentLine, bullet: num, sep: 'rgba(255,255,255,.1)', gap: 1.75 });
+    if (fl.length) tBlock(ctx, fl.join('   '), { x: m, y: sf.bot - m - 34 * u, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
+  };
+  // 8. 글래스 — 번진 빛 배경 위 반투명 유리판, 둥근 사진이 떠 있음
+  LAYS.glass = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.filter = 'blur(' + Math.round(70 * u) + 'px)';
+    [[0.1, 0.12, 0.42, P.blob1], [0.95, 0.4, 0.4, P.blob2], [0.4, 0.98, 0.5, P.blob3]].forEach(function (b) { ctx.fillStyle = b[3]; ctx.beginPath(); ctx.arc(W * b[0], H * b[1], Math.min(W, H) * b[2], 0, Math.PI * 2); ctx.fill(); });
+    ctx.restore();
+    var dark = lumOf(P.bg) < 0.4, glassC = dark ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.55)', edge = dark ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.9)';
+    var tc = dark ? '#ffffff' : P.ink, sc = dark ? 'rgba(255,255,255,.75)' : P.sub, m = 56 * u;
+    function panel(x, y, w, h) { ctx.fillStyle = glassC; round(ctx, x, y, w, h, 40 * u); ctx.fill(); ctx.strokeStyle = edge; ctx.lineWidth = 2 * u; ctx.stroke(); }
+    function dot(c, x, yy, fs) { c.fillStyle = P.accent; c.beginPath(); c.arc(x + fs * 0.3, yy + fs * 0.55, fs * 0.18, 0, Math.PI * 2); c.fill(); }
+    if (g.land) {
+      var ph = H - m * 2, pw = Math.min(W * 0.4, ph);
+      ctx.save(); ctx.shadowColor = 'rgba(20,10,40,.35)'; ctx.shadowBlur = 40 * u; ctx.shadowOffsetY = 20 * u; ctx.fillStyle = P.accent; round(ctx, m, m, pw, ph, 40 * u); ctx.fill(); ctx.restore();
+      pic(ctx, D.main, m, m, pw, ph, D, { shape: 'round', r: 40 * u, fill: P.accent, fam: fam });
+      var tx = m * 2 + pw, tw = W - tx - m; panel(tx, m, tw, ph);
+      var y = m + 40 * u;
+      y = tBlock(ctx, D.title, { x: tx + 40 * u, y: y, w: tw - 80 * u, size: 62 * u, min: 34 * u, fam: fam, weight: 800, color: tc, lines: 2 }) + 6 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx + 40 * u, y: y, w: tw - 80 * u, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: sc, lines: 1 }) + 18 * u;
+      y = iList(ctx, D.items, { x: tx + 40 * u, y: y, w: tw - 80 * u, h: m + ph - y - (fl.length ? 70 * u : 30 * u), fs: 28 * u, min: 20 * u, color: tc, pcolor: dark ? P.accentLine : P.accent, bullet: dot, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx + 40 * u, y: m + ph - 60 * u, w: tw - 80 * u, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: tc, lines: 1 });
+      return;
+    }
+    var top = sf.top + m, phH = (sf.bot - top) * (g.sq ? 0.42 : 0.4), phW = W - m * 2.6;
+    ctx.save(); ctx.shadowColor = 'rgba(20,10,40,.35)'; ctx.shadowBlur = 50 * u; ctx.shadowOffsetY = 24 * u; ctx.fillStyle = P.accent; round(ctx, (W - phW) / 2, top, phW, phH, 48 * u); ctx.fill(); ctx.restore();
+    pic(ctx, D.main, (W - phW) / 2, top, phW, phH, D, { shape: 'round', r: 48 * u, fill: P.accent, fam: fam });
+    var py = top + phH + 36 * u, pH = sf.bot - m - py; panel(m, py, W - m * 2, pH);
+    var y2 = py + 40 * u, ix = m + 44 * u, iw = W - m * 2 - 88 * u;
+    y2 = tBlock(ctx, D.title, { x: ix, y: y2, w: iw, size: (g.tall ? 84 : 70) * u, min: 38 * u, fam: fam, weight: 800, color: tc, lines: 2 }) + 6 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: ix, y: y2, w: iw, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: sc, lines: 1 }) + 18 * u;
+    iList(ctx, D.items, { x: ix, y: y2, w: iw, h: py + pH - y2 - (fl.length ? 80 * u : 30 * u), fs: (g.tall ? 34 : 29) * u, min: 20 * u, color: tc, pcolor: dark ? P.accentLine : P.accent, bullet: dot, gap: 1.75 });
+    if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: ix, y: py + pH - 64 * u, w: iw, size: 28 * u, min: 18 * u, fam: FONT, weight: 800, color: tc, lines: 1 });
+  };
+  // 9. 레트로 팝 — 굵은 검정 테두리, 그림자 밀린 사진, 별 딱지, 체크 띠
+  LAYS.retro = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), ink = P.ink, m = 56 * u;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    var cs = 30 * u; for (var cx = 0; cx < W; cx += cs) { ctx.fillStyle = (cx / cs) % 2 ? P.accent : ink; ctx.fillRect(cx, sf.top, cs, cs * 0.6); ctx.fillStyle = (cx / cs) % 2 ? ink : P.accent; ctx.fillRect(cx, sf.bot - cs * 0.6, cs, cs * 0.6); }
+    function star(x, y, r, label) {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(-0.2); ctx.fillStyle = P.c1; ctx.strokeStyle = ink; ctx.lineWidth = 4 * u; ctx.beginPath();
+      for (var i = 0; i < 24; i++) { var a = i * Math.PI / 12, rr = i % 2 ? r * 0.8 : r; ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = P.onC1; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var ls = String(label).split('\n'); ls.forEach(function (l, i) { ctx.font = '900 ' + Math.round(r * (ls.length > 1 ? 0.3 : 0.36)) + 'px ' + fam; ctx.fillText(l, 0, (i - (ls.length - 1) / 2) * r * 0.36); });
+      ctx.restore(); ctx.textAlign = 'left';
+    }
+    var hot = (D.items.filter(function (x) { return x.p; })[0] || {}).p || D.badge || 'HOT';
+    function box(x, y, w, h) { ctx.fillStyle = ink; ctx.fillRect(x + 14 * u, y + 14 * u, w, h); pic(ctx, D.main, x, y, w, h, D, { fill: P.accent, fam: fam }); ctx.strokeStyle = ink; ctx.lineWidth = 6 * u; ctx.strokeRect(x, y, w, h); }
+    function sq(c, x, yy, fs, i) { c.fillStyle = [P.accent, P.c1, ink][i % 3]; c.fillRect(x, yy + fs * 0.3, fs * 0.5, fs * 0.5); }
+    if (g.land) {
+      var top = sf.top + cs + 30 * u, ph = H - top - cs - 50 * u, pw = Math.min(W * 0.42, ph * 1.1);
+      box(m, top, pw, ph); star(m + pw - 20 * u, top + 30 * u, 70 * u, hot);
+      var tx = m + pw + 60 * u, tw = W - tx - m, y = top;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 74 * u, min: 38 * u, fam: fam, weight: 400, color: ink, shadow: P.accent, lines: 2, lh: 1.1 }) + 8 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 800, color: P.sub, lines: 1 }) + 16 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: top + ph - y - (fl.length ? 50 * u : 0), fs: 28 * u, min: 20 * u, color: ink, pcolor: P.accent, bullet: sq, gap: 1.7 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: top + ph - 36 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 900, color: ink, lines: 1 });
+      return;
+    }
+    var y2 = sf.top + cs + 40 * u;
+    y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 120 : 104) * u, min: 50 * u, fam: fam, weight: 400, color: ink, shadow: P.accent, lines: 2, lh: 1.08, align: 'center' }) + 6 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 800, color: P.sub, lines: 1, align: 'center' }) + 26 * u;
+    var bottom = sf.bot - cs - 30 * u - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (g.sq ? 0.55 : 0.52);
+    box(m, y2, W - m * 2 - 14 * u, phH); star(W - m - 60 * u, y2 + 20 * u, (g.sq ? 74 : 90) * u, hot);
+    y2 += phH + 44 * u;
+    iList(ctx, D.items, { x: m + 10 * u, y: y2, w: W - m * 2 - 20 * u, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, color: ink, pcolor: P.accent, bullet: sq, gap: 1.7 });
+    if (fl.length) { ctx.fillStyle = ink; ctx.fillRect(m, sf.bot - cs - 90 * u, W - m * 2, 60 * u); tBlock(ctx, fl.join('  ·  '), { x: m + 20 * u, y: sf.bot - cs - 78 * u, w: W - m * 2 - 40 * u, size: 30 * u, min: 18 * u, fam: FONT, weight: 900, color: P.bg, lines: 1, align: 'center' }); }
+  };
+  // 10. 네온 나이트 — 어두운 격자, 빛나는 제목·사진 테두리
+  LAYS.neon = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), m = 60 * u;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1; for (var x = 0; x < W; x += 54 * u) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); } for (var y0 = 0; y0 < H; y0 += 54 * u) { ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(W, y0); ctx.stroke(); }
+    function glowBox(x, y, w, h) { ctx.save(); ctx.shadowColor = P.accent; ctx.shadowBlur = 40 * u; ctx.strokeStyle = P.accent; ctx.lineWidth = 6 * u; round(ctx, x, y, w, h, 28 * u); ctx.stroke(); ctx.stroke(); ctx.restore(); pic(ctx, D.main, x + 10 * u, y + 10 * u, w - 20 * u, h - 20 * u, D, { shape: 'round', r: 20 * u, fill: P.paper, mono: P.c1, fam: fam }); }
+    function bar(c, x, yy, fs, i) { c.save(); c.shadowColor = i % 2 ? P.c2 : P.c1; c.shadowBlur = 14 * u; c.fillStyle = i % 2 ? P.c2 : P.c1; c.fillRect(x, yy + fs * 0.2, fs * 0.16, fs * 0.8); c.restore(); }
+    if (g.land) {
+      var ph = H - m * 2, pw = Math.min(W * 0.42, ph * 1.05); glowBox(m, m, pw, ph);
+      var tx = m * 2 + pw, tw = W - tx - m, y = m;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 74 * u, min: 38 * u, fam: fam, weight: 900, color: '#ffffff', glow: P.accent, lines: 2 }) + 8 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 700, color: P.c1, glow: P.c1, lines: 1 }) + 18 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: H - m - y - (fl.length ? 50 * u : 0), fs: 28 * u, min: 20 * u, color: '#ffffff', pcolor: P.c2, bullet: bar, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - m - 36 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.c1, glow: P.c1, lines: 1 });
+      return;
+    }
+    var y2 = sf.top + m;
+    var bottom = sf.bot - m - (fl.length ? 60 * u : 0), phH = (bottom - y2) * (g.sq ? 0.46 : 0.45);
+    glowBox(m, y2, W - m * 2, phH); y2 += phH + 40 * u;
+    y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 112 : 96) * u, min: 46 * u, fam: fam, weight: 900, color: '#ffffff', glow: P.accent, lines: 2, align: 'center' }) + 4 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 700, color: P.c1, glow: P.c1, lines: 1, align: 'center' }) + 24 * u;
+    iList(ctx, D.items, { x: m + 20 * u, y: y2, w: W - m * 2 - 40 * u, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, color: '#ffffff', pcolor: P.c2, bullet: bar, gap: 1.75 });
+    if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: m, y: sf.bot - m - 40 * u, w: W - m * 2, size: 32 * u, min: 20 * u, fam: FONT, weight: 800, color: P.c1, glow: P.c1, lines: 1, align: 'center' });
+  };
+  // 11. 유럽 빈티지 — 줄무늬 차양, 기울임 명조, 얇은 테 사진, 점선 메뉴
+  LAYS.paris = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), m = 70 * u;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    var aw = W / 12, ah = (g.land ? 70 : 96) * u, at = sf.top;
+    if (at) { ctx.fillStyle = P.accent; ctx.fillRect(0, 0, W, at); }
+    for (var i = 0; i < 12; i++) { ctx.fillStyle = i % 2 ? P.paper : P.accent; ctx.fillRect(i * aw, at, aw + 1, ah); ctx.beginPath(); ctx.arc(i * aw + aw / 2, at + ah, aw / 2, 0, Math.PI); ctx.fill(); }
+    ctx.strokeStyle = P.accentLine; ctx.lineWidth = 2 * u; ctx.strokeRect(m * 0.5, at + ah + aw / 2 + 20 * u, W - m, sf.bot - (at + ah + aw / 2 + 20 * u) - m * 0.5);
+    var top = at + ah + aw / 2 + 50 * u;
+    function head(x, y, w) { ctx.font = 'italic 600 ' + Math.round(24 * u) + 'px ' + fam; ctx.fillStyle = P.accentLine; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText('— ' + D.head + ' —', x + w / 2, y); ctx.textAlign = 'left'; return y + 40 * u; }
+    if (g.land) {
+      var ph = sf.bot - top - m, pw = Math.min(W * 0.36, ph * 0.9);
+      pic(ctx, D.main, m, top, pw, ph, D, { stroke: P.accentLine, sw: 2 * u, pad: 10 * u, fill: P.paper, fam: fam });
+      var tx = m + pw + 60 * u, tw = W - tx - m, y = top;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 66 * u, min: 36 * u, fam: fam, weight: 600, color: P.onBg, align: 'center', lines: 2 }) + 4 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 22 * u, min: 18 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 12 * u;
+      y = head(tx, y, tw);
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: sf.bot - m - y - (fl.length ? 40 * u : 0), fs: 26 * u, min: 18 * u, fam: fam, color: P.onBg, pcolor: P.accentLine, lead: P.accentLine, gap: 1.7 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: sf.bot - m - 30 * u, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 700, color: P.onBg, align: 'center', lines: 1 });
+      return;
+    }
+    var y2 = top;
+    y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 96 : 82) * u, min: 42 * u, fam: fam, weight: 600, color: P.onBg, align: 'center', lines: 2 }) + 4 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, align: 'center', lines: 1 }) + 22 * u;
+    var bottom = sf.bot - m - (fl.length ? 50 * u : 0), phH = (bottom - y2) * (g.sq ? 0.46 : 0.46), phW = Math.min(W - m * 2.4, phH * 1.25);
+    pic(ctx, D.main, (W - phW) / 2, y2, phW, phH, D, { stroke: P.accentLine, sw: 2 * u, pad: 12 * u, fill: P.paper, fam: fam });
+    y2 += phH + 34 * u; y2 = head(m, y2, W - m * 2);
+    iList(ctx, D.items, { x: m * 1.4, y: y2, w: W - m * 2.8, h: bottom - y2, fs: (g.tall ? 34 : 28) * u, min: 20 * u, fam: fam, color: P.onBg, pcolor: P.accentLine, lead: P.accentLine, gap: 1.7 });
+    if (fl.length) tBlock(ctx, fl.join('  ·  '), { x: m, y: sf.bot - m - 40 * u, w: W - m * 2, size: 28 * u, min: 18 * u, fam: FONT, weight: 700, color: P.onBg, align: 'center', lines: 1 });
+  };
+  // 12. 북유럽 — 반은 사진, 반은 흙빛 바탕 + 둥근 자연 도형
+  LAYS.nordic = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), fl = foot(D), m = 64 * u;
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+    function blobs(x, y, w, h) { [[1.02, 0.08, 0.16, P.blob1], [1.04, 0.98, 0.22, P.blob2], [-0.02, 1.02, 0.14, P.blob3]].forEach(function (b) { ctx.fillStyle = b[3]; ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.ellipse(x + w * b[0], y + h * b[1], Math.min(w, h) * b[2], Math.min(w, h) * b[2] * 0.82, 0.4, 0, Math.PI * 2); ctx.fill(); }); ctx.globalAlpha = 1; }
+    function leaf(c, x, yy, fs, i) { c.fillStyle = [P.accent, P.c2, P.c3][i % 3]; c.beginPath(); c.ellipse(x + fs * 0.32, yy + fs * 0.55, fs * 0.26, fs * 0.16, -0.6, 0, Math.PI * 2); c.fill(); }
+    if (g.land) {
+      var pw = W * 0.48; pic(ctx, D.main, 0, 0, pw, H, D, { fill: P.c1, fam: fam });
+      blobs(pw, 0, W - pw, H);
+      var tx = pw + m, tw = W - tx - m, y = m;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 66 * u, min: 36 * u, fam: fam, weight: 800, color: P.onBg, lines: 2 }) + 6 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 24 * u, min: 18 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 20 * u;
+      y = iList(ctx, D.items, { x: tx, y: y, w: tw, h: H - m - y - (fl.length ? 50 * u : 0), fs: 28 * u, min: 20 * u, color: P.onBg, pcolor: P.accentLine, bullet: leaf, gap: 1.75 });
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - m - 34 * u, w: tw, size: 26 * u, min: 18 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
+      return;
+    }
+    var phH = H * (g.sq ? 0.46 : g.tall ? 0.46 : 0.48);
+    pic(ctx, D.main, 0, 0, W, phH, D, { fill: P.c1, fam: fam });
+    ctx.fillStyle = P.bg; ctx.beginPath(); ctx.moveTo(0, phH); ctx.quadraticCurveTo(W * 0.5, phH - 90 * u, W, phH - 10 * u); ctx.lineTo(W, phH + 2); ctx.lineTo(0, phH + 2); ctx.fill();
+    blobs(0, phH, W, H - phH);
+    var y2 = phH + 10 * u;
+    y2 = tBlock(ctx, D.title, { x: m, y: y2, w: W - m * 2, size: (g.tall ? 96 : 82) * u, min: 42 * u, fam: fam, weight: 800, color: P.onBg, lines: 2 }) + 6 * u;
+    if (D.sub) y2 = tBlock(ctx, D.sub, { x: m, y: y2, w: W - m * 2, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: P.subBg, lines: 1 }) + 24 * u;
+    var bottom = sf.bot - m - (fl.length ? 56 * u : 0);
+    iList(ctx, D.items, { x: m, y: y2, w: W - m * 2, h: bottom - y2, fs: (g.tall ? 36 : 30) * u, min: 20 * u, color: P.onBg, pcolor: P.accentLine, bullet: leaf, gap: 1.75 });
+    if (fl.length) tBlock(ctx, fl.join('   '), { x: m, y: sf.bot - m - 36 * u, w: W - m * 2, size: 30 * u, min: 20 * u, fam: FONT, weight: 800, color: P.accentLine, lines: 1 });
+  };
+  LAYS.safe = LAYS.mdark;
+
+  function snsData(card, design, opts, imgs) {
+    var items = frameMenu(card, opts).map(function (m) { return { n: m.n, p: m.p }; });
+    var fromMenu = !!(card.reserve && card.reserve.menu && card.reserve.menu.length) || !!(opts && opts.menu && opts.menu.length);
+    var tag = fromMenu ? ((card.body || []).filter(function (l) { return /한정|할인|이벤트|신메뉴|오픈|모집|특강|무료/.test(l); })[0] || (card.body || [])[0] || '') : '';
+    tag = String(tag).replace(/^[^:：]{0,12}[:：]\s*/, '');
+    var title = String(card.title || '').trim() || '싸바';
+    return {
+      title: title, sub: String(card.subtitle || '').trim(), items: items, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag,
+      phone: card.contact && card.contact.phone || '', addr: frameAddr(card) || (card.place && card.place.name) || '',
+      head: IND_HEAD[opts.industry] || String(design.badge || '').replace(/\n/g, ' ') || TYPE_HEAD[card.template] || '안내', badge: design.badge || '',
+      imgs: imgs, main: imgs[0] || null, ip: card.image ? card.ip : null, fam: famStack(design)
+    };
+  }
+  function drawSns(card, design, opts, imgs, size) {
+    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d');
+    var D = snsData(card, design, opts, imgs), P = design.colors;
+    (LAYS[design.style] || LAYS.minimal)(ctx, W, H, D, P);
+    mark(ctx, W, H, lumOf(P.bg) > 0.5);
+    return c;
+  }
+  // 디자인 1개 → 올릴 곳 크기 6가지 (opts.sizes 로 골라 그릴 수 있음)
+  function buildSns(card, design, opts) {
+    opts = opts || {};
+    var pics = opts.pics || {}, srcs = [card.image].concat(card.gallery || []).filter(Boolean);
+    srcs = srcs.filter(function (s, i) { return srcs.indexOf(s) === i; }).slice(0, 4);
+    var fam = famStack(design).split(',')[0], ready = [(document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function () {}) : null, loadSerif()];
+    if (document.fonts && fam) ready.push(Promise.race([Promise.all([document.fonts.load('900 80px ' + fam, card.title || '가'), document.fonts.load('400 80px ' + fam, '가')]).catch(function () {}), new Promise(function (r) { setTimeout(r, 2500); })]));
+    return Promise.all(ready).then(function () {
+      return Promise.all(srcs.map(function (s) { return loadImg(s, pics[s]); }));
+    }).then(function (imgs) {
+      imgs = imgs.map(function (im) { return usable(im) ? im : null; });
+      if (!card.image) imgs.unshift(null);
+      var sizes = SNS_SIZES.filter(function (s) { return !opts.sizes || opts.sizes.indexOf(s.id) >= 0; });
+      var base = String(card.title || '싸바').replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 16), dn = design.name.replace(/[·\s]/g, '');
+      var list = sizes.map(function (sz) { return { name: base + '-' + dn + '-' + sz.places[0].replace(/[·\s]/g, '') + '-' + sz.w + 'x' + sz.h, label: sz.label + ' · ' + sz.places.join(' · '), places: sz.places, size: sz, c: drawSns(card, design, opts, imgs, sz) }; });
+      return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
+        return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, places: x.places, sizeId: x.size.id, blob: blobs[i], w: x.c.width, h: x.c.height }; });
+      });
+    });
+  }
+
+  global.SsakaExport = { build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -314,46 +314,55 @@
     return { id: id, name: P.name, style: P.style, font: st.title, mood: st.mood || 'modern', photo: true, pal: clean, colors: colorsFor(P.style, clean) };
   }
 
-  var BY_ID = {}, BY_INDUSTRY = {};
+  // ---------- 디자인 v4 (2026-11-19): 모든 업종 똑같이 "모양이 서로 다른 12가지 디자인" ----------
+  // 12가지는 화면 구조부터 다르고(색만 바꾼 반복 없음), 디자인마다 색 3벌을 따로 고를 수 있어요.
+  // 같은 12가지가 SNS 이미지(인스타·카톡 채널·네이버·당근·블로그·유튜브…)에도 똑같은 모양으로 나옵니다 (js/export.js).
+  // 예전 1~12번 · -w1~36 · 순천만 시안 번호는 쓰지 않아요. 예전 링크는 그 업종의 1번 디자인으로 보여 줍니다.
+  var TWELVE = ['sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
+  var COLOR_NAMES = {
+    sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
+    minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],
+    pastel: ['분홍', '하늘', '연두'], gold: ['진녹·금', '남색·금', '검정·금'],
+    mdark: ['검정·주황', '검정·민트', '검정·보라'], glass: ['복숭아', '밤하늘', '청록 밤'],
+    retro: ['크림·빨강', '민트·분홍', '노랑·파랑'], neon: ['분홍 네온', '초록 네온', '주황 네온'],
+    paris: ['미색·빨강', '연녹·초록', '연보라·남색'], nordic: ['모래·올리브', '안개·청회색', '살구·테라코타']
+  };
+  // 인스타 매거진 머리띠 동그라미 글씨 (업종마다)
+  var BADGE = { restaurant: '오늘의\n맛', cafe: '오늘의\n디저트', beauty: '이달의\n스타일', fitness: '오늘도\n운동', flower: '오늘의\n꽃', stay: '오늘의\n바다',
+    realty: '추천\n매물', toefl: '이번 달\n특강', bigacademy: '신규생\n모집', academy: '시험\n대비', entrance: '합격\n전략', tutor: '첫 수업\n상담', arts: '체험\n수업',
+    actor: 'NEW\nFACE', director: 'NEW\nWORK', freelancer: '강의\n문의', insurance: '무료\n상담', newcar: '이달\n혜택', usedcar: '오늘의\n차', sales: '상담\n환영',
+    club: '함께\n가요', alumni: '반가운\n얼굴', party: '함께\n해요', greeting: '고마운\n마음', event: '초대\n합니다' };
+  var BY_ID = {}, BY_INDUSTRY = {}, FAMILY_OF = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
-    if (ind.id === 'restaurant') SC_FAMS.forEach(function (fk) {
-      var st = STYLES[fk];
-      st.palettes.forEach(function (pal, pi) {
-        var ds = { id: 'restaurant-' + fk + (pi + 1), industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
-        BY_ID[ds.id] = ds; list.push(ds);
-      });
+    if (ind.type === 'safe') { // 어린이·어르신 안심은 큰 글씨 안심 디자인만 (6가지)
+      for (var i = 0; i < (ind.count || 6); i++) {
+        var sp = STYLES.safe.palettes[(i + (ind.offset || 0)) % STYLES.safe.palettes.length];
+        var sd = { id: ind.id + '-' + (i + 1), industry: ind.id, name: '안심 ' + (i + 1), style: 'safe', font: 'sys', mood: 'classic', colors: colorsFor('safe', sp) };
+        BY_ID[sd.id] = sd; list.push(sd);
+      }
+      return;
+    }
+    TWELVE.forEach(function (fk, fi) {
+      var st = STYLES[fk], ids = [];
+      var pals = fk === 'glass' ? GLASS_PICK.map(function (k) { return st.palettes[k]; }) : st.palettes;
+      var first = ind.id === 'restaurant' ? 0 : (n + fi) % 3; // 업종마다 처음 보이는 색을 돌려서 같은 디자인도 업종별로 다르게
+      for (var pi = 0; pi < 3; pi++) {
+        var d = { id: ind.id + '-' + fk + '-' + (pi + 1), industry: ind.id, no: fi + 1, name: st.label, colorName: COLOR_NAMES[fk][pi], c: pi + 1,
+          style: fk, font: st.title, mood: st.mood || 'modern', badge: BADGE[ind.id] || '', pal: pals[pi], colors: colorsFor(fk, pals[pi]) };
+        BY_ID[d.id] = d; ids.push(d.id);
+      }
+      FAMILY_OF[ind.id + '-' + fk] = ids;
+      list.push(BY_ID[ids[first]]);
     });
-    // 새 디자인 가족 12 × 색 3 = 36장을 앞에 (기존 1~12번은 예전 카드 호환을 위해 뒤에 그대로)
-    if (ind.world) {
-      var w = 0;
-      FAMILIES.forEach(function (fk, fi) {
-        var st = STYLES[fk];
-        for (var pi = 0; pi < 3; pi++) {
-          var pal = fk === 'glass' ? st.palettes[GLASS_PICK[pi]] : st.palettes[(pi + (ind.id === 'cafe' ? 1 : ind.id === 'toefl' ? 2 : 0)) % 3];
-          w++;
-          var dw = { id: ind.id + '-w' + w, industry: ind.id, name: st.label + ' ' + (pi + 1), style: fk, v: pi + 1, font: st.title, mood: st.mood, colors: colorsFor(fk, pal) };
-          BY_ID[dw.id] = dw; list.push(dw);
-        }
-      });
-    }
-    var count = ind.count || 12, styles = ind.styles, per = Math.ceil(count / styles.length);
-    for (var i = 0; i < count; i++) {
-      var styleKey = styles[i % styles.length];
-      var st = STYLES[styleKey];
-      var k = Math.floor(i / styles.length);
-      var pal = st.palettes[(k + (ind.offset != null ? ind.offset : n * 3)) % st.palettes.length];
-      if (styleKey === 'safe') pal = st.palettes[(i + (ind.offset || 0)) % st.palettes.length];
-      var d = {
-        id: ind.id + '-' + (i + 1), industry: ind.id,
-        name: st.label + ' ' + (i + 1), style: styleKey, font: st.title, mood: st.mood || 'classic',
-        // 새 디자인 가족이 있는 업종은 예전 1~12번도 같은 이름끼리 모양을 다르게 (1·2·3·4번째)
-        v: ind.world && styleKey !== 'safe' ? (k % 4) + 1 : undefined,
-        colors: colorsFor(styleKey, pal)
-      };
-      BY_ID[d.id] = d; list.push(d);
-    }
   });
+  // 예전 디자인 번호 → 같은 업종 1번 (지난 링크가 깨지지 않게만)
+  function legacy(id) {
+    var m = String(id || '').match(/^([a-z]+)-/);
+    var l = m && BY_INDUSTRY[m[1]];
+    return l && l[0] || null;
+  }
+  function colorsOf(id) { var d = BY_ID[id]; return d ? (FAMILY_OF[d.industry + '-' + d.style] || [id]).map(function (k) { return BY_ID[k]; }) : []; }
 
   function register(design) { if (design && design.id && design.style) BY_ID[design.id] = design; }
 
@@ -382,6 +391,7 @@
     s.setProperty('--f-title', (FONTS[d.font] || FONTS.sys).stack);
     s.setProperty('--f-body', FONTS.sys.stack);
     el.setAttribute('data-style', d.style);
+    if (d.badge) { el.setAttribute('data-badge', '1'); s.setProperty('--badge', '"' + d.badge.replace(/\n/g, '\\A ') + '"'); } else { el.removeAttribute('data-badge'); s.removeProperty('--badge'); }
     // 같은 가족 안에서도 1·2·3번이 모양부터 다르게 (사진 자리·제목 자리)
     if (d.v) el.setAttribute('data-v', String(d.v)); else el.removeAttribute('data-v');
     loadFont(d.font);
@@ -390,9 +400,9 @@
   // 예전 카드(디자인 없이 만든 것)용 기본 디자인
   function fallback(card) {
     if (card && card.sos) return BY_ID['senior-1'];
-    var byTpl = { profile: 'actor-1', club: 'club-1', shop: 'restaurant-1', safe: 'senior-1', greet: 'greeting-1' };
-    if (card && card.theme === 'dark') return BY_ID['actor-1'];
-    return BY_ID[byTpl[card && card.template] || 'actor-2'];
+    var byTpl = { profile: 'actor', club: 'club', shop: 'restaurant', safe: 'senior', greet: 'greeting' };
+    if (card && card.theme === 'dark') return BY_ID['actor-mdark-1'];
+    return (BY_INDUSTRY[byTpl[card && card.template] || 'actor'] || [])[0];
   }
 
   // 업종 4묶음 (홈·만들기 화면에서 묶어서 보여줌)
@@ -421,13 +431,14 @@
     FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, ALL_GROUPS: ALL_GROUPS, groupOf: groupOf, MOODS: MOODS,
     isOpen: isOpen, OPEN: OPEN, showAll: showAll,
     get: function (id) { return BY_ID[id] || null; },
+    colorsOf: colorsOf, TWELVE: TWELVE,
     list: function (industryId) { return BY_INDUSTRY[industryId] || []; },
     industry: function (id) { return INDUSTRIES.filter(function (x) { return x.id === id; })[0] || null; },
     all: function () { return Object.keys(BY_ID).map(function (k) { return BY_ID[k]; }); },
     apply: apply, register: register, fallback: fallback, contrast: contrast,
     PHOTO_IDS: Object.keys(PHOTO), photoPalettes: photoPalettes, photoDesign: photoDesign,
     // 카드에 담긴 디자인 찾기: 보통 디자인 → 사진 색 디자인 → 기본
-    forCard: function (card) { return BY_ID[card && card.design] || (card && photoDesign(card.design, card.pal)) || fallback(card); }
+    forCard: function (card) { return BY_ID[card && card.design] || (card && photoDesign(card.design, card.pal)) || (card && legacy(card.design)) || fallback(card); }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   global.SsakaDesigns = api;

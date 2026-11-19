@@ -102,9 +102,9 @@
     return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js'; s.onload = function () { ok(window.Hls); }; s.onerror = no; document.head.appendChild(s); });
   }
   function fallback(c) {
-    state('싸바에서 안 나와서 방송사 듣기 화면을 열어요');
     stop(); mark();
-    if (c[5]) window.open(c[5], '_blank', 'noopener');
+    var st = $('nowState'); st.textContent = '지금 싸바에서 안 나와요 · ';
+    if (c[5]) { var a = document.createElement('a'); a.href = c[5]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '방송사 화면에서 듣기 ›'; a.style.cssText = 'color:#FFD400;font-weight:900'; st.appendChild(a); }
   }
   function play(c) {
     stop(); cur = c; save(c[0]); tries++; var my = tries;

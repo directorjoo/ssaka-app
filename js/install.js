@@ -7,7 +7,7 @@
   // 예전 주소(ssaka-app.pages.dev)로 들어오면 정식 주소 sava.kr 로 옮김 (카톡 공유는 sava.kr 에서만 됨)
   if (location.hostname === 'ssaka-app.pages.dev') { location.replace('https://sava.kr' + location.pathname + location.search + location.hash); return; }
   var SELF = (document.currentScript && document.currentScript.src) || '';
-  var ICON = SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png?v=2') : '/img/icon-192.png?v=2';
+  var ICON = SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png?v=3') : '/img/icon-192.png?v=3';
   var ua = navigator.userAgent;
   var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var inKakao = /KAKAOTALK/i.test(ua);

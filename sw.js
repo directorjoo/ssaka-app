@@ -2,7 +2,7 @@
 var CACHE = 'sava-v209';
 var SHELL = ['./', './app/', './eodiya/', './lucky/', './shoot/', './fly/', './pool/', './emo/', './make/', './c/', './css/brand.css', './css/sk.css', './css/sk-world.css',
   './js/codec.js', './js/store.js', './js/designs.js', './js/render.js', './js/roster.js', './js/notice.js', './js/share.js', './js/msgimg.js', './js/install.js', './js/sound.js',
-  './img/icon-192.png?v=2', './img/cherry.svg', './img/cherry-dance-anim.svg', './manifest.webmanifest'];
+  './img/icon-192.png?v=3', './img/cherry.svg', './img/cherry-dance-anim.svg', './manifest.webmanifest'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL).catch(function () {}); }).then(function () { return self.skipWaiting(); }));
 });

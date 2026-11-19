@@ -308,6 +308,17 @@
   .mtabs::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: calc(64px + env(safe-area-inset-top)); background: #F4F4F5; }
   @media (min-width: 860px) { .mtabs::before { display: none; } }
   .tab-off { display: none !important; }
+  .sec-h { display: grid; grid-template-columns: 34px 1fr; column-gap: 10px; align-items: center; margin: 26px 0 10px; padding: 12px 14px; border-radius: 16px; background: #fff; border-left: 5px solid #B3132B; box-shadow: 0 6px 16px -12px rgba(0,0,0,.35); }
+  .sec-h span { grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #B3132B; color: #fff; font-size: 17px; font-weight: 900; }
+  .sec-h b { font-size: 17px; font-weight: 900; line-height: 1.35; color: #1a1a1a; word-break: keep-all; }
+  .sec-h small { font-size: 14.5px; font-weight: 600; line-height: 1.45; color: #555; word-break: keep-all; }
+  .sec-h small:empty { display: none; }
+  .tp[data-tab="design2"] { margin-top: 26px; padding: 14px; border-radius: 18px; background: #FFF6F7; border: 2px dashed #E7A3AE; }
+  .tp[data-tab="design2"] .step { font-size: 17px; font-weight: 900; color: #8E0A1C; }
+  .pv-up { margin: 0 0 10px; padding: 12px 14px; border-radius: 14px; background: #FFF6D9; border: 1.5px solid #F2C94C; font-size: 15px; line-height: 1.5; color: #4a3a00; word-break: keep-all; }
+  .pv-up b { color: #1a1a1a; }
+  .pv-up button { display: block; width: 100%; min-height: 46px; margin-top: 8px; border: 0; border-radius: 12px; background: #B3132B; color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+  @media (min-width: 860px) { .pv-up { display: none; } }
   .exfill { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 12px; }
   .exfill button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #B3132B; background: #FFF1F2; color: #8E0A1C; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
   .exfill small { font-size: 13px; color: var(--muted); }
@@ -330,73 +341,25 @@
       </a>
     </div>
     <h1>10초 만에 카드 만들기</h1>
-    <p>적으면 오른쪽(아래)에 바로 보여요. 다 되면 카톡으로 보내기를 누르세요.</p>
+    <p>위에서부터 차례로 적으면 미리보기에 바로 보여요. 디자인은 맨 마지막에 골라요. 다 되면 카톡으로 보내기를 누르세요.</p>
     <a class="mwrite" href="../survey/">✍️ <b>블로그 글쓰기</b> · 질문에 답하면 글 10가지 ›</a>
   </header>
 
   <div class="layout">
     <form id="form" autocomplete="off" onsubmit="return false">
-      <nav class="mtabs" id="mtabs" role="tablist" aria-label="만들기 순서"></nav>
-      <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>탭마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
+      <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>칸마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
       <div class="tp" data-tab="design">
       <div class="step">1. 업종 고르기</div>
       <div class="inds" id="inds" role="group" aria-label="업종"></div>
       <div class="hlinks" id="hLinks" hidden></div>
-
-      <div class="step">2. 디자인 고르기 <span id="designInfo"></span></div>
-      <div class="phsug" id="phSug" hidden>
-        <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
-        <div class="phsug-cols" id="phCols"></div>
-        <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
-      </div>
-      <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
-      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
-      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
       </div>
 
+      <h2 class="sec-h" data-sec="basic"><span>2</span><b></b><small></small></h2>
       <fieldset data-for="club" data-tab="basic">
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
         <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·프로그램·회비 계좌·탑승지·참석자 명단을 알아서 채워 드려요.</div>
         <textarea id="noticeIn" maxlength="6000" placeholder="👉 여기를 길게 눌러 [붙여넣기]&#10;(공지·초대장 글 전체를 복사해 오세요)"></textarea>
         <button type="button" class="kakao big" id="noticeGo" style="margin-top:8px">✨ 붙여넣은 글로 카드 채우기</button>
-      </fieldset>
-
-      <fieldset data-tab="photo">
-        <legend id="phLeg">📷 대표 사진 · 사진첩</legend>
-        <div data-for="profile club shop greet">
-          <label class="ptile" for="photoFile" id="ptile">
-            <img id="thumbBlur" alt="" hidden>
-            <img id="thumb" alt="" hidden>
-            <span class="ptile-in">
-              <span class="ptile-ico" aria-hidden="true">📷</span>
-              <b id="photoLabel">대표 사진 올리기</b>
-              <small id="photoHelp">앨범에서 고르면 카드 맨 위에 크게 들어가요</small>
-            </span>
-          </label>
-          <input id="photoFile" type="file" accept="image/*" hidden>
-          <div class="adj" id="adj" hidden>
-            <div class="seg" role="group" aria-label="사진 맞추기"><button type="button" id="fitCover" aria-pressed="true">꽉 채우기</button><button type="button" id="fitAll" aria-pressed="false">전체 보이기</button></div>
-            <div class="zrow"><b>크기</b><button type="button" id="zMinus" aria-label="작게">−</button><input type="range" id="zoom" min="100" max="300" step="5" value="100" aria-label="사진 크기"><button type="button" id="zPlus" aria-label="크게">＋</button></div>
-            <div class="arow"><small>사진을 손가락으로 끌어서 위치를 맞추세요</small><button type="button" id="ipReset">처음대로</button></div>
-          </div>
-          <div class="photo-row">
-            <span class="hint" id="photoStatus">사진은 크기를 줄여서 카카오 서버에 올려요.</span>
-            <button type="button" class="mini" id="photoRemove" hidden>사진 빼기</button>
-          </div>
-          <div class="photo-row">
-            <label class="fixlab"><input type="checkbox" id="autoFix" checked> ✨ 사진 자동 보정 (밝기·색감)</label>
-          </div>
-          <input id="image" type="hidden">
-        </div>
-        <div data-for="profile club shop" id="galBox">
-          <div class="gal-head"><b id="galTitle">사진 더 올리기</b> <span class="hint" id="galCount">최대 10장</span></div>
-          <div class="gal-grid" id="galGrid">
-            <label class="gal-add" for="galFile" id="galAdd"><span aria-hidden="true">＋</span><small>사진 추가</small></label>
-          </div>
-          <input id="galFile" type="file" accept="image/*" multiple hidden>
-          <input id="galUrls" type="hidden">
-          <div class="hint" id="galStatus">여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.</div>
-        </div>
       </fieldset>
 
       <fieldset data-tab="basic">
@@ -482,6 +445,59 @@
         <input id="lkIg" type="url" inputmode="url" placeholder="https://instagram.com/…">
       </fieldset>
 
+      <h2 class="sec-h" data-sec="photo"><span>3</span><b></b><small></small></h2>
+      <fieldset data-tab="photo">
+        <legend id="phLeg">📷 대표 사진 · 사진첩</legend>
+        <div data-for="profile club shop greet">
+          <label class="ptile" for="photoFile" id="ptile">
+            <img id="thumbBlur" alt="" hidden>
+            <img id="thumb" alt="" hidden>
+            <span class="ptile-in">
+              <span class="ptile-ico" aria-hidden="true">📷</span>
+              <b id="photoLabel">대표 사진 올리기</b>
+              <small id="photoHelp">앨범에서 고르면 카드 맨 위에 크게 들어가요</small>
+            </span>
+          </label>
+          <input id="photoFile" type="file" accept="image/*" hidden>
+          <div class="adj" id="adj" hidden>
+            <div class="seg" role="group" aria-label="사진 맞추기"><button type="button" id="fitCover" aria-pressed="true">꽉 채우기</button><button type="button" id="fitAll" aria-pressed="false">전체 보이기</button></div>
+            <div class="zrow"><b>크기</b><button type="button" id="zMinus" aria-label="작게">−</button><input type="range" id="zoom" min="100" max="300" step="5" value="100" aria-label="사진 크기"><button type="button" id="zPlus" aria-label="크게">＋</button></div>
+            <div class="arow"><small>사진을 손가락으로 끌어서 위치를 맞추세요</small><button type="button" id="ipReset">처음대로</button></div>
+          </div>
+          <div class="photo-row">
+            <span class="hint" id="photoStatus">사진은 크기를 줄여서 카카오 서버에 올려요.</span>
+            <button type="button" class="mini" id="photoRemove" hidden>사진 빼기</button>
+          </div>
+          <div class="photo-row">
+            <label class="fixlab"><input type="checkbox" id="autoFix" checked> ✨ 사진 자동 보정 (밝기·색감)</label>
+          </div>
+          <input id="image" type="hidden">
+        </div>
+        <div data-for="profile club shop" id="galBox">
+          <div class="gal-head"><b id="galTitle">사진 더 올리기</b> <span class="hint" id="galCount">최대 10장</span></div>
+          <div class="gal-grid" id="galGrid">
+            <label class="gal-add" for="galFile" id="galAdd"><span aria-hidden="true">＋</span><small>사진 추가</small></label>
+          </div>
+          <input id="galFile" type="file" accept="image/*" multiple hidden>
+          <input id="galUrls" type="hidden">
+          <div class="hint" id="galStatus">여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.</div>
+        </div>
+      </fieldset>
+
+      <h2 class="sec-h" data-sec="video"><span>4</span><b></b><small></small></h2>
+      <fieldset data-tab="video">
+        <legend>📹 동영상 올리기 (선택)</legend>
+        <div class="clipbox">
+          <label class="clipbtn" for="clipFile">📹 동영상 올리기 <small>15초 · 30MB까지</small></label>
+          <input type="file" id="clipFile" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
+          <input type="hidden" id="clip">
+          <div class="clipst" id="clipSt" role="status"></div>
+          <button type="button" class="ghost" id="clipDel" hidden>영상 빼기</button>
+        </div>
+        <div class="hint">대표 사진 자리에서 영상이 소리 없이 반복돼요(눌러서 소리 켜기). 카톡 말풍선에는 대표 사진이 보이니 사진도 함께 넣어 주세요.</div>
+      </fieldset>
+
+      <h2 class="sec-h" data-sec="content"><span>5</span><b></b><small></small></h2>
       <fieldset data-tab="content">
         <legend id="bodyLeg">내용</legend>
         <label for="body" data-l="body">한 줄에 하나씩</label>
@@ -565,6 +581,20 @@
         </div>
       </fieldset>
 
+      <h2 class="sec-h" data-sec="deco"><span>6</span><b></b><small></small></h2>
+      <fieldset data-tab="photo">
+        <legend>🎬 움직이는 카드 (짧은 영상처럼)</legend>
+        <select id="motion">
+          <option value="">움직임 없음</option>
+          <option value="zoom">🎥 사진이 천천히 다가오기</option>
+          <option value="steam">♨️ 김이 모락모락 (음식·차)</option>
+          <option value="shine">✨ 반짝반짝 빛나기</option>
+          <option value="petal">🌸 꽃잎 흩날리기</option>
+          <option value="cherry">🍒 체리가 톡톡 떨어지기</option>
+        </select>
+        <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
+      </fieldset>
+
       <fieldset data-for="profile club shop greet" data-tab="deco">
         <legend>시즌 테마</legend>
         <select id="season">
@@ -577,27 +607,6 @@
         <div class="hint">카드 위로 눈이나 색종이가 내리고, 맨 위에 시즌 인사가 붙어요.</div>
       </fieldset>
 
-      <fieldset data-tab="photo">
-        <legend>🎬 움직이는 카드 (짧은 영상처럼)</legend>
-        <select id="motion">
-          <option value="">움직임 없음</option>
-          <option value="zoom">🎥 사진이 천천히 다가오기</option>
-          <option value="steam">♨️ 김이 모락모락 (음식·차)</option>
-          <option value="shine">✨ 반짝반짝 빛나기</option>
-          <option value="petal">🌸 꽃잎 흩날리기</option>
-          <option value="cherry">🍒 체리가 톡톡 떨어지기</option>
-        </select>
-        <div class="hint">받는 사람이 카드를 열면 대표 사진이 짧은 영상처럼 움직여요. 소리 없이 계속 반복돼요.</div>
-        <div class="clipbox">
-          <label class="clipbtn" for="clipFile">📹 내 영상 넣기 <small>15초 · 30MB까지</small></label>
-          <input type="file" id="clipFile" accept="video/mp4,video/quicktime,video/webm,video/*" hidden>
-          <input type="hidden" id="clip">
-          <div class="clipst" id="clipSt" role="status"></div>
-          <button type="button" class="ghost" id="clipDel" hidden>영상 빼기</button>
-        </div>
-        <div class="hint">대표 사진 자리에서 영상이 소리 없이 반복돼요(눌러서 소리 켜기). 카톡 말풍선에는 대표 사진이 보이니 사진도 함께 넣어 주세요.</div>
-      </fieldset>
-
       <fieldset data-tab="deco">
         <legend>카드 열면 나오는 소리</legend>
         <div class="addr">
@@ -607,11 +616,23 @@
         <div class="hint">받는 사람에 맞춰 고르세요. 손님·어른께는 정중하게, 친구·후배에겐 재미있게. 카드를 열자마자 나오고, 휴대폰이 막으면 첫 탭에 나와요.</div>
       </fieldset>
 
-      <div class="tnav" id="tnav"><button type="button" id="tPrev">‹ 이전</button><button type="button" id="tNext">다음 ›</button></div>
+      <div class="tp" data-tab="design2">
+      <div class="step">7. 마지막으로 디자인 고르기 <span id="designInfo"></span></div>
+      <div class="hint" style="margin:-4px 0 10px">이것저것 눌러 보고 미리보기에서 확인하세요. 디자인을 바꿔도 적은 내용·사진은 그대로예요.</div>
+      <div class="phsug" id="phSug" hidden>
+        <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
+        <div class="phsug-cols" id="phCols"></div>
+        <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
+      </div>
+      <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
+      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
+      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
+      </div>
     </form>
 
     <section class="preview" aria-label="미리보기">
       <h2>미리보기 <small style="font-weight:600;font-size:12px;opacity:.7">· 글자를 누르면 바로 고쳐요</small></h2>
+      <div class="pv-up">👆 <b><span id="pvUpName">가게 정보</span>·사진·동영상 넣는 칸은 이 미리보기 위에 있어요.</b> 화면을 위로 올려 차례로 입력하세요. 디자인은 맨 아래에서 골라요.<button type="button" id="pvUpGo">✏️ 입력하러 가기</button></div>
       <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
       <div class="done">
         <button type="button" class="kakao" id="send">💬 카톡으로 보내기</button>
@@ -2230,70 +2251,43 @@
     if (mj) { junk(mj); localStorage.setItem('ssaka-me-v1', JSON.stringify(mj)); }
   } catch (e) {}
   // ---------- 만들기 탭: 디자인 · 정보 · 사진 · 메뉴·예약 · 꾸미기 (예시: 압구정 순천만) ----------
-  var TAB_IDS = ['design', 'basic', 'photo', 'content', 'deco'], curTab = 'design';
+  // ---------- 만들기: 탭 없이 위에서 아래로 한 번에 (업종 → 정보 → 사진 → 동영상 → 메뉴·예약 → 꾸미기 → 마지막에 디자인) ----------
+  var curTab = 'basic';
   function tabDefs() {
     var food = industry === 'restaurant' || industry === 'cafe';
     var B = { shop: ['🏠', '가게 정보'], club: ['📍', '모임 정보'], profile: ['👤', '내 정보'], greet: ['✉️', '보내는 이'] }[type] || ['🏠', '기본 정보'];
     var C = type === 'shop' ? (food ? ['🍽️', '메뉴·예약'] : ['📝', '소개·예약']) : type === 'club' ? ['🙋', '참석·회비'] : type === 'greet' ? ['💌', '인사말'] : type === 'profile' ? ['📝', '소개'] : ['📝', '내용'];
-    return { design: ['🎨', '디자인'], basic: B, photo: ['📷', type === 'profile' ? '사진·영상' : '사진'], content: C, deco: ['✨', '꾸미기'] };
+    return { design: ['🎨', '디자인'], basic: B, photo: ['📷', '사진 (10장까지)'], video: ['📹', '동영상'], content: C, deco: ['✨', '꾸미기'] };
   }
   function tabHead(id) {
     var ex = EX(), nm = ex.name || ex.title || '';
-    var H = {
-      design: ['업종과 디자인을 골라요', '디자인은 나중에 바꿔도 적은 내용은 그대로예요.'],
-      basic: [type === 'shop' ? '가게 이름 · 영업시간 · 전화 · 주소' : type === 'club' ? '모임 제목 · 날짜 · 장소 · 보내는 사람' : '제목 · 이름 · 연락처', nm ? '예: ' + [ex.title, ex.subtitle && ex.subtitle.split(' · ')[0], ex.phone].filter(Boolean).join(' · ') : ''],
-      photo: [type === 'shop' ? '대표 음식 사진 한 장 + 메뉴·매장 사진' : '대표 사진 한 장 + 사진 더 올리기', type === 'shop' ? '대표 사진이 카톡 말풍선에 크게 보여요. 사진첩은 10장까지.' : '대표 사진이 카톡 말풍선에 크게 보여요.'],
-      content: [type === 'shop' ? '오늘의 메뉴 · 예약 받기' : type === 'club' ? '안내 내용 · 회비 계좌 · 참석 신청' : '내용 · 복사 단추', type === 'shop' && ex.menu ? '예: ' + ex.menu.split('\n').slice(0, 3).map(function (l) { return l.replace(/\s+(\d+)$/, function (m, n) { return ' ' + (+n).toLocaleString() + '원'; }); }).join(' · ') : ''],
-      deco: ['시즌 테마 · 열면 나오는 소리', '첫눈·연말 테마와 인사 소리로 받는 사람을 반겨요.']
-    }[id];
-    return H;
-  }
-  function tabBadge(id) {
-    if (id === 'basic') { var m = missingFields().length; return m ? { t: String(m), need: 1 } : { t: '✓' }; }
-    if (id === 'photo') { var n = (v('image') ? 1 : 0) + galList().length; return { t: n ? String(n) : '' }; }
-    if (id === 'content') return { t: v('body') || v('menu') ? '✓' : '' };
-    if (id === 'deco') return { t: v('season') ? '✓' : '' };
-    return { t: '' };
+    return {
+      basic: [type === 'shop' ? '가게 이름 · 영업시간 · 전화 · 주소를 적어 주세요' : type === 'club' ? '모임 제목 · 날짜 · 장소 · 보내는 사람을 적어 주세요' : '제목 · 이름 · 연락처를 적어 주세요', nm ? '예: ' + [ex.title, ex.subtitle && ex.subtitle.split(' · ')[0], ex.phone].filter(Boolean).join(' · ') : '적는 대로 미리보기에 바로 보여요.'],
+      photo: [type === 'shop' ? '대표 음식 사진 한 장 + 메뉴·매장 사진' : '대표 사진 한 장 + 사진 더 올리기', '대표 사진은 카톡 말풍선에 크게 보여요. 그 아래 사진 더 올리기는 10장까지예요.'],
+      video: ['내 동영상 올리기 (선택)', '15초 · 30MB까지. 대표 사진 자리에서 소리 없이 반복돼요.'],
+      content: [type === 'shop' ? '메뉴 · 예약 받기' : type === 'club' ? '안내 내용 · 회비 계좌 · 참석 신청' : '내용 · 복사 단추', type === 'shop' && ex.menu ? '예: ' + ex.menu.split('\n').slice(0, 3).map(function (l) { return l.replace(/\s+(\d+)$/, function (m, n) { return ' ' + (+n).toLocaleString() + '원'; }); }).join(' · ') : ''],
+      deco: ['움직임 · 시즌 테마 · 열면 나오는 소리 (선택)', '안 골라도 돼요. 받는 사람을 반기는 재미를 더해요.']
+    }[id] || ['', ''];
   }
   function renderTabs() {
-    var bar = $('mtabs'), D2 = tabDefs();
-    if (!bar.children.length) TAB_IDS.forEach(function (id) {
-      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.t = id;
-      b.innerHTML = '<i></i><b></b><small></small>';
-      b.addEventListener('click', function () { showTab(id, true); });
-      bar.appendChild(b);
-    });
-    Array.prototype.forEach.call(bar.children, function (b, k) {
-      var id = b.dataset.t, d = D2[id], bd = tabBadge(id);
-      b.querySelector('i').textContent = d[0]; b.querySelector('b').textContent = (k + 1) + '. ' + d[1];
-      var sm = b.querySelector('small'); sm.textContent = bd.t; sm.classList.toggle('need', !!bd.need);
-      b.setAttribute('aria-selected', id === curTab ? 'true' : 'false');
+    var D2 = tabDefs();
+    document.querySelectorAll('#form .sec-h').forEach(function (h) {
+      var id = h.dataset.sec, d = D2[id] || ['', ''], t = tabHead(id);
+      h.querySelector('b').textContent = d[0] + ' ' + d[1] + (t[0] ? ' — ' + t[0] : '');
+      h.querySelector('small').textContent = t[1] || '';
     });
     var ex = EX(), nm = ex.name || ex.title;
     $('exFillBox').hidden = !nm || !!editCard || !!v('title');
     if (nm) $('exFillName').textContent = '‘' + nm + '’ 예시';
-    var k = TAB_IDS.indexOf(curTab), nx = TAB_IDS[k + 1];
-    $('tPrev').disabled = k === 0;
-    $('tNext').textContent = nx ? '다음: ' + D2[nx][1] + ' ›' : '✅ 완료 · 보내기';
-    var h = tabHead(curTab), hd = $('tpHead');
-    hd.innerHTML = ''; var hb = document.createElement('b'); hb.textContent = h[0]; hd.appendChild(hb);
-    if (h[1]) hd.appendChild(document.createTextNode(h[1]));
+    var bn = $('pvUpName'); if (bn) bn.textContent = (D2.basic || ['', '정보'])[1];
   }
   function showTab(id, scroll) {
-    if (TAB_IDS.indexOf(id) < 0) id = 'design';
     curTab = id;
-    document.querySelectorAll('#form [data-tab]').forEach(function (el) { el.classList.toggle('tab-off', el.dataset.tab !== id); });
-    try { sessionStorage.setItem('sava-make-tab', id); } catch (e) {}
     renderTabs();
-    if (scroll) { var top = $('form').getBoundingClientRect().top + window.scrollY - 66; if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' }); }
+    if (scroll) { var h = document.querySelector('#form .sec-h[data-sec="' + id + '"]') || document.querySelector('#form [data-tab="' + id + '"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
-  function reveal(el) { var p = el && el.closest && el.closest('[data-tab]'); if (p && p.classList.contains('tab-off')) showTab(p.dataset.tab); }
-  (function () {
-    var hd = document.createElement('div'); hd.className = 'tp-head'; hd.id = 'tpHead';
-    $('exFillBox').parentNode.insertBefore(hd, $('exFillBox').nextSibling);
-  })();
-  $('tPrev').addEventListener('click', function () { var k = TAB_IDS.indexOf(curTab); if (k > 0) showTab(TAB_IDS[k - 1], true); });
-  $('tNext').addEventListener('click', function () { var k = TAB_IDS.indexOf(curTab); if (k < TAB_IDS.length - 1) showTab(TAB_IDS[k + 1], true); else $('finish').click(); });
+  function reveal(el) {}
+  $('pvUpGo').addEventListener('click', function () { var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   // 예시로 채워 보기 (음식점은 압구정 순천만) — 탭마다 실제로 채워진 모습을 보여 줌
   $('exFill').addEventListener('click', function () {
     var ex = EX();
@@ -2302,7 +2296,7 @@
     ['title', 'name', 'phone'].forEach(function (f) { $(f).classList.remove('missing'); });
     try { showThumb($('image').value); renderGal(); } catch (e) {}
     update();
-    toast('예시를 채웠어요. 탭을 넘기며 보시고 내 내용으로 고치세요 (↩ 되돌리기 가능)');
+    toast('예시를 채웠어요. 아래로 내려가며 보시고 내 내용으로 고치세요 (↩ 되돌리기 가능)');
   });
   industry = loadDraft();
   if (editCard) {
@@ -2332,8 +2326,7 @@
   renderGal();
   // 싸바알림 화면에서 '디자인 먼저'·'사진 한 장으로'를 눌러 들어오면 그 자리로
   var jump = /^#(gallery|ptile)$/.test(location.hash) && document.getElementById(location.hash.slice(1));
-  var t0 = 'design'; try { t0 = sessionStorage.getItem('sava-make-tab') || (editCard ? 'basic' : 'design'); } catch (e) {}
-  showTab(jump ? jump.closest('[data-tab]').dataset.tab : t0);
+  showTab('basic');
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();
 </script>

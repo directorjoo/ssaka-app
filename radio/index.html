@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#B3132B">
   <title>라디오 · TV · 싸바</title>
   <meta property="og:title" content="📻 라디오 · 📺 TV 바로 듣고 보기 · 싸바">
-  <meta property="og:description" content="KBS·MBC·SBS·CBS·국악방송 라디오와 24시간 뉴스를 한 번에. 방송사 공식 앱·웹으로 바로 연결해요.">
+  <meta property="og:description" content="KBS·MBC·SBS·CBS·국악방송 라디오와 24시간 뉴스를 한 번에. 가입·로그인 없이 싸바에서 바로 들어요.">
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
   <link rel="icon" href="../img/favicon.png?v=3">
   <link rel="stylesheet" href="../css/brand.css">
@@ -27,13 +27,26 @@
     .ch a.play { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 76px; min-height: 44px; padding: 0 12px; border-radius: 14px; background: var(--ssaka); color: #fff; text-decoration: none; font-weight: 900; font-size: 16px; }
     .ch a.app { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 10px; border-radius: 12px; border: 1.5px solid #eadbd0; color: #6b5a50; text-decoration: none; font-weight: 800; font-size: 13.5px; }
     .tv .ch a.play { background: #1A4FB0; }
+    .now { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin: 14px 0 0; padding: 14px 14px 14px 18px; border-radius: 22px; background: #B3132B; color: #fff; box-shadow: 0 10px 24px -14px rgba(120,10,30,.7); }
+    .now b { display: block; font-size: 20px; font-weight: 900; letter-spacing: -.03em; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .now span { display: block; margin-top: 2px; font-size: 14.5px; opacity: .95; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .now button { min-width: 84px; min-height: 52px; border: 0; border-radius: 16px; background: #FFD400; color: #3a0a12; font: 900 18px var(--font); }
+    .ch button.play { display: inline-flex; align-items: center; justify-content: center; min-width: 76px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 14px; background: var(--ssaka); color: #fff; font: 900 16px var(--font); }
+    .ch.on { outline: 3px solid #FFD400; }
+    .ch.on button.play { background: #3a0a12; }
     .note { margin: 22px 4px 0; color: var(--ink-2); font-size: 14px; line-height: 1.65; word-break: keep-all; }
   </style>
 </head>
 <body>
 <div class="w">
   <h1>📻 라디오 · 📺 TV</h1>
-  <p class="sub">누르면 방송사 공식 웹·앱으로 바로 연결돼요. 앱이 있으면 더 편하게 들을 수 있어요.</p>
+  <p class="sub">라디오는 ▶ 듣기만 누르면 싸바 안에서 바로 나와요. 가입·로그인 필요 없어요. 한 번 들은 채널은 다음에 맨 위 단추 하나로 이어 들을 수 있어요.</p>
+
+  <div class="now" id="now" hidden>
+    <div><b id="nowName"></b><span id="nowState"></span></div>
+    <button type="button" id="nowBtn">▶ 듣기</button>
+  </div>
+  <audio id="au" playsinline preload="none"></audio>
 
   <h2>📻 라디오</h2>
   <div class="list" id="radio"></div>
@@ -41,19 +54,25 @@
   <h2>📺 TV · 24시간 뉴스</h2>
   <div class="list tv" id="tv"></div>
 
-  <p class="note">싸바는 방송을 직접 틀지 않고, 방송사가 공식으로 열어 둔 웹·앱으로 이어 드려요. 처음 한 번은 방송사 화면에서 ▶ 재생을 눌러 주세요. 방송사 화면은 새 창으로 열리니, 그 창을 닫거나(✕) ‘뒤로’를 누르면 싸바로 돌아와요.</p>
+  <p class="note">라디오는 방송사가 인터넷으로 내보내는 소리를 싸바에서 그대로 틀어 드려요. 혹시 소리가 안 나오면 방송사 듣기 화면으로 바로 넘겨 드려요. TV는 방송사 화면이 새 창으로 열리니, 그 창을 닫거나(✕) ‘뒤로’를 누르면 싸바로 돌아와요.</p>
 </div>
 <script>
 (function () {
   var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/i.test(ua), and = /Android/i.test(ua);
-  // [이름, 설명, 로고 글자, 로고 색, 웹 주소, 앱스토어 id, 앱 이름(구글플레이 검색어)]
+  // [채널 id, 이름, 설명, 로고 글자, 로고 색, 안 될 때 열 방송사 듣기 화면]
   var RADIO = [
-    ['KBS 클래식FM', '93.1MHz · 클래식·국악 (KBS 콩)', 'KBS<br>1FM', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
-    ['KBS 쿨FM · 해피FM', '89.1 · 106.1MHz · 가요·팝 (KBS 콩)', 'KBS<br>2FM', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
-    ['MBC FM4U · 표준FM', '91.9 · 95.9MHz (MBC 미니)', 'MBC', '#111', 'https://mini.imbc.com', '384041016', 'MBC mini'],
-    ['SBS 파워FM · 러브FM', '107.7 · 103.5MHz (SBS 고릴라)', 'SBS', '#0a7a3f', 'https://www.sbs.co.kr/radio/gorealra.html', '406456433', 'SBS 고릴라'],
-    ['CBS 음악FM', '93.9MHz · 가요·팝·클래식 (CBS 레인보우)', 'CBS<br>93.9', '#e4572e', 'https://www.cbs.co.kr', '432866707', 'CBS레인보우'],
-    ['국악방송', '99.1MHz · 우리 소리 (덩더쿵)', '국악<br>99.1', '#7a5a2a', '', '975033702', '국악방송 덩더쿵']
+    ['cbs939', 'CBS 음악FM', '93.9MHz · 가요·팝·클래식', 'CBS<br>93.9', '#e4572e', 'https://www.cbs.co.kr/'],
+    ['kbs1fm', 'KBS 클래식FM', '93.1MHz · 클래식·국악', 'KBS<br>1FM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=24'],
+    ['kbs2fm', 'KBS 쿨FM', '89.1MHz · 가요·팝', 'KBS<br>쿨FM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=25'],
+    ['kbs2r', 'KBS 해피FM', '106.1MHz · 트로트·추억의 노래', 'KBS<br>해피', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=22'],
+    ['kbs1r', 'KBS 1라디오', '97.3MHz · 뉴스·시사', 'KBS<br>1R', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=21'],
+    ['mbcfm4u', 'MBC FM4U', '91.9MHz · 가요·팝', 'MBC<br>FM4U', '#111', 'https://mini.imbc.com/'],
+    ['mbcsfm', 'MBC 표준FM', '95.9MHz · 시사·가요', 'MBC<br>표준', '#111', 'https://mini.imbc.com/'],
+    ['sbspower', 'SBS 파워FM', '107.7MHz · 가요·팝', 'SBS<br>파워', '#0a7a3f', 'https://www.sbs.co.kr/radio/gorealra.html'],
+    ['sbslove', 'SBS 러브FM', '103.5MHz · 시사·가요', 'SBS<br>러브', '#0a7a3f', 'https://www.sbs.co.kr/radio/gorealra.html'],
+    ['cbs981', 'CBS 표준FM', '98.1MHz · 시사·교양', 'CBS<br>98.1', '#e4572e', 'https://www.cbs.co.kr/'],
+    ['ebsfm', 'EBS FM', '104.5MHz · 교육·영어', 'EBS<br>FM', '#6b8e23', 'https://www.ebs.co.kr/onair'],
+    ['gugak', '국악방송', '99.1MHz · 우리 소리', '국악<br>99.1', '#7a5a2a', 'https://www.gugakfm.co.kr/']
   ];
   var TV = [
     ['YTN 24시간 뉴스', '공식 홈페이지 생방송', 'YTN', '#0b4ea2', 'https://www.ytn.co.kr/_hd/hd_live.html', '353117998', 'YTN'],
@@ -66,20 +85,81 @@
     if (id) return 'https://apps.apple.com/kr/app/id' + id;
     return '';
   }
+  function $(id) { return document.getElementById(id); }
+  var au = $('au'), hls = null, cur = null, rows = {}, tries = 0;
+  function save(id) { try { localStorage.setItem('sava-radio', id); } catch (e) {} }
+  function last() { try { return localStorage.getItem('sava-radio') || ''; } catch (e) { return ''; } }
+  function byId(id) { return RADIO.filter(function (c) { return c[0] === id; })[0]; }
+  function state(t) { $('nowState').textContent = t; }
+  function mark() {
+    Object.keys(rows).forEach(function (k) { rows[k].classList.toggle('on', !!cur && k === cur[0]); rows[k].querySelector('.play').textContent = cur && k === cur[0] && !au.paused ? '■ 끄기' : '▶ 듣기'; });
+    $('nowBtn').textContent = au.paused ? '▶ 듣기' : '■ 끄기';
+  }
+  function stop() { try { au.pause(); } catch (e) {} if (hls) { hls.destroy(); hls = null; } au.removeAttribute('src'); try { au.load(); } catch (e) {} }
+  // hls.js — 아이폰은 필요 없고, 안드로이드·컴퓨터에서 소리 주소를 못 틀 때만 불러옴
+  function loadHls() {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js'; s.onload = function () { ok(window.Hls); }; s.onerror = no; document.head.appendChild(s); });
+  }
+  function fallback(c) {
+    state('싸바에서 안 나와서 방송사 듣기 화면을 열어요');
+    stop(); mark();
+    if (c[5]) window.open(c[5], '_blank', 'noopener');
+  }
+  function play(c) {
+    stop(); cur = c; save(c[0]); tries++; var my = tries;
+    $('now').hidden = false; $('nowName').textContent = '📻 ' + c[1]; state('🍒 채널 맞추는 중…'); mark();
+    fetch('/api/radio?ch=' + c[0]).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) {
+      if (my !== tries) return;
+      if (!j.url) throw 0;
+      var native = au.canPlayType('application/vnd.apple.mpegurl');
+      if (native) { au.src = j.url; return au.play(); }
+      return loadHls().then(function (H) {
+        if (!H || !H.isSupported()) { au.src = j.url; return au.play(); }
+        hls = new H(); hls.loadSource(j.url); hls.attachMedia(au);
+        hls.on(H.Events.ERROR, function (e, d) { if (d && d.fatal && my === tries) fallback(c); });
+        return au.play();
+      });
+    }).then(function () { if (my === tries) { state(c[2] + ' · 듣는 중'); mark(); } })
+      .catch(function (e) {
+        if (my !== tries) return;
+        if (e && e.name === 'NotAllowedError') { state('▶ 듣기를 한 번 더 눌러 주세요'); mark(); return; }
+        fallback(c);
+      });
+  }
+  au.addEventListener('error', function () { if (cur && au.getAttribute('src')) fallback(cur); });
+  au.addEventListener('playing', function () { if (cur) state(cur[2] + ' · 듣는 중'); mark(); });
+  au.addEventListener('pause', mark);
+  $('nowBtn').addEventListener('click', function () { if (!cur) return; if (au.paused) play(cur); else { stop(); state('꺼졌어요 · ▶ 누르면 다시 들어요'); mark(); } });
+
   function row(c) {
+    var d = document.createElement('div'); d.className = 'ch';
+    var lg = document.createElement('div'); lg.className = 'logo'; lg.style.background = c[4]; lg.innerHTML = c[3];
+    var tx = document.createElement('div'); var b = document.createElement('b'); b.textContent = c[1]; var s = document.createElement('span'); s.textContent = c[2]; tx.appendChild(b); tx.appendChild(s);
+    var bt = document.createElement('div'); bt.className = 'btns';
+    var p = document.createElement('button'); p.type = 'button'; p.className = 'play'; p.textContent = '▶ 듣기';
+    p.addEventListener('click', function () { if (cur && cur[0] === c[0] && !au.paused) { stop(); state('꺼졌어요 · ▶ 누르면 다시 들어요'); mark(); } else play(c); });
+    bt.appendChild(p);
+    d.appendChild(lg); d.appendChild(tx); d.appendChild(bt); rows[c[0]] = d; return d;
+  }
+  function tvRow(c) {
     var d = document.createElement('div'); d.className = 'ch';
     var lg = document.createElement('div'); lg.className = 'logo'; lg.style.background = c[3]; lg.innerHTML = c[2];
     var tx = document.createElement('div'); var b = document.createElement('b'); b.textContent = c[0]; var s = document.createElement('span'); s.textContent = c[1]; tx.appendChild(b); tx.appendChild(s);
     var bt = document.createElement('div'); bt.className = 'btns';
-    var au = appUrl(c[5], c[6]);
-    var main = c[4] || au;
-    if (main) { var p = document.createElement('a'); p.className = 'play'; p.href = main; p.target = '_blank'; p.rel = 'noopener'; p.textContent = c[4] ? '▶ 듣기' : '▶ 앱'; bt.appendChild(p); }
-    if (c[4] && au) { var a = document.createElement('a'); a.className = 'app'; a.href = au; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '앱 받기'; bt.appendChild(a); }
+    var au2 = appUrl(c[5], c[6]);
+    var p = document.createElement('a'); p.className = 'play'; p.href = c[4]; p.target = '_blank'; p.rel = 'noopener'; p.textContent = '▶ 보기'; bt.appendChild(p);
+    if (au2) { var a = document.createElement('a'); a.className = 'app'; a.href = au2; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '앱 받기'; bt.appendChild(a); }
     d.appendChild(lg); d.appendChild(tx); d.appendChild(bt); return d;
   }
-  var r = document.getElementById('radio'), t = document.getElementById('tv');
-  RADIO.forEach(function (c) { r.appendChild(row(c)); });
-  TV.forEach(function (c) { var x = row(c); var p = x.querySelector('.play'); if (p) p.textContent = '▶ 보기'; t.appendChild(x); });
+  // 지난번 들은 채널을 맨 위로 (?ch=cbs939 로 열면 그 채널)
+  var want = new URLSearchParams(location.search).get('ch') || last();
+  var first = byId(want);
+  var list = first ? [first].concat(RADIO.filter(function (c) { return c !== first; })) : RADIO;
+  var r = $('radio'), t = $('tv');
+  list.forEach(function (c) { r.appendChild(row(c)); });
+  TV.forEach(function (c) { t.appendChild(tvRow(c)); });
+  if (first) { cur = first; $('now').hidden = false; $('nowName').textContent = '📻 ' + first[1]; state('지난번 듣던 채널 · ▶ 누르면 바로 나와요'); mark(); }
 })();
 </script>
 <script src="/js/home.js?v=10" defer></script>

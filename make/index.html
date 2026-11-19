@@ -87,6 +87,11 @@
     .tcard[aria-pressed="true"] { outline: 3px solid #B3132B; outline-offset: 2px; }
     .tcard:focus-visible { outline: 3px solid #2f6bff; outline-offset: 2px; }
     .tcard .tscale { position: absolute; left: 0; top: 0; width: 390px; transform: scale(0.3026); transform-origin: 0 0; }
+    /* 올릴 곳을 인스타·스토리·정사각으로 고르면 디자인 미리보기도 그 모양으로 */
+    .tcard.r-feed { height: 148px; } .tcard.r-sq { height: 118px; } .tcard.r-story { height: 210px; }
+    .tcard .tsns { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: #fff; }
+    .tcard .tload { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.82); color: #8E0A1C; font-size: 12px; font-weight: 800; }
+    .tcard.r-feed .tscale, .tcard.r-sq .tscale, .tcard.r-story .tscale { opacity: .35; }
     .tcard .tname {
       position: absolute; left: 6px; bottom: 6px; padding: 3px 7px; border-radius: 8px;
       background: rgba(20,20,24,.72); color: #fff; font-size: 11px; font-weight: 700; line-height: 1.3;
@@ -938,11 +943,43 @@
     scale.className = 'tscale';
     scale.appendChild(SsakaRender.build(sample, d, null));
     el.appendChild(scale);
+    snsThumb(el, d);
     var name = document.createElement('span');
     name.className = 'tname'; name.textContent = (d.no ? d.no + '. ' : '') + d.name;
     el.appendChild(name);
     el.addEventListener('click', function () { setDesign(d.id); });
     return el;
+  }
+  // 인스타 피드(4:5)·스토리(9:16)·정사각(1:1)을 골랐으면 디자인 미리보기를 SNS 사진 그대로 그려서 보여 줌
+  var SNS_OF = { feed: { sz: 'p45', cls: 'r-feed' }, story: { sz: 'story', cls: 'r-story' }, square: { sz: 'sq', cls: 'r-sq' } };
+  var snsCache = {}, snsQ = [], snsBusy = false, snsGen = 0;
+  function snsThumb(el, d) {
+    var dd = (typeof dest === 'string' && SNS_OF[dest]) || null;
+    if (!dd || !window.SsakaExport || !SsakaExport.sns) return;
+    el.classList.add(dd.cls);
+    var r = buildCard(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(r.card);
+    if (snsCache[key]) return putSns(el, snsCache[key]);
+    var ld = document.createElement('span'); ld.className = 'tload'; ld.textContent = '🍒 그리는 중'; el.appendChild(ld);
+    snsQ.push({ el: el, d: d, card: r.card, key: key, sz: dd.sz, gen: snsGen });
+    setTimeout(runSns, 0); // 갤러리에 붙은 다음에 그림
+  }
+  function putSns(el, url) {
+    var im = el.querySelector('.tsns') || document.createElement('img');
+    im.className = 'tsns'; im.alt = ''; im.src = url;
+    var ld = el.querySelector('.tload'); if (ld) ld.remove();
+    if (!im.parentNode) el.insertBefore(im, el.querySelector('.tname'));
+  }
+  function runSns() {
+    if (snsBusy) return;
+    var j; while ((j = snsQ.shift()) && (j.gen !== snsGen || !j.el.isConnected)) {}
+    if (!j) return;
+    if (snsCache[j.key]) { putSns(j.el, snsCache[j.key]); return runSns(); }
+    snsBusy = true;
+    var menu = []; try { menu = SsakaReserve.parseMenu(v('menu') || (EX().menu || '')); } catch (e) {}
+    SsakaExport.sns(j.card, j.d, { sizes: [j.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
+      if (list && list[0]) { var u = URL.createObjectURL(list[0].blob); snsCache[j.key] = u; if (j.el.isConnected) putSns(j.el, u); }
+    }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story'); })
+      .then(function () { snsBusy = false; setTimeout(runSns, 0); });
   }
   var mood = '';
   function moodList() {
@@ -2493,10 +2530,14 @@
     });
     paintDest();
   }
+  var paintedDest = null;
   function paintDest() {
     var n = $('d2dest'), ds = DEST_BY[dest];
     n.hidden = dest === 'kakao';
-    if (!n.hidden) n.textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 디자인을 고르고 다 쓰면, 완성 화면에서 ' + ds.b + ' 크기 사진이 맨 위에 나와요.';
+    if (!n.hidden) n.textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 아래 디자인도 실제 올라갈 ' + ds.s.replace('세로 ', '').replace('정사각 ', '') + ' 모양 그대로 보여 드려요. 다 쓰면 완성 화면에서 이 크기 사진이 맨 위에 나와요.';
+    // 올릴 곳이 바뀌면 디자인 미리보기를 그 모양으로 다시 그림
+    if (paintedDest !== null && paintedDest !== dest) { snsGen++; snsQ = []; renderGallery(); try { if (PHPAL) paintPhotoSug(); } catch (e) {} }
+    paintedDest = dest;
   }
   var stage = 3;
   function goStage(n, scrollTo) {

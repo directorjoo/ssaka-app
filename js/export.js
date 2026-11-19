@@ -1243,5 +1243,8 @@
     });
   }
 
-  global.SsakaExport = { build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
+  // 업종별 템플릿(js/pack.js)이 같은 도구로 그리도록 내어 줌
+  var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
+    tBlock: tBlock, iList: iList, pic: pic, geo: geo, safeY: safeY, lumOf: lumOf, frameMenu: frameMenu, frameAddr: frameAddr, loadSerif: loadSerif, sizes: SNS_SIZES };
+  global.SsakaExport = { _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

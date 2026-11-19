@@ -218,6 +218,10 @@
     #expFrame { min-width: 0; max-width: 100%; }
     .exp-pals { display: flex; gap: 6px; max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; }
     .exp-pals::-webkit-scrollbar { display: none; }
+    .pack-ed { display: grid; gap: 6px; margin: 8px 0 4px; }
+    .pack-ed label { font-size: 14px; font-weight: 800; color: #333; display: grid; gap: 4px; }
+    .pack-ed label small { font-weight: 600; color: #777; font-size: 13px; }
+    .pack-ed input { min-height: 44px; border: 1.5px solid #E2E2E2; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 16px; }
     .exp-pals button { flex: none; display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px 0 8px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 700; color: #333; }
     .exp-pals button i { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
     .exp-pals button[aria-pressed="true"] { border-color: #B3132B; color: #B3132B; }
@@ -705,6 +709,16 @@
   <div class="modal-box done-box">
     <div class="modal-head"><b>SNS 올릴 곳마다 맞춘 사진</b><button type="button" class="mini" id="expClose">닫기</button></div>
     <p class="done-sub" id="expStatus">이미지를 만드는 중이에요…</p>
+    <div id="expPack" hidden>
+      <p class="exp-sec"><b>🎨 업종별 템플릿 — 무엇을 알릴까요?</b><small>캔바처럼 쓰임새를 고르면 오방색 디자인으로 6가지 크기를 한 번에 만들어요. <a href="../pack/" target="_blank" rel="noopener">템플릿 전체 보기</a></small></p>
+      <div class="exp-pals" id="packPur" role="group" aria-label="쓰임새"></div>
+      <div class="exp-pals" id="packPal" role="group" aria-label="오방색" style="margin-top:6px"></div>
+      <div class="pack-ed">
+        <label>큰 글씨<input id="packHead" maxlength="30"></label>
+        <label>작은 글씨 <small>비워 두면 카드 내용에서 골라요 · 이벤트는 "30% 할인"처럼</small><input id="packLine" maxlength="60"></label>
+      </div>
+      <div class="exp-grid sns-grid" id="packGrid"></div>
+    </div>
     <div id="expFrame" hidden>
       <p class="exp-sec"><b>🖼️ SNS 올릴 곳마다 맞춘 이미지</b><small>카드와 같은 디자인으로 인스타·카톡 채널·네이버·당근·블로그·유튜브 크기를 한 번에 만들어요. 디자인과 색을 바꿔 보세요.</small></p>
       <div class="exp-pals" id="expLays" role="group" aria-label="SNS 디자인 12가지"></div>
@@ -747,7 +761,8 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=82"></script>
+<script src="../js/export.js?v=83"></script>
+<script src="../js/pack.js?v=1"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -2056,6 +2071,40 @@
       $('expSave').disabled = false;
     }).catch(function () { if (job === frameJob) $('expGrid2').innerHTML = '<p class="done-sub">SNS 이미지를 만들지 못했어요. 다시 눌러주세요.</p>'; });
   }
+  // ---------- 업종별 템플릿 (js/pack.js) ----------
+  var packSel = { pur: '', pal: '' }, packFiles = [], packJob = 0, packT = null, packCard = null;
+  function makePack(c, fresh) {
+    var K = window.SsakaPack, box = $('expPack');
+    if (!K || c.card.template === 'safe') { box.hidden = true; packFiles = []; return; }
+    var list = K.purposes(industry, c.card.template);
+    if (!list.length) { box.hidden = true; packFiles = []; return; }
+    box.hidden = false; packCard = c.card;
+    if (fresh || !list.some(function (x) { return x.id === packSel.pur; })) { packSel.pur = list[0].id; packSel.pal = ''; $('packHead').value = list[0].head; $('packLine').value = ''; }
+    var pp = list.filter(function (x) { return x.id === packSel.pur; })[0];
+    var pals = K.pals(pp.tpl); if (!pals.some(function (x) { return x.id === packSel.pal; })) packSel.pal = pals[0].id;
+    var pb = $('packPur'); pb.innerHTML = '';
+    list.forEach(function (x) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = x.label;
+      b.setAttribute('aria-pressed', x.id === pp.id ? 'true' : 'false');
+      b.addEventListener('click', function () { packSel.pur = x.id; packSel.pal = ''; $('packHead').value = x.head; $('packLine').value = ''; makePack(c); });
+      pb.appendChild(b);
+    });
+    var cb = $('packPal'); cb.innerHTML = '';
+    pals.forEach(function (pl) {
+      var b = document.createElement('button'); b.type = 'button';
+      var i = document.createElement('i'); i.style.background = 'linear-gradient(90deg,' + pl.bg + ' 0 34%,' + pl.ink + ' 34% 67%,' + pl.acc + ' 67%)';
+      b.appendChild(i); b.appendChild(document.createTextNode(pl.name));
+      b.setAttribute('aria-pressed', pl.id === packSel.pal ? 'true' : 'false');
+      b.addEventListener('click', function () { packSel.pal = pl.id; makePack(c); });
+      cb.appendChild(b);
+    });
+    var job = ++packJob; packFiles = []; $('packGrid').innerHTML = '<p class="done-sub">만드는 중…</p>';
+    K.build(c.card, pp.id, packSel.pal, { pics: localPics, industry: industry, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')), head: $('packHead').value, line: $('packLine').value }).then(function (list2) {
+      if (job !== packJob) return;
+      packFiles = list2; snsFigs($('packGrid'), list2); $('expSave').disabled = false;
+    }).catch(function () { if (job === packJob) $('packGrid').innerHTML = '<p class="done-sub">템플릿을 만들지 못했어요. 다시 눌러주세요.</p>'; });
+  }
+  ['packHead', 'packLine'].forEach(function (id) { $(id).addEventListener('input', function () { clearTimeout(packT); packT = setTimeout(function () { var cc = current(); if (cc) makePack(cc); }, 500); }); });
   $('exp2').addEventListener('click', function () {
     var c = current(); if (!c) return;
     expCard = c.card; expUrl = link(c); expFiles = [];
@@ -2064,6 +2113,7 @@
     $('expModal').hidden = false;
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
     $('expStatus').textContent = '이미지를 만드는 중이에요…';
+    makePack(c, true);
     makeFrames(c);
     var noSet = c.card.template === 'safe';
     $('expSec1').hidden = noSet; $('expGrid').hidden = noSet;
@@ -2076,8 +2126,8 @@
     }).catch(function () { $('expStatus').textContent = '이미지를 만들지 못했어요. 다시 눌러주세요.'; });
   });
   $('expSave').addEventListener('click', function () {
-    if (!expFiles.length && !frameFiles.length) return;
-    var files = frameFiles.concat(expFiles).map(function (x) { return new File([x.blob], x.name, { type: 'image/jpeg' }); });
+    if (!expFiles.length && !frameFiles.length && !packFiles.length) return;
+    var files = packFiles.concat(frameFiles, expFiles).map(function (x) { return new File([x.blob], x.name, { type: 'image/jpeg' }); });
     if (navigator.canShare && navigator.canShare({ files: files })) {
       navigator.share({ files: files }).catch(function () {});
       return;

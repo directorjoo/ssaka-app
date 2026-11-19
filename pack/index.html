@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>싸바 업종별 템플릿</title>
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" href="../img/favicon.png?v=3">
+  <meta property="og:title" content="싸바 업종별 템플릿 — 무엇을 알릴까 고르면 끝">
+  <meta property="og:description" content="오늘의 메뉴 · 신메뉴 · 이벤트 · 휴무 · 예약 · 메뉴판 · 사진 모음 · 오시는 길 — 인스타·카톡 채널·네이버·당근·유튜브 크기로 한 번에">
+  <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { background: #F4F4F5; color: #1A1A1A; font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px 14px 110px; }
+    h1 { font-size: 24px; margin: 6px 0 4px; letter-spacing: -0.02em; }
+    h1 i { font-style: normal; color: #C8102E; }
+    .lead { font-size: 15px; line-height: 1.5; color: #444; margin: 0 0 12px; word-break: keep-all; }
+    .obang { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
+    .obang b { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+    .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0 8px; position: sticky; top: 0; background: #F4F4F5; z-index: 2; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chips button { flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E2E2E2; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: #333; }
+    .chips button[aria-pressed="true"] { background: #C8102E; border-color: #C8102E; color: #fff; }
+    .row { background: #fff; border-radius: 18px; padding: 14px 12px 12px; margin: 12px 0; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+    .row h2 { font-size: 18px; margin: 0 0 2px; }
+    .row h2 small { font-size: 13px; font-weight: 700; color: #C8102E; margin-left: 6px; letter-spacing: .06em; }
+    .row p { font-size: 14px; color: #555; margin: 0 0 10px; }
+    .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .thumbs button { padding: 0; border: 0; background: none; text-align: left; font: inherit; cursor: pointer; }
+    .thumbs canvas { width: 100%; height: auto; display: block; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+    .thumbs span { display: block; font-size: 13px; font-weight: 800; color: #333; margin-top: 5px; }
+    .load { font-size: 15px; color: #666; padding: 20px 4px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 10; display: flex; align-items: flex-end; justify-content: center; }
+    .modal[hidden] { display: none; }
+    .box { background: #fff; width: 100%; max-width: 980px; max-height: 92vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 14px 14px 30px; }
+    .bh { display: flex; align-items: center; justify-content: space-between; gap: 8px; position: sticky; top: -14px; background: #fff; padding: 6px 0 8px; z-index: 1; }
+    .bh b { font-size: 17px; }
+    .bh button, .save { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #E2E2E2; background: #fff; font: inherit; font-size: 15px; font-weight: 800; }
+    .save { background: #FEE500; border-color: #F2D900; width: 100%; margin: 12px 0 0; min-height: 52px; font-size: 17px; }
+    .edit { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 6px 0 10px; }
+    .edit label { font-size: 14px; font-weight: 800; color: #333; }
+    .edit input { width: 100%; min-height: 44px; border: 1.5px solid #E2E2E2; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 16px; }
+    .pals { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+    .pals button { display: flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px 0 8px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 14px; font-weight: 800; }
+    .pals button i { display: flex; } .pals button i b { width: 14px; height: 22px; } .pals button i b:first-child { border-radius: 11px 0 0 11px; } .pals button i b:last-child { border-radius: 0 11px 11px 0; }
+    .pals button[aria-pressed="true"] { border-color: #C8102E; color: #C8102E; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; align-items: start; }
+    .grid figure { margin: 0; }
+    .grid img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.14); }
+    .grid figcaption { font-size: 15px; line-height: 1.45; margin-top: 6px; word-break: keep-all; }
+    .grid figcaption .sz { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #C8102E; color: #fff; font-size: 14px; font-weight: 800; }
+    .grid figcaption .pl { display: block; font-size: 14.5px; } .grid figcaption .pl i { font-style: normal; color: #C8102E; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; justify-content: center; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); border-top: 1px solid #E6E6E6; z-index: 5; }
+    .bar a { flex: 1; max-width: 200px; min-height: 46px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #fff; border: 1.5px solid #E2E2E2; color: #1A1A1A; text-decoration: none; font-size: 15px; font-weight: 800; }
+    .bar a.go { background: #C8102E; border-color: #C8102E; color: #fff; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍒 싸바 <i>업종별 템플릿</i></h1>
+  <p class="lead">무엇을 알릴지 고르면 끝 — 인스타·카톡 채널·네이버·당근·유튜브 크기로 한 번에 만들어요. 색은 오방색<span class="obang"><b style="background:#1A4C9C"></b><b style="background:#C8102E"></b><b style="background:#FFCC00"></b><b style="background:#fff"></b><b style="background:#161616"></b></span>에서 한 장에 2~3색만.</p>
+  <div class="chips" id="inds" role="group" aria-label="업종"></div>
+  <div id="rows"><p class="load">템플릿을 그리는 중이에요…</p></div>
+</div>
+<div class="modal" id="m" hidden>
+  <div class="box">
+    <div class="bh"><b id="mt">템플릿</b><button type="button" id="mx">닫기</button></div>
+    <div class="pals" id="mp"></div>
+    <div class="edit">
+      <label for="eh">큰 글씨</label><input id="eh" maxlength="30">
+      <label for="el">작은 글씨 <small style="font-weight:600;color:#777">(이벤트는 "30% 할인"처럼 숫자를 넣으면 크게 나와요)</small></label><input id="el" maxlength="60">
+    </div>
+    <div class="grid" id="mg"></div>
+    <button type="button" class="save" id="ms" disabled>📥 6장 모두 저장하기</button>
+  </div>
+</div>
+<nav class="bar"><a href="../">🏠 싸바 홈</a><a class="go" id="mk" href="../make/">✏️ 내 내용으로 만들기</a></nav>
+
+<script src="../js/designs.js?v=85"></script>
+<script src="../js/reserve.js"></script>
+<script src="../js/export.js?v=83"></script>
+<script src="../js/pack.js?v=1"></script>
+<script>
+(function () {
+  var D = window.SsakaDesigns, K = window.SsakaPack;
+  var $ = function (id) { return document.getElementById(id); };
+  var qs = new URLSearchParams(location.search);
+  var LIST = D.INDUSTRIES.filter(function (x) { return x.type !== 'safe'; });
+  var ind = (LIST.filter(function (x) { return x.id === qs.get('ind'); })[0] || LIST.filter(function (x) { return x.id === 'restaurant'; })[0]).id;
+  // 예시 사진은 같은 주소에서 불러와야 이미지로 저장할 수 있음
+  var local = function (u) { return String(u || '').replace(/^https:\/\/sava\.kr\//, '/'); };
+  function cardOf(id) {
+    var I = D.industry(id), ex = I.ex || {};
+    var card = {
+      template: I.type, title: ex.title || '', subtitle: ex.subtitle || '', image: local(ex.image),
+      body: String(ex.body || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
+      contact: { name: ex.name || '', phone: ex.phone || '010-0000-0000' }
+    };
+    if (ex.place) card.place = { name: ex.place };
+    if (ex.copyValue) card.copy = { label: ex.copyLabel || '', value: ex.copyValue };
+    if (ex.galUrls) card.gallery = ex.galUrls.split('\n').filter(Boolean).map(local);
+    if (ex.menu) card.reserve = { menu: SsakaReserve.parseMenu(ex.menu) };
+    if (!card.image) delete card.image;
+    return card;
+  }
+  var chips = $('inds');
+  LIST.forEach(function (I) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = I.emoji + ' ' + I.label;
+    b.setAttribute('aria-pressed', I.id === ind ? 'true' : 'false');
+    b.addEventListener('click', function () { ind = I.id; history.replaceState(null, '', '?ind=' + ind); [].forEach.call(chips.children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); render(); });
+    chips.appendChild(b);
+  });
+  var job = 0, imgsCache = {}, P45 = K && window.SsakaExport._h.sizes[0];
+  function render() {
+    var my = ++job, card = cardOf(ind), rows = $('rows'), opts = { industry: ind };
+    $('mk').href = '../make/?ind=' + ind;
+    rows.innerHTML = '<p class="load">템플릿을 그리는 중이에요…</p>';
+    (imgsCache[ind] || (imgsCache[ind] = K.loadImgs(card, opts))).then(function (imgs) {
+      if (my !== job) return;
+      rows.innerHTML = '';
+      var list = K.purposes(ind, card.template), i = 0;
+      function next() {
+        if (my !== job || i >= list.length) return;
+        var pp = list[i++], row = document.createElement('section'); row.className = 'row';
+        row.innerHTML = '<h2></h2><p></p><div class="thumbs"></div>';
+        row.querySelector('h2').textContent = pp.label; var sm = document.createElement('small'); sm.textContent = pp.en; row.querySelector('h2').appendChild(sm);
+        row.querySelector('p').textContent = '눌러서 6가지 크기로 만들기 · 글씨 고치기';
+        var th = row.querySelector('.thumbs');
+        K.pals(pp.tpl).forEach(function (pl) {
+          var b = document.createElement('button'); b.type = 'button';
+          var c = K.draw(card, pp.id, pl.id, opts, imgs, { w: 540, h: 675, id: 'p45' });
+          if (c) b.appendChild(c);
+          var s = document.createElement('span'); s.textContent = pl.name; b.appendChild(s);
+          b.addEventListener('click', function () { open(card, pp, pl.id); });
+          th.appendChild(b);
+        });
+        rows.appendChild(row);
+        setTimeout(next, 0);
+      }
+      next();
+    });
+  }
+  // 작은 미리보기는 반 크기로 그림 — 글씨 크기 계산은 비율로 하므로 모양이 같음
+  var cur = null, files = [], bjob = 0;
+  function open(card, pp, palId) {
+    cur = { card: card, pp: pp, pal: palId };
+    $('mt').textContent = pp.label + ' — 6가지 크기';
+    $('eh').value = pp.head; $('el').value = '';
+    $('el').placeholder = '비워 두면 카드 내용에서 알아서 골라요';
+    var mp = $('mp'); mp.innerHTML = '';
+    K.pals(pp.tpl).forEach(function (pl) {
+      var b = document.createElement('button'); b.type = 'button';
+      var i = document.createElement('i'); [pl.bg, pl.ink, pl.acc].forEach(function (c) { var x = document.createElement('b'); x.style.background = c; i.appendChild(x); });
+      b.appendChild(i); b.appendChild(document.createTextNode(pl.name));
+      b.setAttribute('aria-pressed', pl.id === palId ? 'true' : 'false');
+      b.addEventListener('click', function () { cur.pal = pl.id; [].forEach.call(mp.children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); make(); });
+      mp.appendChild(b);
+    });
+    $('m').hidden = false; make();
+  }
+  var t = null;
+  ['eh', 'el'].forEach(function (id) { $(id).addEventListener('input', function () { clearTimeout(t); t = setTimeout(make, 450); }); });
+  function make() {
+    var my = ++bjob; $('mg').innerHTML = '<p class="load">만드는 중…</p>'; $('ms').disabled = true;
+    K.build(cur.card, cur.pp.id, cur.pal, { industry: ind, head: $('eh').value, line: $('el').value }).then(function (list) {
+      if (my !== bjob) return;
+      files = list; var g = $('mg'); g.innerHTML = '';
+      list.forEach(function (x) {
+        var u = URL.createObjectURL(x.blob), f = document.createElement('figure'), a = document.createElement('a'); a.href = u; a.download = x.name;
+        var im = document.createElement('img'); im.src = u; im.alt = x.label; a.appendChild(im); f.appendChild(a);
+        var cap = document.createElement('figcaption'), sz = document.createElement('span'); sz.className = 'sz'; sz.textContent = x.sizeLabel + ' · ' + x.w + '×' + x.h; cap.appendChild(sz);
+        x.places.forEach(function (p) { var s = document.createElement('span'); s.className = 'pl'; var st = document.createElement('i'); st.textContent = '★ '; s.appendChild(st); s.appendChild(document.createTextNode(p)); cap.appendChild(s); });
+        f.appendChild(cap); g.appendChild(f);
+      });
+      $('ms').disabled = false;
+    });
+  }
+  $('ms').addEventListener('click', function () {
+    var fs = files.map(function (x) { return new File([x.blob], x.name, { type: 'image/jpeg' }); });
+    if (navigator.canShare && navigator.canShare({ files: fs })) { navigator.share({ files: fs }).catch(function () {}); return; }
+    fs.forEach(function (f, i) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); }, i * 350); });
+  });
+  $('mx').addEventListener('click', function () { $('m').hidden = true; });
+  $('m').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+  render();
+})();
+</script>
+</body>
+</html>

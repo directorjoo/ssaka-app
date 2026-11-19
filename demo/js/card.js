@@ -294,11 +294,11 @@
           var tot = document.createElement('small'); tot.textContent = '처음부터 지금까지 열어 본 횟수 ' + (t.view || 0) + '번 · 같은 사람은 하루 한 번만 세요'; st.appendChild(tot);
         }).catch(function () { st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
         var mk = new URL('../make/', location.href).href;
-        var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 바로 고치기';
+        var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 수정하기';
         e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
         var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : ''); e1.textContent = '📝 입력칸';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
-        bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
+        bar.appendChild(e0); bar.appendChild(e2);
         document.body.appendChild(bar);
         // 손님 반응은 화면에 떠 있지 않고 카드 바로 아래에 놓음 → 예약·전화 단추를 가리지 않음
         if (app && app.parentNode) app.insertAdjacentElement('afterend', st); else bar.parentNode.insertBefore(st, bar);
@@ -381,27 +381,131 @@
     bar.style.display = 'none'; if (st) st.style.display = 'none';
     var addr = (card.body || []).length > (orig.body || []).length ? card.body.slice((orig.body || []).length) : [];
     var lines = (orig.body || []).slice();
-    var tip = h('div', { class: 'sk-edtip', text: '✏️ 고칠 글자를 누르세요 · 내용은 줄바꿈까지 자유롭게' });
+    var tip = h('div', { class: 'sk-edtip', text: '✏️ 글자는 눌러서 고치고, 사진·전화·주소는 카드 아래에서 고치세요' });
     var foot = h('div', { class: 'sk-edbar' });
     var bNo = h('button', { type: 'button', class: 'no', text: '취소' });
     var bUn = h('button', { type: 'button', class: 'no un', text: '↩ 되돌리기' });
-    var bOk = h('button', { type: 'button', class: 'ok', text: '💾 저장' });
+    var bOk = h('button', { type: 'button', class: 'ok', text: '✅ 수정 완료' });
     foot.appendChild(bNo); foot.appendChild(bUn); foot.appendChild(bOk);
     // 되돌리기: 고칠 때마다 그 전 모습을 기억해 두고 한 단계씩 돌아감
     var HIST = [];
     function txt(sel) { var e = root.querySelector(sel); return e ? e.textContent : null; }
-    function snapE() { return JSON.stringify({ k: txt('.sk-kick'), t: txt('.sk-title'), s: txt('.sk-sub'), b: lines }); }
+    function snapE() { return JSON.stringify({ k: txt('.sk-kick'), t: txt('.sk-title'), s: txt('.sk-sub'), b: lines, w: W }); }
     function push() { var x = snapE(); if (HIST[HIST.length - 1] !== x) HIST.push(x); bUn.disabled = HIST.length < 2; }
     function redrawList() {
       var tmp = SsakaRender.build(Object.assign({}, card, { body: lines.concat(addr) }), design, ctx);
       var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' }), ol = root.querySelector('.sk-list');
       if (ol) ol.replaceWith(nl);
     }
+    // ---------- 사진·전화·주소도 이 화면에서 한 번에 (입력칸으로 갈 필요 없음) ----------
+    var oc = orig.contact || {};
+    var W = { image: orig.image || '', ip: orig.ip || null, gallery: (orig.gallery || []).filter(Boolean).slice(0, 10),
+      phone: oc.phone || '', street: oc.address && oc.address.street || '' };
+    var pan = h('section', { class: 'sk-edpan' });
+    function upPic(file) {
+      return new Promise(function (ok) {
+        var im = new Image(), u = URL.createObjectURL(file);
+        im.onload = function () {
+          var r = Math.min(1, 1080 / Math.max(im.width, im.height)), cv = document.createElement('canvas');
+          cv.width = Math.round(im.width * r); cv.height = Math.round(im.height * r);
+          cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); URL.revokeObjectURL(u);
+          cv.toBlob(function (b) { ok(b ? new File([b], 'sava.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.85);
+        };
+        im.onerror = function () { URL.revokeObjectURL(u); ok(file); };
+        im.src = u;
+      }).then(function (f) {
+        var list = [f]; try { var dt = new DataTransfer(); dt.items.add(f); list = dt.files; } catch (e) {}
+        if (!window.SsakaKakao) throw new Error('kakao');
+        return SsakaKakao().then(function (K) { return K.Share.uploadImage({ file: list }); });
+      }).then(function (res) {
+        var info = (res && (res.infos || res)) || {}, url = info.original && info.original.url;
+        if (!url) throw new Error('no url');
+        return url.replace(/^http:/, 'https:');
+      });
+    }
+    function pick(multi, cb) {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; if (multi) inp.multiple = true;
+      inp.addEventListener('change', function () { var fs = [].slice.call(inp.files || []).filter(function (f) { return /^image\//.test(f.type); }); if (fs.length) cb(fs); });
+      inp.click();
+    }
+    function mainPhoto() {
+      pick(false, function (fs) {
+        toast('📷 사진 올리는 중…');
+        upPic(fs[0]).then(function (u) { W.image = u; W.ip = null; applyW(); push(); toast('대표 사진을 바꿨어요 ✓'); })
+          .catch(function () { toast('사진을 올리지 못했어요. 다시 골라 주세요'); });
+      });
+    }
+    function morePhotos() {
+      var room = 10 - W.gallery.length; if (room <= 0) { toast('사진은 10장까지예요'); return; }
+      pick(true, function (fs) {
+        fs = fs.slice(0, room); toast('📷 사진 ' + fs.length + '장 올리는 중…');
+        fs.reduce(function (pr, f) { return pr.then(function () { return upPic(f).then(function (u) { W.gallery.push(u); }).catch(function () {}); }); }, Promise.resolve())
+          .then(function () { applyW(); push(); toast('사진을 올렸어요 ✓'); });
+      });
+    }
+    function applyW() {
+      // 대표 사진
+      var ph = root.querySelector('.sk-photo');
+      if (ph) {
+        var im = ph.querySelector('img:not(.sk-photo-blur)'), bl = ph.querySelector('.sk-photo-blur');
+        if (W.image) {
+          if (!im) { var mono = ph.querySelector('.sk-mono'); if (mono) mono.remove(); im = document.createElement('img'); ph.insertBefore(im, ph.firstChild); ph.classList.remove('sk-nophoto'); }
+          im.src = W.image; if (bl) bl.src = W.image;
+          if (!W.ip) { im.removeAttribute('style'); if (bl) bl.remove(); ph.classList.remove('sk-fit'); }
+        } else if (im) { im.remove(); if (bl) bl.remove(); }
+      }
+      // 사진 여러 장
+      var tmp = SsakaRender.build(Object.assign({}, card, { image: W.image, gallery: W.gallery }), design, ctx);
+      var ng = tmp.querySelector('.sk-gal'), og = root.querySelector('.sk-gal');
+      if (og && ng) og.replaceWith(ng); else if (og) og.remove();
+      else if (ng) { var hero = root.querySelector('.sk-hero'); if (hero) hero.insertAdjacentElement('afterend', ng); }
+      // 주소 줄
+      addr = W.street ? ['📍 ' + W.street] : [];
+      if (!root.querySelector('.sk-edta')) redrawList();
+      drawPan();
+    }
+    function drawPan() {
+      pan.innerHTML = '';
+      pan.appendChild(h('h3', { text: '📷 사진·전화·주소 고치기' }));
+      // 대표 사진
+      var r1 = h('div', { class: 'sk-edrow' });
+      var th = h('div', { class: 'sk-edmain' }); if (W.image) { var ti = h('img', { alt: '' }); ti.src = W.image; th.appendChild(ti); } else th.textContent = '사진 없음';
+      r1.appendChild(th);
+      var bx = h('div', { class: 'sk-edbtns' });
+      bx.appendChild(h('button', { type: 'button', text: W.image ? '대표 사진 바꾸기' : '대표 사진 넣기', onclick: mainPhoto }));
+      if (W.image) bx.appendChild(h('button', { type: 'button', class: 'del', text: '대표 사진 빼기', onclick: function () { W.image = ''; W.ip = null; applyW(); push(); } }));
+      r1.appendChild(bx); pan.appendChild(r1);
+      // 사진 여러 장
+      pan.appendChild(h('p', { class: 'sk-edlab', text: '사진 더 보여 주기 (' + W.gallery.length + '/10) · ✕ 누르면 빠져요' }));
+      var gl = h('div', { class: 'sk-edgal' });
+      W.gallery.forEach(function (u, i) {
+        var it = h('div', { class: 'sk-edgi' }); var gi = h('img', { alt: '' }); gi.src = u; it.appendChild(gi);
+        it.appendChild(h('button', { type: 'button', 'aria-label': '사진 빼기', text: '✕', onclick: function () { W.gallery.splice(i, 1); applyW(); push(); } }));
+        gl.appendChild(it);
+      });
+      if (W.gallery.length < 10) gl.appendChild(h('button', { type: 'button', class: 'sk-edadd', text: '＋\n사진', onclick: morePhotos }));
+      pan.appendChild(gl);
+      // 전화·주소
+      var f1 = h('label', { class: 'sk-edfld' }, [h('span', { text: '📞 전화번호' })]);
+      var ip1 = h('input', { type: 'tel', inputmode: 'tel', maxlength: '20', placeholder: '010-0000-0000' }); ip1.value = W.phone;
+      ip1.addEventListener('change', function () { W.phone = ip1.value.trim(); push(); });
+      f1.appendChild(ip1); pan.appendChild(f1);
+      var f2 = h('label', { class: 'sk-edfld' }, [h('span', { text: '📍 주소' })]);
+      var ip2 = h('input', { type: 'text', maxlength: '80', placeholder: '예: 서울 강남구 신사동 609-1 지하1층' }); ip2.value = W.street;
+      ip2.addEventListener('change', function () { W.street = ip2.value.trim(); applyW(); push(); });
+      f2.appendChild(ip2); pan.appendChild(f2);
+      pan.appendChild(h('p', { class: 'sk-edlab', text: '다 고치셨으면 맨 아래 ✅ 수정 완료를 누르세요' }));
+    }
+    drawPan();
+    root.insertAdjacentElement('afterend', pan);
+    // 카드의 대표 사진을 눌러도 바로 바꾸기
+    function photoTap(ev) { var ph = ev.target.closest && ev.target.closest('.sk-photo'); if (!ph || !root.contains(ph) || ev.target.closest('.sk-clip-snd')) return; ev.preventDefault(); ev.stopPropagation(); mainPhoto(); }
+    root.addEventListener('click', photoTap, true);
     bUn.addEventListener('click', function () {
       if (HIST.length < 2) return;
       HIST.pop(); var d = JSON.parse(HIST[HIST.length - 1]);
       [['.sk-kick', d.k], ['.sk-title', d.t], ['.sk-sub', d.s]].forEach(function (x) { var e = root.querySelector(x[0]); if (e && x[1] != null) e.textContent = x[1]; });
-      lines = d.b; redrawList(); bUn.disabled = HIST.length < 2;
+      lines = d.b; if (d.w) { W = d.w; applyW(); } redrawList(); bUn.disabled = HIST.length < 2;
       toast('↩ 한 단계 되돌렸어요');
     });
     document.body.appendChild(tip); document.body.appendChild(foot);
@@ -440,8 +544,8 @@
       if (sub) { var ph = h('ul', { class: 'sk-list' }); ph.appendChild(h('li', { class: 'sk-p', text: '여기를 눌러 내용을 쓰세요' })); (sub.parentNode.parentNode || sub.parentNode).appendChild(ph); }
     }
     function done() {
-      root.removeEventListener('click', openBody, true);
-      tip.remove(); foot.remove();
+      root.removeEventListener('click', openBody, true); root.removeEventListener('click', photoTap, true);
+      tip.remove(); foot.remove(); pan.remove();
     }
     bNo.addEventListener('click', function () { done(); location.reload(); });
     bOk.addEventListener('click', function () {
@@ -453,6 +557,12 @@
       if (su !== null) nc.subtitle = su.slice(0, 60);
       if (kk !== null) nc.kick = kk.slice(0, 20);
       nc.body = lines;
+      if (W.image) nc.image = W.image; else delete nc.image;
+      if (W.ip && W.image) nc.ip = W.ip; else delete nc.ip;
+      if (W.gallery.length) nc.gallery = W.gallery.slice(0, 10); else delete nc.gallery;
+      nc.contact = nc.contact || {};
+      nc.contact.phone = W.phone;
+      if (W.street) { var oa = nc.contact.address || {}; nc.contact.address = oa.street === W.street ? oa : { street: W.street }; } else delete nc.contact.address;
       bOk.disabled = true; bOk.textContent = '저장하는 중…';
       var d = SsakaCodec.encode(nc), api = new URL('../api/card', location.href).href;
       var k = window.SsakaStore ? SsakaStore.ownerKey() : '', sid = new URLSearchParams(location.search).get('s');
@@ -471,7 +581,7 @@
           var url = new URL('?s=' + j.id, location.href).href;
           setTimeout(function () { if (same) location.reload(); else location.replace(url); }, 2200);
         })
-        .catch(function (e) { bOk.disabled = false; bOk.textContent = '💾 저장'; toast(String(e.message) === 'bad-content' ? '보낼 수 없는 내용이 있어요' : '저장하지 못했어요. 다시 눌러 주세요'); });
+        .catch(function (e) { bOk.disabled = false; bOk.textContent = '✅ 수정 완료'; toast(String(e.message) === 'bad-content' ? '보낼 수 없는 내용이 있어요' : '저장하지 못했어요. 다시 눌러 주세요'); });
     });
   }
   // 모임 참석 답장: 보낸 사람에게 정리된 문자를 보냄 (서버 없음)

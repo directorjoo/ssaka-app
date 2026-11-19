@@ -662,3 +662,22 @@
 .sk .sk-list li.sk-h { font-size: 17px !important; letter-spacing: .02em; }
 .sk .sk-list li.sk-h.sk-sm { font-size: 14px !important; }
 .sk .sk-list.sk-doc li.sk-p { font-size: 15.5px; }
+/* 수정하기: 사진·전화·주소를 카드 아래에서 한 번에 */
+.sk-editing .sk-photo { outline: 2px dashed #B3132B; outline-offset: -4px; cursor: pointer; }
+.sk-edpan { box-sizing: border-box; width: min(480px, calc(100% - 24px)); margin: 18px auto 150px; padding: 18px 16px; border-radius: 20px; background: #fff; color: #222; border: 2px solid #B3132B; font: 500 16px/1.5 system-ui, sans-serif; box-shadow: 0 10px 30px -18px rgba(0,0,0,.5); }
+.sk-edpan h3 { margin: 0 0 12px; font-size: 19px; font-weight: 900; color: #B3132B; }
+.sk-edrow { display: flex; gap: 12px; align-items: center; }
+.sk-edmain { flex: none; width: 92px; height: 92px; border-radius: 14px; overflow: hidden; background: #f4ece6; display: grid; place-items: center; font-size: 13px; color: #8a7f78; }
+.sk-edmain img { width: 100%; height: 100%; object-fit: cover; }
+.sk-edbtns { flex: 1; display: grid; gap: 8px; }
+.sk-edpan button { min-height: 46px; border: 0; border-radius: 12px; background: #B3132B; color: #fff; font: 800 15.5px/1.2 system-ui, sans-serif; cursor: pointer; }
+.sk-edpan button.del { background: #fff; color: #B3132B; border: 1.5px solid #B3132B; }
+.sk-edlab { margin: 16px 0 8px; font-size: 15px; font-weight: 800; color: #5a4a42; }
+.sk-edgal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.sk-edgi { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #f4ece6; }
+.sk-edgi img { width: 100%; height: 100%; object-fit: cover; }
+.sk-edgi button { position: absolute; top: 4px; right: 4px; min-height: 0; width: 30px; height: 30px; padding: 0; border-radius: 50%; background: rgba(0,0,0,.65); font-size: 15px; }
+.sk-edpan .sk-edadd { aspect-ratio: 1; min-height: 0; white-space: pre-line; background: #FFF3EE; color: #B3132B; border: 2px dashed #B3132B; font-size: 16px; }
+.sk-edfld { display: block; margin-top: 14px; }
+.sk-edfld span { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 800; color: #5a4a42; }
+.sk-edfld input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 0 12px; border: 1.5px solid #e2d4ca; border-radius: 12px; font: 600 16.5px system-ui, sans-serif; color: #222; background: #fff; }

@@ -49,7 +49,7 @@
     // 내 계정·내 것
     box.appendChild(el('h3', '', '내 정보'));
     var acct = el('a', 'sv-row', '🍒 로그인 · 회원가입'); acct.href = '/join/?next=' + encodeURIComponent(location.pathname); acct.appendChild(el('span', '', '카카오로 1초')); box.appendChild(acct);
-    [['🛒 내 주문', '/app/orders/', '김치 등 상품'], ['📅 내 예약', '/app/#resv', ''], ['💌 받은 카드', '/app/#inbox', '']].forEach(function (r) {
+    [['🗂️ 내 작업 관리', '/app/manage/', '만든 카드·블로그 글 고치기'], ['🛒 내 주문', '/app/orders/', '김치 등 상품'], ['📅 내 예약', '/app/#resv', ''], ['💌 받은 카드', '/app/#inbox', '']].forEach(function (r) {
       var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); box.appendChild(a);
     });
     var admin = el('div', 'sv-admin'); admin.hidden = true; box.appendChild(admin);
@@ -65,7 +65,7 @@
       if (j && j.user) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; acct.href = '/join/'; }
       if (j && j.admin) {
         admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
-        [['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
+        [['🔑 싸바 관리자 화면', '/admin/', '경영·디자인·Claude 요청'], ['💡 의견 관리', '/idea/admin/', '채택·쿠폰'], ['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
           var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); admin.appendChild(a);
         });
       }

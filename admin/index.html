@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1A1A1A">
+  <title>싸바 관리자 · 대표</title>
+  <link rel="icon" href="/img/favicon.png">
+  <link rel="stylesheet" href="/css/brand.css">
+  <style>
+    * { box-sizing: border-box; } [hidden] { display: none !important; }
+    html, body { margin: 0; background: #f4f1ec; color: var(--ink); font-family: var(--font); -webkit-text-size-adjust: 100%; }
+    .w { max-width: 760px; margin: 0 auto; padding: calc(14px + env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom)); }
+    header { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; padding-right: 108px; }
+    header img { width: 38px; height: 38px; }
+    h1 { font-size: 23px; margin: 0; letter-spacing: -.02em; word-break: keep-all; }
+    header small { display: block; font-size: 14px; color: var(--ink-2); font-weight: 600; margin-top: 2px; }
+    header button { margin-left: auto; min-height: 42px; border-radius: 12px; border: 1.5px solid #ddd5cc; background: #fff; font: inherit; font-size: 15px; font-weight: 800; padding: 0 12px; cursor: pointer; }
+    .nav { display: flex; gap: 6px; overflow-x: auto; margin: 0 -14px 12px; padding: 6px 14px; position: sticky; top: 0; z-index: 5; background: #f4f1ec; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a { flex: none; min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; background: #fff; border: 1.5px solid #e2dbd2; color: #333; font-size: 15px; font-weight: 800; text-decoration: none; }
+    section { background: #fff; border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 0 rgba(0,0,0,.04); scroll-margin-top: 60px; }
+    h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+    h2 span { margin-left: auto; font-size: 14px; color: var(--ink-2); font-weight: 700; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .tile { background: #faf7f3; border-radius: 16px; padding: 12px 14px; }
+    .tile b { display: block; font-size: 28px; font-weight: 900; letter-spacing: -.02em; line-height: 1.1; }
+    .tile i { font-style: normal; display: block; font-size: 15px; font-weight: 800; color: #4a423b; margin-bottom: 4px; }
+    .tile em { font-style: normal; display: block; font-size: 14px; color: #8a7f76; font-weight: 700; margin-top: 4px; }
+    .tile em.up { color: #0d7a4e; }
+    .chart { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; align-items: end; height: 120px; margin-top: 6px; }
+    .chart div { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 2px; }
+    .chart s { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--ssaka); min-height: 2px; text-decoration: none; }
+    .chart small { font-size: 12px; color: #8a7f76; font-weight: 700; }
+    .seg { display: flex; gap: 6px; margin-bottom: 4px; }
+    .seg button { min-height: 38px; border-radius: 999px; border: 1.5px solid #e2dbd2; background: #fff; font: inherit; font-size: 14px; font-weight: 800; padding: 0 12px; cursor: pointer; }
+    .seg button[aria-pressed="true"] { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .row { display: flex; align-items: center; gap: 10px; padding: 11px 2px; border-bottom: 1px solid #f0ebe5; font-size: 16px; }
+    .row:last-child { border-bottom: 0; }
+    .row .n { flex: none; width: 28px; font-weight: 900; color: var(--ssaka-deep); }
+    .row .t { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row .t small { display: block; font-size: 14px; color: #8a7f76; font-weight: 600; white-space: normal; }
+    .row .v { flex: none; font-weight: 900; }
+    .row a.t { color: inherit; text-decoration: none; }
+    .sb { flex: none; min-height: 38px; border-radius: 10px; border: 1.5px solid #e2dbd2; background: #fff; font: inherit; font-size: 14px; font-weight: 800; padding: 0 10px; cursor: pointer; }
+    .sb.red { color: #a3121f; } .sb.dark { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .muted { font-size: 15px; color: #8a7f76; line-height: 1.55; margin: 6px 0 0; }
+    textarea, select, input[type=password] { width: 100%; font: inherit; font-size: 16px; border: 1.5px solid #ddd5cc; border-radius: 14px; padding: 12px; background: #fff; color: #222; }
+    textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
+    select { min-height: 48px; margin-bottom: 8px; }
+    .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .btns button, .btns a { flex: 1 1 40%; min-height: 50px; display: inline-flex; align-items: center; justify-content: center; border-radius: 14px; border: 0; font: inherit; font-size: 16px; font-weight: 800; text-decoration: none; cursor: pointer; padding: 0 12px; }
+    .claude { background: #c96442; color: #fff; flex-basis: 100% !important; font-size: 17px !important; }
+    .save { background: #1a1a1a; color: #fff; }
+    .copy { background: #f1ece6; color: #222; }
+    .req { padding: 12px 2px; border-bottom: 1px solid #f0ebe5; }
+    .req p { margin: 0 0 8px; font-size: 16px; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; }
+    .req.done p { color: #9a9087; text-decoration: line-through; }
+    .req .meta { font-size: 14px; color: #8a7f76; font-weight: 700; margin-bottom: 6px; }
+    .req .a { display: flex; flex-wrap: wrap; gap: 6px; }
+    .links { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .links a { min-height: 64px; display: flex; flex-direction: column; justify-content: center; gap: 2px; border-radius: 16px; background: #faf7f3; color: #222; text-decoration: none; padding: 10px 14px; font-size: 16px; font-weight: 800; }
+    .links a small { font-size: 14px; color: #8a7f76; font-weight: 600; }
+    .chk { display: flex; justify-content: space-between; gap: 10px; padding: 9px 2px; border-bottom: 1px solid #f0ebe5; font-size: 15px; font-weight: 700; }
+    .chk b { flex: none; }
+    .gate { text-align: center; padding: 28px 18px; }
+    .gate p { font-size: 16px; line-height: 1.6; color: #4a423b; }
+    .gate a.k { display: inline-flex; min-height: 52px; align-items: center; padding: 0 22px; border-radius: 14px; background: #FEE500; color: #191919; font-weight: 900; text-decoration: none; font-size: 17px; }
+    .gate .key { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 18px; text-align: left; }
+    .gate .key button { min-height: 48px; border-radius: 14px; border: 0; background: #1a1a1a; color: #fff; font: inherit; font-weight: 800; padding: 0 16px; }
+    .toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: rgba(20,20,20,.92); color: #fff; padding: 11px 18px; border-radius: 14px; font-size: 15px; font-weight: 700; z-index: 50; white-space: nowrap; }
+  </style>
+</head>
+<body>
+<div class="w">
+  <header>
+    <img src="/img/cherry.svg" alt="">
+    <div><h1>🔑 싸바 관리자</h1><small id="hello">대표 전용 · 싸바 전체 디자인·경영</small></div>
+  </header>
+
+  <section id="gate" class="gate" hidden>
+    <p id="gateMsg">대표 카카오 계정으로 로그인해야 열려요.</p>
+    <a class="k" href="/join/?next=%2Fadmin%2F">카카오로 로그인</a>
+    <div class="key"><input id="key" type="password" placeholder="또는 관리 비밀번호 (ADMIN_KEY)" autocomplete="current-password"><button type="button" id="keyGo">열기</button></div>
+  </section>
+
+  <div id="main" hidden>
+    <nav class="nav">
+      <a href="#s-claude">💬 Claude</a><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><a href="#s-report">🚨 신고·차단</a><a href="#s-req">📝 요청 목록</a><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
+    </nav>
+
+    <section id="s-claude">
+      <h2>💬 Claude에게 바로 수정 요청</h2>
+      <select id="where" aria-label="어느 화면">
+        <option>싸바 전체 디자인</option><option>홈 (sava.kr/app/)</option><option>어디야? (/eodiya/)</option><option>싸바알림 · 카드 만들기 (/make/)</option>
+        <option>싸바카드 화면 (/c/)</option><option>오늘의 싸바 · 생활 채널 (/today/)</option><option>아침편지 (/letter/)</option><option>블로그 글쓰기 (/survey/)</option>
+        <option>설정 · 관리 탭</option><option>회원가입 · 로그인 (/join/)</option><option>싸바비앙</option><option>싸바스타</option><option>기타</option>
+      </select>
+      <textarea id="ask" placeholder="예: 홈 화면 어디야 버튼을 조금 더 크게, 글씨는 진하게 해 줘"></textarea>
+      <div class="btns">
+        <button type="button" class="claude" id="toClaude">Claude에게 보내기 ↗</button>
+        <button type="button" class="save" id="saveReq">목록에 적어 두기</button>
+        <button type="button" class="copy" id="copyReq">복사</button>
+      </div>
+      <p class="muted">"Claude에게 보내기"를 누르면 저장소(ssaka-app)·화면 이름이 붙은 요청문으로 Claude 새 대화가 열려요. 동시에 아래 요청 목록에도 적혀서, 무엇을 맡겼고 무엇이 끝났는지 한눈에 볼 수 있어요.</p>
+    </section>
+
+    <section id="s-today">
+      <h2>📊 오늘 한눈에 <span id="asof"></span><button type="button" class="sb" id="reload" hidden>🔄 새로</button></h2>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <section id="s-trend">
+      <h2>📈 14일 추이</h2>
+      <div class="seg" id="seg"><button type="button" data-k="users" aria-pressed="true">새 회원</button><button type="button" data-k="cards" aria-pressed="false">새 카드</button><button type="button" data-k="views" aria-pressed="false">카드 열람</button></div>
+      <div class="chart" id="chart"></div>
+      <p class="muted" id="chartCap"></p>
+    </section>
+
+    <section id="s-top">
+      <h2>🏆 이번 주 많이 열린 카드 <span>최근 7일</span></h2>
+      <div id="top"></div>
+    </section>
+
+    <section id="s-report">
+      <h2>🚨 신고 · 차단</h2>
+      <div id="reports"></div>
+      <h2 style="margin-top:16px">⛔ 지금 막힌 카드</h2>
+      <div id="blocked"></div>
+      <p class="muted">서로 다른 3명이 신고하면 자동으로 막혀요. 살펴보고 괜찮으면 "풀기", 신고만 지우려면 "신고 지우기".</p>
+    </section>
+
+    <section id="s-req">
+      <h2>📝 수정 요청 목록 <span id="reqN"></span></h2>
+      <div id="reqs"></div>
+    </section>
+
+    <section id="s-go">
+      <h2>🧭 관리 바로가기</h2>
+      <div class="links">
+        <a href="/idea/admin/">💡 의견 관리<small id="lkIdea">채택 · 쿠폰</small></a>
+        <a href="/app/orders/?admin=1">🥬 김치 주문<small id="lkKim">주문·입금·발송</small></a>
+        <a href="/?all=1">👀 전체보기<small>감춘 메뉴까지</small></a>
+        <a href="/app/manage/">🗂️ 내 작업 관리<small>회원 화면 미리보기</small></a>
+        <a href="/today/">☀️ 오늘의 싸바<small>생활 채널</small></a>
+        <a href="/make/">🍒 싸바카드 만들기<small>템플릿 확인</small></a>
+        <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">☁️ Cloudflare<small>배포·비밀값·R2</small></a>
+        <a href="https://github.com/directorjoo/ssaka-app" target="_blank" rel="noopener">🐙 GitHub<small>ssaka-app</small></a>
+        <a href="https://developers.kakao.com/console/app" target="_blank" rel="noopener">💬 카카오디벨로퍼스<small>로그인·공유</small></a>
+        <a href="https://claude.ai/" target="_blank" rel="noopener">✳️ Claude<small>새 대화</small></a>
+      </div>
+    </section>
+
+    <section id="s-setup">
+      <h2>⚙️ 설정 점검</h2>
+      <div id="setup"></div>
+      <p class="muted">비밀값 자체는 보이지 않고, Cloudflare에 넣었는지만 확인해요.</p>
+    </section>
+  </div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var D = null, metric = 'users', KEY = '';
+  try { KEY = sessionStorage.getItem('sava-adm') || ''; } catch (e) {}
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function toast(t) { var d = el('div', 'toast', t); d.setAttribute('role', 'status'); document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2300); }
+  function num(n) { return n == null ? '–' : Number(n).toLocaleString('ko-KR'); }
+  function when(t) { var d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  function hdr() { var h = { 'content-type': 'application/json' }; if (KEY) h['x-admin-key'] = KEY; return h; }
+  function api(body) {
+    return fetch('/api/admin', body ? { method: 'POST', credentials: 'same-origin', headers: hdr(), body: JSON.stringify(body) } : { credentials: 'same-origin', cache: 'no-store', headers: hdr() })
+      .then(function (r) { return r.json(); });
+  }
+  function load() {
+    return api().then(function (j) {
+      if (!j || !j.ok) {
+        $('main').hidden = true; $('gate').hidden = false; $('reload').hidden = true;
+        $('gateMsg').textContent = j && j.error === 'setup' ? 'Cloudflare에 SAVA_ADMIN_UID(대표 회원번호)나 ADMIN_KEY를 먼저 넣어 주세요.' : j && j.login ? '이 계정은 관리자가 아니에요. 대표 카카오 계정으로 로그인해 주세요.' : '대표 카카오 계정으로 로그인해야 열려요.';
+        if (KEY) { KEY = ''; try { sessionStorage.removeItem('sava-adm'); } catch (e) {} }
+        return;
+      }
+      D = j; $('gate').hidden = true; $('main').hidden = false; $('reload').hidden = false;
+      $('hello').textContent = (j.nick ? j.nick + ' 대표님' : '대표님') + ' · ' + (j.by === 'key' ? '비밀번호로 열림' : '카카오 로그인');
+      paint();
+    }).catch(function () { toast('인터넷 연결을 확인해 주세요'); });
+  }
+  function tile(label, big, sub, up) { var t = el('div', 'tile'); t.appendChild(el('i', '', label)); t.appendChild(el('b', '', big)); if (sub) t.appendChild(el('em', up ? 'up' : '', sub)); return t; }
+  function paint() {
+    var u = D.users, c = D.cards, v = D.views, o = D.other;
+    $('asof').textContent = when(D.at) + ' 기준';
+    var T = $('tiles'); T.innerHTML = '';
+    T.appendChild(tile('🍒 회원', num(u.total), '오늘 +' + num(u.today) + ' · 7일 +' + num(u.week), u.today > 0));
+    T.appendChild(tile('🙋 7일 접속 회원', num(u.active), '가입 마무리 ' + num(u.agreed)));
+    T.appendChild(tile('🃏 싸바카드', num(c.total), '오늘 +' + num(c.today) + ' · 7일 +' + num(c.week), c.today > 0));
+    T.appendChild(tile('👀 카드 열람', num(v.today), '오늘 · 7일 ' + num(v.week)));
+    T.appendChild(tile('📞 손님 반응', num(v.acts), '7일 · 전화·길찾기·예약·저장'));
+    T.appendChild(tile('💬 카톡·문자 보냄', num(v.shares), '7일'));
+    T.appendChild(tile('✍️ 블로그 글', num(o.posts), '계정에 저장된 글'));
+    T.appendChild(tile('💡 읽을 의견', num(o.ideasNew), '새로 온 것'));
+    T.appendChild(tile('📋 참석 명단', num(o.rosters), '신청 ' + num(o.rosterPeople) + '명'));
+    if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일'));
+    T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '아침편지 받을 수 있는 회원'));
+    $('lkIdea').textContent = o.ideasNew ? '읽을 것 ' + o.ideasNew + '개' : '채택 · 쿠폰';
+    chart(); top(); reports(); reqs(); setup();
+  }
+  function chart() {
+    var C = $('chart'); C.innerHTML = '';
+    var max = Math.max.apply(null, D.trend.map(function (x) { return x[metric]; }).concat([1])), sum = 0;
+    D.trend.forEach(function (x, i) {
+      var d = el('div'), n = x[metric]; sum += n;
+      var s = el('s'); s.style.height = Math.max(2, Math.round(n / max * 92)) + '%'; s.title = x.day + ' · ' + n;
+      d.appendChild(el('small', '', n ? String(n) : ''));
+      d.appendChild(s);
+      d.appendChild(el('small', '', i % 2 ? '' : x.day.slice(8)));
+      C.appendChild(d);
+    });
+    $('chartCap').textContent = { users: '새 회원', cards: '새로 만든 카드', views: '카드 열람' }[metric] + ' 14일 합계 ' + num(sum) + ' (아래 숫자는 날짜)';
+  }
+  document.querySelectorAll('#seg button').forEach(function (b) { b.addEventListener('click', function () { metric = b.dataset.k; document.querySelectorAll('#seg button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); chart(); }); });
+  function top() {
+    var L = $('top'); L.innerHTML = '';
+    if (!D.top.length) { L.appendChild(el('p', 'muted', '이번 주에 열린 카드가 아직 없어요.')); return; }
+    D.top.forEach(function (x, i) {
+      var r = el('div', 'row'); r.appendChild(el('span', 'n', String(i + 1)));
+      var t = el('a', 't', x.title || (x.gone ? '(지운 카드)' : '(제목 없음)')); t.href = '/c/?s=' + x.cid; t.target = '_blank'; t.rel = 'noopener';
+      t.appendChild(el('small', '', x.cid + (x.design ? ' · ' + x.design : '')));
+      r.appendChild(t); r.appendChild(el('span', 'v', '👀 ' + num(x.n))); L.appendChild(r);
+    });
+  }
+  function act(op, cid, msg) { api({ op: op, cid: cid }).then(function (j) { if (j.ok) { toast(msg); load(); } else toast('안 됐어요'); }); }
+  function reports() {
+    var L = $('reports'); L.innerHTML = '';
+    if (!D.reports.length) L.appendChild(el('p', 'muted', '들어온 신고가 없어요. 👍'));
+    D.reports.forEach(function (x) {
+      var r = el('div', 'row');
+      var t = el('a', 't', (x.blocked ? '⛔ ' : '') + (x.title || '(제목 없음)')); t.href = '/c/?s=' + x.cid; t.target = '_blank'; t.rel = 'noopener';
+      t.appendChild(el('small', '', '신고 ' + x.n + '명 · ' + (x.why || '이유 없음') + ' · ' + when(x.at)));
+      r.appendChild(t);
+      if (x.blocked) { var u = el('button', 'sb', '풀기'); u.type = 'button'; u.addEventListener('click', function () { act('unblock', x.cid, '풀었어요'); }); r.appendChild(u); }
+      else {
+        var bl = el('button', 'sb red', '막기'); bl.type = 'button'; bl.addEventListener('click', function () { if (confirm('이 카드를 막을까요? 받은 사람도 더는 못 열어요.')) act('block', x.cid, '막았어요'); }); r.appendChild(bl);
+        var ds = el('button', 'sb', '신고 지우기'); ds.type = 'button'; ds.addEventListener('click', function () { act('dismiss', x.cid, '신고를 지웠어요'); }); r.appendChild(ds);
+      }
+      L.appendChild(r);
+    });
+    var B = $('blocked'); B.innerHTML = '';
+    if (!D.blocked.length) B.appendChild(el('p', 'muted', '막힌 카드가 없어요.'));
+    D.blocked.forEach(function (x) {
+      var r = el('div', 'row'), t = el('div', 't', x.title || x.cid);
+      t.appendChild(el('small', '', (String(x.why).indexOf('reports') === 0 ? '신고로 자동' : x.why === 'admin' ? '대표가 막음' : x.why || '') + ' · ' + when(x.at)));
+      r.appendChild(t);
+      var u = el('button', 'sb', '풀기'); u.type = 'button'; u.addEventListener('click', function () { act('unblock', x.cid, '풀었어요'); }); r.appendChild(u);
+      B.appendChild(r);
+    });
+  }
+  // ---------- Claude에게 수정 요청 ----------
+  function prompt() {
+    var ask = $('ask').value.trim(), where = $('where').value;
+    return '싸바(sava.kr) 수정 요청이에요. GitHub 저장소 directorjoo/ssaka-app 에서 작업해 주세요.\n' +
+      '화면: ' + where + '\n\n요청:\n' + ask + '\n\n(싸바 관리자 화면에서 보냄 · ' + new Date().toLocaleString('ko-KR') + ')';
+  }
+  function saveReq(silent) {
+    var ask = $('ask').value.trim(); if (ask.length < 2) { toast('요청 내용을 적어 주세요'); return Promise.resolve(null); }
+    return api({ op: 'req', text: ask, where: $('where').value }).then(function (j) { if (j.ok) { if (!silent) toast('요청 목록에 적었어요'); load(); return j; } toast('저장이 안 됐어요'); return null; });
+  }
+  $('toClaude').addEventListener('click', function () {
+    var ask = $('ask').value.trim(); if (ask.length < 2) return toast('요청 내용을 적어 주세요');
+    var p = prompt(), w = window.open('https://claude.ai/new?q=' + encodeURIComponent(p), '_blank');
+    if (!w) location.href = 'https://claude.ai/new?q=' + encodeURIComponent(p);
+    saveReq(true).then(function () { $('ask').value = ''; });
+  });
+  $('saveReq').addEventListener('click', function () { saveReq().then(function (j) { if (j) $('ask').value = ''; }); });
+  $('copyReq').addEventListener('click', function () {
+    var ask = $('ask').value.trim(); if (ask.length < 2) return toast('요청 내용을 적어 주세요');
+    var p = prompt();
+    (navigator.clipboard ? navigator.clipboard.writeText(p) : Promise.reject()).then(function () { toast('복사했어요 · Claude 대화창에 붙여넣기'); }).catch(function () { var t = el('textarea'); t.value = p; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); toast('복사했어요'); } catch (e) {} t.remove(); });
+  });
+  function reqs() {
+    var L = $('reqs'); L.innerHTML = '';
+    var open = D.reqs.filter(function (x) { return x.st === 'open'; }).length;
+    $('reqN').textContent = '할 일 ' + open + ' · 끝남 ' + (D.reqs.length - open);
+    if (!D.reqs.length) { L.appendChild(el('p', 'muted', '아직 적어 둔 요청이 없어요. 위 칸에 적고 "요청 목록에 적어 두기"를 누르세요.')); return; }
+    D.reqs.forEach(function (x) {
+      var d = el('div', 'req' + (x.st === 'done' ? ' done' : ''));
+      d.appendChild(el('div', 'meta', (x.st === 'done' ? '✅ 끝남 · ' : '🟠 할 일 · ') + (x.place || '') + ' · ' + when(x.at)));
+      d.appendChild(el('p', '', x.text));
+      var a = el('div', 'a');
+      function b(txt, cls, fn) { var e = el('button', 'sb ' + (cls || ''), txt); e.type = 'button'; e.addEventListener('click', fn); a.appendChild(e); }
+      if (x.st === 'open') {
+        b('Claude에게 다시 ↗', 'dark', function () { $('ask').value = x.text; var s = $('where'); for (var i = 0; i < s.options.length; i++) if (s.options[i].text === x.place) s.selectedIndex = i; window.open('https://claude.ai/new?q=' + encodeURIComponent(prompt()), '_blank'); $('ask').value = ''; });
+        b('✅ 끝남', '', function () { api({ op: 'reqdone', id: x.id }).then(load); });
+      } else b('다시 할 일로', '', function () { api({ op: 'reqopen', id: x.id }).then(load); });
+      b('지우기', 'red', function () { if (confirm('이 요청을 지울까요?')) api({ op: 'reqdel', id: x.id }).then(load); });
+      d.appendChild(a); L.appendChild(d);
+    });
+  }
+  function setup() {
+    var L = $('setup'); L.innerHTML = '';
+    (D.setup || []).forEach(function (s) { var r = el('div', 'chk'); r.appendChild(el('span', '', s[0])); r.appendChild(el('b', '', s[1] ? '✅ 들어감' : '⬜ 아직')); L.appendChild(r); });
+  }
+  $('reload').addEventListener('click', function () { load().then(function () { toast('새로 불러왔어요'); }); });
+  $('keyGo').addEventListener('click', function () { KEY = $('key').value.trim(); if (!KEY) return; try { sessionStorage.setItem('sava-adm', KEY); } catch (e) {} load(); });
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('keyGo').click(); });
+  load();
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

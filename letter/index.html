@@ -27,6 +27,15 @@
     .cities button[aria-pressed="true"] { background: #1A4FB0; border-color: #1A4FB0; color: #fff; }
     .paper { position: relative; margin-top: 14px; padding: 22px 18px 18px; border-radius: 22px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 14px 30px -20px rgba(80,30,20,.45); }
     .paper::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border-radius: 22px 22px 0 0; background: repeating-linear-gradient(135deg, #B3132B 0 14px, #fff 14px 22px, #1A4FB0 22px 36px, #fff 36px 44px); }
+    .paper.writing::before { height: 10px; animation: mail 0.9s linear infinite; }
+    @keyframes mail { from { background-position: 0 0; } to { background-position: 62.2254px 0; } }
+    .paper.writing .msg { animation: breathe 1.6s ease-in-out infinite; }
+    .pen { display: inline-block; font-size: 26px; animation: pen 0.7s ease-in-out infinite alternate; transform-origin: 20% 90%; }
+    @keyframes pen { from { transform: translateX(-6px) rotate(-8deg); } to { transform: translateX(6px) rotate(8deg); } }
+    @keyframes breathe { 50% { opacity: .55; } }
+    .dots i { font-style: normal; animation: dot 1.2s infinite; opacity: .2; }
+    .dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; }
+    @keyframes dot { 30% { opacity: 1; } 60%, 100% { opacity: .2; } }
     .date { color: var(--ink-2); font-size: 14.5px; font-weight: 800; }
     .hello { margin: 6px 0 14px; font-size: 22px; font-weight: 900; letter-spacing: -.03em; line-height: 1.4; word-break: keep-all; }
     .it { display: grid; grid-template-columns: 40px 1fr; gap: 10px; padding: 13px 0; border-top: 1px solid #f3ebe5; }
@@ -59,7 +68,7 @@
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
   <div class="who" id="who"></div>
   <div class="cities" id="cities"></div>
-  <article class="paper" id="paper"><div class="msg">편지를 쓰는 중이에요…</div></article>
+  <article class="paper writing" id="paper"><div class="msg">편지를 쓰는 중이에요…</div></article>
   <div class="acts">
     <button type="button" class="k" id="send">💬 단톡방에 보내기</button>
     <a class="l" href="../today/">☀️ 오늘의 싸바 더 보기</a>
@@ -97,7 +106,7 @@
     try { localStorage.setItem('sava-letter-k', k); localStorage.setItem('sava-letter-city', city); } catch (e) {}
     history.replaceState(null, '', '?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)));
     bar(); last = null;
-    var p = $('paper'); p.innerHTML = '<div class="msg">오늘 편지를 쓰는 중이에요…<br><small>처음엔 20초쯤 걸릴 수 있어요</small></div>';
+    var p = $('paper'); p.classList.add('writing'); p.innerHTML = '<div class="msg"><span class="pen">✍️</span><br>오늘 편지를 쓰는 중이에요<span class="dots"><i>.</i><i>.</i><i>.</i></span><br><small>처음엔 20초쯤 걸릴 수 있어요</small></div>';
     var want = k + city;
     fetch('/api/letter?k=' + k + '&city=' + encodeURIComponent(city)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       if (want !== k + city) return; last = d;
@@ -113,8 +122,8 @@
       } else
       h += d.items.map(function (x) { return '<div class="it"><i>' + esc(x.icon || '•') + '</i><div><b>' + esc(x.title) + '</b><p>' + esc(x.body) + '</p>' + (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">원문 보기 ›</a>' : '') + '</div></div>'; }).join('');
       h += '<div class="sign">— 🍒 싸바 드림</div>';
-      p.innerHTML = h;
-    }).catch(function () { if (want === k + city) p.innerHTML = '<div class="msg">편지를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
+      p.classList.remove('writing'); p.innerHTML = h;
+    }).catch(function () { if (want === k + city) { p.classList.remove('writing'); } if (want === k + city) p.innerHTML = '<div class="msg">편지를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
   }
   $('send').addEventListener('click', function () {
     var who = WHO.filter(function (w) { return w[0] === k; })[0];

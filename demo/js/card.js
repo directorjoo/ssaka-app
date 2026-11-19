@@ -282,23 +282,31 @@
         // 참석 명단: 카드 주인 화면에서만 이름·전화번호가 보이게 잠금
         if (card.roster && window.SsakaRoster && SsakaRoster.own) { try { SsakaRoster.own(); } catch (e) {} }
         var bar = document.createElement('div'); bar.className = 'sk-owner';
-        var st = document.createElement('div'); st.className = 'sk-stats'; st.textContent = '📊 손님 반응 불러오는 중…';
-        fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {
-          var w = j.week || {}, t = j.total || {};
-          var mp = (w.map || 0) + (w.kakaomap || 0) + (w.navermap || 0) + (w.googlemap || 0);
-          st.innerHTML = '';
-          var h = document.createElement('b'); h.textContent = '📊 이번 주 손님 반응'; st.appendChild(h);
-          [['👀 열어 봄', w.view || 0], ['📍 길찾기', mp], ['📞 전화', w.call || 0], ['📅 예약', (w.reserve || 0) + (w.rsvp || 0)], ['💬 다시 보냄', (w.share || 0) + (w.sms || 0)]].forEach(function (x) {
-            var c = document.createElement('span'); c.innerHTML = '<i></i><em></em>'; c.firstChild.textContent = x[0]; c.lastChild.textContent = x[1]; st.appendChild(c);
-          });
-          var tot = document.createElement('small'); tot.textContent = '처음부터 지금까지 열어 본 횟수 ' + (t.view || 0) + '번 · 같은 사람은 하루 한 번만 세요'; st.appendChild(tot);
-        }).catch(function () { st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
+        // 손님 반응은 평소엔 접어 둠 — 아래 예약·전화 단추를 가리지 않게, 위 '📊 반응'을 누를 때만 위쪽에 펼침
+        var st = document.createElement('div'); st.className = 'sk-stats'; st.hidden = true; st.textContent = '📊 손님 반응 불러오는 중…';
+        var stLoaded = false;
+        var loadStats = function () {
+          if (stLoaded) return; stLoaded = true;
+          fetch(new URL('../api/stats', location.href).href + '?d=' + encodeURIComponent(dq)).then(function (r) { return r.json(); }).then(function (j) {
+            var w = j.week || {}, t = j.total || {};
+            var mp = (w.map || 0) + (w.kakaomap || 0) + (w.navermap || 0) + (w.googlemap || 0);
+            st.innerHTML = '';
+            var h = document.createElement('b'); h.textContent = '📊 이번 주 손님 반응'; st.appendChild(h);
+            var x0 = document.createElement('button'); x0.type = 'button'; x0.className = 'sk-stats-x'; x0.textContent = '✕ 닫기'; x0.addEventListener('click', function () { st.hidden = true; }); st.appendChild(x0);
+            [['👀 열어 봄', w.view || 0], ['📍 길찾기', mp], ['📞 전화', w.call || 0], ['📅 예약', (w.reserve || 0) + (w.rsvp || 0)], ['💬 다시 보냄', (w.share || 0) + (w.sms || 0)]].forEach(function (x) {
+              var c = document.createElement('span'); c.innerHTML = '<i></i><em></em>'; c.firstChild.textContent = x[0]; c.lastChild.textContent = x[1]; st.appendChild(c);
+            });
+            var tot = document.createElement('small'); tot.textContent = '처음부터 지금까지 열어 본 횟수 ' + (t.view || 0) + '번 · 같은 사람은 하루 한 번만 세요'; st.appendChild(tot);
+          }).catch(function () { stLoaded = false; st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
+        };
         var mk = new URL('../make/', location.href).href;
         var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 바로 고치기';
         e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
         var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : ''); e1.textContent = '📝 입력칸';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
-        bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2);
+        var e3 = document.createElement('a'); e3.href = '#'; e3.textContent = '📊 반응';
+        e3.addEventListener('click', function (ev) { ev.preventDefault(); st.hidden = !st.hidden; if (!st.hidden) loadStats(); });
+        bar.appendChild(e0); bar.appendChild(e1); bar.appendChild(e2); bar.appendChild(e3);
         document.body.appendChild(bar); bar.parentNode.insertBefore(st, bar);
       };
       var sidQ = new URLSearchParams(location.search).get('s');

@@ -1310,9 +1310,8 @@
     var bh = 170 * u; ctx.fillStyle = grad(ctx, 0, H - bh * 1.6, 0, H, [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.62)']]); ctx.fillRect(0, H - bh * 1.6, W, bh * 1.6);
     ctx.fillStyle = P.accentLine || P.accent; ctx.fillRect(56 * u, H - 112 * u, 56 * u, 6 * u);
     ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 8 * u; ctx.shadowOffsetY = 2 * u;
-    tBlock(ctx, String(card.title || '싸바'), { x: 56 * u, y: H - 92 * u, w: W - 300 * u, size: 44 * u, min: 30 * u, fam: famStack(design), weight: 800, color: '#ffffff', lines: 1 });
-    ctx.font = '800 ' + Math.round(34 * u) + 'px ' + FONT; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-    ctx.fillText(i + ' / ' + n, W - 56 * u, H - 88 * u); ctx.textAlign = 'left'; ctx.restore();
+    tBlock(ctx, String(card.title || '싸바'), { x: 56 * u, y: H - 92 * u, w: W - 112 * u, size: 44 * u, min: 30 * u, fam: famStack(design), weight: 800, color: '#ffffff', lines: 1 });
+    ctx.restore(); // 쪽수는 안 그림 — 인스타가 점으로 보여 주고, 완성 화면에서 장을 뺄 수 있어 숫자가 틀어짐
     return c;
   }
   function drawInfoSlide(card, design, opts, i, n, size) {
@@ -1339,7 +1338,6 @@
     var cta = w.cta || '자세한 안내는 프로필 링크에서 👆';
     ctx.fillStyle = P.accent; round(ctx, m, H - m - 110 * u, W - m * 2, 110 * u, 55 * u); ctx.fill();
     tBlock(ctx, cta, { x: m + 30 * u, y: H - m - 76 * u, w: W - m * 2 - 60 * u, size: 38 * u, min: 26 * u, fam: FONT, weight: 800, color: P.onAccent || '#fff', align: 'center', lines: 1 });
-    ctx.font = '800 ' + Math.round(30 * u) + 'px ' + FONT; ctx.fillStyle = P.subBg; ctx.textAlign = 'right'; ctx.fillText(i + ' / ' + n, W - m, m - 10 * u); ctx.textAlign = 'left';
     mark(ctx, W, H, lumOf(P.bg) > 0.5);
     return c;
   }

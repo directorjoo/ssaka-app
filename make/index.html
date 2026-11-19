@@ -413,6 +413,15 @@
   #pvModal .pv-sns { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: start center; }
   .done-sns { display: grid; gap: 8px; }
   .done-sns .snspv { max-width: 300px; } .done-sns .snspv.r-story { height: min(52vh, 480px); }
+  .slides { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; margin: 0 auto; width: 100%; }
+  .slides .sl { position: relative; padding: 0; border: 2px solid #eee; border-radius: 8px; overflow: hidden; background: #f4f4f4; aspect-ratio: 4 / 5; }
+  .slides.sq .sl { aspect-ratio: 1 / 1; }
+  .slides .sl img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .slides .sl.on { border-color: #B3132B; box-shadow: 0 0 0 2px #B3132B; }
+  .slides .sl.off img { opacity: .25; filter: grayscale(1); }
+  .slides .sl .no { position: absolute; left: 3px; top: 3px; min-width: 20px; padding: 0 4px; border-radius: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; font-weight: 800; line-height: 20px; text-shadow: 0 1px 2px #000; }
+  .slides .sl .x { position: absolute; right: 2px; top: 2px; width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #B3132B; font-size: 14px; font-weight: 900; line-height: 22px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+  .slides-tip { font-size: 15px; color: #555; text-align: center; word-break: keep-all; line-height: 1.5; }
   .more-dest { margin: 4px 0 12px; padding: 14px 12px; border-radius: 16px; background: #FFF6F7; border: 2px dashed #E7A3AE; text-align: left; }
   .more-dest > b { display: block; font-size: 16px; font-weight: 900; color: #8E0A1C; margin-bottom: 2px; }
   .more-dest > small { display: block; font-size: 15px; color: #555; margin-bottom: 10px; word-break: keep-all; }
@@ -781,6 +790,8 @@
     <p class="done-sub" id="doneSub">이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
     <div class="done-sns" id="doneSns" hidden>
       <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
+      <div class="slides" id="doneSlides" role="group" aria-label="넘겨 보기 묶음" hidden></div>
+      <small class="slides-tip" id="doneSlidesTip" hidden></small>
       <button type="button" class="kakao big" id="doneSnsSave">📥 이 사진 저장하기</button>
     </div>
     <div class="more-dest" id="moreDest">
@@ -886,7 +897,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=87"></script>
+<script src="../js/export.js?v=88"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1539,13 +1550,14 @@
     var ds = DEST_BY[dest] || DEST_BY.kakao, dd = destSns();
     if (madeDests.indexOf(dest) < 0) madeDests.push(dest);
     $('doneSns').hidden = !dd;
-    if (dd) { var gn = Math.min(8, (buildCard().card.gallery || []).length), multi = (dd.sz === 'sq' || dd.sz === 'p45') && gn; $('doneSnsSave').textContent = multi ? '📥 사진 묶음 저장하기 (넘겨 보기 최대 ' + (gn + 2) + '장)' : '📥 이 사진 저장하기'; }
+    if (dd) $('doneSnsSave').textContent = '📥 이 사진 저장하기';
     $('send2').className = dd ? 'ghost big' : 'kakao big';
     if (dd) {
       $('doneHead').textContent = '🎉 ' + ds.b + ' 사진이 완성됐어요!';
       $('doneSub').textContent = ds.s + ' 크기 그대로예요. 저장해서 올리세요. 카드 링크도 카톡으로 함께 보낼 수 있어요.';
-      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card);
+      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card).then(function (r) { if (r) paintSlides(r); });
     } else {
+      $('doneSlides').hidden = $('doneSlidesTip').hidden = true;
       $('doneHead').textContent = '🎉 카드가 완성됐어요!';
       $('doneSub').textContent = '이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.';
     }
@@ -1573,21 +1585,59 @@
     setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
     toast(DEST_BY[id].b + '(' + DEST_BY[id].s + ')에 맞는 디자인을 골라 주세요. 쓴 내용은 그대로예요');
   }
-  $('doneSnsSave').addEventListener('click', function () {
-    makeSnsImg(buildCard().card).then(function (r) {
-      if (!r) { toast('사진을 아직 그리는 중이에요. 잠시 뒤 다시 눌러 주세요'); return; }
-      var f = new File([r.blob], 'sava-' + dest + '-1.jpg', { type: 'image/jpeg' }), dd = destSns(), card = buildCard().card;
-      // 인스타 피드(1:1·4:5)는 사진을 여러 장 올렸으면 넘겨 보는 묶음(최대 10장)으로: 첫 장 디자인 + 사진 한 장씩 + 마지막 안내 장
-      var more = dd && (dd.sz === 'sq' || dd.sz === 'p45') && SsakaExport.slides && (card.gallery || []).length
-        ? SsakaExport.slides(card, curDesign(), { pics: localPics, industry: industry, menu: snsMenu() }, dd.sz).catch(function () { return []; }) : Promise.resolve([]);
-      toast('🍒 사진 준비 중');
-      more.then(function (ls) {
-        var files = [f].concat(ls.map(function (x) { return new File([x.blob], 'sava-' + dest + '-' + x.name.replace(/^.*-(\d+)\.jpg$/, '$1') + '.jpg', { type: 'image/jpeg' }); }));
-        if (navigator.canShare && navigator.canShare({ files: files })) { navigator.share({ files: files }).catch(function () {}); return; }
-        files.forEach(function (ff, k) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(ff); a.download = ff.name; document.body.appendChild(a); a.click(); a.remove(); }, k * 400); });
-        toast(files.length > 1 ? '사진 ' + files.length + '장을 내려받았어요 — 인스타에 한꺼번에 올리면 넘겨 보는 묶음이 돼요' : '사진을 내려받았어요');
+  // ---------- 인스타 넘겨 보기 묶음: 완성 화면에서 모든 장을 한눈에 → 눌러 크게 보기, ✕로 빼기 ----------
+  // 저장 단추를 누르는 순간 바로 공유창이 떠야 함(아이폰은 누른 직후가 아니면 공유를 막음) → 묶음은 미리 그려 둠
+  var slideSet = null, slideGen = 0;   // { key, first:{url,blob}, list:[{url,blob,name,info}], off:{} }
+  function slideKey(card) { var d = curDesign(); return dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length; }
+  function isFeed(dd) { return dd && (dd.sz === 'sq' || dd.sz === 'p45'); }
+  function paintSlides(first) {
+    var box = $('doneSlides'), tip = $('doneSlidesTip'), dd = destSns(), card = buildCard().card, key = slideKey(card), gen = ++slideGen;
+    box.hidden = tip.hidden = true; box.innerHTML = '';
+    if (!isFeed(dd) || !SsakaExport.slides || !(card.gallery || []).length) { slideSet = null; return; }
+    if (slideSet && slideSet.key === key) return drawSlideThumbs(first);
+    tip.hidden = false; tip.textContent = '🍒 넘겨 보기 묶음 그리는 중…';
+    SsakaExport.slides(card, curDesign(), { pics: localPics, industry: industry, menu: snsMenu() }, dd.sz).then(function (ls) {
+      if (gen !== slideGen) return;
+      if (slideSet) slideSet.list.forEach(function (x) { URL.revokeObjectURL(x.url); });
+      slideSet = { key: key, list: (ls || []).map(function (x, k) { return { url: URL.createObjectURL(x.blob), blob: x.blob, info: k === ls.length - 1 && !!((card.contact && card.contact.phone) || card.place) }; }), off: {} };
+      drawSlideThumbs(first);
+    }).catch(function () { if (gen === slideGen) { slideSet = null; tip.hidden = true; } });
+  }
+  function drawSlideThumbs(first) {
+    var box = $('doneSlides'), tip = $('doneSlidesTip'), dd = destSns();
+    box.innerHTML = ''; box.classList.toggle('sq', dd.sz === 'sq');
+    if (!slideSet || !slideSet.list.length) { box.hidden = tip.hidden = true; return; }
+    var all = [{ url: first.url, main: true }].concat(slideSet.list);
+    all.forEach(function (x, k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'sl' + (k === 0 ? ' on' : '') + (slideSet.off[k] ? ' off' : '');
+      b.setAttribute('aria-label', (k + 1) + '번째 장' + (k === 0 ? ' (디자인)' : x.info ? ' (안내)' : ''));
+      b.innerHTML = '<img alt="" src="' + x.url + '"><span class="no">' + (k + 1) + '</span>' + (k ? '<span class="x" title="빼기/넣기">' + (slideSet.off[k] ? '+' : '✕') + '</span>' : '');
+      b.addEventListener('click', function (e) {
+        if (k && e.target.classList.contains('x')) { slideSet.off[k] = !slideSet.off[k]; drawSlideThumbs(first); return; }
+        $('doneSnsImg').src = x.url;
+        [].forEach.call(box.children, function (c, i) { c.classList.toggle('on', i === k); });
       });
+      box.appendChild(b);
     });
+    var n = 1 + slideSet.list.filter(function (x, i) { return !slideSet.off[i + 1]; }).length;
+    box.hidden = tip.hidden = false;
+    tip.textContent = n > 1 ? '👆 눌러서 크게 보기 · ✕로 뺄 수 있어요. 인스타에 ' + n + '장을 한꺼번에 올리면 넘겨 보는 묶음이 돼요' : '디자인 한 장만 저장해요 (✕를 다시 누르면 넣어요)';
+    $('doneSnsSave').textContent = n > 1 ? '📥 넘겨 보기 ' + n + '장 한꺼번에 저장하기' : '📥 이 사진 저장하기';
+  }
+  $('doneSnsSave').addEventListener('click', function () {
+    var card = buildCard().card;
+    // 이미 그려 둔 첫 장이 있으면 기다리지 않고 바로 공유 (누른 직후에 공유창을 띄워야 아이폰에서 막히지 않음)
+    var ready = snsPvBlob && snsPvKey === slideKey(card);
+    var go = function (blob) {
+      var files = [new File([blob], 'sava-' + dest + '-1.jpg', { type: 'image/jpeg' })];
+      if (slideSet && slideSet.key === slideKey(card)) slideSet.list.forEach(function (x, i) { if (!slideSet.off[i + 1]) files.push(new File([x.blob], 'sava-' + dest + '-' + (files.length + 1) + '.jpg', { type: 'image/jpeg' })); });
+      if (navigator.canShare && navigator.canShare({ files: files })) { navigator.share({ files: files }).catch(function () {}); return; }
+      files.forEach(function (ff, k) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(ff); a.download = ff.name; document.body.appendChild(a); a.click(); a.remove(); }, k * 400); });
+      toast(files.length > 1 ? '사진 ' + files.length + '장을 내려받았어요 — 인스타에 한꺼번에 올리면 넘겨 보는 묶음이 돼요' : '사진을 내려받았어요');
+    };
+    if (ready) return go(snsPvBlob);
+    toast('🍒 사진 준비 중 — 다 되면 한 번 더 눌러 주세요');
+    makeSnsImg(card).then(function (r) { if (r) paintSlides(r); });
   });
   var INV = [
     '바쁘신 중에도 귀한 걸음 하시어\n자리를 빛내 주시면 감사하겠습니다.',

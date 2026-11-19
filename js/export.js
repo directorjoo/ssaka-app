@@ -201,11 +201,48 @@
   function pick(card, re) { var l = (card.body || []).filter(function (x) { return re.test(x); })[0]; return l ? l.replace(re, '').replace(/^[\s:·]+/, '').trim() : ''; }
   function won(p) { return p ? Number(p).toLocaleString('ko-KR') : ''; }
 
+  // ---------- 업종별 낱말 (2026-11-20: 카드형 소식 세트를 모든 업종으로) ----------
+  var WD_BASE = { sig: '대표 메뉴', sigEn: 'SIGNATURE', board: '차림표', none: '시세', now: '맛볼 수 있어요', info: '찾아오시는 길', hours: '영업', cta: '예약 · 길찾기는 프로필 링크에서 👆', extra: /배달|주차|포장|단체/ };
+  var EDU = { sig: '추천 강좌', sigEn: 'CLASS', board: '수강 안내', none: '문의', now: '신청할 수 있어요', hours: '시간', cta: '상담 예약은 프로필 링크에서 👆', extra: /셔틀|주차|레벨|무료|상담/ };
+  var PRO = { sig: '포트폴리오', sigEn: 'PORTFOLIO', board: '경력 · 소개', none: '', now: '만날 수 있어요', info: '연락처', hours: '소개', cta: '연락 · 문의는 프로필 링크에서 👆', extra: /상담|가능|문의/ };
+  var CLUB = { sig: '함께한 순간', sigEn: 'MOMENTS', board: '일정 안내', none: '', now: '함께해요', info: '모임 안내', hours: '일시', cta: '참석 신청은 카드 링크에서 👆', hot: /회비|모집|선착순|마감/, extra: /회비|준비물|주차|드레스/ };
+  var WORDS = {
+    restaurant: { hot: /한정/ }, cafe: { hot: /한정|신메뉴|이벤트|할인|1\+1|2\+1/, board: '메뉴', extra: /주차|포장|단체|예약|디저트/ },
+    beauty: { sig: '대표 시술', sigEn: 'STYLE', board: '시술 가격표', none: '상담', now: '받을 수 있어요', hours: '시간', cta: '시술 예약은 프로필 링크에서 👆', extra: /주차|예약|첫 방문/ },
+    toefl: EDU, bigacademy: EDU, academy: EDU, entrance: EDU, arts: Object.assign({}, EDU, { sig: '수업 · 작품', sigEn: 'CLASS' }),
+    fitness: { sig: '대표 프로그램', sigEn: 'PROGRAM', board: '이용 요금', none: '상담', now: '시작할 수 있어요', hours: '운영', cta: '체험 · 상담 예약은 프로필 링크에서 👆', extra: /주차|샤워|무료|체험/ },
+    flower: { sig: '이번 주 꽃', sigEn: 'FLOWERS', board: '가격표', none: '문의', now: '만날 수 있어요', hours: '영업', cta: '주문 · 예약은 프로필 링크에서 👆', extra: /배송|배달|주차|클래스/ },
+    stay: { sig: '객실 · 풍경', sigEn: 'ROOMS', board: '객실 요금', none: '문의', now: '예약할 수 있어요', info: '오시는 길', hours: '입실', cta: '객실 예약은 프로필 링크에서 👆', extra: /바비큐|스파|주차|조식|픽업/ },
+    realty: { sig: '추천 매물', sigEn: 'LISTING', board: '매물 목록', none: '문의', now: '만날 수 있어요', hours: '상담', cta: '방문 상담 예약은 프로필 링크에서 👆', extra: /역세권|주차|상담/ },
+    actor: Object.assign({}, PRO, { sig: '프로필 사진', sigEn: 'PROFILE', board: '필모그래피' }), director: Object.assign({}, PRO, { sig: '작품', sigEn: 'WORKS', board: '필모그래피' }),
+    freelancer: PRO, insurance: Object.assign({}, PRO, { board: '상담 분야' }), newcar: Object.assign({}, PRO, { board: '이달의 상담', sig: '차량', sigEn: 'CARS' }),
+    usedcar: Object.assign({}, PRO, { board: '상담 안내', sig: '오늘의 차', sigEn: 'CARS' }), sales: PRO, tutor: Object.assign({}, PRO, { board: '수업 안내' }),
+    club: CLUB, alumni: CLUB, party: CLUB, event: Object.assign({}, CLUB, { sig: '소중한 순간', board: '안내', info: '오시는 길', cta: '오시는 길 · 연락은 카드 링크에서 👆' }),
+    greeting: { sig: '마음을 담아', sigEn: 'WITH LOVE', board: '전하는 말', none: '', now: '고마워요', info: '', hours: '', cta: '카드를 열어 답장해 주세요 👆', hot: /^$/, extra: /^$/ }
+  };
+  var TYPE_WORDS = { shop: {}, profile: PRO, club: CLUB, greet: WORDS.greeting };
+  function words(ind, tpl) { return Object.assign({}, WD_BASE, TYPE_WORDS[tpl] || {}, WORDS[ind] || {}); }
+  // 이미지 크기 → 올리기 알맞은 SNS 이름 (SNS_SIZES 표와 같은 기준)
+  function sizePlaces(w, h) {
+    var r = w / h, best = null, gap = 9;
+    SNS_SIZES.forEach(function (s) { var g = Math.abs(s.w / s.h - r); if (g < gap) { gap = g; best = s; } });
+    return best ? { label: best.label, places: best.places } : { label: '', places: [] };
+  }
+
   function shopCover(card, sc, img, H) {
     var W = 1080, c = canvas(W, H), ctx = c.getContext('2d'), story = H > 1500;
     ctx.fillStyle = sc.dark; ctx.fillRect(0, 0, W, H);
     var ph = Math.round(H * (story ? 0.54 : 0.66));
     if (img) cover(ctx, img, 0, 0, W, ph, card.__main === img ? card.ip : null);
+    else { // 사진이 없을 때: 강조색 빛 번짐 + 큰 첫 글자 + 동심원 (캔바 표지 느낌)
+      var rg = ctx.createRadialGradient(W * 0.72, ph * 0.3, 20, W * 0.6, ph * 0.4, W * 0.95);
+      rg.addColorStop(0, sc.accent); rg.addColorStop(1, sc.dark);
+      ctx.fillStyle = rg; ctx.fillRect(0, 0, W, ph);
+      ctx.strokeStyle = 'rgba(255,217,168,.22)'; ctx.lineWidth = 2;
+      [180, 260, 340, 420].forEach(function (r) { ctx.beginPath(); ctx.arc(W * 0.72, ph * 0.34, r, 0, Math.PI * 2); ctx.stroke(); });
+      ctx.save(); ctx.globalAlpha = 0.16; ctx.font = '900 ' + Math.round(ph * 0.72) + 'px ' + SERIF; ctx.fillStyle = sc.cream; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(card.title || '싸').trim().charAt(0), W * 0.72, ph * 0.4); ctx.restore();
+    }
     if (story) { ctx.fillStyle = grad(ctx, 0, 0, 0, 260, [[0, 'rgba(0,0,0,.5)'], [1, 'rgba(0,0,0,0)']]); ctx.fillRect(0, 0, W, 260); }
     fade(ctx, W, H, ph - (story ? 420 : 300), ph + 10, sc.dark);
     var y = story ? 900 : Math.round(H * 0.6);
@@ -217,14 +254,23 @@
     if (line) y = centerText(ctx, line, y, story ? 40 : 36, sc.cream, 700, FONT, 940) + 8;
     var pop = pick(card, /^인기\s*[:：]/) || pick(card, /한정\s*[:：]/);
     if (pop) centerText(ctx, pop, y + 6, story ? 32 : 28, sc.mute, 500, FONT, 940);
+    // 캔바식 마감: 위쪽 머리말 알약 + 얇은 금빛 안쪽 테두리
+    var hd = String(card.__head || '').trim();
+    if (hd) {
+      ctx.font = '800 30px ' + FONT; var hw = ctx.measureText(hd).width + 56, hy = story ? 230 : 52;
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; round(ctx, (W - hw) / 2, hy, hw, 58, 29); ctx.fill();
+      ctx.strokeStyle = sc.gold; ctx.lineWidth = 2; round(ctx, (W - hw) / 2, hy, hw, 58, 29); ctx.stroke();
+      ctx.fillStyle = sc.cream; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(hd, W / 2, hy + 30); ctx.textAlign = 'left';
+    }
+    ctx.strokeStyle = 'rgba(255,217,168,.55)'; ctx.lineWidth = 2; ctx.strokeRect(24, story ? 200 : 24, W - 48, H - (story ? 420 : 48));
     if (!story) mark(ctx, W, H);
     return c;
   }
   function shopSignature(card, sc, imgs) {
     var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
     ctx.fillStyle = sc.paper; ctx.fillRect(0, 0, W, H);
-    ctx.font = '500 26px ' + FONT; ctx.fillStyle = '#8A7660'; ctx.textBaseline = 'top'; ctx.fillText('SIGNATURE', 60, 64);
-    ctx.font = '900 64px ' + FONT; ctx.fillStyle = sc.ink; ctx.fillText(String(card.title || '').slice(0, 10) + ' 대표 메뉴', 60, 104);
+    ctx.font = '500 26px ' + FONT; ctx.fillStyle = '#8A7660'; ctx.textBaseline = 'top'; ctx.fillText(card.__w.sigEn, 60, 64);
+    ctx.font = '900 64px ' + FONT; ctx.fillStyle = sc.ink; var sgt = String(card.title || '').slice(0, 10) + ' ' + card.__w.sig; ctx.font = '900 ' + fitFont(ctx, sgt, W - 120, 64, 900, FONT) + 'px ' + FONT; ctx.fillText(sgt, 60, 104);
     var menu = ((card.reserve && card.reserve.menu) || []).filter(function (m) { return m.p; }).slice(0, 4);
     var pics = imgs.slice(0, 4), n = Math.max(pics.length, 1);
     var listH = menu.length ? 70 + Math.ceil(menu.length / 2) * 74 : 0;
@@ -252,31 +298,35 @@
   }
   function shopMenuBoards(card, sc) {
     var menu = (card.reserve && card.reserve.menu) || [];
+    if (!menu.length && card.template !== 'shop') menu = (card.body || []).filter(Boolean).map(function (l) { return { n: String(l) }; });
     if (!menu.length) return [];
+    var food = card.__ind === 'restaurant' || card.__ind === 'cafe';
     var per = 13, pages = [];
     for (var i = 0; i < menu.length && pages.length < 2; i += per) pages.push(menu.slice(i, i + per));
     return pages.map(function (items, pi) {
       var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
-      ctx.fillStyle = '#7A5634'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = food ? '#7A5634' : sc.dark; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = sc.paper; ctx.fillRect(34, 34, W - 68, H - 68);
       ctx.strokeStyle = '#CDB89A'; ctx.lineWidth = 2; ctx.strokeRect(56, 56, W - 112, H - 112);
       var ts = fitFont(ctx, String(card.title || ''), 760, 96, 900, SERIF);
       ctx.font = '900 ' + ts + 'px ' + SERIF; ctx.fillStyle = sc.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(card.title || '', 540, 96);
-      ctx.font = '500 28px ' + FONT; ctx.fillStyle = '#7A6650'; ctx.fillText(pages.length > 1 ? '차림표 ' + (pi + 1) + ' / ' + pages.length : '차림표', 540, 96 + ts * 1.22);
+      ctx.font = '500 28px ' + FONT; ctx.fillStyle = '#7A6650'; ctx.fillText(pages.length > 1 ? card.__w.board + ' ' + (pi + 1) + ' / ' + pages.length : card.__w.board, 540, 96 + ts * 1.22);
       ctx.textAlign = 'left';
       var y = 96 + ts * 1.22 + 80, x = 120, r = W - 120;
       items.forEach(function (m) {
         ctx.font = '700 38px ' + FONT; ctx.fillStyle = sc.ink; ctx.textBaseline = 'alphabetic';
-        var nm = m.n; while (ctx.measureText(nm).width > 600 && nm.length > 2) nm = nm.slice(0, -1);
+        var pr = m.p ? won(m.p) : (m.note || card.__w.none || '');
+        var nm = m.n, lim = pr ? 600 : r - x; while (ctx.measureText(nm).width > lim && nm.length > 2) nm = nm.slice(0, -1);
+        if (nm !== m.n) nm = nm.slice(0, -1) + '…';
         ctx.fillText(nm, x, y);
         var nw = ctx.measureText(nm).width;
-        var pr = m.p ? won(m.p) : (m.note || '시세');
+        if (!pr) { y += 70; return; }
         ctx.font = '800 38px ' + FONT; var pw = ctx.measureText(pr).width;
         ctx.textAlign = 'right'; ctx.fillText(pr, r, y); ctx.textAlign = 'left';
         ctx.strokeStyle = '#CDB89A'; ctx.setLineDash([3, 8]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + nw + 18, y - 10); ctx.lineTo(r - pw - 18, y - 10); ctx.stroke(); ctx.setLineDash([]);
         y += 70;
       });
-      var ft = [card.subtitle, card.contact && card.contact.phone ? '예약 ' + card.contact.phone : ''].filter(Boolean).join('  ·  ');
+      var ft = [card.subtitle, card.contact && card.contact.phone ? '☎ ' + card.contact.phone : ''].filter(Boolean).join('  ·  ');
       ctx.fillStyle = '#CDB89A'; ctx.fillRect(120, H - 190, W - 240, 2);
       ctx.font = '600 26px ' + FONT; ctx.fillStyle = '#6B5A47'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       var f2 = ft; while (ctx.measureText(f2).width > W - 240 && f2.length > 4) f2 = f2.slice(0, -1); ctx.fillText(f2, 540, H - 160); ctx.textAlign = 'left';
@@ -285,23 +335,24 @@
     });
   }
   function shopSeason(card, sc) {
-    var line = (card.body || []).filter(function (l) { return /한정/.test(l); })[0];
+    var hot = card.__w.hot || /한정|이벤트|할인|특강|모집|혜택|무료|오픈|신규/;
+    var line = (card.body || []).filter(function (l) { return hot.test(l); })[0];
     if (!line) return null;
     var W = 1080, H = 1350, c = canvas(W, H), ctx = c.getContext('2d');
     ctx.fillStyle = '#16283C'; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = 'radial-gradient' && grad(ctx, 0, 0, 0, 700, [[0, 'rgba(255,255,255,.07)'], [1, 'rgba(255,255,255,0)']]); ctx.fillRect(0, 0, W, 700);
-    var m = line.match(/^(.*?한정)\s*[:：]?\s*(.*)$/) || [line, '이번 한정', line];
+    var m = line.match(/^(.*?한정)\s*[:：]?\s*(.*)$/) || line.match(/^(.{1,14}?)\s*[:：]\s*(.+)$/) || [line, '이달의 소식', line];
     var tag = m[1].trim(), items = (m[2] || '').split(/[·,]/).map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 4);
     ctx.font = '900 30px ' + FONT; var tw = ctx.measureText(tag).width + 44;
     ctx.fillStyle = sc.cream; round(ctx, 80, 150, tw, 58, 10); ctx.fill(); ctx.fillStyle = '#16283C'; ctx.textBaseline = 'middle'; ctx.fillText(tag, 102, 180);
     ctx.textBaseline = 'top'; ctx.font = '900 92px ' + FONT; ctx.fillStyle = sc.cream; ctx.fillText('지금만', 80, 260);
-    ctx.fillStyle = '#9CC9F0'; ctx.fillText('맛볼 수 있어요', 80, 370);
+    ctx.fillStyle = '#9CC9F0'; ctx.fillText(card.__w.now, 80, 370);
     var menu = (card.reserve && card.reserve.menu) || [];
     var y = 560; ctx.fillStyle = 'rgba(245,235,217,.35)'; ctx.fillRect(80, y, W - 160, 2);
     items.forEach(function (it) {
       var nm = it.replace(/\(.*?\)/g, '').trim(), hit = menu.filter(function (mm) { return mm.n.replace(/\s|\(.*?\)/g, '').indexOf(nm.replace(/\s/g, '')) >= 0; })[0];
       var pr = /시세/.test(it) ? '시세' : hit && hit.p ? won(hit.p) : '';
-      y += 46; ctx.font = '800 52px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'alphabetic'; ctx.fillText(nm, 80, y + 50);
+      y += 46; ctx.font = '800 ' + fitFont(ctx, nm, W - 160 - (pr ? 260 : 0), 52, 800, FONT) + 'px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'alphabetic'; ctx.fillText(nm, 80, y + 50);
       if (pr) { ctx.font = '800 48px ' + FONT; ctx.fillStyle = sc.gold; ctx.textAlign = 'right'; ctx.fillText(pr, W - 80, y + 50); ctx.textAlign = 'left'; }
       y += 90; ctx.fillStyle = 'rgba(245,235,217,.2)'; ctx.fillRect(80, y, W - 160, 2);
     });
@@ -315,13 +366,13 @@
     if (img) cover(ctx, img, 0, 0, W, 650);
     fade(ctx, W, H, 400, 660, sc.dark);
     var x = 70, y = 640;
-    ctx.font = '900 60px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'top'; ctx.fillText('찾아오시는 길', x, y); y += 100;
+    ctx.font = '900 60px ' + FONT; ctx.fillStyle = sc.cream; ctx.textBaseline = 'top'; ctx.fillText(card.__w.info, x, y); y += 100;
     var addr = (card.copy && /[로길동]\s?\d|구\s/.test(card.copy.value || '') ? card.copy.value : '') || (card.place && card.place.name) || '';
     var rows = [];
     if (addr) rows.push(['주소', addr]);
-    if (card.subtitle) rows.push(['영업', card.subtitle]);
+    if (card.subtitle) rows.push([card.__w.hours || '안내', card.subtitle]);
     if (ci.phone) rows.push(['전화', ci.phone]);
-    var extra = (card.body || []).filter(function (l) { return /배달|주차|포장|단체/.test(l); })[0];
+    var extra = (card.body || []).filter(function (l) { return card.__w.extra.test(l); })[0];
     if (extra) rows.push(['안내', extra]);
     rows.slice(0, 4).forEach(function (r) {
       ctx.font = '800 32px ' + FONT; ctx.fillStyle = sc.accent; ctx.fillText(r[0], x, y);
@@ -330,7 +381,7 @@
     });
     var cy = Math.min(y + 20, H - 170);
     ctx.fillStyle = sc.cream; round(ctx, x, cy, W - x * 2, 96, 18); ctx.fill();
-    ctx.font = '900 34px ' + FONT; ctx.fillStyle = sc.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('예약 · 길찾기는 프로필 링크에서 👆', 540, cy + 49); ctx.textAlign = 'left';
+    ctx.font = '900 34px ' + FONT; ctx.fillStyle = sc.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(card.__w.cta, 540, cy + 49); ctx.textAlign = 'left';
     mark(ctx, W, H);
     return c;
   }
@@ -345,22 +396,25 @@
     }).then(function (imgs) {
       imgs = imgs.map(function (im) { return usable(im) ? im : null; });
       var main = card.image ? imgs[0] : null;
-      card = Object.assign({}, card, { __main: main });
-      if (!(card.reserve && card.reserve.menu && card.reserve.menu.length) && opts.menu) card.reserve = Object.assign({}, card.reserve || {}, { menu: opts.menu });
+      var ind = opts.industry || (card.template === 'shop' ? 'restaurant' : '');
+      card = Object.assign({}, card, { __main: main, __ind: ind, __w: words(ind, card.template), __head: IND_HEAD[ind] || String((design && design.badge) || '').replace(/\n/g, ' ') || TYPE_HEAD[card.template] || '' });
+      if (card.template === 'shop' && !(card.reserve && card.reserve.menu && card.reserve.menu.length) && opts.menu && opts.menu.length) card.reserve = Object.assign({}, card.reserve || {}, { menu: opts.menu });
       var all = imgs.filter(Boolean), rest = imgs.filter(function (im, i) { return im && !(card.image && i === 0); });
       var first = main || all[0] || null, list = [];
       list.push({ name: '01-표지', label: '① 표지', c: shopCover(card, sc, first, 1350) });
       var sig = (main ? [main] : []).concat(rest).slice(0, 4);
-      if (sig.length) list.push({ name: '02-대표메뉴', label: '② 대표 메뉴', c: shopSignature(card, sc, sig) });
-      shopMenuBoards(card, sc).forEach(function (b, i) { list.push({ name: '0' + (list.length + 1) + '-메뉴판', label: '③ 메뉴판' + (i ? ' 2' : ''), c: b }); });
-      var se = shopSeason(card, sc); if (se) list.push({ name: '0' + (list.length + 1) + '-한정메뉴', label: '④ 한정 메뉴', c: se });
+      var Wd = card.__w, nm = function (t) { return t.replace(/[·\s]/g, ''); };
+      if (sig.length) list.push({ name: '02-' + nm(Wd.sig), label: '② ' + Wd.sig, c: shopSignature(card, sc, sig) });
+      shopMenuBoards(card, sc).forEach(function (b, i) { list.push({ name: '0' + (list.length + 1) + '-' + nm(Wd.board), label: '③ ' + Wd.board + (i ? ' 2' : ''), c: b }); });
+      var se = shopSeason(card, sc); if (se) list.push({ name: '0' + (list.length + 1) + '-지금만', label: '④ 지금만 ' + Wd.now, c: se });
       var wide = rest.slice().reverse().filter(function (im) { return im.naturalWidth / im.naturalHeight >= 1.3; })[0];
-      list.push({ name: '0' + (list.length + 1) + '-오시는길', label: '⑤ 찾아오시는 길', c: shopInfo(card, sc, wide || first) });
-      list.push({ name: '스토리', label: '스토리 9:16 (아래는 링크 스티커 자리)', c: shopCover(card, sc, first, 1920) });
-      list.push({ name: '정사각', label: '정사각 1:1 (플레이스·당근·카톡)', c: drawCover(card, colors(design), first, 1080, 1080) });
+      if (Wd.info) list.push({ name: '0' + (list.length + 1) + '-' + nm(Wd.info), label: '⑤ ' + Wd.info, c: shopInfo(card, sc, wide || first) });
+      list.push({ name: '스토리', label: '표지 세로 (링크 스티커 자리 비움)', c: shopCover(card, sc, first, 1920) });
+      list.push({ name: '정사각', label: '표지 정사각', c: shopCover(card, sc, first, 1080) });
+      var NUM = '①②③④⑤⑥⑦⑧'; list.forEach(function (x, i) { x.label = x.label.replace(/^[①-⑧]/, NUM.charAt(i)); });
       var skipped = uniq.length - imgs.filter(Boolean).length;
       return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
-        var out = list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, blob: blobs[i], w: x.c.width, h: x.c.height }; });
+        var out = list.map(function (x, i) { var sp = sizePlaces(x.c.width, x.c.height); return { name: x.name + '.jpg', label: x.label, sizeLabel: sp.label, places: sp.places, blob: blobs[i], w: x.c.width, h: x.c.height }; });
         out.skipped = skipped;
         return out;
       });
@@ -626,7 +680,7 @@
   function layoutOk(card, id) { return id !== 'coupon' || !!couponLine(card); }
 
   function build(card, design, opts) {
-    if (card && card.template === 'shop' && !(opts && opts.classic)) return buildShop(card, design, opts);
+    if (card && card.template !== 'safe' && !(opts && opts.classic)) return buildShop(card, design, opts);
     opts = opts || {};
     var pics = opts.pics || {};
     var col = colors(design);

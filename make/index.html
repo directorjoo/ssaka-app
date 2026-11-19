@@ -225,9 +225,13 @@
     #expLays button { padding: 0 14px; }
     .exp-grid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; display: block; background: #eee; }
     .sns-grid img { aspect-ratio: auto; object-fit: contain; }
-    .sns-grid figcaption { font-size: 12px; line-height: 1.45; text-align: left; word-break: keep-all; }
-    .sns-grid figcaption b { display: block; font-size: 13px; }
-    .exp-grid figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; text-align: center; }
+    .exp-grid figcaption { font-size: 15px; color: var(--muted); margin-top: 4px; text-align: center; }
+    .sns-grid figcaption { font-size: 15px; line-height: 1.45; text-align: left; word-break: keep-all; color: var(--text); }
+    .sns-grid figcaption b { display: block; font-size: 15px; }
+    .sns-grid figcaption .sz { display: inline-block; margin: 2px 0; padding: 1px 8px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 14px; font-weight: 800; }
+    .sns-grid figcaption .pl { display: block; font-size: 14.5px; }
+    .sns-grid figcaption .pl i { font-style: normal; color: #B3132B; }
+    @media (max-width: 480px) { .exp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .exp-grid a { color: inherit; text-decoration: none; }
     .exp-how { margin: 14px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.6; color: var(--text); }
     .exp-how li { margin-bottom: 4px; }
@@ -707,12 +711,12 @@
       <div class="exp-pals" id="expPals" role="group" aria-label="SNS 디자인 색" style="margin-top:6px"></div>
       <div class="exp-grid sns-grid" id="expGrid2"></div>
     </div>
-    <p class="exp-sec" id="expSec1"><b>📚 카톡 채널 카드형 소식 (여러 장)</b><small>표지 → 사진 → 안내 순서로 한 소식에 여러 장 올릴 때</small></p>
-    <div class="exp-grid" id="expGrid"></div>
+    <p class="exp-sec" id="expSec1"><b>📚 카드형 소식 세트 (여러 장 넘겨 보기)</b><small>표지 → 대표 사진 → 가격·안내 → 지금만 → 오시는 길 순서. 인스타 여러 장 올리기·카톡 채널 카드형 소식에 그대로 쓰세요. 사진마다 ★ 올리기 좋은 SNS를 적어 두었어요.</small></p>
+    <div class="exp-grid sns-grid" id="expGrid"></div>
     <button type="button" class="kakao big" id="expSave" disabled>📥 사진 앱에 저장하기</button>
     <button type="button" class="ghost big" id="expText">📝 소식 글 복사하기 (링크 포함)</button>
     <ol class="exp-how">
-      <li>사진 아래에 적힌 <b>올릴 곳</b>을 보고 맞는 사진을 고르세요. (인스타 피드·카톡 채널 소식은 세로 4:5, 네이버 플레이스·블로그·당근은 정사각, 스토리·쇼츠·틱톡은 세로 9:16, 유튜브 썸네일은 가로)</li>
+      <li>사진마다 빨간 크기 표시 아래 <b>★ 올리기 좋은 SNS</b>가 적혀 있어요. 거기 맞춰 고르세요.<br>세로 4:5 → 인스타 피드·카톡 채널 소식·스레드·페이스북 / 정사각 → 네이버 플레이스·블로그 대표사진·당근 / 세로 9:16 → 인스타 스토리·릴스·유튜브 쇼츠·틱톡 / 가로 4:3 → 카톡 채널 메시지·밴드 / 가로 16:9 → 유튜브 썸네일·블로그 본문 / 링크형 → 페이스북·X 링크 공유</li>
       <li>📝 <b>소식 글 복사하기</b>를 눌러 글을 붙여넣고, 링크 칸에 카드 링크를 넣으면 손님이 바로 예약·길찾기를 해요.</li>
       <li>스토리·쇼츠 사진은 위아래를 비워 두었어요. 앱 단추에 글자가 가리지 않아요.</li>
     </ol>
@@ -743,7 +747,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=81"></script>
+<script src="../js/export.js?v=82"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -2015,8 +2019,10 @@
       var im = document.createElement('img'); im.src = u; im.alt = x.label;
       a.appendChild(im); f.appendChild(a);
       var cap = document.createElement('figcaption');
-      var b = document.createElement('b'); b.textContent = x.label.split(' · ')[0] + ' (' + x.w + '×' + x.h + ')'; cap.appendChild(b);
-      cap.appendChild(document.createTextNode((x.places || []).join(' · '))); f.appendChild(cap);
+      if (x.title) { var b = document.createElement('b'); b.textContent = x.title; cap.appendChild(b); }
+      var sz = document.createElement('span'); sz.className = 'sz'; sz.textContent = (x.sizeLabel || x.label.split(' · ')[0]) + ' · ' + x.w + '×' + x.h; cap.appendChild(sz);
+      (x.places || []).forEach(function (pl) { var s = document.createElement('span'); s.className = 'pl'; var st = document.createElement('i'); st.textContent = '★ '; s.appendChild(st); s.appendChild(document.createTextNode(pl)); cap.appendChild(s); });
+      f.appendChild(cap);
       box.appendChild(f);
     });
   }
@@ -2059,19 +2065,12 @@
     $('expGrid').innerHTML = ''; $('expSave').disabled = true;
     $('expStatus').textContent = '이미지를 만드는 중이에요…';
     makeFrames(c);
-    $('expSec1').hidden = c.card.template !== 'shop'; $('expGrid').hidden = c.card.template !== 'shop';
-    if (c.card.template !== 'shop') { $('expStatus').textContent = '올릴 곳에 맞는 사진을 골라 저장하세요. 사진을 누르면 한 장씩 저장돼요.'; return; }
-    window.SsakaExport.build(c.card, curDesign(), { pics: localPics, menu: SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) }).then(function (list) {
+    var noSet = c.card.template === 'safe';
+    $('expSec1').hidden = noSet; $('expGrid').hidden = noSet;
+    if (noSet) { $('expStatus').textContent = '올릴 곳에 맞는 사진을 골라 저장하세요. 사진을 누르면 한 장씩 저장돼요.'; return; }
+    window.SsakaExport.build(c.card, curDesign(), { pics: localPics, industry: industry, menu: c.card.template === 'shop' ? SsakaReserve.parseMenu(v('menu') || (EX().menu || '')) : [] }).then(function (list) {
       expFiles = list;
-      list.forEach(function (x) {
-        var u = URL.createObjectURL(x.blob);
-        var f = document.createElement('figure');
-        var a = document.createElement('a'); a.href = u; a.download = x.name;
-        var im = document.createElement('img'); im.src = u; im.alt = x.label;
-        a.appendChild(im); f.appendChild(a);
-        var cap = document.createElement('figcaption'); cap.textContent = x.label; f.appendChild(cap);
-        $('expGrid').appendChild(f);
-      });
+      snsFigs($('expGrid'), list.map(function (x) { return Object.assign({}, x, { title: x.label }); }));
       $('expStatus').textContent = list.length + '장을 만들었어요.' + (list.skipped ? ' (사진 ' + list.skipped + '장은 이 휴대폰에 원본이 없어 빠졌어요. 사진을 다시 올리면 들어가요.)' : ' 사진을 누르면 한 장씩 저장할 수도 있어요.');
       $('expSave').disabled = false;
     }).catch(function () { $('expStatus').textContent = '이미지를 만들지 못했어요. 다시 눌러주세요.'; });

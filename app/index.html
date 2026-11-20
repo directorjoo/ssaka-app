@@ -361,6 +361,8 @@
     #v-home .nc .ph { position: absolute; left: 0; right: 0; top: 0; bottom: 0; height: auto; }
     #v-home .nc .ph::after { height: 100%; background: linear-gradient(180deg, transparent 0%, transparent 18%, var(--c0) 62%); }
     #v-home .nc .ph.art { display: grid; place-items: center end; padding-right: 22px; height: auto; background: var(--g); font-size: 60px; }
+    #v-home .nc.pg .ph.art span { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 6px; font-size: 26px; line-height: 1.15; transform: rotate(-6deg); align-self: start; margin-top: 14px; }
+    #v-home .nc.pg .ph.art span b { font-weight: 400; }
     #v-home .nc .tx { padding: 0 18px 10px; }
     #v-home .nc .tx.np, #v-home .nc.has-art .tx { padding-top: 14px; padding-right: 96px; }
     #v-home .nc .tx em { font-size: 15px; }
@@ -762,7 +764,7 @@
     v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
     v.appendChild(campaigns());
 
-    // 7. 오늘의 놀이터 — 7·9·10번이 날마다 돌아가며
+    // 7. 싸바 놀이터 — 7·9·10번이 날마다 돌아가며
     v.appendChild(todayGame());
 
     // 8. 싸바 이야기 — 8번 와인 장미(체리 장미) 원래 그라데이션 (11-21 대표님)
@@ -801,7 +803,7 @@
     v.appendChild(up);
   }
 
-  // ---------- 오늘의 놀이터 (앱스토어 투데이 카드처럼, 날마다 다른 게임) ----------
+  // ---------- 싸바 놀이터 (놀이터 전체로 가는 칸, 오늘의 추천 게임은 띠에) ----------
   var GAMES = [
     ['../grow/', '🌱', '체리 키우기', '하루 3번 물을 주면 체리가 열려요', '물 주러 가기', '#5BAA4A', '#3F7F33', '모두가 즐기는 게임'],
     ['../pang/', '🍒', '체리 팡!', '같은 과일 셋을 맞춰 1분 동안 팡팡', '한 판 하기', '#D6334A', '#9E1A2E', '시간 순삭 퍼즐'],
@@ -815,11 +817,15 @@
     ['../alkkagi/', '👆', '알까기', '튕겨서 밖으로! 단순해서 더 재밌어요', '튕기러 가기', '#3C8A5E', '#245E3E', '친구와 겨루기']
   ];
   function todayGame() {
+    // 싸바 놀이터 — 게임 하나가 아니라 놀이터 전체를 여는 칸 (11-21 대표님), 오늘의 추천 게임은 아래 띠에만
     var now = new Date(), day = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
     var g = GAMES[day % GAMES.length], pal = [7, 9, 10][day % 3];
     var w = el('div');
-    w.appendChild(nhead('오늘의 놀이터', { text: '전체 게임 ›', href: '../eodiya/#playground' }));
-    w.appendChild(ncard({ pal: pal, href: g[0], label: '오늘의 놀이터 — ' + g[2], art: g[1], em: g[7], title: g[2], desc: g[3], icon: g[1], name: g[2], sub: '싸바 놀이터 · 무료', btn: g[4] }));
+    var c = ncard({ pal: pal, href: '../eodiya/#playground', label: '싸바 놀이터 — 게임 ' + GAMES.length + '가지', art: '🎮', em: '게임 ' + GAMES.length + '가지 · 모두 무료', title: '싸바 놀이터', desc: '체리 팡 · 두더지 · 오목 · 눈 나이…', icon: g[1], name: '오늘의 추천', sub: g[2], btn: '놀러 가기' });
+    c.classList.add('pg');
+    var sp = c.querySelector('.ph.art span'); sp.textContent = '';
+    GAMES.slice(0, 6).forEach(function (x) { sp.appendChild(el('b', '', x[1])); });
+    w.appendChild(c);
     return w;
   }
 

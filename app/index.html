@@ -117,6 +117,40 @@
     .home-install-bottom{margin:18px 18px 28px;padding:14px;border:1px solid #f0d9dd;border-radius:20px;background:#fff8f9}.home-install-bottom .big{width:100%;min-height:54px;font-size:17px;font-weight:900;font-family:inherit;border:0;border-radius:16px;background:#B3132B;color:#fff;cursor:pointer;box-shadow:0 10px 22px -12px rgba(179,19,43,.9)}.home-install-bottom .big:active{transform:scale(.98)}
     .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 12px 16px 10px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
+    /* 백화점식 추천 카드 (사진 칸 + [이름] 설명) */
+    .camp2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding: 4px 18px 14px; }
+    .camp2 a { display: block; text-decoration: none; color: #1a1a1a; -webkit-tap-highlight-color: transparent; }
+    .camp2 a:active .ph { transform: scale(.97); }
+    .camp2 .ph { position: relative; display: grid; place-items: center; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; transition: transform .15s; box-shadow: 0 10px 22px -16px rgba(0,0,0,.6); }
+    .camp2 .ph strong { position: relative; z-index: 1; padding: 0 8px; white-space: pre-line; text-align: center; color: #fff; font-size: 30px; line-height: 1.02; font-weight: 900; letter-spacing: -0.03em; text-shadow: 0 2px 8px rgba(0,0,0,.45); }
+    .camp2 .ph.pic { place-items: end start; }
+    .camp2 .ph.pic strong { padding: 0 12px 12px; text-align: left; font-size: 27px; }
+    .camp2 .ph i { position: absolute; right: 8px; bottom: 4px; font-style: normal; font-size: 34px; opacity: .9; }
+    .camp2 b { display: block; margin-top: 8px; font-size: 16.5px; font-weight: 900; letter-spacing: -0.02em; }
+    .camp2 .cap { display: block; margin-top: 1px; font-size: 15.5px; line-height: 1.35; color: #333; word-break: keep-all; }
+    .camp2 a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 3px; border-radius: 18px; }
+    /* 오늘의 싸바 오른쪽 날씨 (백화점 영업시간 칸의 기온처럼) */
+    .wr.today .tw { margin-left: auto; flex: none; display: grid; justify-items: end; line-height: 1; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8); }
+    .wr.today .tw b { font-size: 34px; font-weight: 900; letter-spacing: -0.04em; }
+    .wr.today .tw small { margin-top: 4px; font-size: 15px; font-weight: 800; }
+    /* 오늘의 놀이터 — 앱스토어 투데이 카드처럼 */
+    .tdy { display: block; margin: 4px 18px 14px; border-radius: 26px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 18px 36px -22px rgba(0,0,0,.7); -webkit-tap-highlight-color: transparent; }
+    .tdy:active { transform: scale(.985); }
+    .tdy .art { position: relative; min-height: 210px; padding: 18px 18px 16px; display: flex; flex-direction: column; justify-content: flex-end; background: var(--g1); overflow: hidden; }
+    .tdy .art .big { position: absolute; right: -6px; top: 4px; font-size: 118px; line-height: 1; transform: rotate(-8deg); filter: drop-shadow(0 10px 16px rgba(0,0,0,.3)); }
+    .tdy .art em { font-style: normal; font-size: 16px; font-weight: 800; opacity: .95; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+    .tdy .art h3 { margin: 2px 0 4px; font-size: 34px; line-height: 1.1; font-weight: 900; letter-spacing: -0.04em; text-shadow: 0 2px 8px rgba(0,0,0,.45); }
+    .tdy .art p { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.35; text-shadow: 0 1px 5px rgba(0,0,0,.55); word-break: keep-all; }
+    .tdy .bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--g2); }
+    .tdy .bar i { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 14px; background: #fff; font-style: normal; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+    .tdy .bar span { flex: 1; min-width: 0; }
+    .tdy .bar span b { display: block; font-size: 18px; font-weight: 900; letter-spacing: -0.02em; }
+    .tdy .bar span small { display: block; font-size: 15px; font-weight: 700; opacity: .9; }
+    .tdy .bar u { flex: none; text-decoration: none; padding: 9px 20px; border-radius: 999px; background: rgba(255,255,255,.25); font-size: 17px; font-weight: 900; }
+    .tdy .bar, .tdy .bar * { text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+    .tdy .bar i { text-shadow: none; }
+    /* 맨 위로 */
+    .to-top { display: grid; place-items: center; width: 58px; height: 58px; margin: 18px auto 6px; border: 0; border-radius: 50%; background: #fff; color: #222; font-size: 26px; font-weight: 900; box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: pointer; }
     .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
     .wr.today { background: linear-gradient(90deg, rgba(8,28,70,.82) 0%, rgba(8,28,70,.55) 50%, rgba(8,28,70,.12) 100%), url(../img/today-tower.jpg) 70% 35%/cover; border: 1.5px solid rgba(255,255,255,.55); }
     .wr.today b, .wr.today span { text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8); }
@@ -398,12 +432,12 @@
   function campaigns() {
     var now = new Date(), m = now.getMonth() + 1, d = now.getDate();
     var all = [
-      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', href: '../make/?ind=greeting&season=snow' },
-      { from: [11, 10], to: [12, 31], t: '송년회\u00a0공지, 카드\u00a0한\u00a0장으로', s: '장소 · 회비 · 참석·불참 답장까지', e: '🥂', bg: '#FFE0E6', href: '../make/?ind=party&season=yearend' },
-      { from: [11, 15], to: [1, 31], t: '겨울방학 특강 모집', s: '학부모 단톡·인스타에 바로', e: '📚', bg: '#FFF3B8', href: '../make/?ind=academy&season=snow' },
-      { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, href: '../make/?ind=greeting&season=xmas' },
-      { from: [12, 15], to: [2, 10], t: '새해 인사 미리 만들기', s: '신년회 초대도 함께', e: '🎉', bg: '#FFEFD1', href: '../make/?ind=greeting&season=newyear' },
-      { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', href: '../eodiya/' }
+      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', tile: '#2E5FA8', href: '../make/?ind=greeting&season=snow' },
+      { from: [11, 10], to: [12, 31], t: '송년회\u00a0공지, 카드\u00a0한\u00a0장으로', s: '장소 · 회비 · 참석·불참 답장까지', e: '🥂', bg: '#FFE0E6', k: '송년회', pic: '../img/ex/party-cheers.jpg', big: '송년회', href: '../make/?ind=party&season=yearend' },
+      { from: [11, 15], to: [1, 31], t: '겨울방학 특강 모집', s: '학부모 단톡·인스타에 바로', e: '📚', bg: '#FFF3B8', k: '겨울방학', pic: '../img/ex/jok-class.jpg', big: '특강 모집', href: '../make/?ind=academy&season=snow' },
+      { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, k: '크리스마스', big: 'MERRY\nX-MAS', tile: '#1f4d3a', href: '../make/?ind=greeting&season=xmas' },
+      { from: [12, 15], to: [2, 10], t: '새해 인사 미리 만들기', s: '신년회 초대도 함께', e: '🎉', bg: '#FFEFD1', k: '새해 인사', pic: '../img/ex/suncheon-sunset.jpg', big: '2027',  href: '../make/?ind=greeting&season=newyear' },
+      { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', k: '설 연휴', big: '어디야?', tile: '#B3132B', href: '../eodiya/' }
     ];
     function key(md) { return md[0] * 100 + md[1]; }
     var today = m * 100 + d;
@@ -413,11 +447,19 @@
       return a <= b ? (today >= a && today <= b) : (today >= a || today <= b);
     });
     if (on.length < 2) on = all.slice(0, 4);
-    var g = el('div', 'camp');
+    // 두 칸씩 맞게 짝수로 — 모자라면 늘 쓰는 가게 홍보 카드로 채움
+    if (on.length % 2) on.push({ t: '오늘의 메뉴, 카드 한 장으로', s: '단골 단톡·인스타에 바로', e: '🍽️', bg: '#FFE1CF', k: '가게 홍보', pic: '../img/ex/suncheon-jeon.jpg', big: '오늘의\n메뉴', href: '../make/?ind=restaurant' });
+    // 백화점 혜택 칸처럼: 위에 큰 사진(또는 색) 칸 + 굵은 글씨, 아래에 [이름] 두 줄 설명
+    var g = el('div', 'camp2');
     on.slice(0, 4).forEach(function (c) {
-      var a = el('a', c.dark ? 'dark' : ''); a.href = c.href; a.style.background = c.bg;
-      a.appendChild(el('b', '', c.t)); a.appendChild(el('span', '', c.s));
-      var i = el('i', '', c.e); i.setAttribute('aria-hidden', 'true'); a.appendChild(i);
+      var a = el('a'); a.href = c.href; a.setAttribute('aria-label', c.t.replace(/\u00a0/g, ' ') + ' — ' + c.s);
+      var ph = el('span', 'ph' + (c.pic ? ' pic' : ''));
+      ph.style.background = c.pic ? 'linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.55)), url(' + c.pic + ') center/cover' : (c.tile || c.bg);
+      var bg = el('strong', '', c.big || c.e); ph.appendChild(bg);
+      if (!c.pic) { var i = el('i', '', c.e); i.setAttribute('aria-hidden', 'true'); ph.appendChild(i); }
+      a.appendChild(ph);
+      a.appendChild(el('b', '', '[' + (c.k || '추천') + ']'));
+      a.appendChild(el('span', 'cap', c.t.replace(/\u00a0/g, ' ')));
       g.appendChild(a);
     });
     return g;
@@ -559,11 +601,13 @@
     var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '오늘의 싸바');
     rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘의 싸바</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
     v.appendChild(rd);
+    homeWeather(rd);
     // 반쪽 두 칸: 왼쪽 블로그 쓰기 · 오른쪽 싸바비앙 (싸바비앙이 잘되면 홈 위쪽으로 올림)
     var hf = el('div', 'half');
     hf.innerHTML = '<a class="hb blog" href="../survey/" aria-label="블로그 쓰기"><i aria-hidden="true">✍️</i><b>블로그 쓰기</b><span>답만 하면 글 10가지</span></a>' +
       '<a class="hb lux" href="../savabien/" aria-label="싸바비앙 명인 명품관"><i aria-hidden="true">👑</i><b>싸바비앙</b><span>명인 명품관</span></a>';
     v.appendChild(hf);
+    v.appendChild(todayGame());
     v.appendChild(secHead('지금 보내기 좋은 카드'));
     v.appendChild(campaigns());
     v.appendChild(el('div', 'divider'));
@@ -595,6 +639,56 @@
       installBottom.appendChild(installAction);
       v.appendChild(installBottom);
     }
+    var up = el('button', 'to-top', '↑'); up.type = 'button'; up.setAttribute('aria-label', '맨 위로');
+    up.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    v.appendChild(up);
+  }
+
+  // ---------- 오늘의 놀이터 (앱스토어 투데이 카드처럼, 날마다 다른 게임) ----------
+  var GAMES = [
+    ['../grow/', '🌱', '체리 키우기', '하루 3번 물을 주면 체리가 열려요', '물 주러 가기', '#5BAA4A', '#3F7F33', '모두가 즐기는 게임'],
+    ['../pang/', '🍒', '체리 팡!', '같은 과일 셋을 맞춰 1분 동안 팡팡', '한 판 하기', '#D6334A', '#9E1A2E', '시간 순삭 퍼즐'],
+    ['../mole/', '🐹', '두더지 잡기', '30초 동안 콩콩, 손이 빠른 사람은 누구?', '잡으러 가기', '#A87A3D', '#7A5520', '모두가 즐기는 게임'],
+    ['../omok/', '⚫', '체리랑 오목', '다섯 알 먼저 놓으면 이겨요', '한 판 두기', '#C9A26A', '#8C6A3A', '머리 쓰는 게임'],
+    ['../chosung/', '🔤', '초성 퀴즈', 'ㅅㄱ? 사과? 시계? 먼저 맞히기', '맞히러 가기', '#4F6FD6', '#2F4CA8', '온 가족 게임'],
+    ['../eye/', '👀', '눈 나이 재기', '내 눈은 몇 살일까? 1분이면 알아요', '재러 가기', '#2E9C9C', '#1D6E6E', '어르신도 쉽게'],
+    ['../react/', '⚡', '순발력 나이', '번쩍하면 톡! 내 순발력은 몇 살?', '재러 가기', '#E08A1E', '#A8620C', '친구와 겨루기'],
+    ['../match/', '🍒', '짝 맞추기', '뒤집어서 같은 그림 찾기, 기억력 대결', '한 판 하기', '#B3132B', '#7E0A1B', '모두가 즐기는 게임'],
+    ['../baduk/', '⚪', '체리랑 바둑', '작은 판에서 가볍게 한 판', '한 판 두기', '#6E6E6E', '#3F3F3F', '머리 쓰는 게임'],
+    ['../alkkagi/', '👆', '알까기', '튕겨서 밖으로! 단순해서 더 재밌어요', '튕기러 가기', '#3C8A5E', '#245E3E', '친구와 겨루기']
+  ];
+  function todayGame() {
+    var now = new Date(), day = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
+    var g = GAMES[day % GAMES.length];
+    var a = el('a', 'tdy'); a.href = g[0]; a.setAttribute('aria-label', '오늘의 놀이터 — ' + g[2]);
+    a.style.setProperty('--g1', 'linear-gradient(160deg,' + g[5] + ' 0%,' + g[6] + ' 100%)'); a.style.setProperty('--g2', g[6]);
+    a.innerHTML = '<div class="art"><span class="big" aria-hidden="true"></span><em></em><h3></h3><p></p></div>' +
+      '<div class="bar"><i aria-hidden="true"></i><span><b></b><small>싸바 놀이터 · 무료</small></span><u></u></div>';
+    a.querySelector('.big').textContent = g[1]; a.querySelector('em').textContent = g[7];
+    a.querySelector('h3').textContent = g[2]; a.querySelector('p').textContent = g[3];
+    a.querySelector('.bar i').textContent = g[1]; a.querySelector('.bar b').textContent = g[2]; a.querySelector('.bar u').textContent = g[4];
+    var w = el('div'); w.appendChild(secHead('오늘의 놀이터', { text: '전체 게임', href: '../eodiya/#playground' })); w.appendChild(a);
+    return w;
+  }
+
+  // ---------- 오늘의 싸바 칸 오른쪽에 날씨 (오늘의 싸바에서 고른 도시, 없으면 광주) ----------
+  function homeWeather(box) {
+    var c = null; try { c = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
+    if (!c || !c[1]) c = ['광주', 35.1595, 126.8526];
+    function ic(n) { return n === 0 ? '☀️' : n <= 2 ? '🌤️' : n === 3 ? '☁️' : n <= 48 ? '🌫️' : n <= 67 ? '🌧️' : n <= 77 ? '❄️' : n <= 82 ? '🌦️' : n <= 86 ? '🌨️' : '⛈️'; }
+    var key = 'sava-home-wx', cache = null; try { cache = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
+    function show(t, code) {
+      var em = box.querySelector('em'); if (em) em.remove();
+      var tw = el('span', 'tw'); tw.innerHTML = '<b></b><small></small>';
+      tw.querySelector('b').textContent = ic(code) + ' ' + Math.round(t) + '°'; tw.querySelector('small').textContent = c[0] + ' · 보기 ›';
+      box.appendChild(tw); box.querySelector('i').textContent = ic(code);
+    }
+    if (cache && cache.city === c[0] && Date.now() - cache.at < 30 * 60e3) return show(cache.t, cache.code);
+    if (!window.fetch) return;
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + c[1] + '&longitude=' + c[2] + '&current=temperature_2m,weather_code&timezone=Asia%2FSeoul')
+      .then(function (r) { return r.json(); })
+      .then(function (w) { var t = w.current.temperature_2m, code = w.current.weather_code; try { sessionStorage.setItem(key, JSON.stringify({ city: c[0], t: t, code: code, at: Date.now() })); } catch (e) {} show(t, code); })
+      .catch(function () {});
   }
 
   // ---------- 받은 카드 ----------

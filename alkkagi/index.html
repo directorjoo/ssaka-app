@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>체리랑 알까기 — 싸바</title>
+  <meta name="description" content="바둑알을 튕겨서 체리 알을 판 밖으로! 몇 개 남기고 이길까?">
+  <meta name="theme-color" content="#1F5FAF">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/alkkagi/">
+  <meta property="og:title" content="🥏 체리랑 알까기 — 싸바 한 판 승부">
+  <meta property="og:description" content="바둑알을 튕겨서 체리 알을 판 밖으로! 몇 개 남기고 이길까?">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1F5FAF; --ac: #1F5FAF; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A6CC0 0%,#1F5FAF 45%,#174C8E 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .bwrap { margin-top: 14px; padding: 8px; border-radius: 18px; background: #5A3420; }
+    canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; touch-action: manipulation; }
+    .lv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .lv button { min-height: 56px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .lv button[aria-pressed="true"] { background: #fff; color: #1F5FAF; }
+    .msg { margin-top: 12px; text-align: center; font-size: 19px; font-weight: 900; text-shadow: var(--sh); min-height: 28px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+
+    canvas { touch-action: none; }
+    .stat { font-size: 17px; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🥏⚫</div>
+    <h1>체리랑 알까기</h1>
+    <p>내 알을 손가락으로 잡고 <b>뒤로 당겼다 놓으면</b> 새총처럼 튕겨 나가요.<br>체리 알을 판 밖으로 모두 까면 이겨요!</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="lv" role="group" aria-label="난이도">
+    <button type="button" data-l="1" aria-pressed="false">🌱 살살</button>
+    <button type="button" data-l="2" aria-pressed="true">🔥 제대로</button>
+  </div>
+  <div class="stat"><span id="cntB">⚫ 내 알 5</span><span id="cntW">⚪ 체리 알 5</span></div>
+  <div class="msg" id="msg">내 차례! 검은 알을 당겼다 놓아요</div>
+  <div class="bwrap"><canvas id="cv" aria-label="알까기 판"></canvas></div>
+  <button type="button" class="ghost" id="again">🔁 새 판</button>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 알까기 등급 (체리를 이겼을 때)</h3>
+    <div><span>🏆 알까기 황제</span><span>제대로 · 내 알 4개 이상 남김</span></div>
+    <div><span>🥏 알까기 고수</span><span>제대로에서 이김</span></div>
+    <div><span>😊 잘했어요</span><span>살살에서 이김</span></div>
+  </div>
+  <div class="more"><a href="../baduk/">⚫ 체리랑 바둑</a><a href="../pool/">🎱 당구 한판</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  /* ---------- 물리 (판 = 0~1) ---------- */
+  var R = .042, DEC = .95, VMAX = 2.0, REST = .92, PULL = .28;
+  function setup() {
+    var a = [];
+    [.3, .4, .5, .6, .7].forEach(function (x) { a.push({ c: 1, x: x, y: .8, vx: 0, vy: 0, alive: true, fall: 0 }); });
+    [.3, .4, .5, .6, .7].forEach(function (x) { a.push({ c: 2, x: x, y: .2, vx: 0, vy: 0, alive: true, fall: 0 }); });
+    return a;
+  }
+  function step(a, dt) {
+    var moving = false, i, j, s;
+    for (i = 0; i < a.length; i++) { s = a[i]; if (!s.alive) continue;
+      var sp = Math.hypot(s.vx, s.vy); if (sp > 0) { var ns = Math.max(0, sp - DEC * dt); s.vx *= ns / sp; s.vy *= ns / sp; if (ns > 0) moving = true; }
+      s.x += s.vx * dt; s.y += s.vy * dt;
+    }
+    for (i = 0; i < a.length; i++) { var p = a[i]; if (!p.alive) continue;
+      for (j = i + 1; j < a.length; j++) { var q = a[j]; if (!q.alive) continue;
+        var dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy);
+        if (d < 2 * R && d > 1e-6) { var nx = dx / d, ny = dy / d, ov = (2 * R - d) / 2; p.x -= nx * ov; p.y -= ny * ov; q.x += nx * ov; q.y += ny * ov;
+          var rel = (p.vx - q.vx) * nx + (p.vy - q.vy) * ny; if (rel > 0) { var im = rel * (1 + REST) / 2; p.vx -= im * nx; p.vy -= im * ny; q.vx += im * nx; q.vy += im * ny; moving = true; } }
+      }
+    }
+    for (i = 0; i < a.length; i++) { s = a[i]; if (s.alive && (s.x < 0 || s.x > 1 || s.y < 0 || s.y > 1)) { s.alive = false; s.fall = 1; s.vx *= .3; s.vy *= .3; } }
+    return moving;
+  }
+  function count(a, c) { var n = 0; for (var i = 0; i < a.length; i++) if (a[i].alive && a[i].c === c) n++; return n; }
+  function clone(a) { return a.map(function (s) { return { c: s.c, x: s.x, y: s.y, vx: 0, vy: 0, alive: s.alive }; }); }
+
+  /* ---------- 체리 생각: 여러 가지로 쳐 보고 제일 좋은 수 ---------- */
+  function evalShot(a, k, ang, pw) {
+    var b = clone(a), s = b[k]; s.vx = Math.cos(ang) * pw * VMAX; s.vy = Math.sin(ang) * pw * VMAX;
+    for (var t = 0; t < 900; t++) if (!step(b, 1 / 90)) break;
+    var sc = (count(a, 1) - count(b, 1)) * 10 - (count(a, 2) - count(b, 2)) * 13;
+    b.forEach(function (q) { if (q.alive && q.c === 2) { var m = Math.min(q.x, q.y, 1 - q.x, 1 - q.y); if (m < .1) sc -= (.1 - m) * 20; } });
+    return sc;
+  }
+  function think(a) {
+    var best = null, tries = [];
+    for (var k = 0; k < a.length; k++) { var s = a[k]; if (!s.alive || s.c !== 2) continue;
+      for (var j = 0; j < a.length; j++) { var t = a[j]; if (!t.alive || t.c !== 1) continue;
+        var base = Math.atan2(t.y - s.y, t.x - s.x);
+        [-.07, -.035, 0, .035, .07].forEach(function (off) { [.5, .72, .95].forEach(function (pw) { tries.push({ k: k, ang: base + off, pw: pw }); }); });
+      }
+    }
+    tries.forEach(function (m) { m.sc = evalShot(a, m.k, m.ang, m.pw) + Math.random() * .5; if (!best || m.sc > best.sc) best = m; });
+    if (lvl === 1) {
+      tries.sort(function (x, y) { return y.sc - x.sc; });
+      best = tries[Math.min(tries.length - 1, (Math.random() * 6) | 0)];
+      best = { k: best.k, ang: best.ang + (Math.random() - .5) * .22, pw: Math.min(1, best.pw * (.85 + Math.random() * .3)) };
+    } else best = { k: best.k, ang: best.ang + (Math.random() - .5) * .025, pw: best.pw };
+    return best;
+  }
+
+  /* ---------- 화면 ---------- */
+  var KEY = 'sava-alkkagi-v1', rec = load(KEY, { w: 0, l: 0 }), lvl = 2, st, turn, anim = false, over = false, aim = null, shots = 0;
+  var cv = $('cv'), ctx = cv.getContext('2d');
+  var cl = +qp.get('l'), cm = +qp.get('m'), cn = (qp.get('n') || '').slice(0, 10);
+  if (cm) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님은 내 알 <b>' + cm + '개</b>를 남기고 체리를 이겼어요! (' + (cl === 1 ? '살살' : '제대로') + ')<br>더 많이 남기고 이기면 내가 이겨요'; if (cl === 1 || cl === 2) lvl = cl; }
+  function paintBest() { $('best').textContent = (rec.w || rec.l) ? '체리 상대 ' + rec.w + '승 ' + rec.l + '패' : ''; }
+  function paintCnt() { $('cntB').textContent = '⚫ 내 알 ' + count(st, 1); $('cntW').textContent = '⚪ 체리 알 ' + count(st, 2); }
+  function reset() {
+    st = setup(); turn = 1; anim = false; over = false; aim = null; shots = 0; $('out').hidden = true;
+    $('msg').textContent = '내 차례! 검은 알을 당겼다 놓아요';
+    document.querySelectorAll('.lv button').forEach(function (x) { x.setAttribute('aria-pressed', +x.dataset.l === lvl ? 'true' : 'false'); });
+    paintCnt(); draw();
+  }
+  var S = 0;
+  function size() { var w = cv.clientWidth || 340, d = window.devicePixelRatio || 1; cv.width = w * d; cv.height = w * d; S = w * d; draw(); }
+  function draw() {
+    if (!S) return; ctx.fillStyle = '#E9C27A'; ctx.fillRect(0, 0, S, S);
+    ctx.strokeStyle = 'rgba(90,52,32,.75)'; ctx.lineWidth = Math.max(1, S / 380);
+    for (var i = 0; i < 9; i++) { var v = (.1 + i * .1) * S; ctx.beginPath(); ctx.moveTo(.1 * S, v); ctx.lineTo(.9 * S, v); ctx.stroke(); ctx.beginPath(); ctx.moveTo(v, .1 * S); ctx.lineTo(v, .9 * S); ctx.stroke(); }
+    if (aim) {
+      var s = st[aim.k], dx = aim.dx, dy = aim.dy, pw = aim.pw;
+      ctx.setLineDash([S * .015, S * .012]); ctx.strokeStyle = '#B3132B'; ctx.lineWidth = S * .008;
+      ctx.beginPath(); ctx.moveTo(s.x * S, s.y * S); ctx.lineTo((s.x + dx * (.08 + pw * .45)) * S, (s.y + dy * (.08 + pw * .45)) * S); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#B3132B'; ctx.font = '900 ' + Math.round(S * .045) + 'px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('힘 ' + Math.round(pw * 100) + '%', s.x * S, (s.y > .5 ? s.y - .08 : s.y + .11) * S);
+    }
+    st.forEach(function (s) {
+      var sc = s.alive ? 1 : s.fall; if (sc <= 0) return;
+      var cx = s.x * S, cy = s.y * S, r = R * S * sc;
+      ctx.globalAlpha = s.alive ? 1 : sc;
+      ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.arc(cx + r * .12, cy + r * .18, r, 0, 7); ctx.fill();
+      var g = ctx.createRadialGradient(cx - r * .35, cy - r * .35, r * .1, cx, cy, r);
+      if (s.c === 1) { g.addColorStop(0, '#666'); g.addColorStop(1, '#111'); } else { g.addColorStop(0, '#fff'); g.addColorStop(1, '#d0d0d0'); }
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      if (aim && st[aim.k] === s) { ctx.strokeStyle = '#B3132B'; ctx.lineWidth = S * .007; ctx.beginPath(); ctx.arc(cx, cy, r + S * .01, 0, 7); ctx.stroke(); }
+    });
+  }
+  function shoot(k, ang, pw) {
+    var s = st[k]; s.vx = Math.cos(ang) * pw * VMAX; s.vy = Math.sin(ang) * pw * VMAX; anim = true; shots += turn === 1 ? 1 : 0;
+    var before1 = count(st, 1), before2 = count(st, 2), lt = performance.now(), rest = 0;
+    function frame(now) {
+      var dt = Math.min(.05, (now - lt) / 1000); lt = now; var mv = false;
+      for (var i = 0; i < 4; i++) if (step(st, dt / 4)) mv = true;
+      st.forEach(function (q) { if (!q.alive && q.fall > 0) { q.fall = Math.max(0, q.fall - dt * 3); q.x += q.vx * dt; q.y += q.vy * dt; mv = true; } });
+      paintCnt(); draw();
+      if (mv) { rest = 0; return requestAnimationFrame(frame); }
+      if (++rest < 3) return requestAnimationFrame(frame);
+      anim = false; var lost1 = before1 - count(st, 1), lost2 = before2 - count(st, 2);
+      if (lost1 + lost2) buzz([30, 40, 30]);
+      after(lost1, lost2);
+    }
+    requestAnimationFrame(frame);
+  }
+  function after(l1, l2) {
+    var b = count(st, 1), w = count(st, 2);
+    if (!b || !w) return finish(b, w);
+    if (turn === 1) {
+      turn = 2; $('msg').textContent = l2 ? '🎯 ' + l2 + '알 깠다! 🍒 체리 차례…' : '🍒 체리 차례…';
+      setTimeout(function () { var m = think(st); shoot(m.k, m.ang, m.pw); }, 650);
+    } else {
+      turn = 1; $('msg').textContent = l1 ? '😱 ' + l1 + '알 까였어요! 내 차례 ⚫' : '내 차례! 검은 알을 당겼다 놓아요';
+    }
+  }
+  function pos(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height }; }
+  var grab = null;
+  cv.addEventListener('pointerdown', function (e) {
+    e.preventDefault(); if (over || anim || turn !== 1) return;
+    var p = pos(e), best = -1, bd = R * 2.2;
+    st.forEach(function (s, k) { if (s.alive && s.c === 1) { var d = Math.hypot(s.x - p.x, s.y - p.y); if (d < bd) { bd = d; best = k; } } });
+    if (best < 0) { $('msg').textContent = '검은 알을 꾹 잡고 뒤로 당겨요'; return; }
+    grab = { k: best, sx: p.x, sy: p.y }; try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    aim = { k: best, dx: 0, dy: -1, pw: 0 }; draw();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!grab) return; e.preventDefault(); var p = pos(e), dx = grab.sx - p.x, dy = grab.sy - p.y, d = Math.hypot(dx, dy);
+    if (d < .005) { aim.pw = 0; draw(); return; }
+    aim = { k: grab.k, dx: dx / d, dy: dy / d, pw: Math.min(1, d / PULL) }; draw();
+  });
+  function release() {
+    if (!grab) return; var a = aim; grab = null; aim = null;
+    if (!a || a.pw < .06) { draw(); return; }
+    buzz(20); $('msg').textContent = '딱!'; shoot(a.k, Math.atan2(a.dy, a.dx), a.pw);
+  }
+  cv.addEventListener('pointerup', release);
+  cv.addEventListener('pointercancel', function () { grab = null; aim = null; draw(); });
+
+  var last = null;
+  function finish(b, w) {
+    over = true; var g, txt, win = b && !w ? 1 : w && !b ? 2 : 0;
+    if (win === 1) { rec.w++; g = lvl === 2 && b >= 4 ? { e: '🏆', t: '알까기 황제' } : lvl === 2 ? { e: '🥏', t: '알까기 고수' } : { e: '😊', t: '잘했어요' }; txt = '내 알 ' + b + '개 남기고 체리 알을 다 깠어요!'; $('msg').textContent = '🎉 내가 이겼다!'; }
+    else if (win === 2) { rec.l++; g = { e: '🍒', t: '체리 승!' }; txt = '아깝다! 체리 알이 ' + w + '개 남았어요'; $('msg').textContent = '🍒 체리가 이겼어요'; }
+    else { g = { e: '🤝', t: '무승부' }; txt = '둘 다 다 까졌어요!'; $('msg').textContent = '🤝 무승부'; }
+    save(KEY, rec); last = { win: win, b: b, g: g };
+    var vs = cm && win === 1 && cl === lvl ? (b > cm ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님보다 많이 남겼어요!</div>' : b === cm ? '<div class="s">🤝 ' + esc(cn || '친구') + '님과 똑같아요!</div>' : '<div class="s">😅 ' + esc(cn || '친구') + '님은 ' + cm + '개 남겼어요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + txt + '</div>' + vs;
+    $('send').textContent = win === 1 ? '💬 친구한테 도전장 보내기' : '💬 친구한테 복수 부탁하기';
+    paintBest(); showOut();
+  }
+  $('again').addEventListener('click', function () { if (!anim) reset(); });
+  document.querySelectorAll('.lv button').forEach(function (x) { x.addEventListener('click', function () { if (anim) return; lvl = +x.dataset.l; reset(); }); });
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/alkkagi/');
+    if (last.win === 1) { u.searchParams.set('m', last.b); u.searchParams.set('l', lvl); }
+    if (nm) u.searchParams.set('n', nm);
+    var t = last.win === 1 ? '🥏 체리 알을 다 깠다! 내 알 ' + last.b + '개 남김 ' + last.g.e + ' ' + last.g.t : '🍒 체리한테 알까기 졌어… 복수해 줄 사람?';
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + t, desc: last.win === 1 ? '너는 몇 개 남기고 이길래? 체리랑 알까기 한 판!' : '체리 알까기 생각보다 세요. 네가 대신 까 줘!', btn: '🥏 알까기 하기' });
+  });
+  window.addEventListener('resize', size);
+  reset(); size(); paintBest();
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

@@ -398,16 +398,14 @@
     #v-home .nc.eo-c .tx p { color: rgba(255,255,255,.72); font-weight: 600; }
     /* 롯데 WINTER SALE처럼: 사진의 체리 색이 같은 계열로 점점 진해지며 아래까지 한 흐름으로 (띠 따로 없음) (11-21) */
     #v-home .nc.eo-c { background: #3A0512; }
-    /* 싸바비앙: 라파예트 돔 사진 그대로(덧칠 없음), 글씨는 그림자로만 살림. 제목 앞 체리 바탕 왕관 */
-    #v-home .nc.sv-c { background: url(../img/savabien-dome.jpg) center 35% / cover no-repeat; padding-top: 118px; }
+    /* 싸바비앙: 라파예트 돔 사진 그대로(덧칠 없음), 글씨는 아래 3분의 1에 그림자로만. 명품 콜렉션(금색) → 체리 왕관+싸바비앙 → 설명 */
+    #v-home .nc.sv-c { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 620 / 472; padding-top: 0; background: url(../img/savabien-dome.jpg) center / cover no-repeat; }
     #v-home .nc.sv-c .ph { display: none; }
-    #v-home .nc.sv-c .tx em { color: #fff; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,.8), 0 0 10px rgba(0,0,0,.5); }
-    #v-home .nc.sv-c .tx h3 { display: flex; align-items: center; gap: 10px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.8), 0 0 14px rgba(0,0,0,.55); }
-    #v-home .nc.sv-c .svk { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(145deg, #D0233F, #B3132B 55%, #8E0F22); box-shadow: 0 4px 10px rgba(0,0,0,.4); font-size: 25px; text-shadow: none; }
-    #v-home .nc.sv-c .tx p { color: #fff; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,.85), 0 0 10px rgba(0,0,0,.5); }
-    #v-home .nc.sv-c .bar { background: transparent; border: 0; box-shadow: none; }
-    #v-home .nc.sv-c .bar b, #v-home .nc.sv-c .bar small { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.85); }
-    #v-home .nc.sv-c .bar u { background: #B3132B; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,.35); }
+    #v-home .nc.sv-c .tx { padding: 0 18px 16px; }
+    #v-home .nc.sv-c .tx em { display: block; color: #FFD66B; font-size: 16px; font-weight: 800; letter-spacing: .02em; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6); }
+    #v-home .nc.sv-c .tx h3 { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; font-size: 30px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.85), 0 0 14px rgba(0,0,0,.6); }
+    #v-home .nc.sv-c .svk { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(145deg, #D0233F, #B3132B 55%, #8E0F22); box-shadow: 0 4px 10px rgba(0,0,0,.45); font-size: 25px; text-shadow: none; }
+    #v-home .nc.sv-c .tx p { color: #fff; font-size: 16px; font-weight: 600; white-space: normal; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6); }
     #v-home .nc.eo-c .ph::after { background: linear-gradient(180deg, rgba(112,9,34,0) 0%, rgba(112,9,34,0) 14%, rgba(98,8,30,.55) 38%, rgba(86,8,28,.88) 58%, #4E0718 78%, #3A0512 100%); }
     #v-home .nc.eo-c .eo3 { background: transparent; }
     #v-home .n-h { margin-bottom: 10px; }
@@ -779,6 +777,14 @@
     if (link) { var a = el('a', '', link.text); a.href = link.href; h.appendChild(a); }
     return h;
   }
+  // 카드 아무 데나 눌러도 열리게 (안의 단추·링크는 제 할 일 그대로)
+  function tapGo(card, url) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('a,button')) return;
+      location.href = url;
+    });
+  }
   function renderHome() {
     var v = $('v-home'); v.innerHTML = '';
     var now = new Date();
@@ -788,7 +794,7 @@
     v.appendChild(hi);
 
     // 1. 싸바비앙 — 맨 위 (1번 레몬 안개 + 금 왕관)
-    var lux = ncard({ pal: 1, href: '../savabien/', label: '싸바비앙 명품 콜렉션', photo: '../img/savabien-dome.jpg', em: '명품 콜렉션', title: '싸바비앙', desc: '전국 장인·명인의 좋은 물건을 한곳에', icon: '👑', name: '싸바비앙', sub: 'SAVABIEN', btn: '구경하기' });
+    var lux = ncard({ pal: 1, href: '../savabien/', label: '싸바비앙 명품 콜렉션', photo: '../img/savabien-dome.jpg', em: '명품 콜렉션', title: '싸바비앙', desc: '명인의 손끝에서 태어난 명품만 모았습니다' });
     var h3 = lux.querySelector('.tx h3'), cr = el('span', 'svk', '👑'); cr.setAttribute('aria-hidden', 'true'); h3.insertBefore(cr, h3.firstChild); lux.classList.add('sv-c');
     v.appendChild(lux);
 
@@ -797,7 +803,7 @@
     eo.classList.add('eo-c');
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
-    eo.appendChild(b3);
+    eo.appendChild(b3); tapGo(eo, '../eodiya/');
     v.appendChild(eo);
 
     // 3. 싸바알림판 + 언니김치 특판 — 예전 초록 알림판 그대로 되돌림 (11-21 대표님)
@@ -806,6 +812,7 @@
       '<h2>싸바알림판</h2><p>가게홍보 · 모임공지<br>프로필 · 초대장<br><small>SNS에 알리세요!</small></p></a>' +
       '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M25.8 3.2a3 3 0 0 1 4.2 4.2L10.2 27.2 3 29l1.8-7.2L25.8 3.2Z" fill="#76552b"/><path d="m4.8 21.8 5.4 5.4L3 29l1.8-7.2Z" fill="#e9c99a"/><path d="m25.8 3.2 4.2 4.2-3.8 3.8L22 7l3.8-3.8Z" fill="#b78b50"/><path d="m22 7 4.2 4.2" stroke="#f5e5c7" stroke-width="1.2"/></svg></span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
       '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
+    tapGo(mk, '#alim');
     v.appendChild(mk);
 
     // 4. 오늘의 싸바 — 예전 파란 탭(남산타워 사진) 그대로 되돌림, 싸바알림판 바로 아래 (11-21 대표님)
@@ -835,7 +842,7 @@
       if (!window.SsakaShare) { location.href = '../?story=1'; return; }
       SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
-    stb.appendChild(see); stb.appendChild(kk);
+    stb.appendChild(see); stb.appendChild(kk); tapGo(st, '../?story=1');
     v.appendChild(st);
 
     // 내가 만든 카드 — 3장만

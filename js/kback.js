@@ -3,6 +3,7 @@
  * (카톡 단추 위치는 화면 오른쪽 끝에서 일정한 거리라서 오른쪽 기준으로 맞춤)
  * 안드로이드는 위 단추가 없어서 "◀ 뒤로가기 = 대화창"을 작게 늘 띄움 */
 (function () {
+  return; // 11-21 대표님: 카톡 위 왼쪽에 대화방 가는 화살이 이미 있어 오른쪽 위 이름표(카톡 주소·대화창)는 필요 없음 — 모든 화면에서 끔
   var ua = navigator.userAgent || '';
   if (!/KAKAOTALK/i.test(ua)) return;
   var ios = /iPhone|iPad|iPod/i.test(ua);

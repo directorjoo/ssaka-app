@@ -743,7 +743,7 @@
     v.appendChild(lux);
 
     // 2. 어디야? — 12번 크리에이터 레드, 원래 체리 사진(물방울만 지운 eodiya-cherry4.jpg) 그대로, 단추 셋 (이 카드만 예외)
-    var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry5.jpg?v=2', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
+    var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry6.jpg', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
     eo.classList.add('eo-c');
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
@@ -833,7 +833,11 @@
     var c = ncard({ pal: pal, href: '../eodiya/#playground', label: '싸바 놀이터 — 게임 ' + GAMES.length + '가지', art: '🎮', em: '게임 ' + GAMES.length + '가지 · 모두 무료', title: '싸바 놀이터', desc: '체리 팡 · 두더지 · 오목 · 눈 나이…', icon: g[1], name: '오늘의 추천', sub: g[2], btn: '놀러 가기' });
     c.classList.add('pg');
     // 9번 햇살 초록은 위쪽 연두가 너무 연해 흰 글씨가 안 보임 → 이 카드에선 연두를 진하게 (11-21 대표님)
-    if (pal === 9) { c.style.setProperty('--g', 'linear-gradient(180deg,#6F8A22 0%,#4E8A3C 45%,#3E7432 100%)'); c.style.setProperty('--c0', '#6F8A22'); c.style.setProperty('--b', 'linear-gradient(90deg,#3B6E30,#457A36)'); }
+    // 왼쪽(글씨)은 진하게, 오른쪽(게임 그림)은 연하게 — 가로 그라데이션 (11-21 대표님)
+    var HG = { 7: ['linear-gradient(100deg,#7E2F2D 0%,#9A4440 40%,#C06A5C 75%,#DD8C7C 100%)', '#9A4440', 'linear-gradient(90deg,#6E2422,#92403F)'],
+               9: ['linear-gradient(100deg,#2F5E26 0%,#3E7432 40%,#62963E 75%,#9DBA4E 100%)', '#3E7432', 'linear-gradient(90deg,#2C5824,#3B6E30)'],
+               10: ['linear-gradient(100deg,#1C2F55 0%,#2A4373 40%,#3B6C88 75%,#6E9BB5 100%)', '#2A4373', 'linear-gradient(90deg,#16274A,#253B66)'] }[pal];
+    if (HG) { c.style.setProperty('--g', HG[0]); c.style.setProperty('--c0', HG[1]); c.style.setProperty('--b', HG[2]); }
     var sp = c.querySelector('.ph.art span'); sp.textContent = '';
     GAMES.slice(0, 6).forEach(function (x) { sp.appendChild(el('b', '', x[1])); });
     w.appendChild(c);

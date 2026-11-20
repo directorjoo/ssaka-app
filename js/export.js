@@ -200,7 +200,7 @@
     ctx.font = (weight || 700) + ' ' + size + 'px ' + (family || FONT); ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     var s2 = String(str || ''); while (max && ctx.measureText(s2).width > max && s2.length > 2) s2 = s2.slice(0, -1);
     if (s2 !== String(str || '')) s2 = s2.slice(0, -1) + '…';
-    ctx.fillText(s2, ctx.__cx != null ? ctx.__cx : ctx.canvas.width / 2, y); ctx.textAlign = 'left'; return y + size * 1.3;
+    ctx.fillText(s2, ctx.__cx != null ? ctx.__cx : ctx.canvas.width / 2 / (ctx.__s || 1), y); ctx.textAlign = 'left'; return y + size * 1.3;
   }
   function fitFont(ctx, str, max, start, weight, family) { var sz = start; do { ctx.font = weight + ' ' + sz + 'px ' + family; if (ctx.measureText(str).width <= max) break; sz -= 4; } while (sz > 40); return sz; }
   function mark(ctx, w, h, dark) { ctx.font = '500 18px ' + FONT; ctx.fillStyle = dark ? 'rgba(27,19,12,.35)' : 'rgba(245,235,217,.45)'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('sava.kr', w - 34, h - 26); ctx.textAlign = 'left'; }
@@ -753,7 +753,9 @@
     { id: 'story', w: 1080, h: 1920, label: '세로 9:16', places: ['인스타 스토리·릴스', '유튜브 쇼츠', '틱톡', '카톡 프로필 배경'] },
     { id: 'k43', w: 1200, h: 900, label: '가로 4:3', places: ['카톡 채널 메시지', '밴드'] },
     { id: 'yt', w: 1280, h: 720, label: '가로 16:9', places: ['유튜브 썸네일', '블로그 본문 사진'] },
-    { id: 'link', w: 1200, h: 630, label: '가로 링크형', places: ['페이스북·X 링크 공유'] }
+    { id: 'link', w: 1200, h: 630, label: '가로 링크형', places: ['페이스북·X 링크 공유'] },
+    // 인쇄 (2026-11-20): A4·A3·A5는 모두 같은 비율(1:√2) → 한 장으로 세 크기 모두. 그릴 땐 1080 기준, 저장은 300dpi(2480×3508)로 키워서
+    { id: 'a4', w: 1080, h: 1527, label: '인쇄 A4 세로', places: ['전단지·포스터 (A4·A3·A5)', '매장 안내문·게시판'], print: { mm: [210, 297], px: [2480, 3508] } }
   ];
   var TYPE_HEAD = { shop: '오늘의 안내', profile: 'PROFILE', club: '모임 안내', greet: '마음을 전해요', safe: '안심 카드' };
   function famStack(design) { var F = global.SsakaDesigns && SsakaDesigns.FONTS; return (F && F[design.font] && F[design.font].stack) || FONT; }
@@ -1235,7 +1237,7 @@
   LAYS.safe = LAYS.mdark;
 
   // 크기마다 사진에 넣을 줄 수 (넘치면 앞에서부터 이만큼 + "외 N가지")
-  var SNS_CAP = { sq: 4, p45: 6, story: 9, k43: 5, yt: 4, link: 3 };
+  var SNS_CAP = { sq: 4, p45: 6, story: 9, k43: 5, yt: 4, link: 3, a4: 10 };
   // 사진이 있는 인스타·피드(정사각 1:1·세로 4:5)는 사진이 주인공 — 메뉴는 대표 몇 개만 크게
   var SNS_CAP_PHOTO = { sq: 2, p45: 3 };
   function snsPlan(card, opts, sizeId, pf) {
@@ -1272,7 +1274,9 @@
     };
   }
   function drawSns(card, design, opts, imgs, size) {
-    var W = size.w, H = size.h, c = canvas(W, H), ctx = c.getContext('2d');
+    var W = size.w, H = size.h, hi = !!(size.print && !opts.lo), k = hi ? size.print.px[0] / W : 1;
+    var c = hi ? canvas(size.print.px[0], size.print.px[1]) : canvas(W, H), ctx = c.getContext('2d');
+    if (hi) { ctx.scale(k, size.print.px[1] / H); ctx.__s = k; ctx.imageSmoothingQuality = 'high'; } // 인쇄용: 같은 디자인을 그대로 크게(글씨·무늬는 선명하게 다시 그림)
     var D = snsData(card, design, opts, imgs, size.id), P = design.colors;
     (LAYS[design.style] || LAYS.minimal)(ctx, W, H, D, P);
     mark(ctx, W, H, lumOf(P.bg) > 0.5);
@@ -1295,7 +1299,7 @@
       var base = String(card.title || '싸바').replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 16), dn = design.name.replace(/[·\s]/g, '');
       var list = sizes.map(function (sz) { return { name: base + '-' + dn + '-' + sz.places[0].replace(/[·\s]/g, '') + '-' + sz.w + 'x' + sz.h, label: sz.label + ' · ' + sz.places.join(' · '), places: sz.places, size: sz, c: drawSns(card, design, opts, imgs, sz) }; });
       return Promise.all(list.map(function (x) { return toBlob(x.c); })).then(function (blobs) {
-        return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, places: x.places, sizeId: x.size.id, blob: blobs[i], w: x.c.width, h: x.c.height, fit: x.c._fit }; });
+        return list.map(function (x, i) { return { name: x.name + '.jpg', label: x.label, places: x.places, sizeId: x.size.id, print: x.size.print || null, blob: blobs[i], w: x.c.width, h: x.c.height, fit: x.c._fit }; });
       });
     });
   }
@@ -1360,8 +1364,41 @@
     });
   }
 
+  // =====================================================================
+  // 인쇄용 PDF (2026-11-20) — JPG 한 장을 종이 크기(A5·A4·A3) 한 쪽에 꽉 차게. 라이브러리 없이 직접 만듦.
+  // SsakaExport.pdf(jpgBlob, wPx, hPx, paper) → Promise<Blob>   paper: 'A5' | 'A4' | 'A3'
+  // =====================================================================
+  var PAPER = { A5: [148, 210], A4: [210, 297], A3: [297, 420] };
+  function makePdf(jpg, wPx, hPx, paper) {
+    var mm = PAPER[paper] || PAPER.A4, land = wPx > hPx, pw = (land ? mm[1] : mm[0]) * 72 / 25.4, ph = (land ? mm[0] : mm[1]) * 72 / 25.4;
+    pw = Math.round(pw * 100) / 100; ph = Math.round(ph * 100) / 100;
+    return (jpg.arrayBuffer ? jpg.arrayBuffer() : new Response(jpg).arrayBuffer()).then(function (buf) {
+      var img = new Uint8Array(buf), enc = function (t) { var a = new Uint8Array(t.length); for (var i = 0; i < t.length; i++) a[i] = t.charCodeAt(i) & 255; return a; };
+      var draw = 'q ' + pw + ' 0 0 ' + ph + ' 0 0 cm /Im0 Do Q';
+      var objs = [
+        '<< /Type /Catalog /Pages 2 0 R >>',
+        '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+        '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + '] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>',
+        null,
+        '<< /Length ' + draw.length + ' >>\nstream\n' + draw + '\nendstream'
+      ];
+      var parts = [enc('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n')], len = parts[0].length, offs = [];
+      objs.forEach(function (o, i) {
+        offs.push(len);
+        if (o === null) {
+          var head = enc((i + 1) + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + wPx + ' /Height ' + hPx + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + img.length + ' >>\nstream\n'), tail = enc('\nendstream\nendobj\n');
+          parts.push(head, img, tail); len += head.length + img.length + tail.length;
+        } else { var b = enc((i + 1) + ' 0 obj\n' + o + '\nendobj\n'); parts.push(b); len += b.length; }
+      });
+      var xref = 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n' + offs.map(function (o) { return ('0000000000' + o).slice(-10) + ' 00000 n \n'; }).join('') +
+        'trailer\n<< /Size ' + (objs.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + len + '\n%%EOF\n';
+      parts.push(enc(xref));
+      return new Blob(parts, { type: 'application/pdf' });
+    });
+  }
+
   // 업종별 템플릿(js/pack.js)이 같은 도구로 그리도록 내어 줌
   var HELP = { FONT: FONT, SERIF: SERIF, loadImg: loadImg, viaPic: viaPic, usable: usable, cover: cover, round: round, wrap: wrap, canvas: canvas, toBlob: toBlob,
     tBlock: tBlock, iList: iList, pic: pic, geo: geo, safeY: safeY, lumOf: lumOf, frameMenu: frameMenu, frameAddr: frameAddr, loadSerif: loadSerif, sizes: SNS_SIZES };
-  global.SsakaExport = { plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, slides: buildSlides, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
+  global.SsakaExport = { pdf: makePdf, papers: PAPER, plan: snsPlan, _h: HELP, build: build, text: postText, frame: buildFrame, sns: buildSns, slides: buildSlides, snsSizes: SNS_SIZES, framePals: FRAME_PALS, frameSizes: FRAME_SIZES, layouts: LAYOUTS, layoutOk: layoutOk, indPal: IND_PAL };
 })(typeof window !== 'undefined' ? window : globalThis);

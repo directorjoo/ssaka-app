@@ -88,10 +88,10 @@
     .tcard:focus-visible { outline: 3px solid #2f6bff; outline-offset: 2px; }
     .tcard .tscale { position: absolute; left: 0; top: 0; width: 390px; transform: scale(var(--gs, 0.3026)); transform-origin: 0 0; }
     /* 올릴 곳을 인스타·스토리·정사각으로 고르면 디자인 미리보기도 그 모양으로 */
-    .tcard.r-feed { height: 148px; } .tcard.r-sq { height: 118px; } .tcard.r-story { height: 210px; }
+    .tcard.r-feed { height: 148px; } .tcard.r-sq { height: 118px; } .tcard.r-story { height: 210px; } .tcard.r-a4 { height: 167px; }
     .tcard .tsns { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: #fff; }
     .tcard .tload { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.82); color: #8E0A1C; font-size: 12px; font-weight: 800; }
-    .tcard.r-feed .tscale, .tcard.r-sq .tscale, .tcard.r-story .tscale { opacity: .35; }
+    .tcard.r-feed .tscale, .tcard.r-sq .tscale, .tcard.r-story .tscale, .tcard.r-a4 .tscale { opacity: .35; }
     .tcard .tname {
       position: absolute; left: 6px; bottom: 6px; padding: 3px 7px; border-radius: 8px;
       background: rgba(20,20,24,.72); color: #fff; font-size: 11px; font-weight: 700; line-height: 1.3;
@@ -141,7 +141,7 @@
     @media (max-width: 859px) {
       .gallery { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-columns: auto; gap: 10px 8px; overflow: visible; padding: 4px 2px 12px; }
       .gallery .tcard { width: auto; height: auto; aspect-ratio: 118 / 210; }
-      .gallery .tcard.r-feed { aspect-ratio: 4 / 5; } .gallery .tcard.r-sq { aspect-ratio: 1 / 1; } .gallery .tcard.r-story { aspect-ratio: 9 / 16; }
+      .gallery .tcard.r-feed { aspect-ratio: 4 / 5; } .gallery .tcard.r-sq { aspect-ratio: 1 / 1; } .gallery .tcard.r-story { aspect-ratio: 9 / 16; } .gallery .tcard.r-a4 { aspect-ratio: 210 / 297; }
     }
     @media (min-width: 860px) { .gallery { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, 118px); grid-auto-columns: auto; overflow: visible; } }
 
@@ -312,7 +312,7 @@
     .pv-phone { flex: 1; min-height: 0; border-radius: 16px; overflow: hidden; border: 2px solid #eee; }
     .pv-phone iframe { width: 100%; height: 100%; border: 0; display: block; }
     .modal[hidden] { display: none !important; }
-    .done-box { text-align: center; display: grid; gap: 10px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
+    .done-box { max-height: 94dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; text-align: center; display: grid; gap: 10px; padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); }
     .done-head { font-size: 22px; font-weight: 800; }
     .done-sub { margin: 0 0 6px; color: var(--muted); font-size: 14px; }
     .big { display: flex; align-items: center; justify-content: center; min-height: 56px; border-radius: 16px; font: inherit; font-size: 17px; font-weight: 800; text-decoration: none; cursor: pointer; border: 0; color: var(--text); }
@@ -392,7 +392,12 @@
   @media (max-width: 859px) { .mk-s1 .preview, .mk-s2 .preview { display: none !important; } }
   /* 고른 용도(인스타 4:5·스토리 9:16·정사각 1:1)대로 미리보기도 그 모양 그대로 */
   .snspv { position: relative; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #fff; border: 2px solid #eee; box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); }
-  .snspv.r-feed { aspect-ratio: 4 / 5; width: 100%; } .snspv.r-sq { aspect-ratio: 1 / 1; width: 100%; } .snspv.r-story { aspect-ratio: 9 / 16; height: min(640px, 78vh); }
+  .snspv.r-feed { aspect-ratio: 4 / 5; width: 100%; } .snspv.r-sq { aspect-ratio: 1 / 1; width: 100%; } .snspv.r-story { aspect-ratio: 9 / 16; height: min(640px, 78vh); } .snspv.r-a4 { aspect-ratio: 210 / 297; width: 100%; }
+  /* 인쇄: 종이 크기 고르기 (A5·A4·A3) */
+  .papers { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+  .papers button { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid #cfcfcf; background: #fff; color: #333; font: inherit; font-size: 15px; font-weight: 800; }
+  .papers button[aria-pressed="true"] { border-color: #B3132B; background: #B3132B; color: #fff; }
+  .print-tip { display: block; text-align: center; font-size: 14px; color: #555; line-height: 1.5; word-break: keep-all; }
   .snspv img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .snspv .snsld { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.8); color: #8E0A1C; font-size: 15px; font-weight: 800; }
   .snspv .snsld:empty { display: none; }
@@ -800,6 +805,8 @@
       <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
       <div class="slides" id="doneSlides" role="group" aria-label="넘겨 보기 묶음" hidden></div>
       <small class="slides-tip" id="doneSlidesTip" hidden></small>
+      <div class="papers" id="papers" role="group" aria-label="인쇄할 종이 크기" hidden></div>
+      <small class="print-tip" id="printTip" hidden></small>
       <button type="button" class="kakao big" id="doneSnsSave">📥 이 사진 저장하기</button>
     </div>
     <div class="more-dest" id="moreDest">
@@ -906,7 +913,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=89"></script>
+<script src="../js/export.js?v=90"></script>
 <script src="../js/pack.js?v=5"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1026,7 +1033,7 @@
     return el;
   }
   // 인스타 피드(4:5)·스토리(9:16)·정사각(1:1)을 골랐으면 디자인 미리보기를 SNS 사진 그대로 그려서 보여 줌
-  var SNS_OF = { feed: { sz: 'p45', cls: 'r-feed' }, story: { sz: 'story', cls: 'r-story' }, square: { sz: 'sq', cls: 'r-sq' } };
+  var SNS_OF = { feed: { sz: 'p45', cls: 'r-feed' }, story: { sz: 'story', cls: 'r-story' }, square: { sz: 'sq', cls: 'r-sq' }, print: { sz: 'a4', cls: 'r-a4' } };
   var snsCache = {}, snsQ = [], snsBusy = false, snsGen = 0;
   function snsThumb(el, d) {
     var dd = (typeof dest === 'string' && SNS_OF[dest]) || null;
@@ -1050,9 +1057,9 @@
     if (!j) return;
     if (snsCache[j.key]) { putSns(j.el, snsCache[j.key]); return runSns(); }
     snsBusy = true;
-    SsakaExport.sns(fitCard(j.card), j.d, snsOpts({ sizes: [j.sz] })).then(function (list) {
+    SsakaExport.sns(fitCard(j.card), j.d, snsOpts({ sizes: [j.sz], lo: true })).then(function (list) {
       if (list && list[0]) { var u = URL.createObjectURL(list[0].blob); snsCache[j.key] = u; if (j.el.isConnected) putSns(j.el, u); }
-    }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story'); })
+    }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story', 'r-a4'); })
       .then(function () { snsBusy = false; setTimeout(runSns, 0); });
   }
   // 사진에 넣을 메뉴: 내가 적은 메뉴만. 아무것도 안 적은 예시 화면일 때만 예시 메뉴 (내 카드에 예시 메뉴가 섞이지 않게)
@@ -1082,25 +1089,30 @@
     return c;
   }
   function snsOpts(o) { o.pics = localPics; o.industry = industry; o.menu = snsMenu(); var f = fitNow(); if (f.skip && f.skip.length) o.skip = f.skip.slice(); return o; }
-  function setShape(el, dd) { el.classList.remove('r-feed', 'r-sq', 'r-story'); if (dd) el.classList.add(dd.cls); }
-  function makeSnsImg(card) {
+  function setShape(el, dd) { el.classList.remove('r-feed', 'r-sq', 'r-story', 'r-a4'); if (dd) el.classList.add(dd.cls); }
+  // hi: 완성 화면용 — 인쇄(A4)는 이때만 300dpi(2480×3508)로 크게 그림 (입력 중 미리보기는 가볍게)
+  function pvKey(card, hi) { var dd = destSns(); return slideKey(card) + (hi && dd && dd.sz === 'a4' ? '|hi' : ''); }
+  var snsPvW = 0, snsPvH = 0;
+  function makeSnsImg(card, hi) {
     var dd = destSns();
     if (!dd || !window.SsakaExport || !SsakaExport.sns) return Promise.resolve(null);
-    var d = curDesign(), key = slideKey(card);
+    var d = curDesign(), key = pvKey(card, hi), lo = !(hi && dd.sz === 'a4');
     if (key === snsPvKey && snsPvBlob) return Promise.resolve({ blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit });
-    return SsakaExport.sns(fitCard(card), d, snsOpts({ sizes: [dd.sz] })).then(function (list) {
+    return SsakaExport.sns(fitCard(card), d, snsOpts({ sizes: [dd.sz], lo: lo })).then(function (list) {
       if (!list || !list[0]) return null;
-      snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob); snsPvFit = list[0].fit || null;
+      snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob); snsPvFit = list[0].fit || null; snsPvW = list[0].w; snsPvH = list[0].h;
+      if (!lo) prepPdf();
       return { blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit };
     });
   }
-  function showSnsIn(box, img, ld, card) {
+  function showSnsIn(box, img, ld, card, hi) {
     var dd = destSns(); setShape(box, dd);
     if (!dd) return Promise.resolve(null);
     ld.textContent = img.getAttribute('src') && box.dataset.shape === dest ? '' : '🍒 사진 그리는 중';
     if (box.dataset.shape !== dest) img.removeAttribute('src');
     box.dataset.shape = dest;
-    return makeSnsImg(card).then(function (r) {
+    if (hi && dest === 'print') ld.textContent = '🖨️ 인쇄용으로 크게 그리는 중';
+    return makeSnsImg(card, hi).then(function (r) {
       if (r) { img.src = r.url; ld.textContent = ''; } else ld.textContent = '사진을 그리지 못했어요';
       return r;
     }).catch(function () { ld.textContent = '사진을 그리지 못했어요'; return null; });
@@ -1603,10 +1615,18 @@
     $('doneSns').hidden = !dd;
     if (dd) $('doneSnsSave').textContent = '📥 이 사진 저장하기';
     $('send2').className = dd ? 'ghost big' : 'kakao big';
-    if (dd) {
+    var pr = dest === 'print';
+    $('papers').hidden = $('printTip').hidden = !pr;
+    if (pr) paintPapers();
+    if (dd && pr) {
+      $('doneHead').textContent = '🎉 인쇄용 전단·포스터가 완성됐어요!';
+      $('doneSub').textContent = '종이 크기를 고르고 저장하세요. 인쇄용 PDF와 사진(JPG)을 함께 드려요. 인쇄소에 그대로 보내도 돼요.';
+      $('doneSnsSave').textContent = '📥 인쇄용 PDF·사진 저장하기';
+      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card, true);
+    } else if (dd) {
       $('doneHead').textContent = '🎉 ' + ds.b + ' 사진이 완성됐어요!';
       $('doneSub').textContent = ds.s + ' 크기 그대로예요. 저장해서 올리세요. 카드 링크도 카톡으로 함께 보낼 수 있어요.';
-      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card).then(function (r) { if (r) paintSlides(r); });
+      showSnsIn($('doneSnsPv'), $('doneSnsImg'), $('doneSnsLd'), buildCard().card, true).then(function (r) { if (r) paintSlides(r); });
     } else {
       $('doneSlides').hidden = $('doneSlidesTip').hidden = true;
       $('doneHead').textContent = '🎉 카드가 완성됐어요!';
@@ -1678,7 +1698,17 @@
   $('doneSnsSave').addEventListener('click', function () {
     var card = buildCard().card;
     // 이미 그려 둔 첫 장이 있으면 기다리지 않고 바로 공유 (누른 직후에 공유창을 띄워야 아이폰에서 막히지 않음)
-    var ready = snsPvBlob && snsPvKey === slideKey(card);
+    var ready = snsPvBlob && snsPvKey === pvKey(card, true);
+    if (dest === 'print') {
+      if (!ready) { toast('🖨️ 인쇄용으로 그리는 중 — 다 되면 한 번 더 눌러 주세요'); makeSnsImg(card, true); return; }
+      if (!pdfBlob || pdfFor !== snsPvKey + paper) { toast('🖨️ PDF 준비 중 — 잠시 뒤 한 번 더 눌러 주세요'); prepPdf(); return; }
+      var nm = 'sava-' + String(card.title || '전단').replace(/[\\/:*?"<>|\s]+/g, '').slice(0, 16) + '-' + paper;
+      var pf = [new File([pdfBlob], nm + '.pdf', { type: 'application/pdf' }), new File([snsPvBlob], nm + '.jpg', { type: 'image/jpeg' })];
+      if (navigator.canShare && navigator.canShare({ files: pf })) { navigator.share({ files: pf }).catch(function () {}); return; }
+      pf.forEach(function (ff, k) { setTimeout(function () { var a = document.createElement('a'); a.href = URL.createObjectURL(ff); a.download = ff.name; document.body.appendChild(a); a.click(); a.remove(); }, k * 400); });
+      toast(paper + ' 인쇄용 PDF와 사진을 내려받았어요');
+      return;
+    }
     var go = function (blob) {
       var files = [new File([blob], 'sava-' + dest + '-1.jpg', { type: 'image/jpeg' })];
       if (slideSet && slideSet.key === slideKey(card)) slideSet.list.forEach(function (x, i) { if (!slideSet.off[i + 1]) files.push(new File([x.blob], 'sava-' + dest + '-' + (files.length + 1) + '.jpg', { type: 'image/jpeg' })); });
@@ -1688,8 +1718,28 @@
     };
     if (ready) return go(snsPvBlob);
     toast('🍒 사진 준비 중 — 다 되면 한 번 더 눌러 주세요');
-    makeSnsImg(card).then(function (r) { if (r) paintSlides(r); });
+    makeSnsImg(card, true).then(function (r) { if (r) paintSlides(r); });
   });
+  // ---------- 인쇄: 종이 크기(A5·A4·A3) — 모두 같은 비율이라 디자인 한 장으로 세 크기. PDF는 미리 만들어 둠(아이폰 공유창) ----------
+  var paper = 'A4', pdfBlob = null, pdfFor = '';
+  try { var sp = localStorage.getItem('sava-paper'); if (/^A[345]$/.test(sp)) paper = sp; } catch (e) {}
+  var PAPER_TIP = { A5: 'A5 (148×210mm) — 손에 들고 나눠 주는 전단지, 테이블 안내', A4: 'A4 (210×297mm) — 가장 흔한 전단·안내문, 집 프린터로도 인쇄', A3: 'A3 (297×420mm) — 가게 앞·게시판에 붙이는 포스터' };
+  function paintPapers() {
+    var box = $('papers'); box.innerHTML = '';
+    ['A5', 'A4', 'A3'].forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = p + (p === 'A5' ? ' 전단' : p === 'A4' ? ' 안내문' : ' 포스터');
+      b.setAttribute('aria-pressed', p === paper ? 'true' : 'false');
+      b.addEventListener('click', function () { paper = p; try { localStorage.setItem('sava-paper', p); } catch (e) {} paintPapers(); prepPdf(); });
+      box.appendChild(b);
+    });
+    $('printTip').textContent = PAPER_TIP[paper] + ' · 300dpi 고화질이라 크게 뽑아도 선명해요';
+  }
+  function prepPdf() {
+    if (dest !== 'print' || !snsPvBlob || !SsakaExport.pdf || !/\|hi$/.test(snsPvKey)) return;
+    var want = snsPvKey + paper; if (pdfFor === want && pdfBlob) return;
+    pdfBlob = null; pdfFor = want;
+    SsakaExport.pdf(snsPvBlob, snsPvW, snsPvH, paper).then(function (b) { if (pdfFor === want) pdfBlob = b; });
+  }
   var INV = [
     '바쁘신 중에도 귀한 걸음 하시어\n자리를 빛내 주시면 감사하겠습니다.',
     '{t}에 여러분을 초대합니다.\n함께 이야기 나누고 새로운 인연을 만드는 자리가 되기를 바랍니다.\n귀한 걸음으로 자리를 빛내 주시기 바랍니다.',
@@ -2816,7 +2866,8 @@
     { id: 'kakao', i: '💬', b: '카톡으로 보내기', s: '누르면 열리는 카드' },
     { id: 'feed', i: '📷', b: '인스타 피드', s: '세로 4:5' },
     { id: 'story', i: '📱', b: '스토리·릴스', s: '세로 9:16' },
-    { id: 'square', i: '🖼️', b: '네이버·당근', s: '정사각 1:1' }
+    { id: 'square', i: '🖼️', b: '네이버·당근', s: '정사각 1:1' },
+    { id: 'print', i: '🖨️', b: '인쇄 전단·포스터', s: 'A4 세로 (A3·A5도)' }
   ];
   var DEST_BY = {}; DESTS.forEach(function (d) { DEST_BY[d.id] = d; });
   var dest = 'kakao';
@@ -2841,7 +2892,8 @@
   function paintDest() {
     var n = $('d2dest'), ds = DEST_BY[dest];
     n.hidden = dest === 'kakao';
-    if (!n.hidden) n.textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 아래 디자인도 실제 올라갈 ' + ds.s.replace('세로 ', '').replace('정사각 ', '') + ' 모양 그대로 보여 드려요. 다 쓰면 완성 화면에서 이 크기 사진이 맨 위에 나와요.';
+    if (!n.hidden) n.textContent = dest === 'print' ? '🖨️ 인쇄 전단·포스터용으로 고르셨어요. 아래 디자인도 A4 종이 모양 그대로 보여 드려요. A3·A5도 같은 비율이라 완성 화면에서 종이 크기만 고르면 인쇄용 PDF가 나와요.'
+      : ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 아래 디자인도 실제 올라갈 ' + ds.s.replace('세로 ', '').replace('정사각 ', '') + ' 모양 그대로 보여 드려요. 다 쓰면 완성 화면에서 이 크기 사진이 맨 위에 나와요.';
     // 올릴 곳이 바뀌면 디자인 미리보기를 그 모양으로 다시 그림
     if (paintedDest !== null && paintedDest !== dest) { snsGen++; snsQ = []; renderGallery(); try { if (PHPAL) paintPhotoSug(); } catch (e) {} }
     paintedDest = dest;

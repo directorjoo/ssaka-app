@@ -40,6 +40,20 @@
     .it span { font-weight: 700; color: #8a7a5a; }
     .mi p { margin: 8px 0 0; font-size: 16px; line-height: 1.6; color: #4a3b22; }
     .st { display: inline-block; margin-top: 10px; padding: 6px 12px; border-radius: 999px; background: #FFF4D6; color: #8A5E0E; font-size: 15px; font-weight: 800; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
+    /* 명인 작품: 백화점 혜택 칸처럼 두 개씩 1:1 정사각 (12색 그라데이션 + 작품 이모지 + 품목 이름) */
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+    .mt { min-width: 0; }
+    .sq { position: relative; display: grid; place-items: center; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; color: #1A1A1A; box-shadow: 0 10px 22px -16px rgba(90,60,10,.7); }
+    .sq.dk { color: #fff; }
+    .sq i { font-style: normal; font-size: 64px; line-height: 1; transform: translateY(-10px); filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+    .sq strong { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 19px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.2; }
+    .sq.dk strong { text-shadow: 0 1px 4px rgba(0,0,0,.45); }
+    .sq:not(.dk) strong { text-shadow: 0 1px 2px rgba(255,255,255,.6); }
+    .sq .no { position: absolute; left: 10px; top: 10px; padding: 3px 9px; border-radius: 999px; background: #fff; color: #B3132B; font-size: 13px; font-weight: 800; box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+    .mt b { display: block; margin-top: 9px; font-size: 16.5px; font-weight: 900; color: #3B2A12; letter-spacing: -0.02em; }
+    .mt .rg { display: block; font-size: 14.5px; font-weight: 700; color: #9A7A3A; }
+    .mt p { margin: 4px 0 0; font-size: 15px; line-height: 1.45; color: #4a3b22; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .mt .st { display: inline-block; margin-top: 7px; padding: 3px 10px; border-radius: 999px; background: #FFF4D6; color: #8A5E0E; font-size: 13px; font-weight: 800; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
     .note { margin-top: 18px; padding: 16px; border-radius: 18px; background: #FFF9EA; box-shadow: inset 0 0 0 1.5px #EBD9A6; font-size: 15px; line-height: 1.7; color: #5a4a2a; }
     .note a { color: #8A5E0E; font-weight: 800; }
     .join { display: block; margin-top: 14px; padding: 16px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; font-size: 18px; font-weight: 900;
@@ -60,108 +74,120 @@
 </header>
 <div class="lead"><p>나라가 인정한 명인의 손맛을 한자리에.<br>먼저 대한민국식품명인 열 분을 소개합니다.</p></div>
 <main class="w">
-  <div class="sec"><b>✨ 명인 열 분</b><span>농림축산식품부 지정</span></div>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🌸</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제14호</div>
-        <h3>홍쌍리 <small>명인</small></h3>
-        <div class="it">매실농축액 · <span>전남 광양</span></div>
-        <p>섬진강 매화마을을 일군 매실 명인. 백운산 기슭 청매실농원에서 매실청을 빚어요.</p>
-        <div class="st">🤝 입점 준비 중</div>
+  <div class="sec"><b>명인 열 분의 작품</b><span>농림축산식품부 지정</span></div>
+  <div class="grid">
+    <article class="mt">
+      <div class="sq" style="background:radial-gradient(ellipse at 60% 35%,#ACCEAC 0%,#99BD99 45%,#8FB58F 100%)">
+        <span class="no">제14호</span>
+        <i aria-hidden="true">🌸</i>
+        <strong>매실농축액</strong>
       </div>
+      <b>[홍쌍리 명인]</b>
+      <span class="rg">전남 광양</span>
+      <p>섬진강 매화마을을 일군 매실 명인. 백운산 기슭 청매실농원에서 매실청을 빚어요.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🍶</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제97호</div>
-        <h3>김영민 <small>명인</small></h3>
-        <div class="it">도라지식초 · <span>전남 보성</span></div>
-        <p>30년 넘게 도라지식초를 만들어 온 명인. 집안의 누룩·청주 빚는 법까지 이어 와요.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq" style="background:linear-gradient(95deg,#AF92BA 0%,#B2A6B6 50%,#B1ACB0 100%)">
+        <span class="no">제97호</span>
+        <i aria-hidden="true">🍶</i>
+        <strong>도라지식초</strong>
       </div>
+      <b>[김영민 명인]</b>
+      <span class="rg">전남 보성</span>
+      <p>30년 넘게 도라지식초를 만들어 온 명인. 집안의 누룩·청주 빚는 법까지 이어 와요.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🍖</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제92호</div>
-        <h3>오명숙 <small>명인</small></h3>
-        <div class="it">떡갈비 · <span>광주 광산구</span></div>
-        <p>광주 송정동 떡갈비거리에서 40년 동안 같은 자리를 지켜 온 떡갈비 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq dk" style="background:linear-gradient(170deg,#DD8C7C 0%,#CE7C6A 55%,#9F4946 100%)">
+        <span class="no">제92호</span>
+        <i aria-hidden="true">🍖</i>
+        <strong>떡갈비</strong>
       </div>
+      <b>[오명숙 명인]</b>
+      <span class="rg">광주 광산구</span>
+      <p>광주 송정동 떡갈비거리에서 40년 동안 같은 자리를 지켜 온 떡갈비 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🍵</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제28호</div>
-        <h3>김동곤 <small>명인</small></h3>
-        <div class="it">우전차 · <span>경남 하동</span></div>
-        <p>지리산 화개골에서 첫물 찻잎으로 우전차를 덖는 차 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq dk" style="background:linear-gradient(180deg,#B4AB47 0%,#74A569 45%,#69985E 100%)">
+        <span class="no">제28호</span>
+        <i aria-hidden="true">🍵</i>
+        <strong>우전차</strong>
       </div>
+      <b>[김동곤 명인]</b>
+      <span class="rg">경남 하동</span>
+      <p>지리산 화개골에서 첫물 찻잎으로 우전차를 덖는 차 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🫘</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제62호</div>
-        <h3>서분례 <small>명인</small></h3>
-        <div class="it">청국장 · <span>경기 안성</span></div>
-        <p>1996년부터 서일농원에서 장독 2천여 개와 함께 전통 청국장·장을 지켜 온 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq" style="background:linear-gradient(135deg,#A7A29B 0%,#B7A088 55%,#C8AD8F 100%)">
+        <span class="no">제62호</span>
+        <i aria-hidden="true">🫘</i>
+        <strong>청국장</strong>
       </div>
+      <b>[서분례 명인]</b>
+      <span class="rg">경기 안성</span>
+      <p>1996년부터 서일농원에서 장독 2천여 개와 함께 전통 청국장·장을 지켜 온 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🍡</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제52호</div>
-        <h3>이연순 <small>명인</small></h3>
-        <div class="it">승검초단자 · <span>충북 제천</span></div>
-        <p>당귀 잎 반죽에 잣가루를 입힌 궁중 떡 승검초단자를 잇는 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq" style="background:linear-gradient(180deg,#C3D7F1 0%,#D5DEE9 30%,#93B976 100%)">
+        <span class="no">제52호</span>
+        <i aria-hidden="true">🍡</i>
+        <strong>승검초단자</strong>
       </div>
+      <b>[이연순 명인]</b>
+      <span class="rg">충북 제천</span>
+      <p>당귀 잎 반죽에 잣가루를 입힌 궁중 떡 승검초단자를 잇는 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🥬</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제98호</div>
-        <h3>박미희 <small>명인</small></h3>
-        <div class="it">조기김치 · <span>경기 파주</span></div>
-        <p>배추 사이사이 조기살을 켜켜이 넣는 귀한 조기김치의 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq dk" style="background:linear-gradient(170deg,#CA4138 0%,#C03F3C 45%,#B83A36 100%)">
+        <span class="no">제98호</span>
+        <i aria-hidden="true">🥬</i>
+        <strong>조기김치</strong>
       </div>
+      <b>[박미희 명인]</b>
+      <span class="rg">경기 파주</span>
+      <p>배추 사이사이 조기살을 켜켜이 넣는 귀한 조기김치의 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🌶️</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제100호</div>
-        <h3>정민서 <small>명인</small></h3>
-        <div class="it">겨자김치 · <span>강원 평창</span></div>
-        <p>강원도에서 9년 만에 나온 식품명인. 알싸한 겨자김치를 담가요.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq" style="background:linear-gradient(110deg,#E8E78D 0%,#ECE7BF 45%,#C8D7DA 100%)">
+        <span class="no">제100호</span>
+        <i aria-hidden="true">🌶️</i>
+        <strong>겨자김치</strong>
       </div>
+      <b>[정민서 명인]</b>
+      <span class="rg">강원 평창</span>
+      <p>강원도에서 9년 만에 나온 식품명인. 알싸한 겨자김치를 담가요.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🍯</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제95호</div>
-        <h3>박일례 <small>명인</small></h3>
-        <div class="it">도라지정과 · <span>경기 이천</span></div>
-        <p>옛 조리서를 따라 도라지 쓴맛을 빼고 꿀에 졸이는 정과를 되살린 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq" style="background:linear-gradient(100deg,#EFE5DA 0%,#F1DECB 60%,#E5D3C1 100%)">
+        <span class="no">제95호</span>
+        <i aria-hidden="true">🍯</i>
+        <strong>도라지정과</strong>
       </div>
+      <b>[박일례 명인]</b>
+      <span class="rg">경기 이천</span>
+      <p>옛 조리서를 따라 도라지 쓴맛을 빼고 꿀에 졸이는 정과를 되살린 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-    <article class="mi">
-      <div class="ph" aria-hidden="true">🥣</div>
-      <div class="tx">
-        <div class="no">대한민국식품명인 제96호</div>
-        <h3>서정옥 <small>명인</small></h3>
-        <div class="it">식혜 · <span>경기 이천</span></div>
-        <p>엿기름 기르기부터 손수 하는 옛 방식 그대로 식혜를 만드는 명인.</p>
-        <div class="st">🤝 입점 준비 중</div>
+    <article class="mt">
+      <div class="sq dk" style="background:linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)">
+        <span class="no">제96호</span>
+        <i aria-hidden="true">🥣</i>
+        <strong>식혜</strong>
       </div>
+      <b>[서정옥 명인]</b>
+      <span class="rg">경기 이천</span>
+      <p>엿기름 기르기부터 손수 하는 옛 방식 그대로 식혜를 만드는 명인.</p>
+      <span class="st">입점 준비 중</span>
     </article>
-  <a class="join" href="mailto:directorjoo@gmail.com?subject=%EC%8B%B8%EB%B0%94%EB%B9%84%EC%95%99%20%EC%9E%85%EC%A0%90%20%EB%AC%B8%EC%9D%98">👑 명인·장인 입점 문의<small>내 물건도 싸바비앙에 올리고 싶어요</small></a>
+  </div>
+  <a class="join" style="margin-top:26px" href="mailto:directorjoo@gmail.com?subject=%EC%8B%B8%EB%B0%94%EB%B9%84%EC%95%99%20%EC%9E%85%EC%A0%90%20%EB%AC%B8%EC%9D%98">👑 명인·장인 입점 문의<small>내 물건도 싸바비앙에 올리고 싶어요</small></a>
   <div class="note">
     여기 소개된 분들은 농림축산식품부가 지정한 <b>대한민국식품명인</b>이에요. 지정 번호·품목·지역은 공개된 자료를 따랐어요.
     아직 싸바비앙에서 파는 상품은 아니며, 명인께 한 분씩 입점을 여쭙고 있어요.<br>

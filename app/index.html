@@ -335,6 +335,7 @@
     .nc .ph.art::after { display: none; }
     .nc .ph.art span { filter: drop-shadow(0 10px 14px rgba(0,0,0,.25)); transform: rotate(-6deg); }
     .nc .tx { position: relative; padding: 4px 20px 18px; }
+    .nc .tx.np { padding-top: 20px; }
     .nc .tx em { display: block; font-style: normal; font-size: 17px; font-weight: 600; color: var(--s); }
     .nc .tx h3 { margin: 2px 0 6px; font-size: 32px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; }
     .nc .tx p { margin: 0; font-size: 17px; line-height: 1.5; font-weight: 500; color: var(--s); word-break: keep-all; }
@@ -676,8 +677,8 @@
     var ph = el('div', 'ph' + (o.art ? ' art' : ''));
     if (o.photo) ph.style.backgroundImage = 'url(' + o.photo + ')';
     if (o.art) { var sp = el('span', '', o.art); sp.setAttribute('aria-hidden', 'true'); ph.appendChild(sp); }
-    c.appendChild(ph);
-    var tx = el('div', 'tx');
+    if (o.photo || o.art) c.appendChild(ph);
+    var tx = el('div', 'tx' + (o.photo || o.art ? '' : ' np'));
     if (o.em) tx.appendChild(el('em', '', o.em));
     tx.appendChild(el('h3', '', o.title));
     if (o.desc) tx.appendChild(el('p', '', o.desc));
@@ -716,7 +717,7 @@
     v.appendChild(eo);
 
     // 3. 싸바알림 — 4번 빛 민트, 단추 하나
-    v.appendChild(ncard({ pal: 4, href: '#alim', label: '싸바알림 — 카드 만들기와 블로그 쓰기', photo: '../img/ex/party-cheers.jpg', em: '가게홍보 · 모임공지 · 프로필 · 초대장', title: '싸바알림', desc: 'SNS에 올릴 카드와 블로그 글을 1분 만에', icon: '✏️', name: '싸바알림', sub: '카드 만들기 · 블로그 쓰기', btn: '1분에 만들기' }));
+    v.appendChild(ncard({ pal: 4, href: '#alim', label: '싸바알림 — 카드 만들기와 블로그 쓰기', em: '가게홍보 · 모임공지 · 프로필 · 초대장', title: '싸바알림', desc: 'SNS에 올릴 카드와 블로그 글을 1분 만에', icon: '✏️', name: '싸바알림', sub: '카드 · 블로그', btn: '1분에 만들기' }));
 
     // 4. 특판 코너 — 11번 세일 레드 (알림판에서 분리)
     v.appendChild(ncard({ pal: 11, href: '../kimchi/', label: '특판 코너 — 언니김치', photo: '../img/gatkimchi-share.jpg', em: '이번 주 특판', title: '언니김치 특판', desc: '특판 코너에서 가격을 확인하세요', icon: '🛒', name: '특판 코너', sub: '싸바 특가', btn: '특판 보기' }));

@@ -458,8 +458,10 @@
     .bigtxt .mode[data-mode] { padding-left: 2px; padding-right: 2px; overflow: hidden; }
     /* ===== 11-21 06:00 대표님: 시 액자 16:9로 줄임, 첫마디 안내 크게·재밌게 ===== */
     #missFrame { aspect-ratio: 16 / 9; display: flex; padding: 10px; margin-bottom: 14px; }
-    #missFrame > .frame-in { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 34px 12px 10px; overflow: hidden; }
-    #missFrame .mus { position: absolute; top: 8px; left: 8px; margin: 0; min-height: 30px; z-index: 2; }
+    #missFrame > .frame-in { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 46px 12px 8px; overflow: hidden; }
+    #missFrame .mus { position: absolute; top: 7px; left: 7px; margin: 0; min-height: 34px; padding: 0 12px 0 9px; gap: 5px; z-index: 2; border: 0; border-radius: 999px; background: #fff; color: #2b2420; font-size: 15px; font-weight: 900; box-shadow: 0 2px 6px rgba(60,30,10,.35); }
+    #missFrame .mus i { font-size: 17px; animation: none; }
+    #missFrame .mus.on { background: #B3132B; color: #fff; }
     #missFrame .orn { display: none; }
     #missFrame .miss-poem { font-size: 18px; line-height: 1.45; padding: 0; }
     #missFrame .miss-poem small { margin-top: 2px; }
@@ -1116,8 +1118,8 @@
     var a = null, track = 0, alt = 0, started = false, fails = 0, btn = document.getElementById('musBtn');
     var off = false; try { off = localStorage.getItem('sava-music') === 'off'; track = (parseInt(localStorage.getItem('sava-track4') || '0', 10) || 0) % LIST.length; } catch (e) {}
     function now() { return LIST[track].t; }
-    function paint() { if (!btn) return; var on = !!(a && !a.paused); btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.querySelector('i').textContent = on ? '🎵' : (off ? '🔇' : '▶');
-      btn.querySelector('span').textContent = on ? LIST[track].short : '음악';
+    function paint() { if (!btn) return; var on = !!(a && !a.paused); btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.querySelector('i').textContent = on ? '🔇' : '🎵';
+      btn.querySelector('span').textContent = on ? '음악 끄기' : '음악 켜기'; btn.title = on ? '지금: ' + LIST[track].t : '';
       var c = document.querySelector('.psheet .pmus'); if (c) c.textContent = '♪ ' + now(); }
     function load() { a.src = LIST[track].s[alt]; try { localStorage.setItem('sava-track4', String(track)); } catch (e) {} paint(); }
     function next() { track = (track + 1) % LIST.length; alt = 0; load(); a.play().catch(function () {}); }

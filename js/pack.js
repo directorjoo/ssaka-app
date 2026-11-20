@@ -94,8 +94,8 @@
     var rows = KIND[ind] || SHOP[GROUP[ind] || ind] || (ind === 'actor' || ind === 'director' ? ACTOR : null)
       || (type === 'club' ? CLUB : type === 'greet' ? GREET : type === 'profile' ? PROFILE : type === 'shop' ? SHOP.restaurant : []);
     var out = rows.map(function (r) { return { id: r[0], tpl: r[0], label: r[1], head: r[2], en: r[3] }; });
-    // 캔바에서 옮겨 온 12가지를 뒤에 덧붙임 (부고는 제외)
-    if (rows.length && ind !== 'funeral') canvaRows(rows).forEach(function (r, i) { out.push({ id: r[0], tpl: r[0], base: CANVA[i][1], label: r[1], head: r[2], en: r[3], canva: 1 }); });
+    // 캔바에서 옮겨 온 12가지를 뒤에 덧붙임 (부고·결혼은 제외)
+    if (rows.length && ind !== 'funeral' && ind !== 'wedding') canvaRows(rows).forEach(function (r, i) { out.push({ id: r[0], tpl: r[0], base: CANVA[i][1], label: r[1], head: r[2], en: r[3], canva: 1 }); });
     return out;
   }
   function palIds(tpl, ind) { return ind === 'funeral' ? MOURN : (TPL_PALS[tpl] || TPL_PALS.hero); }

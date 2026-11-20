@@ -82,7 +82,7 @@
 <script src="../js/designs.js?v=88"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/export.js?v=89"></script>
-<script src="../js/pack.js?v=5"></script>
+<script src="../js/pack.js?v=6"></script>
 <script>
 (function () {
   var D = window.SsakaDesigns, K = window.SsakaPack;
@@ -106,6 +106,9 @@
     if (!card.image) delete card.image;
     return card;
   }
+  // 캔바에서 옮겨 온 12종 예시는 식당만 압구정 순천만 사진, 나머지 업종은 체리 사진으로 (2026-11-20)
+  function cherryCard(card) { return Object.assign({}, card, { image: '/img/eodiya-cherry.jpg', gallery: ['/img/mode-cherry-one.jpg'], ip: null }); }
+  var cherryImgs = null;
   var chips = $('inds');
   LIST.forEach(function (I) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = I.emoji + ' ' + I.label;
@@ -118,7 +121,9 @@
     var my = ++job, card = cardOf(ind), rows = $('rows'), opts = { industry: ind };
     $('mk').href = '../make/?ind=' + ind;
     rows.innerHTML = '<p class="load">템플릿을 그리는 중이에요…</p>';
-    (imgsCache[ind] || (imgsCache[ind] = K.loadImgs(card, opts))).then(function (imgs) {
+    var ck = cherryCard(card);
+    Promise.all([imgsCache[ind] || (imgsCache[ind] = K.loadImgs(card, opts)), cherryImgs || (cherryImgs = K.loadImgs(ck, opts))]).then(function (both) {
+      var imgs = both[0], imgsC = both[1];
       if (my !== job) return;
       rows.innerHTML = '';
       var list = K.purposes(ind, card.template), i = 0;
@@ -128,13 +133,13 @@
         row.innerHTML = '<h2></h2><p></p><div class="thumbs"></div>';
         row.querySelector('h2').textContent = pp.label; var sm = document.createElement('small'); sm.textContent = pp.en; row.querySelector('h2').appendChild(sm);
         row.querySelector('p').textContent = '눌러서 6가지 크기로 만들기 · 글씨 고치기';
-        var th = row.querySelector('.thumbs');
+        var th = row.querySelector('.thumbs'), cv = pp.canva && ind !== 'restaurant';
         K.pals(pp.tpl, ind).forEach(function (pl) {
           var b = document.createElement('button'); b.type = 'button';
-          var c = K.draw(card, pp.id, pl.id, opts, imgs, { w: 540, h: 675, id: 'p45' });
+          var c = K.draw(cv ? ck : card, pp.id, pl.id, opts, cv ? imgsC : imgs, { w: 540, h: 675, id: 'p45' });
           if (c) b.appendChild(c);
           var s = document.createElement('span'); s.textContent = pl.name; b.appendChild(s);
-          b.addEventListener('click', function () { open(card, pp, pl.id); });
+          b.addEventListener('click', function () { open(cv ? ck : card, pp, pl.id); });
           th.appendChild(b);
         });
         rows.appendChild(row);

@@ -774,8 +774,8 @@
     // 8. 싸바 이야기 — 8번 와인 장미(체리 장미) 원래 그라데이션 (11-21 대표님)
     var st = ncard({ pal: 8, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
     // 체리 심볼: 이모지 대신 앱 아이콘과 같은 체리 두 알(img/cherry.webp), 잘리지 않게 글칸 높이 안에 (11-21 대표님)
-    // 바탕: 싸바 체리 레드(#B3132B) 그라데이션 (11-21 대표님)
-    [['g','linear-gradient(170deg,#C8243C 0%,#B3132B 50%,#960C22 100%)'],['b','linear-gradient(90deg,#8A0A1E,#A3122A)'],['c0','#C8243C'],['btn','#5E0612']].forEach(function (x) { st.style.setProperty('--' + x[0], x[1]); });
+    // 바탕: 왼쪽(글씨) 진한 체리 → 오른쪽(체리 그림) 싸바 체리 레드·밝게 가로 그라데이션 (11-21 대표님)
+    [['g','linear-gradient(100deg,#5C0512 0%,#7E0A1C 35%,#B3132B 70%,#D8475E 100%)'],['b','linear-gradient(90deg,#8A0A1E,#A3122A)'],['c0','#7E0A1C'],['btn','#5E0612']].forEach(function (x) { st.style.setProperty('--' + x[0], x[1]); });
     st.classList.add('stc'); var sx = st.querySelector('.ph.art span'); sx.textContent = ''; var ci = el('img'); ci.src = '../img/cherry.webp'; ci.alt = ''; sx.appendChild(ci);
     var bi2 = st.querySelector('.bar i'); bi2.textContent = ''; var ci2 = el('img'); ci2.src = '../img/cherry.webp'; ci2.alt = ''; ci2.style.cssText = 'width:34px;height:auto;display:block'; bi2.appendChild(ci2);
     var stb = st.querySelector('.bar');
@@ -834,9 +834,9 @@
     c.classList.add('pg');
     // 9번 햇살 초록은 위쪽 연두가 너무 연해 흰 글씨가 안 보임 → 이 카드에선 연두를 진하게 (11-21 대표님)
     // 왼쪽(글씨)은 진하게, 오른쪽(게임 그림)은 연하게 — 가로 그라데이션 (11-21 대표님)
-    var HG = { 7: ['linear-gradient(100deg,#7E2F2D 0%,#9A4440 40%,#C06A5C 75%,#DD8C7C 100%)', '#9A4440', 'linear-gradient(90deg,#6E2422,#92403F)'],
-               9: ['linear-gradient(100deg,#2F5E26 0%,#3E7432 40%,#62963E 75%,#9DBA4E 100%)', '#3E7432', 'linear-gradient(90deg,#2C5824,#3B6E30)'],
-               10: ['linear-gradient(100deg,#1C2F55 0%,#2A4373 40%,#3B6C88 75%,#6E9BB5 100%)', '#2A4373', 'linear-gradient(90deg,#16274A,#253B66)'] }[pal];
+    var HG = { 7: ['linear-gradient(100deg,#5E1C1B 0%,#7A2D2B 35%,#A8574C 70%,#DD8C7C 100%)', '#9A4440', 'linear-gradient(90deg,#6E2422,#92403F)'],
+               9: ['linear-gradient(100deg,#1F4419 0%,#2C5A23 35%,#4E8636 70%,#9DBA4E 100%)', '#3E7432', 'linear-gradient(90deg,#2C5824,#3B6E30)'],
+               10: ['linear-gradient(100deg,#111F3D 0%,#1C2F55 35%,#335F80 70%,#6E9BB5 100%)', '#2A4373', 'linear-gradient(90deg,#16274A,#253B66)'] }[pal];
     if (HG) { c.style.setProperty('--g', HG[0]); c.style.setProperty('--c0', HG[1]); c.style.setProperty('--b', HG[2]); }
     var sp = c.querySelector('.ph.art span'); sp.textContent = '';
     GAMES.slice(0, 6).forEach(function (x) { sp.appendChild(el('b', '', x[1])); });

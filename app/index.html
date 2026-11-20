@@ -117,7 +117,7 @@
     @media (max-width: 380px) { .eo-hero { padding: 11px 12px 9px; } .eo-hero p { font-size: 16.5px; padding-right: 50px; } .eo-hero .eo-btns { gap: 8px; } .eo-hero .eo-btns a { font-size: 20px; letter-spacing: -0.04em; } .eo-hero .eo-btns a small { font-size: 15px; letter-spacing: -0.03em; } .eo-hero .eo-btns a.play img { width: 22px; height: 22px; vertical-align: -5px !important; } }
     .si-pad { padding: 0 18px; }
     .home-install-bottom{margin:18px 18px 28px;padding:14px;border:1px solid #f0d9dd;border-radius:20px;background:#fff8f9}.home-install-bottom .big{width:100%;min-height:54px;font-size:17px;font-weight:900;font-family:inherit;border:0;border-radius:16px;background:#B3132B;color:#fff;cursor:pointer;box-shadow:0 10px 22px -12px rgba(179,19,43,.9)}.home-install-bottom .big:active{transform:scale(.98)}
-    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 12px; padding: 12px 16px 10px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
+    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 20px; padding: 12px 16px 10px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
     /* 백화점식 추천 카드 (사진 칸 + [이름] 설명) */
     .camp2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding: 4px 18px 14px; }
@@ -737,11 +737,13 @@
     eo.appendChild(b3);
     v.appendChild(eo);
 
-    // 3. 싸바알림 — 4번 빛 민트, 단추 하나
-    v.appendChild(ncard({ pal: 4, href: '#alim', label: '싸바알림 — 카드 만들기와 블로그 쓰기', em: '가게홍보 · 모임공지 · 프로필 · 초대장', title: '싸바알림', desc: 'SNS에 올릴 카드와 블로그 글을 1분 만에', icon: '✏️', name: '싸바알림', sub: '카드 · 블로그', btn: '1분에 만들기' }));
-
-    // 4. 특판 코너 — 11번 세일 레드 (알림판에서 분리)
-    v.appendChild(ncard({ pal: 11, href: '../kimchi/', label: '특판 코너 — 언니김치', photo: '../img/gatkimchi-share.jpg', em: '이번 주 특판', title: '언니김치 특판', desc: '특판 코너에서 가격을 확인하세요', icon: '🛒', name: '특판 코너', sub: '싸바 특가', btn: '특판 보기' }));
+    // 3. 싸바알림판 + 언니김치 특판 — 예전 초록 알림판 그대로 되돌림 (11-21 대표님)
+    var mk = el('div', 'mk');
+    mk.innerHTML = '<a class="mk-main" href="#alim" aria-label="싸바알림판 — 가게홍보 · 모임공지 · 프로필 · 초대장">' +
+      '<h2>싸바알림판</h2><p>가게홍보 · 모임공지<br>프로필 · 초대장<br><small>SNS에 알리세요!</small></p></a>' +
+      '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M25.8 3.2a3 3 0 0 1 4.2 4.2L10.2 27.2 3 29l1.8-7.2L25.8 3.2Z" fill="#76552b"/><path d="m4.8 21.8 5.4 5.4L3 29l1.8-7.2Z" fill="#e9c99a"/><path d="m25.8 3.2 4.2 4.2-3.8 3.8L22 7l3.8-3.8Z" fill="#b78b50"/><path d="m22 7 4.2 4.2" stroke="#f5e5c7" stroke-width="1.2"/></svg></span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
+      '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
+    v.appendChild(mk);
 
     // 5. 지금 보내기 좋은 카드
     v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));

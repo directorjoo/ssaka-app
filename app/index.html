@@ -453,9 +453,13 @@
       radial-gradient(ellipse 60% 34% at 8% 78%, rgba(255,246,226,.5) 0%, rgba(255,246,226,0) 70%),
       linear-gradient(180deg, #FFF8EE 0%, #FFFAF2 100%); }
     /* 11-21 05:15 띠 나누기: 맨 위 '오늘도 싸바?'까지 진한 미색 띠 → 싸바비앙·어디야 뒤 연한 미색 → 가운데 흰 크림 → 놀이터·싸바 이야기 뒤 다시 연한 미색 */
-    html.home-apricot .top { background: rgba(242,204,146,.96); }
-    html.home-apricot .n-hello { background: linear-gradient(180deg, #F2CC92 0%, #F5D5A2 100%); border-radius: 0 0 28px 28px; padding-top: 10px; box-shadow: 0 8px 18px -12px rgba(120,70,20,.45); position: relative; z-index: 1; }
-    .hz-top { margin-top: -28px; padding-top: 48px; background: linear-gradient(180deg, #FAE3BF 0%, #FBE8CB 55%, #FDF1DE 85%, rgba(255,250,242,0) 100%); }
+    /* 11-21 05:30 대표님: 위가 쓸데없이 넓음 → 날짜 바짝 붙이고 위는 흰색, '오늘도 싸바?' 바로 밑부터 흰색→미색 */
+    html.home-apricot, html.home-apricot body { background-color: #fff; }
+    html.home-apricot .top { background: rgba(255,255,255,.96); }
+    html.home-apricot .top-in { height: 50px; }
+    html.home-apricot .n-hello { background: #fff; padding: 0 22px 10px; }
+    html.home-apricot .n-hello b { margin-top: 0; }
+    .hz-top { padding-top: 6px; background: linear-gradient(180deg, #FFFFFF 0%, #FCEFDA 22%, #FAE3BF 50%, #FBE8CB 75%, #FDF1DE 90%, rgba(255,250,242,0) 100%); }
     .hz-bot { padding-top: 24px; padding-bottom: 12px; background: linear-gradient(180deg, rgba(255,250,242,0) 0%, #FDF1DE 18%, #FBE8CB 50%, #FAE3BF 100%); }
     html:not(.home-apricot) .hz-top, html:not(.home-apricot) .hz-bot { background: none; margin-top: 0; padding-top: 0; }
     html.home-apricot .n-hello small { color: #8A5A22; }

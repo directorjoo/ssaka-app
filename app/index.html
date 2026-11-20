@@ -374,11 +374,6 @@
     #v-home .nc .wx { top: -54px; right: 14px; padding: 5px 10px; font-size: 20px; }
     #v-home .nc .eo3 { position: relative; padding: 8px 12px 12px; gap: 6px; }
     #v-home .nc .eo3 a { min-height: 48px; font-size: 18px; }
-    /* 어디야 카드: 체리 사진을 오른쪽 위 끝에 작게(면적 1/4), 가장자리는 와인 장미 바탕에 스며들게 (11-21) */
-    #v-home .nc.eo-sm .ph { left: auto; right: 0; top: 0; bottom: auto; width: 74%; height: auto; aspect-ratio: 1060 / 570; background-size: 100% 100%; background-position: center;
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.8) 7%, #000 14%), linear-gradient(180deg, #000 72%, transparent 100%); -webkit-mask-composite: source-in;
-      mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.8) 7%, #000 14%), linear-gradient(180deg, #000 72%, transparent 100%); mask-composite: intersect; }
-    #v-home .nc.eo-sm .ph::after { display: none; }
     #v-home .n-h { margin-bottom: 10px; }
     #v-home .n-h h2 { font-size: 23px; }
     .camp2 { gap: 16px 12px; margin-bottom: 26px; }
@@ -735,9 +730,8 @@
     var cr = el('span', 'crown', '👑'); cr.setAttribute('aria-hidden', 'true'); lux.querySelector('.tx').appendChild(cr);
     v.appendChild(lux);
 
-    // 2. 어디야? — 8번 와인 장미(실제 체리 색에 가장 가까움), 체리 두 알 사진이 거의 다 보이게 오른쪽에 두고 왼쪽·아래로 바탕에 스며들게 (11-21), 체리 사진은 오른쪽 끝에 1/4 크기로 스며들게 (11-21), 단추 셋 (이 카드만 예외)
-    var eo = ncard({ pal: 8, photo: '../img/eodiya-cherry3.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
-    eo.classList.add('eo-sm');
+    // 2. 어디야? — 12번 크리에이터 레드, 원래 체리 사진(물방울만 지운 eodiya-cherry4.jpg) 그대로, 단추 셋 (이 카드만 예외)
+    var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry4.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
     eo.appendChild(b3);

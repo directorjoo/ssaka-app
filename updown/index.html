@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>숫자 업다운 — 싸바</title>
+  <meta name="description" content="1~100 사이 숨은 숫자를 업·다운 힌트로 맞혀요.">
+  <meta name="theme-color" content="#1E7A46">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/updown/">
+  <meta property="og:title" content="🔢 숫자 업다운 — 몇 번 만에 맞힐까?">
+  <meta property="og:description" content="1~100 사이 숨은 숫자를 업·다운 힌트로 맞혀요.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1E7A46; --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#24894F 0%,#1E7A46 45%,#17633A 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .top a img { width: 26px; height: 26px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .hero { text-align: center; margin-top: 14px; }
+    .hero .ic { font-size: 60px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 34px; font-weight: 900; letter-spacing: -0.04em; text-shadow: 0 2px 4px rgba(0,0,0,.3); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: #1E7A46; font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.18); color: #fff; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: #1E7A46; }
+    .result .s { font-size: 18px; font-weight: 800; color: #666; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.2); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.18); color: #fff; text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 14px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #fff; }
+    
+    .disp { margin-top: 16px; padding: 16px; border-radius: 24px; background: #fff; color: #1E1E1E; text-align: center; }
+    .disp .q { font-size: 18px; font-weight: 800; color: #555; }
+    .disp .num { margin-top: 4px; min-height: 64px; font-size: 56px; font-weight: 900; color: #1E7A46; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+    .disp .hint { min-height: 34px; font-size: 24px; font-weight: 900; }
+    .disp .hint.up { color: #B3132B; } .disp .hint.down { color: #1F5FAF; }
+    .rng { margin-top: 6px; font-size: 16px; font-weight: 800; color: #666; }
+    .bar2 { position: relative; height: 12px; margin-top: 8px; border-radius: 999px; background: #EEE; overflow: hidden; }
+    .bar2 i { position: absolute; top: 0; bottom: 0; background: #3BA55C; border-radius: 999px; transition: left .3s, width .3s; }
+    .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .pad button { min-height: 62px; border: 0; border-radius: 16px; background: rgba(255,255,255,.95); color: #1E1E1E; font: inherit; font-size: 26px; font-weight: 900; cursor: pointer; }
+    .pad .del { background: rgba(255,255,255,.3); color: #fff; font-size: 18px; }
+    .pad .ok { background: #FFD84D; color: #1E1E1E; font-size: 20px; }
+    .tries { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
+    .tries span { padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,.18); font-size: 16px; font-weight: 800; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🔢</div>
+    <h1>숫자 업다운</h1>
+    <p>체리가 1부터 100 사이 숫자 하나를 숨겼어요.<br>"업!" "다운!" 힌트로 몇 번 만에 맞힐까?</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="disp" aria-live="polite">
+    <div class="q" id="q">숫자를 눌러 보세요</div>
+    <div class="num" id="num">&nbsp;</div>
+    <div class="hint" id="hint"></div>
+    <div class="rng" id="rng">1 ~ 100 사이</div>
+    <div class="bar2"><i id="rb" style="left:0;width:100%"></i></div>
+  </div>
+  <div class="pad" id="pad"></div>
+  <div class="tries" id="tries"></div>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+  <button type="button" class="ghost" id="again">🔁 새 숫자로</button>
+  <div class="ranks">
+    <h3>🏅 업다운 등급</h3>
+    <div><span>🔮 독심술사</span><span>5번 이하</span></div>
+    <div><span>🧠 머리 좋다</span><span>7번 이하</span></div>
+    <div><span>😊 잘했어요</span><span>10번 이하</span></div>
+    <div><span>🌱 한 번 더!</span><span>그 밖</span></div>
+  </div>
+
+  <div class="more"><a href="../lucky/">🎰 럭키 7초</a><a href="../fly/">🪰 파리 잡기</a></div>
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  var KEY = 'sava-updown-v1', secret, lo, hi, cur = '', tries = [], doneF = false, best = 0;
+  try { best = +localStorage.getItem(KEY) || 0; } catch (e) {}
+  function paintBest() { $('best').textContent = best ? '내 최고 ' + best + '번' : ''; }
+  function grade(t) { return t <= 5 ? { e: '🔮', t: '독심술사' } : t <= 7 ? { e: '🧠', t: '머리 좋다' } : t <= 10 ? { e: '😊', t: '잘했어요' } : { e: '🌱', t: '한 번 더!' }; }
+  var ct = +qp.get('t'), cn = (qp.get('n') || '').slice(0, 10);
+  if (ct) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님은 <b>' + ct + '번</b> 만에 맞혔어요!<br>더 적게 맞히면 내가 이겨요'; }
+  var pad = $('pad');
+  ['1','2','3','4','5','6','7','8','9','지움','0','확인'].forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = k === '지움' ? '⌫ 지움' : k === '확인' ? '✅ 확인' : k;
+    if (k === '지움') b.className = 'del'; if (k === '확인') b.className = 'ok';
+    b.addEventListener('click', function () { press(k); }); pad.appendChild(b);
+  });
+  function show() { $('num').innerHTML = cur || '&nbsp;'; }
+  function press(k) {
+    if (doneF) return;
+    if (k === '지움') { cur = cur.slice(0, -1); show(); return; }
+    if (k === '확인') return guess();
+    if (cur.length >= 3) return; cur = (cur + k).replace(/^0+/, ''); if (+cur > 100) cur = '100'; show();
+  }
+  function guess() {
+    var g = +cur; if (!g) { $('hint').className = 'hint'; $('hint').textContent = '숫자를 먼저 눌러요'; return; }
+    if (g < lo || g > hi) { $('hint').className = 'hint'; $('hint').textContent = lo + '~' + hi + ' 사이로!'; cur = ''; return; }
+    tries.push(g);
+    var sp = document.createElement('span');
+    if (g === secret) { sp.textContent = g + ' 🎯'; $('tries').appendChild(sp); return win(); }
+    if (g < secret) { lo = g + 1; $('hint').className = 'hint up'; $('hint').textContent = '⬆️ 업! 더 커요'; sp.textContent = g + ' ⬆️'; }
+    else { hi = g - 1; $('hint').className = 'hint down'; $('hint').textContent = '⬇️ 다운! 더 작아요'; sp.textContent = g + ' ⬇️'; }
+    $('tries').appendChild(sp); if (navigator.vibrate) navigator.vibrate(20);
+    $('q').textContent = tries.length + '번째 — 다시 눌러 보세요'; cur = ''; $('num').innerHTML = g;
+    $('rng').textContent = lo + ' ~ ' + hi + ' 사이';
+    $('rb').style.left = (lo - 1) + '%'; $('rb').style.width = (hi - lo + 1) + '%';
+    setTimeout(function () { if (!cur && !doneF) $('num').innerHTML = '&nbsp;'; }, 900);
+  }
+  var last = null;
+  function win() {
+    doneF = true; var t = tries.length, g = grade(t), nb = !best || t < best; last = { t: t, g: g };
+    if (nb) { best = t; try { localStorage.setItem(KEY, String(best)); } catch (e) {} paintBest(); }
+    $('num').textContent = secret; $('hint').className = 'hint'; $('hint').textContent = '🎯 정답!'; $('q').textContent = t + '번 만에 맞혔어요';
+    var vs = ct ? (t < ct ? '<div class="s" style="color:#3BA55C">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : t === ct ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + esc(cn || '친구') + '님이 ' + (t - ct) + '번 덜 걸렸어요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + t + '번 만에 정답' + (nb ? ' · 🏆 내 최고!' : '') + '</div>' + vs;
+    $('out').hidden = false;
+    setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+  }
+  function reset() {
+    secret = 1 + Math.floor(Math.random() * 100); lo = 1; hi = 100; cur = ''; tries = []; doneF = false;
+    $('tries').innerHTML = ''; $('hint').textContent = ''; $('q').textContent = '숫자를 눌러 보세요'; show();
+    $('rng').textContent = '1 ~ 100 사이'; $('rb').style.left = '0%'; $('rb').style.width = '100%'; $('out').hidden = true; paintBest();
+  }
+  $('again').addEventListener('click', reset);
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/updown/');
+    u.searchParams.set('t', last.t); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '🔢 숫자 업다운 ' + last.t + '번 만에 정답! ' + last.g.e, desc: '1~100 사이 숨은 숫자, 너는 몇 번 만에 맞힐래?', btn: '🔢 도전하기' });
+  });
+  reset();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>체리 짝 맞추기 — 싸바</title>
+  <meta name="description" content="카드 두 장씩 뒤집어 같은 과일 찾기. 몇 번 만에 다 맞힐까?">
+  <meta name="theme-color" content="#1F5FAF">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/match/">
+  <meta property="og:title" content="🍒 체리 짝 맞추기 — 싸바 기억력 대결">
+  <meta property="og:description" content="카드 두 장씩 뒤집어 같은 과일 찾기. 몇 번 만에 다 맞힐까?">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1F5FAF; --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: #fff; font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A6CC0 0%,#1F5FAF 45%,#174C8E 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .top a img { width: 26px; height: 26px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .hero { text-align: center; margin-top: 14px; }
+    .hero .ic { font-size: 60px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 34px; font-weight: 900; letter-spacing: -0.04em; text-shadow: 0 2px 4px rgba(0,0,0,.3); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: #1F5FAF; font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.18); color: #fff; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: #1F5FAF; }
+    .result .s { font-size: 18px; font-weight: 800; color: #666; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.2); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.18); color: #fff; text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 14px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: #fff; }
+    
+    .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .cd { aspect-ratio: 3 / 4; border: 0; border-radius: 14px; padding: 0; background: transparent; perspective: 600px; cursor: pointer; }
+    .cd i { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .35s; }
+    .cd.up i, .cd.ok i { transform: rotateY(180deg); }
+    .cd b, .cd em { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 14px; backface-visibility: hidden; -webkit-backface-visibility: hidden; font-style: normal; }
+    .cd b { background: #fff; box-shadow: inset 0 0 0 3px #CFE0F7; }
+    .cd b img { width: 46%; opacity: .9; }
+    .cd em { background: #FFF8E1; transform: rotateY(180deg); font-size: clamp(30px, 10vw, 46px); box-shadow: inset 0 0 0 3px #FFD84D; }
+    .cd.ok em { background: #E8F7EC; box-shadow: inset 0 0 0 3px #3BA55C; }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 19px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,.35); font-variant-numeric: tabular-nums; }
+    .lv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .lv button { min-height: 60px; border: 0; border-radius: 16px; background: rgba(255,255,255,.18); color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .lv button small { display: block; font-size: 14px; font-weight: 700; margin-top: 2px; }
+    .lv button[aria-pressed="true"] { background: #fff; color: #1F5FAF; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🍒</div>
+    <h1>체리 짝 맞추기</h1>
+    <p>카드를 두 장씩 뒤집어 같은 과일을 찾아요.<br>적게 뒤집을수록 기억력 왕!</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="lv" role="group" aria-label="난이도">
+    <button type="button" data-n="6" aria-pressed="false">🌱 쉬움<small>12장 · 6쌍</small></button>
+    <button type="button" data-n="8" aria-pressed="true">🔥 보통<small>16장 · 8쌍</small></button>
+  </div>
+  <div class="stat"><span>🔄 <span id="mv">0</span>번</span><span>⏱ <span id="tm">0</span>초</span></div>
+  <div class="board" id="board"></div>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+  <button type="button" class="ghost" id="again">🔁 새로 섞기</button>
+  <div class="ranks">
+    <h3>🏅 기억력 등급 (보통 16장 기준)</h3>
+    <div><span>🧠 기억력 천재</span><span>12번 이하</span></div>
+    <div><span>🍒 체리 박사</span><span>16번 이하</span></div>
+    <div><span>😊 잘했어요</span><span>22번 이하</span></div>
+    <div><span>🌱 한 번 더!</span><span>그 밖</span></div>
+  </div>
+
+  <div class="more"><a href="../lucky/">🎰 럭키 7초</a><a href="../fly/">🪰 파리 잡기</a></div>
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  var FR = ['🍒', '🍓', '🍑', '🍇', '🍊', '🍋', '🍉', '🍎'], KEY = 'sava-match-v1';
+  var n = 8, cards = [], open = [], moves = 0, found = 0, t0 = 0, timer = null, lock = false;
+  var best = {}; try { best = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+  function paintBest() { var b = best[n]; $('best').textContent = b ? '내 최고 ' + b.m + '번 · ' + b.s + '초' : ''; }
+  function grade(m, k) { var p = k === 6 ? -3 : 0; return m <= 12 + p ? { e: '🧠', t: '기억력 천재' } : m <= 16 + p ? { e: '🍒', t: '체리 박사' } : m <= 22 + p ? { e: '😊', t: '잘했어요' } : { e: '🌱', t: '한 번 더!' }; }
+  var cm = +qp.get('m'), cn = (qp.get('n') || '').slice(0, 10), ck = +qp.get('k') || 8;
+  if (cm) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님 기록: <b>' + cm + '번</b> 만에 다 맞힘!<br>이보다 적게 뒤집으면 내가 이겨요'; if (ck === 6 || ck === 8) n = ck; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function deal() {
+    clearInterval(timer); timer = null; moves = 0; found = 0; open = []; lock = false; t0 = 0;
+    $('mv').textContent = '0'; $('tm').textContent = '0'; $('out').hidden = true;
+    cards = shuffle(FR.slice(0, n).concat(FR.slice(0, n)));
+    var bd = $('board'); bd.innerHTML = ''; bd.style.gridTemplateColumns = 'repeat(' + (n === 6 ? 3 : 4) + ', 1fr)';
+    cards.forEach(function (f, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'cd'; b.setAttribute('aria-label', (i + 1) + '번 카드');
+      b.innerHTML = '<i><b><img src="../img/cherry.webp" alt=""></b><em>' + f + '</em></i>';
+      b.addEventListener('click', function () { flip(b, i); });
+      bd.appendChild(b);
+    });
+    document.querySelectorAll('.lv button').forEach(function (x) { x.setAttribute('aria-pressed', +x.dataset.n === n ? 'true' : 'false'); });
+    paintBest();
+  }
+  function flip(b, i) {
+    if (lock || b.classList.contains('up') || b.classList.contains('ok')) return;
+    if (!timer) { t0 = Date.now(); timer = setInterval(function () { $('tm').textContent = Math.floor((Date.now() - t0) / 1000); }, 250); }
+    b.classList.add('up'); open.push({ b: b, f: cards[i] });
+    if (open.length < 2) return;
+    moves++; $('mv').textContent = moves;
+    var a = open[0], c = open[1]; open = [];
+    if (a.f === c.f) {
+      a.b.classList.add('ok'); c.b.classList.add('ok'); found++;
+      if (navigator.vibrate) navigator.vibrate(30);
+      if (found === n) done();
+    } else { lock = true; setTimeout(function () { a.b.classList.remove('up'); c.b.classList.remove('up'); lock = false; }, 750); }
+  }
+  var last = null;
+  function done() {
+    clearInterval(timer); timer = null;
+    var s = Math.round((Date.now() - t0) / 1000), g = grade(moves, n); last = { m: moves, s: s, g: g };
+    var b = best[n], nb = !b || moves < b.m || (moves === b.m && s < b.s);
+    if (nb) { best[n] = { m: moves, s: s }; try { localStorage.setItem(KEY, JSON.stringify(best)); } catch (e) {} }
+    var win = cm && ck === n ? (moves < cm ? '<div class="s" style="color:#3BA55C">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : moves === cm ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + esc(cn || '친구') + '님이 ' + (moves - cm) + '번 덜 뒤집었어요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + moves + '번 만에 · ' + s + '초' + (nb ? ' · 🏆 내 최고!' : '') + '</div>' + win;
+    $('out').hidden = false; paintBest();
+    setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+  }
+  document.querySelectorAll('.lv button').forEach(function (x) { x.addEventListener('click', function () { n = +x.dataset.n; deal(); }); });
+  $('again').addEventListener('click', deal);
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/match/');
+    u.searchParams.set('m', last.m); u.searchParams.set('k', n); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '🍒 체리 짝 맞추기 ' + last.g.e + ' ' + last.g.t + '!', desc: last.m + '번 만에 다 맞혔어요. 너는 몇 번에 맞힐래?', btn: '🍒 도전하기' });
+  });
+  deal();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

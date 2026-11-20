@@ -588,9 +588,8 @@
           <button type="button" class="chip" data-t="x" aria-pressed="false">시간 정하기</button>
         </div>
         <input type="time" id="timeAt" hidden style="margin-top:8px">
-        <label class="l" for="memo">한마디 (선택)</label>
-        <input type="text" id="memo" maxlength="60" placeholder="예: 2번 출구 앞 편의점!">
       </details>
+      <div class="rta"><textarea id="memo" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 2번 출구 앞 편의점!"></textarea><button type="button" id="cClear">지우기</button></div>
     </div>
 
     <div class="box" id="playBox" hidden>
@@ -626,6 +625,7 @@
       <label class="l" for="playPlace">어디서?</label>
       <input type="text" id="playPlace" maxlength="40" placeholder="예: 경로당, 시장 앞 다방, 공원 정자">
       <button type="button" class="pbtn" id="playGps" style="width:100%;margin-top:8px">📍 내가 있는 곳으로 부르기</button>
+      <div class="rta"><textarea id="playText" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 늦으면 전화해!"></textarea><button type="button" id="pClear">지우기</button></div>
     </div>
 
     <div class="box">
@@ -939,6 +939,10 @@
     window.addEventListener('hashchange', function () { setTimeout(sync, 0); }); setTimeout(sync, 0); setTimeout(sync, 600);
   }
   composer('gText', '✍️ 보낼 말 — 고친 뒤 보내기', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('askBox'); return m && !m.hidden && b && !b.hidden && b.offsetParent !== null; });
+  composer('memo', '✍️ 한마디 — 안 써도 돼요', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('comeBox'); return m && !m.hidden && b && !b.hidden; });
+  composer('playText', '✍️ 한마디 — 안 써도 돼요', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('playBox'); return m && !m.hidden && b && !b.hidden; });
+  window.savaBackBtn($('cClear'), $('memo'), [], null);
+  window.savaBackBtn($('pClear'), $('playText'), [], null);
   composer('hereText', '✍️ 보낼 답장 — 고친 뒤 보내기', 'rSend', '답장<br>보내기', function () { var v = $('viewAsk'); return v && !v.hidden; });
   // 놀이터만 보기: 홈 '싸바 놀이터' 카드가 ../eodiya/#playground 로 들어옴
   function pgMode() { var on = location.hash === '#playground'; document.documentElement.classList.toggle('pg-only', on); if (on) window.scrollTo(0, 0); }
@@ -985,6 +989,7 @@
       document.title = '친구야 놀자! · 싸바';
       $('pWho').textContent = who + ' 불러요'; callBtn($('pWho'), card.tel);
       $('pAct').textContent = card.act || '☕ 차 한잔';
+      if (card.memo) { var pmm = document.createElement('div'); pmm.className = 'memo'; pmm.textContent = '💬 ' + card.memo; $('pAct').parentNode.insertBefore(pmm, $('pAct').nextSibling); }
       if (card.at) {
         var lf = Math.round((card.at - Date.now()) / 60000);
         var dd = new Date(card.at), today = new Date();
@@ -1530,9 +1535,10 @@
       d.act = act; d.at = playAt();
       var pn = $('playPlace').value.trim();
       if (pn || playXY) d.place = playXY ? { name: pn, lat: playXY.lat, lng: playXY.lng } : { name: pn };
+      var pm = $('playText').value.replace(/\s+/g, ' ').trim(); if (pm) d.memo = pm;
       var purl = BASE + '?d=' + SsakaCodec.encode(d);
       var when = playW === 'now' ? '지금 바로' : (new Date(d.at).toDateString() === new Date().toDateString() ? '' : '내일 ') + clockText(d.at);
-      return { url: purl, title: from + ': 친구야 놀자!', desc: act + ' · ' + when + (pn ? ' · ' + pn : ''), phone: phone, play: true };
+      return { url: purl, title: from + ': 친구야 놀자!', desc: act + ' · ' + when + (pn ? ' · ' + pn : '') + (pm ? ' · ' + pm : ''), phone: phone, play: true };
     }
     if (mode === 'ask') { if (!askText()) { $('gText').value = '싸바?'; gChanged(); } d.q = [askText()]; d.k = (gKinds.length ? gKinds : ['hi']).join(','); }
     var gpsNow = false;
@@ -1548,7 +1554,7 @@
         if (v) { var t = new Date(); var hm = v.split(':'); t.setHours(+hm[0], +hm[1], 0, 0); if (t < Date.now() - 3600000) t.setDate(t.getDate() + 1); d.at = t.getTime(); }
       } else if (minutes > 0) d.at = Date.now() + minutes * 60000;
       else d.at = Date.now();
-      d.memo = $('memo').value.trim();
+      d.memo = $('memo').value.replace(/\s+/g, ' ').trim();
     }
     var url = BASE + '?d=' + SsakaCodec.encode(d);
     var nim = from ? from + '님이 ' : '';

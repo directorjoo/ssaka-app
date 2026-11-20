@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>체리 키우기 — 싸바</title>
+  <meta name="description" content="씨앗 하나 심고 하루 3번 물 주면 체리가 주렁주렁! 내 체리나무 키우기">
+  <meta name="theme-color" content="#1E7A46">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/grow/">
+  <meta property="og:title" content="🌱 체리 키우기 — 싸바">
+  <meta property="og:description" content="씨앗 하나 심고 하루 3번 물 주면 체리가 주렁주렁! 내 체리나무 키우기">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1E7A46; --ac: #1E7A46; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A6CC0 0%,#1F5FAF 45%,#174C8E 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .bwrap { margin-top: 14px; padding: 8px; border-radius: 18px; background: #5A3420; }
+    canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; touch-action: manipulation; }
+    .lv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .lv button { min-height: 56px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .lv button[aria-pressed="true"] { background: #fff; color: #1F5FAF; }
+    .msg { margin-top: 12px; text-align: center; font-size: 19px; font-weight: 900; text-shadow: var(--sh); min-height: 28px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+
+    body { background: linear-gradient(180deg,#2A9A5C 0%,#1E7A46 50%,#155C34 100%); background-attachment: fixed; }
+    :root { --ac: #1E7A46; }
+    .stage { position: relative; margin-top: 14px; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .stage canvas { display: block; width: 100%; aspect-ratio: 1 / .9; }
+    .badge { position: absolute; left: 12px; top: 12px; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,.95); color: #1E1E1E; font-size: 16px; font-weight: 900; }
+    .bar { height: 12px; margin-top: 10px; border-radius: 99px; background: rgba(255,255,255,.25); overflow: hidden; } .bar i { display: block; height: 100%; width: 0; background: #FFD84D; border-radius: 99px; transition: width .5s; }
+    .go:disabled { background: rgba(255,255,255,.35); color: #fff; font-size: 18px; cursor: default; box-shadow: none; }
+    .pick { background: #B3132B; color: #fff; }
+    .tip { margin: 10px 0 0; text-align: center; font-size: 15px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .box { margin-top: 16px; padding: 6px 14px; border-radius: 18px; background: #fff; color: #1E1E1E; }
+    .box div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #eee; font-size: 16px; } .box div:first-child { border-top: 0; } .box b { color: #1E7A46; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <h1 id="title">체리 키우기</h1>
+    <p id="sub">씨앗 하나를 심었어요. 매일 물을 주면<br>싹이 트고, 꽃이 피고, 체리가 열려요!</p>
+  </div>
+  <div class="stage"><canvas id="cv" aria-label="내 체리나무"></canvas><div class="badge" id="badge"></div></div>
+  <div class="bar"><i id="gbar"></i></div>
+  <div class="msg" id="msg"></div>
+  <button type="button" class="go" id="water">💧 물 주기</button>
+  <button type="button" class="go pick" id="pick" hidden>🧺 체리 따기</button>
+  <p class="tip" id="tip"></p>
+
+  <div class="box">
+    <div><span>🧺 지금까지 딴 체리</span><b id="basket">0개</b></div>
+    <div><span>📅 함께한 날</span><b id="days">1일째</b></div>
+    <div><span>💧 오늘 준 물</span><b id="today">0 / 3번</b></div>
+  </div>
+  <label class="name">나무 이름 <input id="tname" maxlength="10" placeholder="예: 우리 체리"></label>
+  <label class="name">내 이름 <input id="me" maxlength="10" placeholder="자랑할 때 보일 이름"></label>
+  <button type="button" class="kakao" id="send">💬 친구한테 내 나무 자랑하기</button>
+
+  <div class="ranks">
+    <h3>🌳 자라는 순서</h3>
+    <div><span>🌰 씨앗 → 🌱 새싹</span><span>물 2번</span></div>
+    <div><span>🌿 어린 나무</span><span>물 6번</span></div>
+    <div><span>🌳 큰 나무</span><span>물 12번</span></div>
+    <div><span>🌸 꽃이 활짝</span><span>물 20번</span></div>
+    <div><span>🍒 체리가 주렁주렁</span><span>물 28번부터</span></div>
+  </div>
+  <div class="more"><a href="../pang/">🍒 체리 팡</a><a href="../match/">🍒 짝 맞추기</a></div>
+
+  <p class="foot">물은 하루 3번, 한 번 주면 2시간 뒤에 또 줄 수 있어요.<br>사흘 넘게 안 오면 나무가 시들해져요 (물 주면 금방 살아나요).<br>기록은 이 휴대폰에만 남아요. <a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+  var KEY = 'sava-grow-v1', H = 3600 * 1000, PER_DAY = 3, GAP = 2 * H, FRUIT_AT = 28, MAXF = 10;
+  var STAGES = [{ at: 0, e: '🌰', t: '씨앗' }, { at: 2, e: '🌱', t: '새싹' }, { at: 6, e: '🌿', t: '어린 나무' }, { at: 12, e: '🌳', t: '큰 나무' }, { at: 20, e: '🌸', t: '꽃이 활짝' }, { at: FRUIT_AT, e: '🍒', t: '체리가 주렁주렁' }];
+  function dayKey(t) { var d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
+  var g = load(), now = Date.now();
+  if (!g) g = { born: now, w: 0, fruit: 0, basket: 0, last: 0, day: '', n: 0, visit: now, name: '' };
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch (e) {} }
+  var wilted = now - Math.max(g.last || g.born, g.born) > 3 * 24 * H && g.w > 0;
+  g.visit = now; save();
+  $('tname').value = g.name || '';
+
+  var cs = +qp.get('s'), cn = (qp.get('n') || '').slice(0, 10), cf = qp.get('t') || '';
+  if (cs >= 0 && qp.has('s')) { var st0 = STAGES[Math.min(cs, STAGES.length - 1)]; $('sub').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님의 ' + esc(cf || '체리나무') + '는 벌써 <b>' + st0.e + ' ' + st0.t + '</b>!<br>나도 씨앗 심고 키워 볼까요?'; }
+
+  function stageIdx() { var k = 0; for (var i = 0; i < STAGES.length; i++) if (g.w >= STAGES[i].at) k = i; return k; }
+  function todayCount() { return g.day === dayKey(Date.now()) ? g.n : 0; }
+  function wait() { var t = (g.last || 0) + GAP - Date.now(); return t > 0 ? t : 0; }
+  function hm(ms) { var m = Math.ceil(ms / 60000), h = Math.floor(m / 60); return (h ? h + '시간 ' : '') + (m % 60) + '분'; }
+  function paint() {
+    var k = stageIdx(), s = STAGES[k], nx = STAGES[k + 1];
+    $('title').textContent = (g.name ? g.name : '내 체리나무');
+    $('badge').textContent = s.e + ' ' + s.t + (wilted ? ' · 시들해요' : '');
+    $('gbar').style.width = (nx ? (g.w - s.at) / (nx.at - s.at) * 100 : (g.fruit / MAXF * 100)) + '%';
+    $('basket').textContent = g.basket + '개';
+    $('days').textContent = (Math.floor((Date.now() - g.born) / (24 * H)) + 1) + '일째';
+    var tc = todayCount(); $('today').textContent = tc + ' / ' + PER_DAY + '번';
+    var wt = wait(), btn = $('water');
+    if (tc >= PER_DAY) { btn.disabled = true; btn.textContent = '💤 오늘 물은 다 줬어요'; $('tip').textContent = '내일 또 와서 물 주세요! 나무가 기다려요 🌙'; }
+    else if (wt > 0) { btn.disabled = true; btn.textContent = '⏳ ' + hm(wt) + ' 뒤에 또 줄 수 있어요'; $('tip').textContent = '물을 너무 많이 주면 뿌리가 상해요. 조금만 기다려요'; }
+    else { btn.disabled = false; btn.textContent = '💧 물 주기'; $('tip').textContent = nx ? s.t + ' → ' + nx.e + ' ' + nx.t + '까지 물 ' + (nx.at - g.w) + '번 남았어요' : '물을 줄 때마다 체리가 하나씩 더 열려요 (최대 ' + MAXF + '개)'; }
+    $('pick').hidden = !g.fruit; $('pick').textContent = '🧺 체리 ' + g.fruit + '개 따기';
+    $('best').textContent = g.basket ? '🧺 ' + g.basket + '개' : '';
+  }
+  if (!$('msg').textContent) $('msg').textContent = wilted ? '🥀 오랜만이에요… 나무가 목말라해요. 물 좀 주세요!' : g.w ? '어서 와요! 오늘도 물 주러 왔나요? 🌤' : '🌰 씨앗을 심었어요. 첫 물을 주세요!';
+
+  /* ---------- 나무 그리기 ---------- */
+  var cv = $('cv'), ctx = cv.getContext('2d'), S = 0, drops = [], t0 = performance.now(), fall = [];
+  function size() { var w = cv.clientWidth || 340, d = window.devicePixelRatio || 1; cv.width = w * d; cv.height = w * .9 * d; S = w * d; }
+  function rnd(seed) { var x = Math.sin(seed * 999) * 10000; return x - Math.floor(x); }
+  function draw(now) {
+    var W = cv.width, Hh = cv.height, t = (now - t0) / 1000, k = stageIdx();
+    var sky = ctx.createLinearGradient(0, 0, 0, Hh); sky.addColorStop(0, '#CDE8FF'); sky.addColorStop(1, '#FFF4E0'); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, Hh);
+    ctx.fillStyle = '#FFD84D'; ctx.beginPath(); ctx.arc(W * .85, Hh * .14, W * .07, 0, 7); ctx.fill();
+    var gy = Hh * .82; ctx.fillStyle = '#7CC56B'; ctx.fillRect(0, gy, W, Hh - gy);
+    ctx.fillStyle = '#8B5A33'; ctx.beginPath(); ctx.ellipse(W / 2, gy + 4, W * .16, W * .035, 0, 0, 7); ctx.fill();
+    var cx = W / 2, sway = Math.sin(t * 1.3) * (wilted ? .5 : 1), grow = Math.min(1, g.w / 20);
+    if (k === 0) { ctx.font = Math.round(W * .1) + 'px "Apple Color Emoji","Noto Color Emoji",sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🌰', cx, gy - W * .005); }
+    else if (k === 1) {
+      ctx.strokeStyle = '#3E8E3A'; ctx.lineWidth = W * .012; ctx.beginPath(); ctx.moveTo(cx, gy); ctx.quadraticCurveTo(cx + sway * 4, gy - W * .07, cx, gy - W * .12); ctx.stroke();
+      ctx.fillStyle = '#5DBB4F'; [[-1, .6], [1, .4]].forEach(function (q) { ctx.save(); ctx.translate(cx, gy - W * .12); ctx.rotate(q[0] * (q[1] + sway * .05)); ctx.beginPath(); ctx.ellipse(q[0] * W * .045, 0, W * .05, W * .022, 0, 0, 7); ctx.fill(); ctx.restore(); });
+    } else {
+      var th = W * (.12 + .38 * grow), tw = W * (.018 + .045 * grow), top = gy - th;
+      ctx.fillStyle = '#6B4226'; ctx.beginPath(); ctx.moveTo(cx - tw, gy); ctx.quadraticCurveTo(cx - tw * .6, gy - th * .5, cx - tw * .45 + sway * 2, top); ctx.lineTo(cx + tw * .45 + sway * 2, top); ctx.quadraticCurveTo(cx + tw * .6, gy - th * .5, cx + tw, gy); ctx.fill();
+      if (k >= 3) { ctx.strokeStyle = '#6B4226'; ctx.lineWidth = tw * .5; [[-1, .55], [1, .45], [-1, .3], [1, .7]].forEach(function (b) { ctx.beginPath(); ctx.moveTo(cx, gy - th * b[1]); ctx.lineTo(cx + b[0] * W * .12 * grow + sway * 2, gy - th * b[1] - W * .07); ctx.stroke(); }); }
+      var cr = W * (.07 + .2 * grow), cy = top + cr * .15, leaf = wilted ? ['#9CA86A', '#B0B07A', '#8C9A5E'] : ['#3E8E3A', '#4FA845', '#5DBB4F'];
+      var blobs = k === 2 ? 5 : 11;
+      for (var i = 0; i < blobs; i++) { var a = rnd(i + 1) * 6.28, d = rnd(i + 7) * cr * .7; ctx.fillStyle = leaf[i % 3]; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * d * 1.2 + sway * 3, cy + Math.sin(a) * d * .8, cr * (.45 + rnd(i + 3) * .25), 0, 7); ctx.fill(); }
+      if (k >= 4) for (i = 0; i < 26; i++) { a = rnd(i + 40) * 6.28; d = Math.sqrt(rnd(i + 60)) * cr * 1.05; var fx = cx + Math.cos(a) * d * 1.2 + sway * 3, fy = cy + Math.sin(a) * d * .8; if (k === 5 && i >= 10) continue; ctx.fillStyle = '#FFC4D6'; for (var p = 0; p < 5; p++) { ctx.beginPath(); ctx.arc(fx + Math.cos(p * 1.26) * W * .009, fy + Math.sin(p * 1.26) * W * .009, W * .008, 0, 7); ctx.fill(); } ctx.fillStyle = '#FFE066'; ctx.beginPath(); ctx.arc(fx, fy, W * .005, 0, 7); ctx.fill(); }
+      for (i = 0; i < g.fruit; i++) { a = rnd(i + 100) * 6.28; d = (.35 + rnd(i + 120) * .6) * cr; cherry(cx + Math.cos(a) * d * 1.15 + sway * 3, cy + Math.sin(a) * d * .75 + W * .02, W * .022); }
+    }
+    fall = fall.filter(function (f) { f.vy += 1.4; f.y += f.vy; f.x += f.vx; cherry(f.x, f.y, W * .022); return f.y < gy + W * .02; });
+    drops = drops.filter(function (d) { d.y += d.v; d.v += .5; ctx.fillStyle = 'rgba(60,140,230,.85)'; ctx.beginPath(); ctx.ellipse(d.x, d.y, W * .007, W * .013, 0, 0, 7); ctx.fill(); return d.y < gy; });
+    requestAnimationFrame(draw);
+  }
+  function cherry(x, y, r) {
+    ctx.strokeStyle = '#3E6B2A'; ctx.lineWidth = r * .25; ctx.beginPath(); ctx.moveTo(x - r * .9, y); ctx.quadraticCurveTo(x - r * .3, y - r * 2.4, x + r * .2, y - r * 2.6); ctx.moveTo(x + r * .9, y + r * .2); ctx.quadraticCurveTo(x + r * .5, y - r * 1.6, x + r * .2, y - r * 2.6); ctx.stroke();
+    [[-r * .9, 0], [r * .9, r * .2]].forEach(function (o) { var gg = ctx.createRadialGradient(x + o[0] - r * .3, y + o[1] - r * .3, r * .1, x + o[0], y + o[1], r); gg.addColorStop(0, '#FF5A6E'); gg.addColorStop(1, '#B3132B'); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x + o[0], y + o[1], r, 0, 7); ctx.fill(); });
+  }
+
+  $('water').addEventListener('click', function () {
+    var t = Date.now(); if (todayCount() >= PER_DAY || wait() > 0) return;
+    var k0 = stageIdx(); if (g.day !== dayKey(t)) { g.day = dayKey(t); g.n = 0; }
+    g.n++; g.w++; g.last = t; wilted = false;
+    if (g.w > FRUIT_AT && g.fruit < MAXF) g.fruit++;
+    if (g.w === FRUIT_AT) g.fruit = 3;
+    save(); buzz(20);
+    for (var i = 0; i < 26; i++) drops.push({ x: cv.width * (.3 + Math.random() * .4), y: -Math.random() * cv.height * .4, v: 4 + Math.random() * 4 });
+    var k = stageIdx();
+    $('msg').textContent = k > k0 ? '🎉 ' + STAGES[k].e + ' ' + STAGES[k].t + '! 쑥쑥 자랐어요!' : ['💧 꿀꺽꿀꺽! 고마워요', '💧 시원하다~ 🌤', '💧 무럭무럭 자랄게요!'][g.w % 3];
+    if (k > k0) buzz([40, 60, 40]);
+    paint();
+  });
+  $('pick').addEventListener('click', function () {
+    if (!g.fruit) return; var n = g.fruit; g.basket += n;
+    for (var i = 0; i < n; i++) { var a = rnd(i + 100) * 6.28; fall.push({ x: cv.width / 2 + Math.cos(a) * cv.width * .15, y: cv.height * .3 + Math.sin(a) * cv.width * .08, vx: (Math.random() - .5) * 3, vy: -3 - Math.random() * 3 }); }
+    g.fruit = 0; save(); buzz([30, 40, 30]); $('msg').textContent = '🧺 체리 ' + n + '개 땄어요! 물 주면 또 열려요'; paint();
+  });
+  $('tname').addEventListener('change', function () { g.name = $('tname').value.trim(); save(); paint(); });
+  $('send').addEventListener('click', function () {
+    g.name = $('tname').value.trim(); save(); var nm = saveName(), k = stageIdx(), s = STAGES[k], u = new URL('https://sava.kr/grow/');
+    u.searchParams.set('s', k); if (g.name) u.searchParams.set('t', g.name); if (nm) u.searchParams.set('n', nm);
+    var tn = g.name || '내 체리나무';
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + tn + ' ' + s.e + ' ' + s.t + '!' + (g.basket ? ' 체리 ' + g.basket + '개 땄어요' : ''), desc: '하루 3번 물 주면 체리가 주렁주렁! 너도 한 그루 키워 봐 🌱', btn: '🌱 나도 키우기' });
+  });
+  setInterval(paint, 30000);
+  window.addEventListener('resize', size);
+  size(); paint(); requestAnimationFrame(draw);
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

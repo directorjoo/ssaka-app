@@ -402,9 +402,12 @@
     #v-home .nc.sv-c { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 620 / 472; padding-top: 0; background: url(../img/savabien-dome.jpg) center / cover no-repeat; }
     #v-home .nc.sv-c .ph { display: none; }
     #v-home .nc.sv-c .tx { padding: 0 18px 16px; }
-    #v-home .nc.sv-c .tx em { display: block; color: #FFD66B; font-size: 16px; font-weight: 800; letter-spacing: .02em; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6); }
-    #v-home .nc.sv-c .tx h3 { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; font-size: 30px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.85), 0 0 14px rgba(0,0,0,.6); }
-    #v-home .nc.sv-c .svk { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(145deg, #D0233F, #B3132B 55%, #8E0F22); box-shadow: 0 4px 10px rgba(0,0,0,.45); font-size: 25px; text-shadow: none; }
+    #v-home .nc.sv-c .svrow { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    #v-home .nc.sv-c .svcol { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+    #v-home .nc.sv-c .tx em { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #fff; color: #B3132B; font-size: 14px; font-weight: 800; line-height: 1.3; letter-spacing: .02em; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+    #v-home .nc.sv-c .tx h3 { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 30px; line-height: 1.1; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.85), 0 0 14px rgba(0,0,0,.6); }
+    #v-home .nc.sv-c .tx h3 small { font-size: 15px; font-weight: 800; letter-spacing: .16em; color: #FFE7A3; text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 8px rgba(0,0,0,.7); }
+    #v-home .nc.sv-c .svk { display: grid; place-items: center; flex: none; width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(145deg, #D0233F, #B3132B 55%, #8E0F22); box-shadow: 0 4px 12px rgba(0,0,0,.45); font-size: 34px; text-shadow: none; }
     #v-home .nc.sv-c .tx p { color: #fff; font-size: 16px; font-weight: 600; white-space: normal; text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6); }
     #v-home .nc.eo-c .ph::after { background: linear-gradient(180deg, rgba(112,9,34,0) 0%, rgba(112,9,34,0) 14%, rgba(98,8,30,.55) 38%, rgba(86,8,28,.88) 58%, #4E0718 78%, #3A0512 100%); }
     #v-home .nc.eo-c .eo3 { background: transparent; }
@@ -795,7 +798,16 @@
 
     // 1. 싸바비앙 — 맨 위 (1번 레몬 안개 + 금 왕관)
     var lux = ncard({ pal: 1, href: '../savabien/', label: '싸바비앙 명품 콜렉션', photo: '../img/savabien-dome.jpg', em: '명품 콜렉션', title: '싸바비앙', desc: '명인의 손끝에서 태어난 명품만 모았습니다' });
-    var h3 = lux.querySelector('.tx h3'), cr = el('span', 'svk', '👑'); cr.setAttribute('aria-hidden', 'true'); h3.insertBefore(cr, h3.firstChild); lux.classList.add('sv-c');
+    // 왕관(체리 바탕) 왼쪽 + 오른쪽 위 '명품 콜렉션' 알약, 아래 '싸바비앙 SAVABIEN' → 설명
+    (function () {
+      var tx = lux.querySelector('.tx'), em = tx.querySelector('em'), h3 = tx.querySelector('h3');
+      var row = el('div', 'svrow'), cr = el('span', 'svk', '👑'), col = el('div', 'svcol');
+      cr.setAttribute('aria-hidden', 'true');
+      h3.appendChild(el('small', '', 'SAVABIEN'));
+      col.appendChild(em); col.appendChild(h3); row.appendChild(cr); row.appendChild(col);
+      tx.insertBefore(row, tx.firstChild);
+      lux.classList.add('sv-c');
+    })();
     v.appendChild(lux);
 
     // 2. 어디야? — 12번 크리에이터 레드, 원래 체리 사진(물방울만 지운 eodiya-cherry4.jpg) 그대로, 단추 셋 (이 카드만 예외)

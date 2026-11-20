@@ -509,11 +509,11 @@
     <div class="box" id="askBox">
       <div class="gstep first" id="gWho">🙋 누구에게 보내요?</div>
       <div class="gsubs" id="gSubs"></div>
-      <label class="l lbig" for="gText">✍️ 첫마디를 보내 볼까요?<span class="ghint">직접 써도 되고, 👇 아래 말을 누르면 글칸에 쏙 들어가요</span></label>
-      <div class="rta"><textarea id="gText" maxlength="100" rows="3" placeholder="여기에 첫마디를 쓰세요&#10;(예: 토요일에 시간 돼?)">싸바?</textarea><button type="button" id="gClear">지우기</button></div>
       <div class="gtabs" id="gTabs"></div>
       <div class="gstep">👇 보내고 싶은 말을 톡! <small>여러 개 눌러도 돼요</small></div>
       <div class="chips" id="gChips"></div>
+      <label class="l lbig" for="gText">✍️ 더 쓰고 싶은 말 있나요?<span class="ghint">고른 말이 여기 쏙 들어가요. 고쳐도 되고, 더 써도 돼요</span></label>
+      <div class="rta"><textarea id="gText" maxlength="100" rows="3" placeholder="여기에 첫마디를 쓰세요&#10;(예: 토요일에 시간 돼?)">싸바?</textarea><button type="button" id="gClear">지우기</button></div>
       <div class="note" style="margin-top:8px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
     </div>
 
@@ -1384,7 +1384,7 @@
         var ta = $('gText'), cur = ta.value.replace(/\s+$/, ''), next = (cur ? cur + ' ' : '') + t;
         if (next.length > 100) { toast('글이 너무 길어요. 조금 지우고 넣어 주세요'); return; }
         ta.value = next; var k = /통화|바빠|물어볼/.test(t) ? 'call' : /사진/.test(t) ? 'pic' : isW ? 'world' : GREET[gTab].k; if (gKinds.indexOf(k) < 0) gKinds.push(k);
-        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); gChanged();
+        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); gChanged(); toast('✍️ 아래 글칸에 넣었어요: ' + $('gText').value);
       });
       cb.appendChild(b);
     });

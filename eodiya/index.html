@@ -515,6 +515,12 @@
     .sv-inv b { display: block; font-size: 20px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
     .sv-inv span { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.4; color: #FFE6E2; }
     .sv-inv em { flex: none; padding: 9px 14px; border-radius: 999px; background: #fff; color: #B3132B; font-style: normal; font-size: 16px; font-weight: 900; }
+    .sv-me { margin: 26px 0 4px; padding: 18px 14px 16px; border-radius: 22px; background: linear-gradient(160deg, #FFF3E6 0%, #FDE3CF 60%, #F8D3BC 100%); text-align: center; box-shadow: 0 8px 18px -12px rgba(120,40,20,.5); }
+    .sv-me b { display: block; font-size: 22px; font-weight: 900; color: #1a1a1a; }
+    .sv-me > span { display: block; margin: 4px 0 14px; font-size: 16px; color: #6E4415; word-break: keep-all; }
+    .sv-me .row { display: flex; gap: 8px; }
+    .sv-me .row a { flex: 1; padding: 12px 4px 10px; border-radius: 16px; background: linear-gradient(180deg, #C8243C, #B3132B 60%, #960C22); color: #fff; text-decoration: none; font-size: 19px; font-weight: 900; line-height: 1.2; box-shadow: 0 3px 0 #6E0A1A; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+    .sv-me .row a small { display: block; margin-top: 3px; font-size: 15px; font-weight: 700; color: #FFE6E2; }
     .sv-after { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.45); }
     .sv-after .in { width: min(100%, 520px); padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: linear-gradient(180deg, #FFF8F0, #FFFFFF); text-align: center; animation: svUp .3s ease; }
     @keyframes svUp { from { transform: translateY(40px); opacity: 0; } }
@@ -996,15 +1002,20 @@
         var v = $(id); if (!v) return;
         var a = document.createElement('a'); a.className = 'sv-inv'; a.href = '../?story=1';
         a.innerHTML = '<img src="' + ICON + '" alt=""><div><b>싸바가 뭐지?</b><span>안부·위치·놀자를 카톡으로 톡! 한 번에</span></div><em>보기 ›</em>';
-        var mk = v.querySelector('.mk'); if (mk) v.insertBefore(a, mk); else v.appendChild(a);
+        // 11-21 07:55 대표님: 받은 사람도 다른 누군가에게 어디야를 보낼 수 있게 → 작은 '나도 보내기' 글씨 대신 큰 칸 (설치 없이 바로)
+        var me = document.createElement('div'); me.className = 'sv-me';
+        me.innerHTML = '<b>✨ 나도 보내 볼까요?</b><span>지금 떠오르는 사람에게 톡! 설치 없이 바로 돼요</span>' +
+          '<div class="row"><a href="./#ask">싸바?<small>안부</small></a><a href="./#come">여기야!<small>위치</small></a><a href="./#play">놀자!<small>부르기</small></a></div>';
+        var mk = v.querySelector('.mk');
+        if (mk) { v.insertBefore(me, mk); v.insertBefore(a, mk); mk.remove(); } else { v.appendChild(me); v.appendChild(a); }
       });
       var sent = false, shown = false;
       window.__svSent = function () { sent = true; };
       function after() {
         if (!sent || shown || document.visibilityState !== 'visible') return; shown = true;
         var d = document.createElement('div'); d.className = 'sv-after';
-        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 보내 볼까요?<br>싸바로 안부·위치·놀자를 톡! 한 번에</p>' +
-          '<a class="a1" href="../?story=1">🍒 싸바가 뭐지?</a><a class="a2" href="../app/">🏠 싸바 구경하기</a><button type="button" class="a3">닫기</button></div>';
+        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 보내 볼까요?<br>떠오르는 사람에게 어디야? 톡! — 설치 없이 바로</p>' +
+          '<a class="a1" href="./#ask">🍒 나도 어디야? 보내기</a><a class="a2" href="../?story=1">싸바가 뭐지?</a><button type="button" class="a3">닫기</button></div>';
         d.addEventListener('click', function (e) { if (e.target === d || e.target.classList.contains('a3')) d.remove(); });
         document.body.appendChild(d);
       }

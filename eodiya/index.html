@@ -476,6 +476,18 @@
     #askBox .note { font-size: 16px; line-height: 1.45; color: #6b5a4a; }
     .chip.wchip { background: linear-gradient(135deg, #1A4FB0, #2F7A62); color: #fff; border-color: transparent; font-weight: 900; }
     .chip.wi { background: #EEF4FF; border-color: #B9CCF0; color: #1A3E80; }
+    /* 11-21 06:40 받는 화면 정리: 이름 칸 크게, 소리 단추 위치, 안내 글씨 크게 */
+    .rname label { font-size: 19px; font-weight: 900; color: #2b2420; }
+    .rname label span { display: block; margin: 3px 0 0; font-size: 15px; font-weight: 700; color: #7A5A3A; }
+    .rname input { font-size: 18px; }
+    .who { font-size: 17px; }
+    .who { padding-right: 92px; }
+    .who .callme { display: table; margin: 8px 0 2px; padding: 8px 16px; font-size: 16px; }
+    .replay { top: calc(54px + env(safe-area-inset-top)); right: 10px; width: 36px; height: 36px; background: rgba(255,255,255,.86); border: 1px solid rgba(110,68,21,.18); color: #B3132B; box-shadow: 0 2px 6px rgba(110,68,21,.16); }
+    .replay svg { width: 19px; height: 19px; }
+    #viewCome .sec-t, .sec-t { font-size: 21px; font-weight: 900; color: #2b2420; }
+    .tnote { font-size: 15px; }
+    .rtitle { font-size: 23px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed #E7D3C4; }
   </style>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&text=%20%21%28%29%2C.03%3A%3F%E2%80%94%E2%80%98%E2%80%99%E2%80%9C%E2%80%9D%E2%80%A6%E3%80%8C%E3%80%8D%EA%B0%80%EA%B0%81%EA%B0%84%EA%B0%88%EA%B0%90%EA%B0%91%EA%B0%93%EA%B0%94%EA%B0%95%EA%B0%99%EA%B0%9A%EA%B0%9C%EA%B1%B0%EA%B1%B1%EA%B1%B7%EA%B1%B8%EA%B2%81%EA%B2%83%EA%B2%8C%EA%B2%A0%EA%B2%A8%EA%B2%B0%EA%B2%BD%EA%B3%81%EA%B3%84%EA%B3%A0%EA%B3%A1%EA%B3%A7%EA%B3%B1%EA%B3%BC%EA%B4%B4%EA%B5%90%EA%B5%AC%EA%B5%AD%EA%B5%B3%EA%B5%B4%EA%B5%BD%EA%B7%80%EA%B7%91%EA%B7%9C%EA%B7%B8%EA%B8%88%EA%B8%8B%EA%B8%B0%EA%B8%B4%EA%B8%B8%EA%B9%80%EA%B9%8A%EA%B9%8C%EA%B9%A8%EA%BD%83%EB%81%84%EB%81%8C%EB%81%9D%EB%81%BC%EB%82%98%EB%82%9C%EB%82%A0%EB%82%A8%EB%82%B4%EB%83%A5%EB%84%88%EB%84%A3%EB%84%A4%EB%85%80%EB%85%84%EB%85%95%EB%85%B8%EB%85%B9%EB%85%BC%EB%86%80%EB%86%93%EB%88%84%EB%88%88%EB%8A%94%EB%8A%98%EB%8B%88%EB%8B%98%EB%8B%A4%EB%8B%A8%EB%8B%AB%EB%8B%AC%EB%8B%AD%EB%8B%B4%EB%8B%B9%EB%8C%80%EB%8D%94%EB%8D%95%EB%8D%98%EB%8D%A4%EB%8D%AE%EB%8D%B0%EB%8F%84%EB%8F%8B%EB%8F%8C%EB%8F%95%EB%8F%99%EB%90%98%EB%90%9C%EB%91%90%EB%91%98%EB%92%B7%EB%93%9D%EB%93%A0%EB%93%A3%EB%93%A4%EB%93%AF%EB%94%94%EB%94%B0%EB%94%B4%EB%95%8C%EB%96%A0%EB%96%A8%EB%98%90%EB%9C%B0%EB%9C%BB%EB%9D%BC%EB%9D%BD%EB%9E%80%EB%9E%8C%EB%9E%91%EB%9E%98%EB%9E%B4%EB%9F%AC%EB%9F%B0%EB%9F%BC%EB%A0%87%EB%A0%88%EB%A0%A4%EB%A1%9C%EB%A1%9D%EB%A1%A0%EB%A3%A8%EB%A5%B4%EB%A5%B8%EB%A5%BC%EB%A6%84%EB%A6%85%EB%A6%87%EB%A6%AC%EB%A6%B0%EB%A6%B4%EB%A6%BD%EB%A7%88%EB%A7%8C%EB%A7%8E%EB%A7%90%EB%A7%9D%EB%A7%B9%EB%A8%B8%EB%A8%B9%EB%A8%BC%EB%A9%80%EB%A9%B0%EB%A9%B4%EB%AA%85%EB%AA%A8%EB%AA%A9%EB%AA%BB%EB%AC%B4%EB%AC%B5%EB%AC%BB%EB%AC%BC%EB%AF%B8%EB%AF%BF%EB%B0%94%EB%B0%95%EB%B0%96%EB%B0%98%EB%B0%9D%EB%B0%A4%EB%B0%B1%EB%B2%84%EB%B2%88%EB%B2%8C%EB%B2%97%EB%B3%84%EB%B3%91%EB%B3%95%EB%B3%B4%EB%B4%84%EB%B4%85%EB%B6%80%EB%B6%81%EB%B6%88%EB%B6%89%EB%B9%84%EB%B9%9A%EB%B9%9B%EB%BF%90%EC%81%98%EC%82%AC%EC%82%B0%EC%82%B4%EC%82%B6%EC%82%BC%EC%83%81%EC%83%88%EC%83%98%EC%83%9D%EC%84%9C%EC%84%A0%EC%84%A4%EC%84%B1%EC%84%B8%EC%85%88%EC%85%B0%EC%86%8C%EC%86%8D%EC%88%98%EC%88%99%EC%88%A8%EC%88%B2%EC%89%AC%EC%8A%A4%EC%8A%A8%EC%8A%AC%EC%8A%B4%EC%8A%B5%EC%8B%9C%EC%8B%9D%EC%8B%A0%EC%8B%AC%EC%8B%AD%EC%8B%B6%EC%8B%B8%EC%8D%A8%EC%93%B8%EC%94%A9%EC%95%84%EC%95%88%EC%95%89%EC%95%8A%EC%95%8C%EC%95%9E%EC%95%A0%EC%95%BC%EC%95%BD%EC%96%91%EC%96%B4%EC%96%B5%EC%96%B8%EC%96%BC%EC%97%86%EC%97%87%EC%97%88%EC%97%90%EC%97%AC%EC%97%B0%EC%97%BC%EC%97%BE%EC%98%80%EC%98%9B%EC%98%A4%EC%98%A5%EC%98%AE%EC%99%80%EC%99%B8%EC%9A%94%EC%9A%A9%EC%9A%B0%EC%9A%B4%EC%9A%B8%EC%9B%80%EC%9B%83%EC%9B%8C%EC%9B%90%EC%9B%94%EC%9C%84%EC%9C%A0%EC%9C%A4%EC%9C%BC%EC%9D%80%EC%9D%84%EC%9D%8C%EC%9D%98%EC%9D%B4%EC%9D%B5%EC%9D%B8%EC%9D%BC%EC%9D%BD%EC%9E%83%EC%9E%85%EC%9E%88%EC%9E%8A%EC%9E%90%EC%9E%91%EC%9E%94%EC%9E%98%EC%9E%A0%EC%9E%A1%EC%9E%A5%EC%A0%80%EC%A0%81%EC%A0%84%EC%A0%88%EC%A0%95%EC%A0%96%EC%A0%9C%EC%A0%B8%EC%A1%8C%EC%A1%B0%EC%A2%81%EC%A3%BC%EC%A3%BD%EC%A4%84%EC%A7%80%EC%A7%81%EC%A7%84%EC%A7%91%EC%A7%93%EC%A7%9D%EC%A9%8C%EC%A9%90%EC%B0%A8%EC%B0%AC%EC%B0%BE%EC%B1%85%EC%B2%98%EC%B2%9C%EC%B2%AB%EC%B2%AD%EC%B3%90%EC%B6%94%EC%B6%98%EC%B9%98%EC%B9%A8%EC%B9%B4%EC%BC%80%EC%BD%A4%ED%82%A4%ED%83%81%ED%83%84%ED%84%B0%ED%85%8C%ED%86%A0%ED%89%81%ED%8A%B8%ED%8B%B0%ED%8C%8C%ED%8C%A8%ED%8D%BC%ED%8E%B4%ED%8E%B8%ED%8E%BC%ED%8F%AC%ED%91%B8%ED%92%80%ED%92%8D%ED%94%84%ED%94%88%ED%94%94%ED%94%BC%ED%95%98%ED%95%99%ED%95%9C%ED%95%A0%ED%95%A8%ED%95%A9%ED%95%B4%ED%96%87%ED%96%88%ED%96%A5%ED%97%88%ED%97%A4%ED%98%80%ED%99%80%ED%99%94%ED%99%A9%ED%9C%A9%ED%9D%90%ED%9D%98%ED%9D%99%ED%9D%AC%ED%9E%88%ED%9E%8C%ED%9E%90%ED%9E%98&display=swap">
 <script src="/js/launch.js?v=3"></script>
@@ -672,12 +684,15 @@
     <p class="tnote">📍 위치는 누를 때만 확인하고, 싸바는 저장하지 않아요.</p>
     <input type="file" id="photoIn" accept="image/*" multiple hidden>
     <div class="rbox" id="rBox">
-    <div class="rtitle">💬 문자·안부 고르기 <span class="gcount" id="rCount">(직접 쓰거나, 아래 말을 누르면 글칸에 들어가요)</span></div>
+    <div class="rtitle">💬 문자로 답하기</div>
+    <div class="gstep first">🙋 누구에게 답해요?</div>
+    <div class="gsubs" id="rWho" aria-label="누구에게 답하나요"></div>
+    <div class="gtabs" id="rTabs"></div>
+    <div class="gstep">👇 보내고 싶은 말을 톡! <small>여러 개 눌러도 돼요</small></div>
+    <div class="chips" id="rChips"></div>
+    <label class="l lbig" for="hereText">✍️ 더 쓰고 싶은 말 있나요?<span class="ghint">고른 말이 여기 쏙 들어가요. 고쳐도 되고, 더 써도 돼요</span></label>
     <div class="rta"><textarea id="hereText" maxlength="100" rows="3" placeholder="여기에 답장을 쓰세요&#10;(예: 회의 중, 30분 뒤 연락할게)"></textarea><button type="button" id="rClear" hidden>지우기</button></div>
     <div class="bubble" id="rPrev" hidden></div>
-    <div class="gtabs" id="rTabs"></div>
-    <div class="gsubs" id="rWho" aria-label="누구에게 답하나요"></div>
-    <div class="chips" id="rChips"></div>
     <button type="button" class="big red" id="rSend" style="margin-top:12px;width:100%;display:block">💬 답장 보내기</button>
     </div>
     <a class="mk" href="./">나도 <b>싸바?</b> 보내기</a>
@@ -809,13 +824,9 @@
     document.body.appendChild(replay);
     SsakaSound.tryAutoplay(id).then(function (ok) {
       if (ok) return;
-      var t = document.createElement('div'); t.className = 'tap'; t.setAttribute('role', 'button'); t.tabIndex = 0;
-      t.innerHTML = id === 'play'
-        ? '<div><img src="../img/cherry-dance-anim.svg" alt="" width="240" height="212" style="display:block;margin:0 auto -6px"><b>친구야 놀자!</b><span>아무 데나 탭하세요</span></div>'
-        : '<div><b>' + (id === 'where' ? '어디야?' : '여기야!') + '</b><span>아무 데나 탭하세요</span></div>';
-      var go = function () { SsakaSound.play(id); t.remove(); };
-      t.addEventListener('click', go); t.addEventListener('touchstart', go, { passive: true });
-      document.body.appendChild(t); t.focus();
+      // 11-21: 가림막('아무 데나 탭하세요') 없앰 — 화면 어디든 처음 누를 때 소리
+      var once = function () { document.removeEventListener('pointerdown', once, true); SsakaSound.play(id); };
+      document.addEventListener('pointerdown', once, true);
     });
   }
 
@@ -836,13 +847,14 @@
     function nameBox(before) {
       if (!before || $('rName')) return;
       var w = document.createElement('div'); w.className = 'rname';
-      w.innerHTML = '<label for="rName">내 이름 <span>답장에 같이 보여요</span></label><input type="text" id="rName" maxlength="12" placeholder="예: 홍길동">';
+      w.innerHTML = '<label for="rName">✏️ 먼저 내 이름을 적어 주세요<span>누가 답했는지 알 수 있어요 · 한 번 쓰면 기억해요</span></label><input type="text" id="rName" maxlength="12" placeholder="예: 홍길동">';
       before.parentNode.insertBefore(w, before);
       try { var me = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); if (me.from) $('rName').value = me.from; } catch (e) {}
     }
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
     function reply(o) {
       var name = myName();
+      if (!name && $('rName')) { toast('✏️ 누가 답했는지 알 수 있게 맨 위에 이름을 먼저 적어 주세요'); $('rName').scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $('rName').focus(); }, 350); return; }
       var title = o.mi ? (name ? name + '님 답장이 왔어요' : '답장이 왔어요') : o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       if (o.mi) { o.img = o.mi.url; o.w = o.mi.w; o.h = o.mi.h; }
       var url = o.url || BASE;

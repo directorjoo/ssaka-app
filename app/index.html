@@ -445,6 +445,18 @@
     .n-panel .camp2 { padding: 4px 16px 14px; margin-bottom: 0; }
     /* 18번 맨 위로: 와인 바닥 위에 떠 있는 흰 동그라미 */
     html.home-wine .to-top { width: 64px; height: 64px; font-weight: 400; font-size: 30px; color: #111; box-shadow: 0 6px 18px rgba(90,20,18,.35); }
+    /* ===== 홈 바탕: 19번 살구 미색 (롯데 가을 간식 배너의 노란 미색 부분만, 빨강·주황 뺌) + 은은한 빛 무늬 (2026-11-21) ===== */
+    html.home-apricot, html.home-apricot body { background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .38 0 0 0 0 .18 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 70% 38% at 18% 6%, rgba(255,250,238,.85) 0%, rgba(255,250,238,0) 70%),
+      radial-gradient(ellipse 55% 30% at 92% 42%, rgba(255,244,222,.55) 0%, rgba(255,244,222,0) 70%),
+      radial-gradient(ellipse 60% 34% at 8% 78%, rgba(255,246,226,.5) 0%, rgba(255,246,226,0) 70%),
+      linear-gradient(160deg, #FCE8CD 0%, #F6D59E 30%, #F3C786 60%, #F0BE7F 100%) fixed; background-attachment: fixed; }
+    html.home-apricot .top { background: rgba(252,232,205,.94); }
+    html.home-apricot .n-hello small { color: #8A5A22; }
+    html.home-apricot #v-home .nc { box-shadow: 0 16px 30px -20px rgba(120,70,20,.55); }
+    html.home-apricot .n-panel { box-shadow: 0 16px 30px -20px rgba(120,70,20,.5); }
+    html.home-apricot .n-h a { color: #8A5A22; }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -1099,6 +1111,7 @@
     document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + (name === 'blog' ? 'alim' : name); });
     // 홈 와인 바탕(13번)은 대표님이 '체리색 바탕은 아니네' 해서 꺼 둠 (11-21) — CSS html.home-wine 는 남겨 둠
     document.documentElement.classList.remove('home-wine');
+    document.documentElement.classList.toggle('home-apricot', name === 'home');
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();

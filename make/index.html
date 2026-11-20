@@ -409,6 +409,14 @@
   .snsfit ul { margin: 6px 0 0; padding-left: 20px; }
   .snsfit .out { color: #6b6b6b; margin-top: 6px; }
   .snsfit button { margin-top: 8px; width: 100%; padding: 11px; border-radius: 12px; border: 2px solid #B3132B; background: #fff; color: #B3132B; font-weight: 800; font-size: 15px; }
+  .snsfit .fchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .snsfit .fchip, .snsfit .fline { margin: 0; width: auto; padding: 7px 12px; border-radius: 999px; border: 2px solid #B3132B; background: #B3132B; color: #fff; font-weight: 800; font-size: 15px; text-align: left; line-height: 1.35; }
+  .snsfit .fline { border-radius: 12px; max-width: 100%; word-break: keep-all; }
+  .snsfit .fchip:not(.on), .snsfit .fline:not(.on) { background: #fff; color: #8a8a8a; border-color: #cfcfcf; text-decoration: line-through; }
+  .snsfit .fchip[disabled] { opacity: .8; }
+  .snsfit .fsub { margin-top: 12px; font-weight: 800; color: #333; }
+  .snsfit .fwarn { padding: 7px 4px; font-weight: 800; color: #B3132B; }
+  .snsfit .freset { width: auto; padding: 8px 14px; border-color: #cfcfcf; color: #555; font-size: 15px; }
   #pvModal .snspv.r-story { height: min(70dvh, 640px); }
   #pvModal .pv-sns { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: start center; }
   .done-sns { display: grid; gap: 8px; }
@@ -898,7 +906,7 @@
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=88"></script>
+<script src="../js/export.js?v=89"></script>
 <script src="../js/pack.js?v=3"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1024,7 +1032,7 @@
     var dd = (typeof dest === 'string' && SNS_OF[dest]) || null;
     if (!dd || !window.SsakaExport || !SsakaExport.sns) return;
     el.classList.add(dd.cls);
-    var r = buildCard(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(r.card);
+    var r = buildCard(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(r.card) + '|' + fitSig();
     if (snsCache[key]) return putSns(el, snsCache[key]);
     var ld = document.createElement('span'); ld.className = 'tload'; ld.textContent = '🍒 그리는 중'; el.appendChild(ld);
     snsQ.push({ el: el, d: d, card: r.card, key: key, sz: dd.sz, gen: snsGen });
@@ -1042,8 +1050,7 @@
     if (!j) return;
     if (snsCache[j.key]) { putSns(j.el, snsCache[j.key]); return runSns(); }
     snsBusy = true;
-    var menu = snsMenu();
-    SsakaExport.sns(j.card, j.d, { sizes: [j.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
+    SsakaExport.sns(fitCard(j.card), j.d, snsOpts({ sizes: [j.sz] })).then(function (list) {
       if (list && list[0]) { var u = URL.createObjectURL(list[0].blob); snsCache[j.key] = u; if (j.el.isConnected) putSns(j.el, u); }
     }).catch(function () { var ld = j.el.querySelector('.tload'); if (ld) ld.remove(); j.el.classList.remove('r-feed', 'r-sq', 'r-story'); })
       .then(function () { snsBusy = false; setTimeout(runSns, 0); });
@@ -1057,14 +1064,31 @@
   // ---------- 3단계 미리보기도 고른 용도 모양(4:5·9:16·1:1) 사진 그대로 ----------
   var snsPvFit = null, snsPvGen = 0, snsPvKey = '', snsPvBlob = null, snsPvUrl = '', snsPvShape = '';
   function destSns() { return (typeof dest === 'string' && SNS_OF[dest]) || null; }
+  // ---------- 용도(올릴 곳)마다 넣을 것·뺄 것: 적은 내용은 그대로 두고, 이 용도 사진에서만 뺌 ----------
+  var FIT_KEY = 'sava-fit-v1', FIT = {};
+  try { FIT = JSON.parse(localStorage.getItem(FIT_KEY) || '{}') || {}; } catch (e) { FIT = {}; }
+  function fitNow() { return destSns() ? (FIT[dest] || {}) : {}; }
+  function fitSig() { return JSON.stringify(fitNow()); }
+  function saveFit() { try { localStorage.setItem(FIT_KEY, JSON.stringify(FIT)); } catch (e) {} }
+  function hasAddr(card) { return !!((card.contact && card.contact.address) || card.place || (card.copy && /[로길동]\s?\d|구\s/.test(card.copy.value || ''))); }
+  function fitCard(card) {
+    var f = fitNow();
+    if (!f.sub && !f.gal && !f.tel && !f.addr) return card;
+    var c = JSON.parse(JSON.stringify(card));
+    if (f.sub) c.subtitle = '';
+    if (f.gal) c.gallery = [];
+    if (f.tel && c.contact) c.contact.phone = '';
+    if (f.addr) { if (c.contact) delete c.contact.address; delete c.place; if (c.copy && /[로길동]\s?\d|구\s/.test(c.copy.value || '')) delete c.copy; }
+    return c;
+  }
+  function snsOpts(o) { o.pics = localPics; o.industry = industry; o.menu = snsMenu(); var f = fitNow(); if (f.skip && f.skip.length) o.skip = f.skip.slice(); return o; }
   function setShape(el, dd) { el.classList.remove('r-feed', 'r-sq', 'r-story'); if (dd) el.classList.add(dd.cls); }
   function makeSnsImg(card) {
     var dd = destSns();
     if (!dd || !window.SsakaExport || !SsakaExport.sns) return Promise.resolve(null);
-    var d = curDesign(), key = dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length;
+    var d = curDesign(), key = slideKey(card);
     if (key === snsPvKey && snsPvBlob) return Promise.resolve({ blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit });
-    var menu = snsMenu();
-    return SsakaExport.sns(card, d, { sizes: [dd.sz], pics: localPics, industry: industry, menu: menu }).then(function (list) {
+    return SsakaExport.sns(fitCard(card), d, snsOpts({ sizes: [dd.sz] })).then(function (list) {
       if (!list || !list[0]) return null;
       snsPvKey = key; snsPvBlob = list[0].blob; snsPvUrl = URL.createObjectURL(snsPvBlob); snsPvFit = list[0].fit || null;
       return { blob: snsPvBlob, url: snsPvUrl, fit: snsPvFit };
@@ -1086,19 +1110,45 @@
   function paintSnsFit(card, dd, ds) {
     var box = $('snsFit');
     if (!dd || !window.SsakaExport || !SsakaExport.plan) { box.hidden = true; return; }
-    var pl = SsakaExport.plan(card, { menu: snsMenu(), industry: industry }, dd.sz), L = [];
-    var food = type === 'shop', what = pl.items.some(function (x) { return x.p; }) ? '메뉴' : '내용';
-    L.push('<li>제목' + (card.subtitle ? ' · ' + esc(card.subtitle) : '') + '</li>');
-    L.push(card.image ? '<li>대표 사진' + ((card.gallery || []).length ? ' + 작은 사진 ' + Math.min(3, card.gallery.length) + '장' : '') + '</li>' : '<li>⚠️ <b>대표 사진이 없어요</b> — 빈 무늬로 나와요</li>');
-    if (pl.total) L.push('<li id="snsFitN" data-w="' + what + '">' + what + ' ' + pl.total + '줄 — 사진 크기에 맞게 넣고, 넘치면 "외 N가지"로 줄여요</li>');
-    else L.push('<li>' + what + ' 없음 — 아래 ' + (food ? '메뉴' : '내용') + ' 칸에 적으면 들어가요</li>');
-    var ft = [card.contact && card.contact.phone ? '전화' : '', (card.contact && card.contact.address) || card.place || (card.copy && /[로길동]\s?\d|구\s/.test(card.copy.value)) ? '주소' : ''].filter(Boolean);
-    if (ft.length) L.push('<li>' + ft.join(' · ') + '</li>');
-    box.innerHTML = '📷 <b>' + esc(ds.b) + '(' + esc(ds.s) + ') 사진에 이렇게 들어가요</b><ul>' + L.join('') + '</ul>' +
-      '<div class="out">사진에는 예약·참석 신청·소리·동영상·링크 단추가 안 들어가서 그 칸은 감췄어요. 카톡 카드로 만들 때 다시 나와요. 적어 둔 내용은 그대로 있어요.</div>' +
+    var f = fitNow(), skip = f.skip || [], pl = SsakaExport.plan(card, { menu: snsMenu(), industry: industry }, dd.sz);
+    var lines = pl.lines || [], what = pl.items.some(function (x) { return x.p; }) ? '메뉴' : '내용', food = type === 'shop';
+    var ch = function (k, label, on, fixed) { return '<button type="button" class="fchip' + (on ? ' on' : '') + '"' + (k ? ' data-k="' + k + '"' : '') + (fixed ? ' disabled' : '') + ' aria-pressed="' + (on ? 'true' : 'false') + '">' + (on ? '✔ ' : '✕ ') + label + '</button>'; };
+    var C = [ch('', '제목', 1, 1)];
+    if (card.subtitle) C.push(ch('sub', '일시·부제', !f.sub));
+    C.push(card.image ? ch('', '대표 사진', 1, 1) : '<span class="fwarn">⚠️ 대표 사진 없음 — 빈 무늬로 나와요</span>');
+    if ((card.gallery || []).length) C.push(ch('gal', '작은 사진·넘겨 보기 ' + card.gallery.length + '장', !f.gal));
+    if (card.contact && card.contact.phone) C.push(ch('tel', '전화', !f.tel));
+    if (hasAddr(card)) C.push(ch('addr', card.template === 'club' ? '모이는 곳' : '주소', !f.addr));
+    var L = lines.length
+      ? '<div class="fsub">' + what + ' 줄 — 이 사진에 넣을 줄만 남기세요</div><div class="fchips">' + lines.map(function (n, i) { var on = skip.indexOf(n) < 0; return '<button type="button" class="fline' + (on ? ' on' : '') + '" data-i="' + i + '" aria-pressed="' + on + '">' + (on ? '✔ ' : '✕ ') + esc(n) + '</button>'; }).join('') + '</div>' +
+        (pl.total ? '<div id="snsFitN" data-w="' + what + '" style="margin-top:8px">' + what + ' ' + pl.total + '줄 — 사진 크기에 맞게 넣어요</div>' : '<div style="margin-top:8px">줄을 모두 뺐어요 — 제목과 사진만 나와요</div>')
+      : '<div class="fsub">' + what + ' 없음 — 아래 ' + (food ? '메뉴' : '내용') + ' 칸에 적으면 들어가요</div>';
+    var off = f.sub || f.gal || f.tel || f.addr || skip.length;
+    box._lines = lines;
+    box.innerHTML = '📷 <b>' + esc(ds.b) + '(' + esc(ds.s) + ') 사진에 넣을 것</b> — 눌러서 넣고 빼세요' +
+      '<div class="fchips">' + C.join('') + '</div>' + L +
+      '<div class="out">여기서 뺀 건 이 ' + esc(ds.b) + ' 사진에서만 빠져요. 적어 둔 내용은 그대로 저장돼 카톡 카드나 다른 용도에는 다시 들어가요. 예약·참석 신청·소리·동영상·링크 단추는 사진에 안 들어가 그 칸은 감췄어요.</div>' +
+      (off ? '<button type="button" class="freset" data-reset="1">↺ 모두 다시 넣기</button>' : '') +
       (card.image ? '' : '<button type="button" id="snsFitPh">📷 대표 사진 넣기</button>');
     box.hidden = false;
     var pb = $('snsFitPh'); if (pb) pb.onclick = function () { $('photoFile').click(); };
+    if (!box._wired) {
+      box._wired = true;
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b || b.disabled || b.id === 'snsFitPh') return;
+        var cur = FIT[dest] = FIT[dest] || {};
+        if (b.dataset.reset) { delete FIT[dest]; toast('↺ 모두 다시 넣었어요'); }
+        else if (b.dataset.k) { cur[b.dataset.k] = cur[b.dataset.k] ? 0 : 1; if (!cur[b.dataset.k]) delete cur[b.dataset.k]; }
+        else if (b.dataset.i != null) {
+          var n = (box._lines || [])[+b.dataset.i]; if (n == null) return;
+          var sk = cur.skip = cur.skip || [], at = sk.indexOf(n);
+          if (at >= 0) sk.splice(at, 1); else sk.push(n);
+          if (!sk.length) delete cur.skip;
+        } else return;
+        saveFit(); snsCache = {};
+        paintSnsPv();
+      });
+    }
   }
   function paintSnsPv() {
     var dd = destSns(), ds = (typeof DEST_BY === 'object' && DEST_BY[dest]) || null;
@@ -1589,15 +1639,15 @@
   // ---------- 인스타 넘겨 보기 묶음: 완성 화면에서 모든 장을 한눈에 → 눌러 크게 보기, ✕로 빼기 ----------
   // 저장 단추를 누르는 순간 바로 공유창이 떠야 함(아이폰은 누른 직후가 아니면 공유를 막음) → 묶음은 미리 그려 둠
   var slideSet = null, slideGen = 0;   // { key, first:{url,blob}, list:[{url,blob,name,info}], off:{} }
-  function slideKey(card) { var d = curDesign(); return dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length; }
+  function slideKey(card) { var d = curDesign(); return dest + '|' + d.id + '|' + JSON.stringify(d.colors || '') + '|' + JSON.stringify(card) + '|' + Object.keys(localPics).length + '|' + fitSig(); }
   function isFeed(dd) { return dd && (dd.sz === 'sq' || dd.sz === 'p45'); }
   function paintSlides(first) {
     var box = $('doneSlides'), tip = $('doneSlidesTip'), dd = destSns(), card = buildCard().card, key = slideKey(card), gen = ++slideGen;
     box.hidden = tip.hidden = true; box.innerHTML = '';
-    if (!isFeed(dd) || !SsakaExport.slides || !(card.gallery || []).length) { slideSet = null; return; }
+    if (!isFeed(dd) || !SsakaExport.slides || !(fitCard(card).gallery || []).length) { slideSet = null; return; }
     if (slideSet && slideSet.key === key) return drawSlideThumbs(first);
     tip.hidden = false; tip.textContent = '🍒 넘겨 보기 묶음 그리는 중…';
-    SsakaExport.slides(card, curDesign(), { pics: localPics, industry: industry, menu: snsMenu() }, dd.sz).then(function (ls) {
+    SsakaExport.slides(fitCard(card), curDesign(), snsOpts({}), dd.sz).then(function (ls) {
       if (gen !== slideGen) return;
       if (slideSet) slideSet.list.forEach(function (x) { URL.revokeObjectURL(x.url); });
       slideSet = { key: key, list: (ls || []).map(function (x, k) { return { url: URL.createObjectURL(x.blob), blob: x.blob, info: k === ls.length - 1 && !!((card.contact && card.contact.phone) || card.place) }; }), off: {} };

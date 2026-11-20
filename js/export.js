@@ -1246,10 +1246,13 @@
     if (fromMenu) { var hot = B.items.filter(function (x) { return !x.p && /한정|할인|이벤트|신메뉴|오픈|모집|특강|무료|특선/.test(x.n); })[0]; tag = hot ? hot.n.replace(/^[^:：]{0,12}[:：]\s*/, '') : ''; hotLine = hot ? hot.n : ''; }
     // 메뉴를 따로 적었으면 본문의 안내 줄(배달 안 함·주차 등)도 자리가 남는 만큼 메뉴 뒤에
     if (fromMenu) B.items.forEach(function (x) { if (!x.p && x.n !== (tag ? hotLine : '')) items.push({ n: x.n, p: '' }); });
+    // 용도마다 '넣을 줄·뺄 줄' (opts.skip) — 뺀 줄은 이 사진에서만 빠지고 적은 내용은 그대로
+    var lines = (tag ? [hotLine] : []).concat(items.map(function (x) { return x.n; })), skip = (opts && opts.skip) || [];
+    if (skip.length) { if (tag && skip.indexOf(hotLine) >= 0) tag = ''; items = items.filter(function (x) { return skip.indexOf(x.n) < 0; }); }
     var cap = (pf && SNS_CAP_PHOTO[sizeId]) || SNS_CAP[sizeId] || 6, cut = 0, total = items.length, unit = fromMenu || items.some(function (x) { return x.p; }) ? '메뉴' : '';
     if (items.length > cap) { cut = items.length - cap; items = items.slice(0, cap); }
     items.more = pf ? 0 : cut; items.pfCut = pf ? cut : 0; items.unit = unit; if (pf) items.boost = 1.3; // 사진 중심: '외 N가지' 없이 대표 메뉴만 큰 글씨로
-    return { items: items, cut: cut, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag, head: B.head, total: total, cap: cap };
+    return { items: items, cut: cut, tag: tag.length > 40 ? tag.slice(0, 39) + '…' : tag, head: B.head, total: total, cap: cap, lines: lines };
   }
   // 01029477775 → 010-2947-7775, 025412125 → 02-541-2125 (이미 - 가 있으면 그대로)
   function telFmt(t) {

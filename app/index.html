@@ -745,14 +745,14 @@
       '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
     v.appendChild(mk);
 
-    // 5. 지금 보내기 좋은 카드
-    v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
-    v.appendChild(campaigns());
-
-    // 6. 오늘의 싸바 — 2번 하늘 풀밭, 기온 크게
+    // 4. 오늘의 싸바 (싸바알림판 바로 아래, 11-21 대표님) — 2번 하늘 풀밭, 기온 크게
     var td = ncard({ pal: 2, href: '../today/', label: '오늘의 싸바', photo: '../img/today-tower.jpg', em: '매일 아침 한눈에', title: '오늘의 싸바', desc: '뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오', icon: '☀️', name: '오늘의 싸바', sub: '광주', btn: '보기' });
     v.appendChild(td);
     homeWeather(td);
+
+    // 5. 지금 보내기 좋은 카드
+    v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
+    v.appendChild(campaigns());
 
     // 7. 오늘의 놀이터 — 7·9·10번이 날마다 돌아가며
     v.appendChild(todayGame());

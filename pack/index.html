@@ -107,8 +107,23 @@
     return card;
   }
   // 캔바에서 옮겨 온 12종 예시는 식당만 압구정 순천만 사진, 나머지 업종은 체리 사진으로 (2026-11-20)
-  function cherryCard(card) { return Object.assign({}, card, { image: '/img/eodiya-cherry.jpg', gallery: ['/img/mode-cherry-one.jpg'], ip: null }); }
-  var cherryImgs = null;
+  // 프로필·학원·모임 업종은 감독님이 준 인물·풍경 사진으로 (2026-11-20)
+  var EXP = '/img/ex/';
+  var SAMPLE = {
+    actor: ['person-actor', 'person-speaker'], director: ['person-actor', 'person-speaker'],
+    freelancer: ['person-speaker', 'person-teacher'], tutor: ['person-teacher', 'person-speaker'],
+    insurance: ['person-speaker', 'person-actor'], newcar: ['person-speaker', 'person-actor'],
+    usedcar: ['person-speaker', 'person-actor'], sales: ['person-speaker', 'person-actor'],
+    academy: ['person-kid', 'person-teacher'], arts: ['person-kid', 'person-speaker'], entrance: ['person-teacher', 'person-kid'],
+    club: ['suncheon-bay', 'suncheon-garden'], alumni: ['suncheon-garden', 'suncheon-bay'], party: ['suncheon-bay', 'suncheon-garden'],
+    event: ['suncheon-garden', 'suncheon-bay'], stay: ['suncheon-bay', 'suncheon-garden'], greeting: ['suncheon-bay', 'suncheon-garden']
+  };
+  function cherryCard(card, ind) {
+    var s = SAMPLE[ind];
+    if (s) return Object.assign({}, card, { image: EXP + s[0] + '.jpg', gallery: s.map(function (n) { return EXP + n + '.jpg'; }), ip: null });
+    return Object.assign({}, card, { image: '/img/eodiya-cherry.jpg', gallery: ['/img/mode-cherry-one.jpg'], ip: null });
+  }
+  var cherryCache = {};
   var chips = $('inds');
   LIST.forEach(function (I) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = I.emoji + ' ' + I.label;
@@ -121,8 +136,8 @@
     var my = ++job, card = cardOf(ind), rows = $('rows'), opts = { industry: ind };
     $('mk').href = '../make/?ind=' + ind;
     rows.innerHTML = '<p class="load">템플릿을 그리는 중이에요…</p>';
-    var ck = cherryCard(card);
-    Promise.all([imgsCache[ind] || (imgsCache[ind] = K.loadImgs(card, opts)), cherryImgs || (cherryImgs = K.loadImgs(ck, opts))]).then(function (both) {
+    var ck = cherryCard(card, ind), ckKey = SAMPLE[ind] ? ind : '_cherry';
+    Promise.all([imgsCache[ind] || (imgsCache[ind] = K.loadImgs(card, opts)), cherryCache[ckKey] || (cherryCache[ckKey] = K.loadImgs(ck, opts))]).then(function (both) {
       var imgs = both[0], imgsC = both[1];
       if (my !== job) return;
       rows.innerHTML = '';

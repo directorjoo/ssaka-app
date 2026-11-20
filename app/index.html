@@ -361,6 +361,9 @@
     #v-home .nc .ph { position: absolute; left: 0; right: 0; top: 0; bottom: 0; height: auto; }
     #v-home .nc .ph::after { height: 100%; background: linear-gradient(180deg, transparent 0%, transparent 18%, var(--c0) 62%); }
     #v-home .nc .ph.art { display: grid; place-items: center end; padding-right: 22px; height: auto; background: var(--g); font-size: 60px; }
+    #v-home .nc.stc .ph.art { place-items: start end; padding: 10px 20px 0 0; }
+    #v-home .nc.stc .ph.art span { transform: rotate(-6deg); }
+    #v-home .nc.stc .ph.art img { display: block; width: 84px; height: auto; filter: drop-shadow(0 0 1.5px rgba(255,255,255,.9)) drop-shadow(0 8px 12px rgba(0,0,0,.35)); }
     #v-home .nc.pg .ph.art span { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 6px; font-size: 26px; line-height: 1.15; transform: rotate(-6deg); align-self: start; margin-top: 14px; }
     #v-home .nc.pg .ph.art span b { font-weight: 400; }
     #v-home .nc .tx { padding: 0 18px 10px; }
@@ -769,6 +772,11 @@
 
     // 8. 싸바 이야기 — 8번 와인 장미(체리 장미) 원래 그라데이션 (11-21 대표님)
     var st = ncard({ pal: 8, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
+    // 체리 심볼: 이모지 대신 앱 아이콘과 같은 체리 두 알(img/cherry.webp), 잘리지 않게 글칸 높이 안에 (11-21 대표님)
+    // 바탕: 싸바 체리 레드(#B3132B) 그라데이션 (11-21 대표님)
+    [['g','linear-gradient(170deg,#C8243C 0%,#B3132B 50%,#960C22 100%)'],['b','linear-gradient(90deg,#8A0A1E,#A3122A)'],['c0','#C8243C'],['btn','#5E0612']].forEach(function (x) { st.style.setProperty('--' + x[0], x[1]); });
+    st.classList.add('stc'); var sx = st.querySelector('.ph.art span'); sx.textContent = ''; var ci = el('img'); ci.src = '../img/cherry.webp'; ci.alt = ''; sx.appendChild(ci);
+    var bi2 = st.querySelector('.bar i'); bi2.textContent = ''; var ci2 = el('img'); ci2.src = '../img/cherry.webp'; ci2.alt = ''; ci2.style.cssText = 'width:34px;height:auto;display:block'; bi2.appendChild(ci2);
     var stb = st.querySelector('.bar');
     var see = el('a', 'pill', '보기'); see.href = '../?story=1';
     var kk = el('button', 'pill lite', '카톡'); kk.type = 'button'; kk.setAttribute('aria-label', '싸바 이야기를 카톡으로 보내기');

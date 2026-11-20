@@ -451,9 +451,13 @@
       radial-gradient(ellipse 70% 38% at 18% 6%, rgba(255,250,238,.85) 0%, rgba(255,250,238,0) 70%),
       radial-gradient(ellipse 55% 30% at 92% 42%, rgba(255,244,222,.55) 0%, rgba(255,244,222,0) 70%),
       radial-gradient(ellipse 60% 34% at 8% 78%, rgba(255,246,226,.5) 0%, rgba(255,246,226,0) 70%),
-      linear-gradient(180deg, #F8DDB0 0%, #FBE7C8 18%, #FDF1DE 34%, #FFF7EC 55%, #FFFAF2 100%) fixed; background-attachment: fixed; }
-    /* 11-21 05:05 숨통: 위 1/3만 살구 미색, 아래로 거의 흰 크림(#FFFAF2)으로 풀림 — 진한 살구 #F3C786·#F0BE7F 뺌 */
-    html.home-apricot .top { background: rgba(248,221,176,.94); }
+      linear-gradient(180deg, #FFF8EE 0%, #FFFAF2 100%); }
+    /* 11-21 05:15 띠 나누기: 맨 위 '오늘도 싸바?'까지 진한 미색 띠 → 싸바비앙·어디야 뒤 연한 미색 → 가운데 흰 크림 → 놀이터·싸바 이야기 뒤 다시 연한 미색 */
+    html.home-apricot .top { background: rgba(242,204,146,.96); }
+    html.home-apricot .n-hello { background: linear-gradient(180deg, #F2CC92 0%, #F5D5A2 100%); border-radius: 0 0 28px 28px; padding-top: 10px; box-shadow: 0 8px 18px -12px rgba(120,70,20,.45); position: relative; z-index: 1; }
+    .hz-top { margin-top: -28px; padding-top: 48px; background: linear-gradient(180deg, #FAE3BF 0%, #FBE8CB 55%, #FDF1DE 85%, rgba(255,250,242,0) 100%); }
+    .hz-bot { padding-top: 24px; padding-bottom: 12px; background: linear-gradient(180deg, rgba(255,250,242,0) 0%, #FDF1DE 18%, #FBE8CB 50%, #FAE3BF 100%); }
+    html:not(.home-apricot) .hz-top, html:not(.home-apricot) .hz-bot { background: none; margin-top: 0; padding-top: 0; }
     html.home-apricot .n-hello small { color: #8A5A22; }
     html.home-apricot #v-home .nc { box-shadow: 0 16px 30px -20px rgba(120,70,20,.55); }
     html.home-apricot .n-panel { box-shadow: 0 16px 30px -20px rgba(120,70,20,.5); }
@@ -837,7 +841,8 @@
       tx.insertBefore(row, tx.firstChild);
       lux.classList.add('sv-c');
     })();
-    v.appendChild(lux);
+    var zt = el('div', 'hz hz-top'); v.appendChild(zt); // 싸바비앙·어디야 뒤 연한 미색 (11-21)
+    zt.appendChild(lux);
 
     // 2. 어디야? — 12번 크리에이터 레드, 대표님이 준 체리 두 알(eodiya-cherry12.jpg, 흰 바탕을 와인색으로 바꿔 확대), 단추 셋 (이 카드만 예외)
     var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry12.jpg', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
@@ -845,7 +850,7 @@
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
     eo.appendChild(b3); tapGo(eo, '../eodiya/');
-    v.appendChild(eo);
+    zt.appendChild(eo);
 
     // 3. 싸바알림판 + 언니김치 특판 — 예전 초록 알림판 그대로 되돌림 (11-21 대표님)
     var mk = el('div', 'mk');
@@ -869,7 +874,8 @@
     v.appendChild(pnl);
 
     // 7. 싸바 놀이터 — 7·9·10번이 날마다 돌아가며
-    v.appendChild(todayGame());
+    var zb = el('div', 'hz hz-bot'); v.appendChild(zb); // 놀이터·싸바 이야기 뒤 연한 미색 (11-21)
+    zb.appendChild(todayGame());
 
     // 8. 싸바 이야기 — 8번 와인 장미(체리 장미) 원래 그라데이션 (11-21 대표님)
     var st = ncard({ pal: 8, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
@@ -886,7 +892,7 @@
       SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
     stb.appendChild(see); stb.appendChild(kk); tapGo(st, '../?story=1');
-    v.appendChild(st);
+    zb.appendChild(st);
 
     // 내가 만든 카드 — 3장만
     var mine = S.mine();

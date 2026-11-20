@@ -1004,7 +1004,7 @@
         a.innerHTML = '<img src="' + ICON + '" alt=""><div><b>싸바가 뭐지?</b><span>안부·위치·놀자를 카톡으로 톡! 한 번에</span></div><em>보기 ›</em>';
         // 11-21 07:55 대표님: 받은 사람도 다른 누군가에게 어디야를 보낼 수 있게 → 작은 '나도 보내기' 글씨 대신 큰 칸 (설치 없이 바로)
         var me = document.createElement('div'); me.className = 'sv-me';
-        me.innerHTML = '<b>🍒 나도 어디야? 물어보기</b><span>지금 떠오르는 사람에게 톡! 설치 없이 바로 돼요</span>' +
+        me.innerHTML = '<b>🍒 나도 안부 전하기</b><span>지금 떠오르는 사람에게 톡! 설치 없이 바로 돼요</span>' +
           '<div class="row"><a href="./#ask">싸바?<small>안부</small></a><a href="./#come">여기야!<small>위치</small></a><a href="./#play">놀자!<small>부르기</small></a></div>';
         var mk = v.querySelector('.mk');
         if (mk) { v.insertBefore(me, mk); v.insertBefore(a, mk); mk.remove(); } else { v.appendChild(me); v.appendChild(a); }
@@ -1014,8 +1014,8 @@
       function after() {
         if (!sent || shown || document.visibilityState !== 'visible') return; shown = true;
         var d = document.createElement('div'); d.className = 'sv-after';
-        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 물어볼까요?<br>떠오르는 사람에게 어디야? 톡! — 설치 없이 바로</p>' +
-          '<a class="a1" href="./#ask">🍒 나도 어디야? 물어보기</a><a class="a2" href="../?story=1">싸바가 뭐지?</a><button type="button" class="a3">닫기</button></div>';
+        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 안부를 전해 볼까요?<br>떠오르는 사람에게 톡! — 설치 없이 바로</p>' +
+          '<a class="a1" href="./#ask">🍒 나도 안부 전하기</a><a class="a2" href="../?story=1">싸바가 뭐지?</a><button type="button" class="a3">닫기</button></div>';
         d.addEventListener('click', function (e) { if (e.target === d || e.target.classList.contains('a3')) d.remove(); });
         document.body.appendChild(d);
       }

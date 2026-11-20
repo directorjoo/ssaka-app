@@ -131,6 +131,20 @@
     .camp2 b { display: block; margin-top: 8px; font-size: 16.5px; font-weight: 900; letter-spacing: -0.02em; }
     .camp2 .cap { display: block; margin-top: 1px; font-size: 15.5px; line-height: 1.35; color: #333; word-break: keep-all; }
     .camp2 a:focus-visible { outline: 3px solid var(--ssaka); outline-offset: 3px; border-radius: 18px; }
+    /* 첫눈 인사 칸: 파란 밤하늘 + 크리스마스트리 + 하얀 눈 내림 */
+    .camp2 .ph.snow { place-items: start center; }
+    .camp2 .ph.snow strong { padding-top: 8%; font-size: 26px; z-index: 3; }
+    .camp2 .ph.snow .tree { position: absolute; left: 50%; bottom: 0; width: 54%; transform: translateX(-50%); z-index: 2; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
+    .camp2 .ph.snow .tree .star { transform-origin: 50px 9px; animation: tstar 1.6s ease-in-out infinite; }
+    .camp2 .ph.snow .tree .bl { animation: tblink 1.8s ease-in-out infinite; }
+    .camp2 .ph.snow .tree .bl:nth-of-type(2n) { animation-delay: .6s; }
+    .camp2 .ph.snow .tree .bl:nth-of-type(3n) { animation-delay: 1.2s; }
+    .camp2 .ph.snow .ground { position: absolute; left: -10%; right: -10%; bottom: -14%; height: 26%; border-radius: 50%; background: #F4F8FF; z-index: 1; }
+    .camp2 .ph.snow .fl { position: absolute; top: -10px; border-radius: 50%; background: #fff; z-index: 4; pointer-events: none; animation: tsnow linear infinite; }
+    @keyframes tsnow { 0% { transform: translate(0,-10px); opacity: 0; } 10% { opacity: .95; } 50% { transform: translate(8px,90px); } 100% { transform: translate(-4px,200px); opacity: .9; } }
+    @keyframes tstar { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.25); opacity: .75; } }
+    @keyframes tblink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) { .camp2 .ph.snow .fl, .camp2 .ph.snow .tree * { animation: none; } }
     /* 오늘의 싸바 오른쪽 날씨 (백화점 영업시간 칸의 기온처럼) */
     .wr.today .tw { margin-left: auto; flex: none; display: grid; justify-items: end; line-height: 1; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8); }
     .wr.today .tw b { font-size: 34px; font-weight: 900; letter-spacing: -0.04em; }
@@ -520,11 +534,36 @@
     return e;
   }
 
+  // 첫눈 칸: 눈 덮인 땅 + 반짝이는 크리스마스트리 + 하얀 눈송이
+  function snowScene(ph) {
+    var gr = el('span', 'ground'); gr.setAttribute('aria-hidden', 'true'); ph.appendChild(gr);
+    var t = document.createElement('span'); t.className = 'tree'; t.setAttribute('aria-hidden', 'true');
+    t.innerHTML = '<svg viewBox="0 0 100 110" width="100%" style="display:block">' +
+      '<rect x="44" y="92" width="12" height="14" rx="2" fill="#6B3F22"/>' +
+      '<path d="M50 20 L74 52 H62 L82 76 H66 L90 96 H10 L34 76 H18 L38 52 H26 Z" fill="#1E7A45"/>' +
+      '<path d="M50 20 L74 52 H62 L82 76 H66 L90 96 H50 Z" fill="#17643A"/>' +
+      '<path d="M30 60 Q50 70 70 58 M24 84 Q50 94 78 82" stroke="#FFD84D" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+      '<circle class="bl" cx="40" cy="45" r="3.4" fill="#E8344A"/><circle class="bl" cx="60" cy="50" r="3.4" fill="#FFD84D"/>' +
+      '<circle class="bl" cx="34" cy="70" r="3.6" fill="#FFD84D"/><circle class="bl" cx="56" cy="68" r="3.6" fill="#E8344A"/>' +
+      '<circle class="bl" cx="70" cy="74" r="3.4" fill="#fff"/><circle class="bl" cx="44" cy="88" r="3.6" fill="#fff"/>' +
+      '<circle class="bl" cx="66" cy="90" r="3.6" fill="#E8344A"/><circle class="bl" cx="24" cy="92" r="3.2" fill="#FFD84D"/>' +
+      '<path class="star" d="M50 2 L53.5 11 L63 11 L55.5 16.5 L58.5 26 L50 20 L41.5 26 L44.5 16.5 L37 11 L46.5 11 Z" fill="#FFD84D"/>' +
+      '</svg>';
+    ph.appendChild(t);
+    for (var n = 0; n < 22; n++) {
+      var f = el('span', 'fl'); f.setAttribute('aria-hidden', 'true');
+      var sz = 2 + Math.random() * 4;
+      f.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;width:' + sz.toFixed(1) + 'px;height:' + sz.toFixed(1) + 'px;' +
+        'animation-duration:' + (4 + Math.random() * 5).toFixed(1) + 's;animation-delay:-' + (Math.random() * 8).toFixed(1) + 's;opacity:' + (0.6 + Math.random() * 0.4).toFixed(2);
+      ph.appendChild(f);
+    }
+  }
+
   // ---------- 시즌 캠페인 (날짜에 맞춰 바뀜) ----------
   function campaigns() {
     var now = new Date(), m = now.getMonth() + 1, d = now.getDate();
     var all = [
-      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', tile: 'linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)', href: '../make/?ind=greeting&season=snow' },
+      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', snow: true, tile: 'linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)', href: '../make/?ind=greeting&season=snow' },
       { from: [11, 10], to: [12, 31], t: '송년회\u00a0공지, 카드\u00a0한\u00a0장으로', s: '장소 · 회비 · 참석·불참 답장까지', e: '🥂', bg: '#FFE0E6', k: '송년회', pic: '../img/ex/party-cheers.jpg', big: '송년회', href: '../make/?ind=party&season=yearend' },
       { from: [11, 15], to: [1, 31], t: '겨울방학 특강 모집', s: '학부모 단톡·인스타에 바로', e: '📚', bg: '#FFF3B8', k: '겨울방학', pic: '../img/ex/jok-class.jpg', big: '특강 모집', href: '../make/?ind=academy&season=snow' },
       { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, k: '크리스마스', big: 'MERRY\nX-MAS', tile: '#1f4d3a', href: '../make/?ind=greeting&season=xmas' },
@@ -545,10 +584,11 @@
     var g = el('div', 'camp2');
     on.slice(0, 4).forEach(function (c) {
       var a = el('a'); a.href = c.href; a.setAttribute('aria-label', c.t.replace(/\u00a0/g, ' ') + ' — ' + c.s);
-      var ph = el('span', 'ph' + (c.pic ? ' pic' : ''));
+      var ph = el('span', 'ph' + (c.pic ? ' pic' : '') + (c.snow ? ' snow' : ''));
       ph.style.background = c.pic ? 'linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.55)), url(' + c.pic + ') center/cover' : (c.tile || c.bg);
       var bg = el('strong', '', c.big || c.e); ph.appendChild(bg);
-      if (!c.pic) { var i = el('i', '', c.e); i.setAttribute('aria-hidden', 'true'); ph.appendChild(i); }
+      if (c.snow) snowScene(ph);
+      else if (!c.pic) { var i = el('i', '', c.e); i.setAttribute('aria-hidden', 'true'); ph.appendChild(i); }
       a.appendChild(ph);
       a.appendChild(el('b', '', '[' + (c.k || '추천') + ']'));
       a.appendChild(el('span', 'cap', c.t.replace(/\u00a0/g, ' ')));

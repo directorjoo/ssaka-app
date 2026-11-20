@@ -1417,7 +1417,8 @@
   }
   $('cancelTop').addEventListener('click', cancelOut);
   $('cancelBottom').addEventListener('click', cancelOut);
-  if (location.hash === '#come' || location.hash === '#play') { var cm = document.querySelector('.mode[data-mode="' + location.hash.slice(1) + '"]'); if (cm) cm.click(); }
+  // 홈에서 싸바?·여기야!·놀자! 를 눌러 들어오면 탭 줄 없이 바로 그 쓰는 칸 (시·음악 액자는 맨 위 그대로)
+  if (/^#(ask|come|play)$/.test(location.hash)) { var cm = document.querySelector('.mode[data-mode="' + location.hash.slice(1) + '"]'); if (cm) cm.click(); var md = document.querySelector('.modes'); if (md) md.style.display = 'none'; }
   if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '싸바 홈 화면에 추가');
 })();
 </script>

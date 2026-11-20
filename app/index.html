@@ -429,6 +429,22 @@
     .al-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 18px 16px; padding: 4px; border-radius: 999px; background: #ECE7E1; }
     .al-seg button { min-height: 48px; border: 0; border-radius: 999px; background: none; font: inherit; font-size: 17px; font-weight: 700; color: #6b625a; cursor: pointer; }
     .al-seg button[aria-selected="true"] { background: #fff; color: #B3132B; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    /* ===== 홈 바탕: 13번 와인 바닥 (롯데 홈처럼 진한 와인 위에 카드, 2026-11-21) ===== */
+    html.home-wine, html.home-wine body { background: linear-gradient(180deg, #7B2D29 0%, #903733 25%, #9D4845 55%, #AF5C58 85%, #AC5B58 100%) fixed; }
+    html.home-wine .top { background: rgba(123,45,41,.94); }
+    html.home-wine .top h1, html.home-wine .top .logo { color: #fff; }
+    html.home-wine .n-hello small { color: #F6D9D5; }
+    html.home-wine .n-hello b { color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.3); }
+    html.home-wine .n-hello b span { color: #FFE7A3; }
+    html.home-wine #v-home > .n-h h2 { color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.35); }
+    html.home-wine #v-home > .n-h a { color: #F6D9D5; }
+    html.home-wine #v-home .nc { box-shadow: 0 16px 30px -18px #4A1310; }
+    /* 15번 흰 카드: 아래가 연회색으로 살짝 꺼짐 — '지금 보내기 좋은 카드'를 롯데 혜택 칸처럼 흰 판 위에 */
+    .n-panel { margin: 0 18px 24px; padding: 20px 0 6px; border-radius: 20px; background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 70%, #F1F1F1 100%); box-shadow: 0 16px 30px -18px #4A1310; }
+    .n-panel .n-h { margin: 0 18px 12px; }
+    .n-panel .camp2 { padding: 4px 16px 14px; margin-bottom: 0; }
+    /* 18번 맨 위로: 와인 바닥 위에 떠 있는 흰 동그라미 */
+    html.home-wine .to-top { width: 64px; height: 64px; font-weight: 400; font-size: 30px; color: #111; box-shadow: 0 6px 18px rgba(90,20,18,.35); }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -834,8 +850,10 @@
     // 광주 기온은 지움 (11-21 대표님) — 전국 날씨는 오늘의 싸바 '전국 날씨' 탭에서
 
     // 5. 지금 보내기 좋은 카드
-    v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
-    v.appendChild(campaigns());
+    var pnl = el('section', 'n-panel');
+    pnl.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
+    pnl.appendChild(campaigns());
+    v.appendChild(pnl);
 
     // 7. 싸바 놀이터 — 7·9·10번이 날마다 돌아가며
     v.appendChild(todayGame());
@@ -1079,6 +1097,7 @@
   }
   function show(name) {
     document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + (name === 'blog' ? 'alim' : name); });
+    document.documentElement.classList.toggle('home-wine', name === 'home');
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();

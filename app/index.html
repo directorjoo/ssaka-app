@@ -1097,7 +1097,8 @@
   }
   function show(name) {
     document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + (name === 'blog' ? 'alim' : name); });
-    document.documentElement.classList.toggle('home-wine', name === 'home');
+    // 홈 와인 바탕(13번)은 대표님이 '체리색 바탕은 아니네' 해서 꺼 둠 (11-21) — CSS html.home-wine 는 남겨 둠
+    document.documentElement.classList.remove('home-wine');
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();

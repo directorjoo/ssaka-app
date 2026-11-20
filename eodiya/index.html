@@ -515,6 +515,8 @@
     .sv-inv b { display: block; font-size: 20px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
     .sv-inv span { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.4; color: #FFE6E2; }
     .sv-inv em { flex: none; padding: 9px 14px; border-radius: 999px; background: #fff; color: #B3132B; font-style: normal; font-size: 16px; font-weight: 900; }
+    .sv-me { display: none; }
+    html.sv-sent .sv-me { display: block; animation: svUp .35s ease; }
     .sv-me { margin: 26px 0 4px; padding: 18px 14px 16px; border-radius: 22px; background: linear-gradient(160deg, #FFF3E6 0%, #FDE3CF 60%, #F8D3BC 100%); text-align: center; box-shadow: 0 8px 18px -12px rgba(120,40,20,.5); }
     .sv-me b { display: block; font-size: 22px; font-weight: 900; color: #1a1a1a; }
     .sv-me > span { display: block; margin: 4px 0 14px; font-size: 16px; color: #6E4415; word-break: keep-all; }
@@ -1009,8 +1011,11 @@
         var mk = v.querySelector('.mk');
         if (mk) { v.insertBefore(me, mk); v.insertBefore(a, mk); mk.remove(); } else { v.appendChild(me); v.appendChild(a); }
       });
+      // 11-21 08:12 대표님: 답장 쓰는 중에 '나도 안부 전하기'가 글칸 바로 위에 떠서 헷갈림 → 답장을 보낸 뒤에만 보이게
+      var SK = 'svSent:' + location.pathname + location.search + location.hash;
       var sent = false, shown = false;
-      window.__svSent = function () { sent = true; };
+      try { if (sessionStorage.getItem(SK)) { sent = true; shown = true; document.documentElement.classList.add('sv-sent'); } } catch (e) {}
+      window.__svSent = function () { sent = true; document.documentElement.classList.add('sv-sent'); try { sessionStorage.setItem(SK, '1'); } catch (e) {} };
       function after() {
         if (!sent || shown || document.visibilityState !== 'visible') return; shown = true;
         var d = document.createElement('div'); d.className = 'sv-after';

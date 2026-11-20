@@ -508,6 +508,23 @@
     .topnav button { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px; border: 1px solid rgba(110,68,21,.18); border-radius: 999px; background: rgba(255,255,255,.86); color: #3a2a1a; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 6px rgba(110,68,21,.12); }
     .topbar { display: flex; align-items: center; gap: 10px; }
     .topbar .topnav { margin: 0; }
+    /* 11-21 07:50 받는 사람이 답만 하고 닫으면 끝 → 답장 화면에 '싸바가 뭐지?' 카드 + 보낸 뒤 안내 창 */
+    .sv-inv { display: flex; align-items: center; gap: 12px; margin: 22px 0 6px; padding: 14px 14px 14px 12px; border-radius: 20px; background: linear-gradient(100deg, #7E0A1C, #B3132B 60%, #D8475E); color: #fff; text-decoration: none; box-shadow: 0 8px 18px -10px rgba(90,8,24,.7); }
+    .sv-inv img { width: 56px; height: 56px; flex: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,.25)); }
+    .sv-inv div { flex: 1; min-width: 0; }
+    .sv-inv b { display: block; font-size: 20px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+    .sv-inv span { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.4; color: #FFE6E2; }
+    .sv-inv em { flex: none; padding: 9px 14px; border-radius: 999px; background: #fff; color: #B3132B; font-style: normal; font-size: 16px; font-weight: 900; }
+    .sv-after { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.45); }
+    .sv-after .in { width: min(100%, 520px); padding: 22px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: linear-gradient(180deg, #FFF8F0, #FFFFFF); text-align: center; animation: svUp .3s ease; }
+    @keyframes svUp { from { transform: translateY(40px); opacity: 0; } }
+    .sv-after img { width: 76px; height: 76px; }
+    .sv-after h3 { margin: 6px 0 4px; font-size: 24px; font-weight: 900; color: #1a1a1a; }
+    .sv-after p { margin: 0 0 16px; font-size: 17px; line-height: 1.5; color: #5A3A14; word-break: keep-all; }
+    .sv-after a, .sv-after button { display: block; width: 100%; margin-top: 10px; min-height: 54px; border: 0; border-radius: 16px; font: inherit; font-size: 18px; font-weight: 900; text-decoration: none; line-height: 54px; cursor: pointer; }
+    .sv-after .a1 { background: #B3132B; color: #fff; box-shadow: 0 3px 0 #7E0C1E; }
+    .sv-after .a2 { background: #F3EDE6; color: #3a2a1a; }
+    .sv-after .a3 { background: none; color: #8a7a6a; font-size: 16px; min-height: 44px; line-height: 44px; }
     .composer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9975; display: none; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); border-top: 1px solid rgba(0,0,0,.08); box-shadow: 0 -6px 18px rgba(60,30,10,.10); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
     html.has-composer .composer { display: block; }
     .composer-in { max-width: 540px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; }
@@ -972,12 +989,35 @@
       try { var me = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); if (me.from) $('rName').value = me.from; } catch (e) {}
     }
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
+    // 11-21 07:50 대표님: 답만 하고 닫으면 싸바는 끝 → 답장 화면마다 '싸바가 뭐지?' 카드, 답장 보내고 돌아오면 안내 창
+    (function () {
+      var ICON = '../img/cherry.webp';
+      ['viewAsk', 'viewCome', 'viewPlay'].forEach(function (id) {
+        var v = $(id); if (!v) return;
+        var a = document.createElement('a'); a.className = 'sv-inv'; a.href = '../?story=1';
+        a.innerHTML = '<img src="' + ICON + '" alt=""><div><b>싸바가 뭐지?</b><span>안부·위치·놀자를 카톡으로 톡! 한 번에</span></div><em>보기 ›</em>';
+        var mk = v.querySelector('.mk'); if (mk) v.insertBefore(a, mk); else v.appendChild(a);
+      });
+      var sent = false, shown = false;
+      window.__svSent = function () { sent = true; };
+      function after() {
+        if (!sent || shown || document.visibilityState !== 'visible') return; shown = true;
+        var d = document.createElement('div'); d.className = 'sv-after';
+        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 보내 볼까요?<br>싸바로 안부·위치·놀자를 톡! 한 번에</p>' +
+          '<a class="a1" href="../?story=1">🍒 싸바가 뭐지?</a><a class="a2" href="../app/">🏠 싸바 구경하기</a><button type="button" class="a3">닫기</button></div>';
+        d.addEventListener('click', function (e) { if (e.target === d || e.target.classList.contains('a3')) d.remove(); });
+        document.body.appendChild(d);
+      }
+      document.addEventListener('visibilitychange', function () { setTimeout(after, 400); });
+      window.addEventListener('focus', function () { setTimeout(after, 400); });
+    })();
     function reply(o) {
       var name = myName();
       if (!name && $('rName')) { toast('✏️ 누가 답했는지 알 수 있게 맨 위에 이름을 먼저 적어 주세요'); $('rName').scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $('rName').focus(); }, 350); return; }
       var title = o.mi ? (name ? name + '님 답장이 왔어요' : '답장이 왔어요') : o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       if (o.mi) { o.img = o.mi.url; o.w = o.mi.w; o.h = o.mi.h; }
       var url = o.url || BASE;
+      if (window.__svSent) window.__svSent();
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
       var wide = o.mi || /eodiya-(ask|here|reply2)\.png/.test(o.img), abs = /^https?:/.test(o.img);
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,

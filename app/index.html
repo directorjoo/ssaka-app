@@ -374,6 +374,8 @@
     #v-home .nc .wx { top: -54px; right: 14px; padding: 5px 10px; font-size: 20px; }
     #v-home .nc .eo3 { position: relative; padding: 8px 12px 12px; gap: 6px; }
     #v-home .nc .eo3 a { min-height: 48px; font-size: 18px; }
+    /* 어디야 카드: 설명은 살짝 연하게 해서 제목 '어디야?'가 살도록 (11-21) */
+    #v-home .nc.eo-c .tx p { color: rgba(255,255,255,.72); font-weight: 600; }
     #v-home .n-h { margin-bottom: 10px; }
     #v-home .n-h h2 { font-size: 23px; }
     .camp2 { gap: 16px 12px; margin-bottom: 26px; }
@@ -732,6 +734,7 @@
 
     // 2. 어디야? — 12번 크리에이터 레드, 원래 체리 사진(물방울만 지운 eodiya-cherry4.jpg) 그대로, 단추 셋 (이 카드만 예외)
     var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry4.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
+    eo.classList.add('eo-c');
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
     eo.appendChild(b3);

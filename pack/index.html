@@ -110,13 +110,14 @@
   // 프로필·학원·모임 업종은 감독님이 준 인물·풍경 사진으로 (2026-11-20)
   var EXP = '/img/ex/';
   var SAMPLE = {
-    actor: ['person-actor', 'person-speaker'], director: ['person-actor', 'person-speaker'],
+    actor: ['person-actor', 'person-bob', 'person-speaker'], director: ['person-walker', 'person-actor'],
     freelancer: ['person-speaker', 'person-teacher'], tutor: ['person-teacher', 'person-speaker'],
-    insurance: ['person-speaker', 'person-actor'], newcar: ['person-speaker', 'person-actor'],
-    usedcar: ['person-speaker', 'person-actor'], sales: ['person-speaker', 'person-actor'],
+    insurance: ['person-bob', 'person-speaker'], newcar: ['person-bob', 'person-speaker'],
+    usedcar: ['person-bob', 'person-speaker'], sales: ['person-bob', 'person-speaker'],
     academy: ['person-kid', 'person-teacher'], arts: ['person-kid', 'person-speaker'], entrance: ['person-teacher', 'person-kid'],
-    club: ['suncheon-bay', 'suncheon-garden'], alumni: ['suncheon-garden', 'suncheon-bay'], party: ['suncheon-bay', 'suncheon-garden'],
-    event: ['suncheon-garden', 'suncheon-bay'], stay: ['suncheon-bay', 'suncheon-garden'], greeting: ['suncheon-bay', 'suncheon-garden']
+    club: ['maehwa-village', 'wetland-path', 'nagan-village'], alumni: ['party-cheers', 'suncheon-bridge'],
+    party: ['party-cheers', 'person-eat', 'party-table'], event: ['hall-sunset', 'suncheon-mums', 'suncheon-garden'],
+    stay: ['nagan-village', 'suncheon-sunset', 'suncheon-bay'], greeting: ['suncheon-sunset', 'suncheon-bay', 'suncheon-mums']
   };
   function cherryCard(card, ind) {
     var s = SAMPLE[ind];

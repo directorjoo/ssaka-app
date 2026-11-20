@@ -314,6 +314,62 @@
     .ic-btn { width: 46px; height: 46px; border: 2.5px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
     .ic-lang { background: linear-gradient(145deg, #2E4A8C, #16244A); }
     .ic-set { background: linear-gradient(145deg, #D4213D, #8E0F22); }
+
+    /* ===== 새 홈 (2026-11-21) — 12색 표준 카드: 사진 → 글칸 → 아래 띠 ===== */
+    html, body { background: linear-gradient(180deg, #FBF9F6 0%, #F5F2EE 60%, #F1EEEA 100%) fixed; }
+    .top { background: rgba(251,249,246,.92); }
+    .ic-btn { width: 40px; height: 40px; border: 0; box-shadow: none; }
+    .upd-btn { height: 36px; font-size: 15px; border-color: #e7e1da; }
+    .n-hello { padding: 6px 22px 22px; }
+    .n-hello small { display: block; font-size: 15px; font-weight: 600; color: #8a8178; letter-spacing: .02em; }
+    .n-hello b { display: block; margin-top: 2px; font-size: 32px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; color: #1A1A1A; }
+    .n-hello b span { color: #B3132B; }
+    .n-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 22px 14px; }
+    .n-h h2 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; color: #1A1A1A; }
+    .n-h a { font-size: 15px; font-weight: 600; color: #8a8178; text-decoration: none; }
+    .nc { display: block; margin: 0 18px 40px; border-radius: 24px; overflow: hidden; text-decoration: none; color: var(--t); background: var(--g); box-shadow: 0 14px 34px -24px rgba(40,30,20,.55); -webkit-tap-highlight-color: transparent; }
+    a.nc:active, .nc a:active { transform: scale(.985); }
+    .nc .ph { position: relative; height: 200px; background-size: cover; background-position: center; }
+    .nc .ph::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 60%; background: linear-gradient(180deg, transparent 0%, var(--c0) 100%); }
+    .nc .ph.art { display: grid; place-items: center; height: 180px; background: var(--g); font-size: 96px; line-height: 1; }
+    .nc .ph.art::after { display: none; }
+    .nc .ph.art span { filter: drop-shadow(0 10px 14px rgba(0,0,0,.25)); transform: rotate(-6deg); }
+    .nc .tx { position: relative; padding: 4px 20px 18px; }
+    .nc .tx em { display: block; font-style: normal; font-size: 17px; font-weight: 600; color: var(--s); }
+    .nc .tx h3 { margin: 2px 0 6px; font-size: 32px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; }
+    .nc .tx p { margin: 0; font-size: 17px; line-height: 1.5; font-weight: 500; color: var(--s); word-break: keep-all; }
+    .nc.lt .tx h3, .nc.lt .tx em, .nc.lt .tx p { text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+    .nc.dk .tx h3, .nc.dk .tx em, .nc.dk .tx p, .nc.dk .bar b, .nc.dk .bar small { text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+    .nc .bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--b); }
+    .nc .bar i { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: #fff; font-style: normal; font-size: 26px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .nc .bar span { flex: 1; min-width: 0; }
+    .nc .bar b { display: block; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; color: var(--t); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nc .bar small { display: block; font-size: 15px; font-weight: 500; color: var(--s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nc .bar u, .nc .bar .pill { flex: none; display: inline-grid; place-items: center; min-height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--btn); color: #fff; font: inherit; font-size: 17px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap; }
+    .nc .bar .pill.lite { background: rgba(255,255,255,.7); color: var(--btn); }
+    .nc .eo3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 14px 16px 16px; background: var(--b); }
+    .nc .eo3 a { display: grid; place-items: center; align-content: center; gap: 2px; min-height: 64px; border-radius: 999px; background: #fff; color: #B3132B; font-size: 21px; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; text-align: center; line-height: 1.15; }
+    .nc .eo3 a small { font-size: 15px; font-weight: 600; color: #7a4a4f; letter-spacing: -0.02em; white-space: nowrap; }
+    .nc .crown { position: absolute; right: 18px; top: -30px; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(145deg, #F7DD8A, #C9962E); box-shadow: 0 6px 16px rgba(120,80,10,.45); font-size: 30px; }
+    .nc .wx { position: absolute; right: 18px; top: -46px; z-index: 1; padding: 8px 14px; border-radius: 16px; background: rgba(255,255,255,.88); color: #1E3A55; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+    .nc .wx small { display: block; margin-top: 3px; font-size: 15px; font-weight: 600; }
+    .nc a:focus-visible, a.nc:focus-visible { outline: 3px solid #B3132B; outline-offset: 2px; }
+    .camp2 { gap: 16px 12px; margin-bottom: 26px; }
+    /* 떠 있는 알약 아래 메뉴 — 체리 레드는 지금 누른 메뉴에만 */
+    body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+    .tabs { left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom)); padding-bottom: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px -10px rgba(40,30,20,.35); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+    .tabs-in { height: 66px; padding: 0 6px; }
+    .tab { font-size: 15px; font-weight: 600; color: #8f8780; }
+    .tab[aria-selected="true"] { color: #B3132B; }
+    .tab-make i { width: 26px; height: 26px; margin: 0; border-radius: 8px; background: none; color: inherit; box-shadow: none; }
+    .tab-make { color: #8f8780; }
+    .tab-make[aria-selected="true"] { color: #B3132B; }
+    .tab-make i svg { width: 24px; height: 24px; stroke-width: 2.2; }
+    .toast { bottom: calc(96px + env(safe-area-inset-bottom)); }
+    /* 싸바알림 안의 [카드 만들기 | 블로그 쓰기] 탭 */
+    .al-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 6px 18px 16px; padding: 4px; border-radius: 999px; background: #ECE7E1; }
+    .al-seg button { min-height: 48px; border: 0; border-radius: 999px; background: none; font: inherit; font-size: 17px; font-weight: 700; color: #6b625a; cursor: pointer; }
+    .al-seg button[aria-selected="true"] { background: #fff; color: #B3132B; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -364,7 +420,7 @@
 (function () {
   var D = window.SsakaDesigns, S = window.SsakaStore;
   var $ = function (id) { return document.getElementById(id); };
-  var TITLES = { home: '홈', alim: '싸바알림', inbox: '받은 카드', resv: '예약', more: '더보기' };
+  var TITLES = { home: '홈', alim: '싸바알림', blog: '싸바알림', inbox: '받은 카드', resv: '예약', more: '더보기' };
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2000); }
@@ -434,12 +490,12 @@
   function campaigns() {
     var now = new Date(), m = now.getMonth() + 1, d = now.getDate();
     var all = [
-      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', tile: '#2E5FA8', href: '../make/?ind=greeting&season=snow' },
+      { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', tile: 'linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)', href: '../make/?ind=greeting&season=snow' },
       { from: [11, 10], to: [12, 31], t: '송년회\u00a0공지, 카드\u00a0한\u00a0장으로', s: '장소 · 회비 · 참석·불참 답장까지', e: '🥂', bg: '#FFE0E6', k: '송년회', pic: '../img/ex/party-cheers.jpg', big: '송년회', href: '../make/?ind=party&season=yearend' },
       { from: [11, 15], to: [1, 31], t: '겨울방학 특강 모집', s: '학부모 단톡·인스타에 바로', e: '📚', bg: '#FFF3B8', k: '겨울방학', pic: '../img/ex/jok-class.jpg', big: '특강 모집', href: '../make/?ind=academy&season=snow' },
       { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, k: '크리스마스', big: 'MERRY\nX-MAS', tile: '#1f4d3a', href: '../make/?ind=greeting&season=xmas' },
       { from: [12, 15], to: [2, 10], t: '새해 인사 미리 만들기', s: '신년회 초대도 함께', e: '🎉', bg: '#FFEFD1', k: '새해 인사', pic: '../img/ex/suncheon-sunset.jpg', big: '2027',  href: '../make/?ind=greeting&season=newyear' },
-      { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', k: '설 연휴', big: '어디야?', tile: '#B3132B', href: '../eodiya/' }
+      { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', k: '설 연휴', big: '어디야?', tile: 'linear-gradient(170deg,#CA4138 0%,#B83A36 100%)', href: '../eodiya/' }
     ];
     function key(md) { return md[0] * 100 + md[1]; }
     var today = m * 100 + d;
@@ -526,8 +582,20 @@
   var WORDS = { restaurant: '식당 가게 메뉴 메뉴판 음식 맛집 예약 홍보 오픈', cafe: '카페 커피 빵 베이커리', party: '송년 신년 회식 모임 연말', club: '산악 등산 동호회 모임 공지 산행',
     alumni: '동창 동문 향우 동기', event: '행사 초대 초대장 결혼 돌잔치 개업 생일', greeting: '인사 새해 연말 첫눈 크리스마스 설 추석 안부', actor: '프로필 배우 모델 오디션',
     director: '감독 크리에이터 유튜버', beauty: '미용 네일 헤어', toefl: '토플 어학원 영어', academy: '학원 보습 내신', fitness: '헬스 필라테스 운동', flower: '꽃 공방', stay: '숙박 펜션' };
+  var alimTab = 'card';
   function renderAlim() {
     var v = $('v-alim'); v.innerHTML = '';
+    var seg = el('div', 'al-seg'); seg.setAttribute('role', 'tablist');
+    [['card', '카드 만들기'], ['blog', '블로그 쓰기']].forEach(function (t) {
+      var b = el('button', '', t[1]); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', alimTab === t[0] ? 'true' : 'false');
+      b.addEventListener('click', function () { alimTab = t[0]; renderAlim(); });
+      seg.appendChild(b);
+    });
+    v.appendChild(seg);
+    if (alimTab === 'blog') {
+      v.appendChild(ncard({ pal: 6, href: '../survey/', label: '블로그 쓰기', photo: '../img/library-blog.jpg', em: '상호와 키워드만 넣으면', title: '블로그 쓰기', desc: '업종 인기 블로그를 참고해 글 여러 편을 써 드려요. 마음에 드는 글을 고르세요.', icon: '✍️', name: '블로그 쓰기', sub: '네이버 · 구글 블로그', btn: '글 쓰러 가기' }));
+      return;
+    }
     var sb = el('label', 'al-search');
     sb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" enterkeyhint="search" placeholder="어떤 카드를 만들까요? (송년회, 메뉴판…)" aria-label="만들 카드 찾기">';
     v.appendChild(sb);
@@ -562,7 +630,7 @@
     // 무엇을 만들까요?
     v.appendChild(secHead('무엇을 만들까요?'));
     var KINDS = [['club', '모임 공지', '🏔️', '#E1F0D5'], ['party', '송년회·신년회', '🥂', '#FFE0E6'], ['restaurant', '가게 홍보', '🍽️', '#FFE1CF'], ['actor', '프로필', '🎬', '#FFE8B8'],
-      ['event', '초대장', '🎉', '#FFEFD1'], ['greeting', '인사 카드', '❄️', '#E2EEFB'], ['alumni', '동문회', '🎓', '#EDE4FF'], ['blog', '블로그 글', '✍️', '#DDE3FF']];
+      ['event', '초대장', '🎉', '#FFEFD1'], ['greeting', '인사 카드', '❄️', '#E2EEFB'], ['alumni', '동문회', '🎓', '#EDE4FF']];
     var sv = el('div', 'svc');
     KINDS.forEach(function (k) {
       var bt = el('button', isOpen(k[0]) || k[0] === 'blog' ? '' : 'soon'); bt.type = 'button';
@@ -584,48 +652,103 @@
     industries(v);
   }
 
-  // ---------- 홈 ----------
+  // ---------- 홈 (2026-11-21 새 판: 12색 표준 카드) ----------
+  // 12색: 글칸 그라데이션(g) · 아래 띠(b) · 제목(t) · 머리말·설명(s) · 단추(btn) · 사진이 번지는 색(c0)
+  var PAL = {
+    1: { g: 'linear-gradient(110deg,#E8E78D 0%,#ECE7BF 45%,#C8D7DA 100%)', b: 'linear-gradient(110deg,#D3CC78,#B2BEC0)', t: '#1A1A1A', s: '#575319', btn: '#6E6820', c0: '#E8E78D' },
+    2: { g: 'linear-gradient(180deg,#C3D7F1 0%,#D5DEE9 30%,#93B976 100%)', b: 'linear-gradient(180deg,#96B17D,#C6CAAC)', t: '#1A1A1A', s: '#1E3A55', btn: '#3E6B8E', c0: '#C3D7F1' },
+    3: { g: 'linear-gradient(100deg,#EFE5DA 0%,#F1DECB 60%,#E5D3C1 100%)', b: 'linear-gradient(100deg,#E8DED4,#E5D3C1)', t: '#1A1A1A', s: '#573619', btn: '#8A5A33', c0: '#EFE5DA' },
+    4: { g: 'radial-gradient(ellipse at 60% 35%,#ACCEAC 0%,#99BD99 45%,#8FB58F 100%)', b: 'linear-gradient(90deg,#8FB58F,#99BD99)', t: '#1A1A1A', s: '#284927', btn: '#2F5A2D', c0: '#ACCEAC' },
+    5: { g: 'linear-gradient(95deg,#AF92BA 0%,#B2A6B6 50%,#B1ACB0 100%)', b: 'linear-gradient(95deg,#A090B4,#9FA19A)', t: '#1A1A1A', s: '#3F2C3C', btn: '#5E4470', c0: '#AF92BA' },
+    6: { g: 'linear-gradient(135deg,#A7A29B 0%,#B7A088 55%,#C8AD8F 100%)', b: 'linear-gradient(90deg,#837664,#AF977D)', t: '#1A1A1A', s: '#3B2B1C', btn: '#5A4330', c0: '#A7A29B' },
+    7: { g: 'linear-gradient(170deg,#DD8C7C 0%,#CE7C6A 55%,#9F4946 100%)', b: 'linear-gradient(90deg,#92403F,#BB4A4A)', t: '#FFFFFF', s: '#FDF1ED', btn: '#6E2422', c0: '#DD8C7C', dk: 1 },
+    8: { g: 'linear-gradient(180deg,#832823 0%,#913A37 35%,#9E4945 70%,#AF5C59 100%)', b: '#AF5C59', t: '#FFFFFF', s: '#FBE3E1', btn: '#5E1814', c0: '#832823', dk: 1 },
+    9: { g: 'linear-gradient(180deg,#B4AB47 0%,#74A569 45%,#69985E 100%)', b: 'linear-gradient(90deg,#6B9C5E,#6E975D)', t: '#FFFFFF', s: '#F4FBE8', btn: '#365F2C', c0: '#B4AB47', dk: 1 },
+    10: { g: 'linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)', b: 'linear-gradient(90deg,#2F587A,#253B66)', t: '#FFFFFF', s: '#D1FDFE', btn: '#16274A', c0: '#3B6C88', dk: 1 },
+    11: { g: 'linear-gradient(180deg,#E73924 0%,#E03121 35%,#9D2515 75%,#5C1408 100%)', b: 'linear-gradient(90deg,#5C1408,#7A1C0E)', t: '#FFFFFF', s: '#FFE3DD', btn: '#E03121', c0: '#E73924', dk: 1 },
+    12: { g: 'linear-gradient(170deg,#CA4138 0%,#C03F3C 45%,#B83A36 100%)', b: 'linear-gradient(90deg,#B83A36,#D0463C)', t: '#FFFFFF', s: '#FFE6E2', btn: '#8E0F22', c0: '#CA4138', dk: 1 }
+  };
+  // 표준 카드 한 장: o = { pal, href, photo, art, em, title, desc, icon, name, sub, btn, label }
+  function ncard(o) {
+    var P = PAL[o.pal], c = el(o.href ? 'a' : 'div', 'nc ' + (P.dk ? 'dk' : 'lt'));
+    if (o.href) { c.href = o.href; if (o.label) c.setAttribute('aria-label', o.label); }
+    ['g', 'b', 't', 's', 'btn', 'c0'].forEach(function (k) { c.style.setProperty('--' + k, P[k]); });
+    var ph = el('div', 'ph' + (o.art ? ' art' : ''));
+    if (o.photo) ph.style.backgroundImage = 'url(' + o.photo + ')';
+    if (o.art) { var sp = el('span', '', o.art); sp.setAttribute('aria-hidden', 'true'); ph.appendChild(sp); }
+    c.appendChild(ph);
+    var tx = el('div', 'tx');
+    if (o.em) tx.appendChild(el('em', '', o.em));
+    tx.appendChild(el('h3', '', o.title));
+    if (o.desc) tx.appendChild(el('p', '', o.desc));
+    c.appendChild(tx);
+    if (o.name) {
+      var bar = el('div', 'bar'), i = el('i', '', o.icon || '🍒'); i.setAttribute('aria-hidden', 'true'); bar.appendChild(i);
+      var sp2 = el('span'); sp2.appendChild(el('b', '', o.name)); if (o.sub) sp2.appendChild(el('small', '', o.sub)); bar.appendChild(sp2);
+      if (o.btn) bar.appendChild(el('u', '', o.btn));
+      c.appendChild(bar);
+    }
+    return c;
+  }
+  function nhead(title, link) {
+    var h = el('div', 'n-h'); h.appendChild(el('h2', '', title));
+    if (link) { var a = el('a', '', link.text); a.href = link.href; h.appendChild(a); }
+    return h;
+  }
   function renderHome() {
     var v = $('v-home'); v.innerHTML = '';
-    // 어디야? — 싸바의 얼굴. [싸바?] [여기야!] [놀자!] 세 버튼 → 어디야 화면의 탭 줄 없이 바로 쓰는 칸으로
-    var eh = el('div', 'eo-hero');
-    eh.innerHTML = '<span class="pin" aria-hidden="true"><svg class="pin-guy" viewBox="0 0 60 72" width="52" height="62"><path d="M30 70C30 70 6 44 6 26a24 24 0 0 1 48 0c0 18-24 44-24 44z" fill="#FFE27A" stroke="#fff" stroke-width="3"/><circle cx="30" cy="26" r="15" fill="#fff"/><g class="pg-eyes"><circle cx="24.5" cy="23.5" r="2.6" fill="#3a1d1d"/><circle cx="35.5" cy="23.5" r="2.6" fill="#3a1d1d"/></g><path d="M23.5 29.5q6.5 6 13 0" fill="none" stroke="#3a1d1d" stroke-width="2.6" stroke-linecap="round"/><circle cx="20" cy="30" r="2.6" fill="#FF8FA3" opacity=".85"/><circle cx="40" cy="30" r="2.6" fill="#FF8FA3" opacity=".85"/></svg><i class="nt n1">♪</i><i class="nt n2">♫</i></span><h2>어디야?</h2><p>잘 지내? 한마디에 답장이 와요</p>' +
-      '<div class="eo-btns three"><a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a class="play" href="../eodiya/#play"><span>놀자!</span><small>친구 부르기</small></a></div>';
-    v.appendChild(eh);
-    // 기존 싸바알림판의 크기와 디자인은 유지하고 문구와 하단 바로가기만 정리
-    var mk = el('div', 'mk');
-    mk.innerHTML = '<a class="mk-main" href="#alim" aria-label="싸바알림판 — 가게홍보 · 모임공지 · 프로필 · 초대장">' +
-      '<h2>싸바알림판</h2><p>가게홍보 · 모임공지<br>프로필 · 초대장<br><small>SNS에 알리세요!</small></p></a>' +
-      '<div class="go-row"><a class="go" href="#alim">1분에 만들기 <span class="pencil" aria-hidden="true"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M25.8 3.2a3 3 0 0 1 4.2 4.2L10.2 27.2 3 29l1.8-7.2L25.8 3.2Z" fill="#76552b"/><path d="m4.8 21.8 5.4 5.4L3 29l1.8-7.2Z" fill="#e9c99a"/><path d="m25.8 3.2 4.2 4.2-3.8 3.8L22 7l3.8-3.8Z" fill="#b78b50"/><path d="m22 7 4.2 4.2" stroke="#f5e5c7" stroke-width="1.2"/></svg></span></a><a class="go" href="../kimchi/">특판코너 가기 <span class="cart" aria-hidden="true">🛒</span></a></div>' +
-      '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
-    v.appendChild(mk);
-    // 오늘의 싸바: 뉴스 요약·날씨·인기 검색어·유튜브·건강·정부 혜택·환율·라디오TV (동그라미 탭)
-    var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '오늘의 싸바');
-    rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘의 싸바</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
-    v.appendChild(rd);
-    homeWeather(rd);
-    // 반쪽 두 칸: 왼쪽 블로그 쓰기 · 오른쪽 싸바비앙 (싸바비앙이 잘되면 홈 위쪽으로 올림)
-    var hf = el('div', 'half');
-    hf.innerHTML = '<a class="hb blog" href="../survey/" aria-label="블로그 쓰기"><i aria-hidden="true">✍️</i><b>블로그 쓰기</b><span>답만 하면 글 10가지</span></a>' +
-      '<a class="hb lux" href="../savabien/" aria-label="싸바비앙 명인 명품관"><i aria-hidden="true">👑</i><b>싸바비앙</b><span>명인 명품관</span></a>';
-    v.appendChild(hf);
-    v.appendChild(todayGame());
-    v.appendChild(secHead('지금 보내기 좋은 카드'));
+    var now = new Date();
+    var hi = el('div', 'n-hello');
+    hi.innerHTML = '<small></small><b>오늘도 <span>싸바?</span></b>';
+    hi.querySelector('small').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
+    v.appendChild(hi);
+
+    // 1. 싸바비앙 — 맨 위 (1번 레몬 안개 + 금 왕관)
+    var lux = ncard({ pal: 1, href: '../savabien/', label: '싸바비앙 명인 명품관', photo: '../img/dome-l.jpg', em: '명인 명품관', title: '싸바비앙', desc: '전국 장인·명인의 좋은 물건을 한곳에', icon: '👑', name: '싸바비앙', sub: 'SAVABIEN', btn: '구경하기' });
+    var cr = el('span', 'crown', '👑'); cr.setAttribute('aria-hidden', 'true'); lux.querySelector('.tx').appendChild(cr);
+    v.appendChild(lux);
+
+    // 2. 어디야? — 12번 크리에이터 레드, 단추 셋 (이 카드만 예외)
+    var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry3.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
+    var b3 = el('div', 'eo3');
+    b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
+    eo.appendChild(b3);
+    v.appendChild(eo);
+
+    // 3. 싸바알림 — 4번 빛 민트, 단추 하나
+    v.appendChild(ncard({ pal: 4, href: '#alim', label: '싸바알림 — 카드 만들기와 블로그 쓰기', photo: '../img/ex/party-cheers.jpg', em: '가게홍보 · 모임공지 · 프로필 · 초대장', title: '싸바알림', desc: 'SNS에 올릴 카드와 블로그 글을 1분 만에', icon: '✏️', name: '싸바알림', sub: '카드 만들기 · 블로그 쓰기', btn: '1분에 만들기' }));
+
+    // 4. 특판 코너 — 11번 세일 레드 (알림판에서 분리)
+    v.appendChild(ncard({ pal: 11, href: '../kimchi/', label: '특판 코너 — 언니김치', photo: '../img/gatkimchi-share.jpg', em: '이번 주 특판', title: '언니김치 특판', desc: '특판 코너에서 가격을 확인하세요', icon: '🛒', name: '특판 코너', sub: '싸바 특가', btn: '특판 보기' }));
+
+    // 5. 지금 보내기 좋은 카드
+    v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
     v.appendChild(campaigns());
-    v.appendChild(el('div', 'divider'));
-    // 싸바 이야기 — 만나는 사람에게 "이거 봐!" 하고 보여 주는 칸 (맨 아래)
-    var st = el('div', 'story'); st.style.marginTop = '12px';
-    st.innerHTML = '<div class="st-top"><img src="../img/cherry-dance.svg" alt=""><div><b>싸바 이야기</b><span>싸바가 뭐냐고 물으면 이걸 보여 주세요</span></div></div>' +
-      '<div class="st-btns"><a href="../?story=1">🍒 싸바가 뭐지?</a><button type="button">💬 카톡으로 보내기</button></div>';
-    st.querySelector('button').addEventListener('click', function () {
+
+    // 6. 오늘의 싸바 — 2번 하늘 풀밭, 기온 크게
+    var td = ncard({ pal: 2, href: '../today/', label: '오늘의 싸바', photo: '../img/today-tower.jpg', em: '매일 아침 한눈에', title: '오늘의 싸바', desc: '뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오', icon: '☀️', name: '오늘의 싸바', sub: '광주', btn: '보기' });
+    v.appendChild(td);
+    homeWeather(td);
+
+    // 7. 오늘의 놀이터 — 7·9·10번이 날마다 돌아가며
+    v.appendChild(todayGame());
+
+    // 8. 싸바 이야기 — 5번 라벤더 안개
+    var st = ncard({ pal: 5, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
+    var stb = st.querySelector('.bar');
+    var see = el('a', 'pill', '보기'); see.href = '../?story=1';
+    var kk = el('button', 'pill lite', '카톡'); kk.type = 'button'; kk.setAttribute('aria-label', '싸바 이야기를 카톡으로 보내기');
+    kk.addEventListener('click', function () {
       if (!window.SsakaShare) { location.href = '../?story=1'; return; }
       SsakaShare({ url: 'https://sava.kr/', title: '싸바 — 괜찮아? 한마디로 이어지는 사람들', description: '싸바? 어디야? 싸바! 여기야! 앱 없이 카톡 하나로.', imageUrl: 'https://sava.kr/img/eodiya-play.png?v=3', imageWidth: 800, imageHeight: 800, buttonTitle: '싸바 이야기 보기', installTitle: '싸바 설치하기' });
     });
+    stb.appendChild(see); stb.appendChild(kk);
     v.appendChild(st);
-    // 내가 만든 카드 (싸바 이야기 아래로) — 3장만, 나머지는 "더 보기"
+
+    // 내가 만든 카드 — 3장만
     var mine = S.mine();
     if (mine.length) {
-      v.appendChild(secHead('내가 만든 카드 ' + mine.length, { text: '+ 새로 만들기', href: '#alim' }));
+      v.appendChild(nhead('내가 만든 카드 ' + mine.length, { text: '+ 새로 만들기', href: '#alim' }));
       mine.slice(0, 3).forEach(function (m) { v.appendChild(cardRow(m, { share: true })); });
       if (mine.length > 3) {
         var mb = el('button', 'al-more', '더 보기 (' + (mine.length - 3) + ')'); mb.type = 'button';
@@ -661,15 +784,10 @@
   ];
   function todayGame() {
     var now = new Date(), day = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
-    var g = GAMES[day % GAMES.length];
-    var a = el('a', 'tdy'); a.href = g[0]; a.setAttribute('aria-label', '오늘의 놀이터 — ' + g[2]);
-    a.style.setProperty('--g1', 'linear-gradient(160deg,' + g[5] + ' 0%,' + g[6] + ' 100%)'); a.style.setProperty('--g2', g[6]);
-    a.innerHTML = '<div class="art"><span class="big" aria-hidden="true"></span><em></em><h3></h3><p></p></div>' +
-      '<div class="bar"><i aria-hidden="true"></i><span><b></b><small>싸바 놀이터 · 무료</small></span><u></u></div>';
-    a.querySelector('.big').textContent = g[1]; a.querySelector('em').textContent = g[7];
-    a.querySelector('h3').textContent = g[2]; a.querySelector('p').textContent = g[3];
-    a.querySelector('.bar i').textContent = g[1]; a.querySelector('.bar b').textContent = g[2]; a.querySelector('.bar u').textContent = g[4];
-    var w = el('div'); w.appendChild(secHead('오늘의 놀이터', { text: '전체 게임', href: '../eodiya/#playground' })); w.appendChild(a);
+    var g = GAMES[day % GAMES.length], pal = [7, 9, 10][day % 3];
+    var w = el('div');
+    w.appendChild(nhead('오늘의 놀이터', { text: '전체 게임 ›', href: '../eodiya/#playground' }));
+    w.appendChild(ncard({ pal: pal, href: g[0], label: '오늘의 놀이터 — ' + g[2], art: g[1], em: g[7], title: g[2], desc: g[3], icon: g[1], name: g[2], sub: '싸바 놀이터 · 무료', btn: g[4] }));
     return w;
   }
 
@@ -680,10 +798,12 @@
     function ic(n) { return n === 0 ? '☀️' : n <= 2 ? '🌤️' : n === 3 ? '☁️' : n <= 48 ? '🌫️' : n <= 67 ? '🌧️' : n <= 77 ? '❄️' : n <= 82 ? '🌦️' : n <= 86 ? '🌨️' : '⛈️'; }
     var key = 'sava-home-wx', cache = null; try { cache = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
     function show(t, code) {
-      var em = box.querySelector('em'); if (em) em.remove();
-      var tw = el('span', 'tw'); tw.innerHTML = '<b></b><small></small>';
-      tw.querySelector('b').textContent = ic(code) + ' ' + Math.round(t) + '°'; tw.querySelector('small').textContent = c[0] + ' · 보기 ›';
-      box.appendChild(tw); box.querySelector('i').textContent = ic(code);
+      var tx = box.querySelector('.tx'); if (!tx) return;
+      var wx = el('span', 'wx'); wx.innerHTML = '<span></span><small></small>';
+      wx.firstChild.textContent = ic(code) + ' ' + Math.round(t) + '°'; wx.querySelector('small').textContent = c[0];
+      tx.appendChild(wx);
+      var bi = box.querySelector('.bar i'); if (bi) bi.textContent = ic(code);
+      var bs = box.querySelector('.bar small'); if (bs) bs.textContent = c[0] + ' ' + Math.round(t) + '°';
     }
     if (cache && cache.city === c[0] && Date.now() - cache.at < 30 * 60e3) return show(cache.t, cache.code);
     if (!window.fetch) return;
@@ -830,10 +950,10 @@
     if (!n && dot) dot.remove();
   }
   function show(name) {
-    document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + name; });
-    document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name) ? 'true' : 'false'); });
+    document.querySelectorAll('.view').forEach(function (x) { x.hidden = x.id !== 'v-' + (name === 'blog' ? 'alim' : name); });
+    document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
-    ({ home: renderHome, alim: renderAlim, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
+    ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
     try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) {}
     window.scrollTo(0, 0);
   }

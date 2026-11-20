@@ -255,7 +255,7 @@
 
   // ---------- 체리 비 ----------
   var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = 0;
-  var cherry = new Image(); cherry.src = '../img/cherry.svg';
+  var cherry = new Image(); cherry.src = '../img/cherry.webp';
   function fit() { var r = window.devicePixelRatio || 1; cv.width = innerWidth * r; cv.height = innerHeight * r; cx.setTransform(r, 0, 0, r, 0, 0); }
   fit(); addEventListener('resize', fit);
   function rain(n, gold) {

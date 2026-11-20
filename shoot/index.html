@@ -387,7 +387,7 @@
   function boo() { tone(330, 0, .25, 'sawtooth', .1); tone(262, .25, .5, 'sawtooth', .1); }
 
   // ---------- 체리 비 ----------
-  var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = 0, cherry = new Image(); cherry.src = '../img/cherry.svg';
+  var cv = $('fx'), cx = cv.getContext('2d'), parts = [], raf = 0, cherry = new Image(); cherry.src = '../img/cherry.webp';
   function fit() { var r = devicePixelRatio || 1; cv.width = innerWidth * r; cv.height = innerHeight * r; cx.setTransform(r, 0, 0, r, 0, 0); } fit(); addEventListener('resize', fit);
   function rain(n) { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; for (var i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -40 - Math.random() * innerHeight * .6, vy: 2 + Math.random() * 3, vx: (Math.random() - .5) * 2, r: Math.random() * 6, vr: (Math.random() - .5) * .2, s: 22 + Math.random() * 18 }); if (!raf) loop(); }
   function loop() { cx.clearRect(0, 0, innerWidth, innerHeight); parts = parts.filter(function (p) { return p.y < innerHeight + 50; }); parts.forEach(function (p) { p.y += p.vy; p.x += p.vx; p.vy += .05; p.r += p.vr; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); if (cherry.complete) cx.drawImage(cherry, -p.s / 2, -p.s / 2, p.s, p.s); cx.restore(); }); raf = parts.length ? requestAnimationFrame(loop) : 0; }
@@ -455,7 +455,7 @@
       svg += '<text x="' + (62 * Math.cos(m)).toFixed(2) + '" y="' + (62 * Math.sin(m)).toFixed(2) + '" fill="#fff" font-size="' + (n > 8 ? 9 : 11) + '" font-weight="900" text-anchor="middle" dominant-baseline="middle" transform="rotate(' + (rot > 90 && rot < 270 ? rot + 180 : rot) + ' ' + (62 * Math.cos(m)).toFixed(2) + ' ' + (62 * Math.sin(m)).toFixed(2) + ')">' + esc(o.n[i]) + '</text>';
     }
     svg += '<circle r="97" fill="none" stroke="#1A1A1A" stroke-width="3"/></g></svg>';
-    $('stage').innerHTML = '<div class="wheelbox"><div class="ptr"></div>' + svg + '<div class="hub"><img src="../img/cherry.svg" alt=""></div></div>' +
+    $('stage').innerHTML = '<div class="wheelbox"><div class="ptr"></div>' + svg + '<div class="hub"><img src="../img/cherry.webp" alt=""></div></div>' +
       '<button type="button" class="big" id="spin" style="width:100%;margin-top:10px">🎡 돌려!</button><p class="tip" id="wtip">' + (o.p > 1 ? '쏠 사람 ' + o.p + '명, ' + o.p + '번 돌려요' : '버튼을 누르면 돌아가요') + '</p>';
     var g = document.getElementById('wheel'), angle = 0, k = 0, got = [];
     var btn = document.getElementById('spin');

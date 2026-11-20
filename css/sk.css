@@ -592,8 +592,8 @@
 .sk-mofall { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .sk-mofall i { position: absolute; top: -24px; width: 12px; height: 10px; border-radius: 80% 0 80% 0; background: #ffb7c9; opacity: .9; animation: sk-petal 7s linear infinite; }
 .sk-mofall i:nth-child(3n) { background: #ffd1dc; width: 9px; height: 8px; }
-.sk-mo-cherry .sk-mofall i { width: 20px; height: 20px; border-radius: 0; background: url(../img/cherry.svg) center / contain no-repeat; }
-.sk-mo-cherry .sk-mofall i:nth-child(3n) { width: 14px; height: 14px; background: url(../img/cherry.svg) center / contain no-repeat; }
+.sk-mo-cherry .sk-mofall i { width: 20px; height: 20px; border-radius: 0; background: url(../img/cherry.webp) center / contain no-repeat; }
+.sk-mo-cherry .sk-mofall i:nth-child(3n) { width: 14px; height: 14px; background: url(../img/cherry.webp) center / contain no-repeat; }
 @keyframes sk-petal { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(30px, 52vh) rotate(180deg); } 100% { transform: translate(-10px, 105vh) rotate(360deg); } }
 /* 고르기 칸의 작은 그림에서는 멈춘 모습 */
 .sk-thumb.sk-mo * { animation: none !important; }

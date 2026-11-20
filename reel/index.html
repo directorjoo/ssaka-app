@@ -271,8 +271,8 @@
     cx.shadowColor = 'transparent'; cx.shadowBlur = 0; cx.shadowOffsetY = 0;
   }
   function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r); cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath(); }
-  var cherry = new Image(); cherry.src = '/img/cherry-white.svg';
-  var cherryC = new Image(); cherryC.src = '/img/cherry.svg';
+  var cherry = new Image(); cherry.src = '/img/cherry.webp';
+  var cherryC = new Image(); cherryC.src = '/img/cherry.webp';
 
   function introText(lt, dur) {
     var C = col(), a = ease((lt - 0.25) / 0.6), title = $('title').value || '싸바', sub = $('subtitle').value;

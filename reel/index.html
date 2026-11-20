@@ -82,12 +82,17 @@
 
   <div class="box ai-box" id="aiBox">
     <b style="font-size:17px">🤖 AI로 사진 움직이기 <small style="font-weight:700;color:#6a4a00">(클링)</small></b>
-    <p class="note" style="margin-top:4px">사진 한 장을 진짜 움직이는 5초 장면으로 만들어 영상 맨 앞에 넣어요. 김이 모락모락, 지글지글처럼요. 1~3분 걸려요.</p>
+    <p class="note" style="margin-top:4px">사진 한 장을 진짜 움직이는 5초 장면으로 만들어 영상 맨 앞에 넣어요. 김이 모락모락 같은 움직임도, 가게를 무대로 한 짧은 이야기도 돼요. 1~3분 걸려요.</p>
     <div id="aiOn">
       <label class="f">어떤 사진을? <small>위 사진 중 번호</small></label>
       <select id="aiPick"></select>
       <label class="f">어떻게 움직일까요?</label>
       <div class="chips" id="aiMotion"></div>
+      <label class="f">📖 이야기 장면 <small>(사진 속 가게를 무대로 AI 배우가 나와요 · 맛 후기·추천 말은 넣지 않아요)</small></label>
+      <div class="chips" id="aiStory"></div>
+      <label class="f">이야기 직접 쓰기 <small>(선택 · 예: 첫눈 오는 날 동창들이 다시 모이는 장면)</small></label>
+      <input type="text" id="aiNote" maxlength="80" placeholder="비워 두면 고른 장면대로 만들어요">
+      <p class="note" id="aiLaw" hidden>📢 AI 배우가 나오는 영상은 법(공정위 지침)에 따라 화면에 "AI 생성 가상인물 포함"이 자동으로 붙어요.</p>
       <div class="row" style="justify-content:flex-start"><button type="button" class="btn" id="aiGo">🤖 AI로 움직이기</button><button type="button" class="btn ghost" id="aiDel" hidden>AI 장면 빼기</button></div>
     </div>
     <div class="st" id="aiSt">확인하는 중…</div>
@@ -133,7 +138,9 @@
   ];
   var TEMPO = [{ id: 'calm', n: '🐢 잔잔하게', t: 3.4 }, { id: 'mid', n: '🙂 보통', t: 2.7 }, { id: 'fast', n: '⚡ 경쾌하게', t: 2.0 }];
   var MUSIC = [{ id: 'bright', n: '☀️ 밝게' }, { id: 'calm', n: '🌙 잔잔하게' }, { id: 'up', n: '🎉 신나게' }, { id: 'off', n: '🔇 음악 없음' }];
-  var MOTIONS = [['steam', '♨️ 김 모락모락'], ['sizzle', '🔥 지글지글'], ['pour', '✨ 윤기 반짝'], ['push', '🎥 천천히 다가가기'], ['orbit', '🔄 빙 둘러보기'], ['life', '🌿 가게가 살아나게']];
+  var MOTIONS = [['steam', '♨️ 김 모락모락'], ['sizzle', '🔥 지글지글'], ['pour', '✨ 윤기 반짝'], ['push', '🎥 천천히 다가가기'], ['orbit', '🔄 빙 둘러보기'], ['life', '🌿 가게가 살아나게'], ['people', '👥 사진 속 사람들 움직이기']];
+  var STORIES = [['rain', '☔ 비 오는 날 퇴근길 손님'], ['family', '👨‍👩‍👧 3대 가족 외식'], ['friends', '🥂 오랜 친구들 건배'], ['chef', '👨‍🍳 정성껏 내는 손'], ['date', '💑 연인의 저녁'], ['open', '🌅 아침에 문 여는 대표님']];
+  function isStory(m) { return STORIES.some(function (x) { return x[0] === m; }); }
 
   var S = { color: 'red', tempo: 'mid', music: 'bright', motion: 'steam' };
   var photos = []; // { src, img(그릴 것), thumb }
@@ -168,10 +175,12 @@
     });
   }
   chips($('colors'), COLORS, 'color', true); chips($('tempo'), TEMPO, 'tempo'); chips($('music'), MUSIC, 'music');
-  MOTIONS.forEach(function (m) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (S.motion === m[0] ? ' on' : ''); b.textContent = m[1];
-    b.addEventListener('click', function () { S.motion = m[0]; [].forEach.call($('aiMotion').children, function (x) { x.classList.remove('on'); }); b.classList.add('on'); });
-    $('aiMotion').appendChild(b);
+  [['aiMotion', MOTIONS], ['aiStory', STORIES]].forEach(function (g) {
+    g[1].forEach(function (m) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (S.motion === m[0] ? ' on' : ''); b.textContent = m[1];
+      b.addEventListener('click', function () { S.motion = m[0]; document.querySelectorAll('#aiMotion .chip, #aiStory .chip').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); $('aiLaw').hidden = !isStory(m[0]); });
+      $(g[0]).appendChild(b);
+    });
   });
   function col() { return COLORS.filter(function (c) { return c.id === S.color; })[0] || COLORS[0]; }
 
@@ -288,6 +297,11 @@
     ls.forEach(function (l, i) { txt(l, x + 45, y + 100 + i * 96, 78, C.dark ? '#1A1A1A' : '#fff', 'left'); });
     cx.restore();
   }
+  function aiLabel(t) { // 공정위 지침: 가상인물은 소비자가 알아보기 쉽게 표시
+    cx.font = '800 40px ' + FONT; var w = cx.measureText(t).width + 48;
+    cx.fillStyle = 'rgba(0,0,0,.62)'; rr(W - w - 40, 60, w, 72, 20); cx.fill();
+    txt(t, W - w / 2 - 40, 110, 40, '#fff');
+  }
   function endScene(lt) {
     var C = col(), fg = C.dark ? '#1A1A1A' : '#fff';
     cx.fillStyle = C.c; cx.fillRect(0, 0, W, H);
@@ -307,6 +321,7 @@
       txt('📞 ' + ph, W / 2, y + 6, 76, C.dark ? '#FFD400' : '#1A1A1A', 'center', 'transparent'); y += 170;
     }
     if (ad) { cx.font = '800 50px ' + FONT; wrap(ad, W - 160).slice(0, 2).forEach(function (l, i) { txt(l, W / 2, y + i * 66, 50, fg); }); }
+    if (clip && clip.story) txt('이 영상에는 AI 생성 가상인물이 포함돼 있어요', W / 2, H - 230, 34, fg);
     txt('싸바로 만들었어요 · sava.kr', W / 2, H - 170, 38, fg);
     cx.restore();
   }
@@ -316,6 +331,7 @@
       cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H);
       if (clip && clip.v && clip.v.readyState >= 2) cover(clip.v, 1, 0, 0);
       if (s.intro) introText(lt, s.dur);
+      aiLabel(clip && clip.story ? 'AI 생성 가상인물 포함' : 'AI로 움직인 장면');
     } else if (s.type === 'photo') {
       var ph = photos[s.idx]; cx.fillStyle = '#111'; cx.fillRect(0, 0, W, H);
       if (ph) {
@@ -441,9 +457,9 @@
   // ---------- 🤖 클링으로 사진 움직이기 ----------
   var AI = { can: false };
   function aiSt(s) { $('aiSt').textContent = s; }
-  function clipFrom(url, from) {
+  function clipFrom(url, from, story) {
     var v = document.createElement('video'); v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.loop = false; v.src = url;
-    v.addEventListener('loadeddata', function () { clip = { url: url, v: v, from: from }; paintPics(); plan(); drawStill(); $('aiDel').hidden = false; aiSt('✅ AI 장면이 영상 맨 앞에 들어갔어요 (▶ 미리보기로 확인)'); }, { once: true });
+    v.addEventListener('loadeddata', function () { clip = { url: url, v: v, from: from, story: !!story }; paintPics(); plan(); drawStill(); $('aiDel').hidden = false; aiSt('✅ AI 장면이 영상 맨 앞에 들어갔어요 (▶ 미리보기로 확인)'); }, { once: true });
     v.load();
   }
   function prep(i) { // 9:16로 잘라 720×1280 JPG → 클링에 보냄 (영상도 9:16로 나옴)
@@ -451,24 +467,24 @@
     var g = c.getContext('2d'), k = Math.max(720 / src.width, 1280 / src.height), dw = src.width * k, dh = src.height * k;
     g.drawImage(src, (720 - dw) / 2, (1280 - dh) / 2, dw, dh); return c.toDataURL('image/jpeg', 0.88);
   }
-  function poll(id, from, n) {
+  function poll(id, from, n, story) {
     fetch('/api/reel/kling?id=' + encodeURIComponent(id), { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (o) {
-      if (o.status === 'done') { keep('sava-reel-ai', { url: o.url, from: from }); localStorage.removeItem('sava-reel-job'); clipFrom(o.url, from); $('aiGo').disabled = false; return; }
+      if (o.status === 'done') { keep('sava-reel-ai', { url: o.url, from: from, story: story }); localStorage.removeItem('sava-reel-job'); clipFrom(o.url, from, story); $('aiGo').disabled = false; return; }
       if (o.status === 'fail' || o.error) { localStorage.removeItem('sava-reel-job'); aiSt('😢 AI가 이 사진을 못 움직였어요' + (o.why ? ' (' + o.why + ')' : '') + '. 다른 사진으로 해 보세요'); $('aiGo').disabled = false; return; }
       aiSt('⏳ AI가 움직이는 중… ' + Math.floor(n * 6 / 60) + '분 ' + (n * 6 % 60) + '초 (다른 칸을 고쳐도 돼요)');
       if (n > 80) { aiSt('조금 오래 걸려요. 나중에 이 화면을 다시 열면 이어서 받아요'); $('aiGo').disabled = false; return; }
-      setTimeout(function () { poll(id, from, n + 1); }, 6000);
-    }).catch(function () { setTimeout(function () { poll(id, from, n + 1); }, 8000); });
+      setTimeout(function () { poll(id, from, n + 1, story); }, 6000);
+    }).catch(function () { setTimeout(function () { poll(id, from, n + 1, story); }, 8000); });
   }
   $('aiGo').addEventListener('click', function () {
     var i = +$('aiPick').value || 0; if (!photos[i]) { alert('먼저 사진을 넣어 주세요'); return; }
     if (!confirm((i + 1) + '번 사진을 AI로 움직일까요?\n(1~3분 걸려요' + (AI.left != null ? ' · 오늘 ' + AI.left + '번 남음' : '') + ')')) return;
     this.disabled = true; aiSt('📤 사진을 AI에 보내는 중…');
-    fetch('/api/reel/kling', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image: prep(i), motion: S.motion }) })
+    fetch('/api/reel/kling', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image: prep(i), motion: S.motion, note: $('aiNote').value.trim() }) })
       .then(function (r) { return r.json(); }).then(function (o) {
         if (!o.id) { aiSt('😢 ' + (o.error || '보내지 못했어요')); $('aiGo').disabled = false; return; }
         if (AI.left) AI.left--;
-        keep('sava-reel-job', { id: o.id, from: i }); poll(o.id, i, 0);
+        var st = isStory(S.motion); keep('sava-reel-job', { id: o.id, from: i, story: st }); poll(o.id, i, 0, st);
       }).catch(function () { aiSt('😢 인터넷 연결을 확인해 주세요'); $('aiGo').disabled = false; });
   });
   $('aiDel').addEventListener('click', function () { clip = null; localStorage.removeItem('sava-reel-ai'); this.hidden = true; paintPics(); plan(); drawStill(); aiSt('AI 장면을 뺐어요'); });
@@ -477,13 +493,13 @@
     if (!o.ready) { $('aiOn').hidden = true; aiSt('🛠 준비 중이에요. 곧 열려요!'); return; }
     if (!o.can) { $('aiOn').hidden = true; aiSt(o.open ? '카카오 로그인하면 쓸 수 있어요' : '🧪 지금은 시험 중이라 싸바 대표만 써요. 곧 열려요!'); return; }
     aiSt('오늘 ' + o.left + '번 쓸 수 있어요');
-    var job = load('sava-reel-job'); if (job && job.id) { $('aiGo').disabled = true; poll(job.id, job.from, 0); }
+    var job = load('sava-reel-job'); if (job && job.id) { $('aiGo').disabled = true; poll(job.id, job.from, 0, job.story); }
   }).catch(function () { $('aiOn').hidden = true; aiSt('🛠 준비 중이에요'); });
 
   // ---------- 시작 ----------
   plan(); drawStill();
   addSrcs(saved.images || []).then(function () {
-    var ai = load('sava-reel-ai'); if (ai && ai.url && ai.from < photos.length && !EXAMPLE) clipFrom(ai.url, ai.from);
+    var ai = load('sava-reel-ai'); if (ai && ai.url && ai.from < photos.length && !EXAMPLE) clipFrom(ai.url, ai.from, ai.story);
   });
   cherry.onload = cherryC.onload = drawStill;
   document.addEventListener('visibilitychange', function () { if (document.hidden && recorder && recorder.state === 'recording') { $('badge').textContent = '⚠️ 화면이 꺼져서 영상이 끊겼을 수 있어요. 다시 만들어 주세요'; } });

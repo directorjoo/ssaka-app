@@ -23,7 +23,18 @@ const MOTION = {
   orbit:  'Slow smooth camera orbit around the subject with natural parallax and soft light changes. Keep the subject exactly as in the photo.',
   push:   'Slow cinematic camera push-in toward the center of the photo, natural depth and subtle light movement.',
   life:   'The scene comes alive naturally: soft light flicker, gentle movement in the background, calm and warm mood, slow camera drift.',
+  people: 'The people already in the photo move naturally: they smile, talk quietly to each other and enjoy the moment. Natural body motion, stable faces, slow camera drift. Do not add new people.',
 };
+// 📖 이야기 장면 — 사진 속 가게를 무대로 AI 배우가 나오는 짧은 이야기 (맛 후기·추천 말 없이 분위기만)
+const STORY = {
+  rain:    'Cinematic short story in this exact place: on a rainy evening a tired office worker steps in, folds an umbrella, sees the warm food and relaxes with a gentle smile. Warm light, slow camera.',
+  family:  'Cinematic short story in this exact place: a family of three generations sits together, the grandmother serves food to the grandchild, everyone laughs warmly. Slow camera.',
+  friends: 'Cinematic short story in this exact place: old friends reunite, hug and raise their glasses together in a toast, cheerful and nostalgic mood. Slow camera.',
+  chef:    'Cinematic short story in this exact place: the hands of a chef carefully plate the food and gently set the dish on the table, steam rising. Close, slow camera.',
+  date:    'Cinematic short story in this exact place: a couple sits by the table, shares food and laughs softly, a warm and romantic evening. Slow camera.',
+  open:    'Cinematic short story in this exact place: early morning, the owner opens the shop, turns on the lights and prepares for the day with care. Slow camera.',
+};
+const STORY_NEG = 'Nobody speaks to the camera, nobody gives a review or recommendation, no thumbs up. No text, no letters, no subtitles, no logos, no watermark. Keep the place exactly as in the photo, natural faces and hands.';
 const NEG = 'No text, no letters, no subtitles, no logos, no watermark, no new objects, no extra people, no distortion of faces or food.';
 
 function json(o, status) { return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } }); }
@@ -129,7 +140,9 @@ export async function onRequest({ request, env }) {
     if (!img || img.length > MAX_B64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(img)) return json({ error: 'JPG·PNG 사진만 돼요' }, 400);
   }
   const note = String(body.note || '').replace(/[\u0000-\u001f]/g, ' ').slice(0, 200);
-  const prompt = (MOTION[body.motion] || MOTION.push) + (note ? ' Mood: ' + note + '.' : '') + ' ' + NEG;
+  const story = STORY[body.motion];
+  const prompt = story ? story + (note ? ' Story: ' + note + '.' : '') + ' ' + STORY_NEG
+    : (MOTION[body.motion] || MOTION.push) + (note ? ' Mood: ' + note + '.' : '') + ' ' + NEG;
 
   let id = '';
   try {

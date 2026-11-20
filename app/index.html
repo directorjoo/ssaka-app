@@ -117,7 +117,7 @@
     @media (max-width: 380px) { .eo-hero { padding: 11px 12px 9px; } .eo-hero p { font-size: 16.5px; padding-right: 50px; } .eo-hero .eo-btns { gap: 8px; } .eo-hero .eo-btns a { font-size: 20px; letter-spacing: -0.04em; } .eo-hero .eo-btns a small { font-size: 15px; letter-spacing: -0.03em; } .eo-hero .eo-btns a.play img { width: 22px; height: 22px; vertical-align: -5px !important; } }
     .si-pad { padding: 0 18px; }
     .home-install-bottom{margin:18px 18px 28px;padding:14px;border:1px solid #f0d9dd;border-radius:20px;background:#fff8f9}.home-install-bottom .big{width:100%;min-height:54px;font-size:17px;font-weight:900;font-family:inherit;border:0;border-radius:16px;background:#B3132B;color:#fff;cursor:pointer;box-shadow:0 10px 22px -12px rgba(179,19,43,.9)}.home-install-bottom .big:active{transform:scale(.98)}
-    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 20px; padding: 12px 16px 10px; border-radius: 26px; background: linear-gradient(135deg, #2F7A62 0%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
+    .mk { position: relative; overflow: hidden; display: block; margin: 0 18px 20px; padding: 12px 16px 10px; border-radius: 26px; background: radial-gradient(ellipse at 18% 0%, rgba(150,210,175,.35) 0%, rgba(150,210,175,0) 55%), linear-gradient(165deg, #4E977A 0%, #3A8669 28%, #2A7059 55%, #1D5D4A 80%, #155040 100%); color: #fff; text-decoration: none; box-shadow: 0 18px 36px -20px rgba(16,64,50,.85); -webkit-tap-highlight-color: transparent; }
     .mk:active { transform: scale(.985); }
     /* 백화점식 추천 카드 (사진 칸 + [이름] 설명) */
     .camp2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; padding: 4px 18px 14px; }
@@ -203,7 +203,7 @@
     .mk .kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
     .mk .kinds a { display: grid; place-items: center; min-height: 46px; border-radius: 14px; background: rgba(255,255,255,.16); color: #fff; text-decoration: none; font-size: 14px; font-weight: 800; line-height: 1.15; text-align: center; }
     .mk .go-row { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .mk .go { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 40px; padding: 4px 3px; border-radius: 15px; background: #EBD9B0; color: #123F33; font-size: 18px; line-height: 1.1; font-weight: 900; text-decoration: none; letter-spacing: -0.04em; text-align: center; white-space: nowrap; }
+    .mk .go { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 40px; padding: 4px 3px; border-radius: 15px; background: linear-gradient(180deg, #F5E7C6 0%, #EBD9B0 55%, #DFC897 100%); color: #123F33; font-size: 18px; line-height: 1.1; font-weight: 900; text-decoration: none; letter-spacing: -0.04em; text-align: center; white-space: nowrap; }
     .mk .go .pencil { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 25px; flex: none; animation: pencilRun .8s ease-in-out infinite; } .mk .go .pencil svg { display: block; width: 25px; height: 25px; }
     .mk .go .cart { display: inline-block; font-size: 20px; filter: brightness(.48) saturate(1.55) contrast(1.2); transform-origin: 50% 80%; animation: cartRun .65s ease-in-out infinite; }
     @keyframes pencilRun { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
@@ -765,8 +765,8 @@
     // 7. 오늘의 놀이터 — 7·9·10번이 날마다 돌아가며
     v.appendChild(todayGame());
 
-    // 8. 싸바 이야기 — 5번 라벤더 안개
-    var st = ncard({ pal: 5, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
+    // 8. 싸바 이야기 — 8번 와인 장미(체리 장미) 원래 그라데이션 (11-21 대표님)
+    var st = ncard({ pal: 8, art: '🍒', em: '싸바가 뭐냐고 물으면', title: '싸바 이야기', desc: '이 카드 한 장을 보여 주세요', icon: '🍒', name: '싸바 이야기', sub: '괜찮아? 나 여기 있어' });
     var stb = st.querySelector('.bar');
     var see = el('a', 'pill', '보기'); see.href = '../?story=1';
     var kk = el('button', 'pill lite', '카톡'); kk.type = 'button'; kk.setAttribute('aria-label', '싸바 이야기를 카톡으로 보내기');

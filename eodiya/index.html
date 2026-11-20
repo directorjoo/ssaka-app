@@ -468,9 +468,10 @@
     #missFrame .miss-poem .more { margin-top: 6px; padding: 5px 12px; font-size: 15px; }
     #missFrame .miss-q { margin-top: 8px; font-size: clamp(20px, 5.6vw, 24px); }
     #missFrame .homeview { flex: 1; height: auto; min-height: 0; align-self: stretch; }
-    label.l.lbig { margin: 4px 0 10px; font-size: 21px; font-weight: 900; color: #2b2420; letter-spacing: -0.03em; }
+    label.l.lbig { margin: 18px 0 10px; font-size: 23px; font-weight: 900; color: #2b2420; letter-spacing: -0.03em; }
     label.l.lbig .ghint, .ghint { display: block; margin-top: 4px; font-size: 16px; font-weight: 700; color: #7A5A3A; letter-spacing: -0.02em; line-height: 1.4; }
     .gstep { margin: 18px 0 10px; font-size: 23px; font-weight: 900; color: #2b2420; letter-spacing: -0.03em; line-height: 1.3; }
+    .gstep.first { margin-top: 2px; }
     .gstep small { display: block; margin-top: 2px; font-size: 17px; font-weight: 700; color: #7A5A3A; }
     #askBox .note { font-size: 16px; line-height: 1.45; color: #6b5a4a; }
     .chip.wchip { background: linear-gradient(135deg, #1A4FB0, #2F7A62); color: #fff; border-color: transparent; font-weight: 900; }
@@ -506,11 +507,11 @@
     </div>
 
     <div class="box" id="askBox">
+      <div class="gstep first" id="gWho">🙋 누구에게 보내요?</div>
+      <div class="gsubs" id="gSubs"></div>
       <label class="l lbig" for="gText">✍️ 첫마디를 보내 볼까요?<span class="ghint">직접 써도 되고, 👇 아래 말을 누르면 글칸에 쏙 들어가요</span></label>
       <div class="rta"><textarea id="gText" maxlength="100" rows="3" placeholder="여기에 첫마디를 쓰세요&#10;(예: 토요일에 시간 돼?)">싸바?</textarea><button type="button" id="gClear">지우기</button></div>
       <div class="gtabs" id="gTabs"></div>
-      <div class="gstep" id="gWho">🙋 누구에게 보내요?</div>
-      <div class="gsubs" id="gSubs"></div>
       <div class="gstep">👇 보내고 싶은 말을 톡! <small>여러 개 눌러도 돼요</small></div>
       <div class="chips" id="gChips"></div>
       <div class="note" style="margin-top:8px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
@@ -1365,8 +1366,8 @@
   function paintGreet() {
     var tb = $('gTabs'); tb.innerHTML = '';
     GREET.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; paintGreet(); }); tb.appendChild(b); });
-    var sb = $('gSubs'); sb.innerHTML = ''; var G = GREET[gTab]; sb.hidden = !G.subs; $('gWho').hidden = !G.subs;
-    if (G.subs) G.subs.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(x[0]).indexOf(' '); b.innerHTML = '<i>' + String(x[0]).slice(0, sp) + '</i><b>' + String(x[0]).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { gSub = i; paintGreet(); }); sb.appendChild(b); });
+    var sb = $('gSubs'); sb.innerHTML = ''; var G = GREET[gTab], W = GREET[0]; // 누구에게는 늘 맨 위에 (11-21)
+    W.subs.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(x[0]).indexOf(' '); b.innerHTML = '<i>' + String(x[0]).slice(0, sp) + '</i><b>' + String(x[0]).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { gSub = i; gTab = 0; paintGreet(); }); sb.appendChild(b); });
     var cb = $('gChips'); cb.innerHTML = '';
     var list = (G.subs ? G.subs[gSub][1] : G.items).slice();
     if (G.subs) { list.splice(1, 0, '__world__'); if (gWorld) list = list.slice(0, 2).concat(WORLD_G.map(function (w) { return '\u0001' + w; })).concat(list.slice(2)); }

@@ -153,7 +153,7 @@
     .tdy .bar i { text-shadow: none; }
     /* 맨 위로 */
     .to-top { display: grid; place-items: center; width: 58px; height: 58px; margin: 18px auto 6px; border: 0; border-radius: 50%; background: #fff; color: #222; font-size: 26px; font-weight: 900; box-shadow: 0 6px 18px rgba(0,0,0,.18); cursor: pointer; }
-    .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 12px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
+    .wr { display: flex; align-items: center; gap: 12px; margin: 0 18px 20px; padding: 14px 16px; border-radius: 22px; background: linear-gradient(135deg, #2E5FA8, #1B3F7A); color: #fff; text-decoration: none; box-shadow: 0 14px 30px -20px rgba(20,50,110,.9); -webkit-tap-highlight-color: transparent; }
     .wr.today { background: linear-gradient(90deg, rgba(8,28,70,.82) 0%, rgba(8,28,70,.55) 50%, rgba(8,28,70,.12) 100%), url(../img/today-tower.jpg) 70% 35%/cover; border: 1.5px solid rgba(255,255,255,.55); }
     .wr.today b, .wr.today span { text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8); }
     .wr.today span { opacity: 1; font-weight: 700; }
@@ -374,6 +374,10 @@
     #v-home .nc .wx { top: -54px; right: 14px; padding: 5px 10px; font-size: 20px; }
     #v-home .nc .eo3 { position: relative; padding: 8px 12px 12px; gap: 6px; }
     #v-home .nc .eo3 a { min-height: 48px; font-size: 18px; }
+    /* 어디야 카드: 체리 사진을 오른쪽 위 끝에 작게(면적 1/4), 가장자리는 와인 장미 바탕에 스며들게 (11-21) */
+    #v-home .nc.eo-sm .ph { left: auto; right: 0; top: 0; bottom: auto; width: 50%; height: 62%; background-size: cover; background-position: 55% 40%;
+      -webkit-mask-image: radial-gradient(ellipse 95% 100% at 100% 0%, #000 35%, rgba(0,0,0,.55) 62%, transparent 92%); mask-image: radial-gradient(ellipse 95% 100% at 100% 0%, #000 35%, rgba(0,0,0,.55) 62%, transparent 92%); }
+    #v-home .nc.eo-sm .ph::after { display: none; }
     #v-home .n-h { margin-bottom: 10px; }
     #v-home .n-h h2 { font-size: 23px; }
     .camp2 { gap: 16px 12px; margin-bottom: 26px; }
@@ -730,8 +734,9 @@
     var cr = el('span', 'crown', '👑'); cr.setAttribute('aria-hidden', 'true'); lux.querySelector('.tx').appendChild(cr);
     v.appendChild(lux);
 
-    // 2. 어디야? — 12번 크리에이터 레드, 단추 셋 (이 카드만 예외)
-    var eo = ncard({ pal: 12, photo: '../img/eodiya-cherry3.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
+    // 2. 어디야? — 8번 와인 장미(실제 체리 색에 가장 가까움), 체리 사진은 오른쪽 끝에 1/4 크기로 스며들게 (11-21), 단추 셋 (이 카드만 예외)
+    var eo = ncard({ pal: 8, photo: '../img/eodiya-cherry3.jpg', em: '싸바의 얼굴', title: '어디야?', desc: '잘 지내? 한마디에 답장이 와요' });
+    eo.classList.add('eo-sm');
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
     eo.appendChild(b3);
@@ -745,10 +750,11 @@
       '<div class="ad"><a class="mini" href="../kimchi/" aria-label="언니김치 특판"><b class="w"><span class="w1">언니김치</span><span class="w2">특판</span></b></a></div><img class="dance" src="../img/cherry-dance-anim.svg" alt="">';
     v.appendChild(mk);
 
-    // 4. 오늘의 싸바 (싸바알림판 바로 아래, 11-21 대표님) — 2번 하늘 풀밭, 기온 크게
-    var td = ncard({ pal: 2, href: '../today/', label: '오늘의 싸바', photo: '../img/today-tower.jpg', em: '매일 아침 한눈에', title: '오늘의 싸바', desc: '뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오', icon: '☀️', name: '오늘의 싸바', sub: '광주', btn: '보기' });
-    v.appendChild(td);
-    homeWeather(td);
+    // 4. 오늘의 싸바 — 예전 파란 탭(남산타워 사진) 그대로 되돌림, 싸바알림판 바로 아래 (11-21 대표님)
+    var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '오늘의 싸바');
+    rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘의 싸바</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
+    v.appendChild(rd);
+    homeWeather(rd);
 
     // 5. 지금 보내기 좋은 카드
     v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
@@ -822,6 +828,12 @@
     function ic(n) { return n === 0 ? '☀️' : n <= 2 ? '🌤️' : n === 3 ? '☁️' : n <= 48 ? '🌫️' : n <= 67 ? '🌧️' : n <= 77 ? '❄️' : n <= 82 ? '🌦️' : n <= 86 ? '🌨️' : '⛈️'; }
     var key = 'sava-home-wx', cache = null; try { cache = JSON.parse(sessionStorage.getItem(key) || 'null'); } catch (e) {}
     function show(t, code) {
+      if (box.classList.contains('wr')) {
+        var em = box.querySelector('em'); if (em) em.remove();
+        var tw = el('span', 'tw'); tw.innerHTML = '<b></b><small></small>';
+        tw.querySelector('b').textContent = ic(code) + ' ' + Math.round(t) + '°'; tw.querySelector('small').textContent = c[0] + ' · 보기 ›';
+        box.appendChild(tw); box.querySelector('i').textContent = ic(code); return;
+      }
       var tx = box.querySelector('.tx'); if (!tx) return;
       var wx = el('span', 'wx'); wx.innerHTML = '<span></span><small></small>';
       wx.firstChild.textContent = ic(code) + ' ' + Math.round(t) + '°'; wx.querySelector('small').textContent = c[0];

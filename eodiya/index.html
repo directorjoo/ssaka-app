@@ -521,6 +521,7 @@
     .composer .chint { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .composer .chint button { position: static; min-height: 30px; padding: 0 12px; border: 1px solid #E7D3C4; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; font-weight: 800; color: #6b5a4a; cursor: pointer; }
     .composer .chint button[hidden] { display: none; }
+    .composer .chint button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
     .composer .rta textarea { padding: 12px 14px; min-height: 56px; }
     .composer .csend { min-height: 56px; width: 64px; padding: 4px 0; border-radius: 16px; display: grid; place-items: center; align-content: center; gap: 1px; font-size: 13.5px; line-height: 1.15; }
     .composer .csend i { font-style: normal; font-size: 18px; line-height: 1; }
@@ -756,6 +757,25 @@
   var BASE = new URL('./', location.href).href.split('?')[0];
   var IMG_BASE = /(^|\.)sava\.kr$|pages\.dev$/.test(location.hostname) ? 'https://sava.kr/img/' : new URL('../img/', location.href).href; // 카톡이 그림을 잘 가져가도록 정식 주소로
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
+  // ---------- 지우기 = 뒤로 한 칸 (11-21 대표님: 톡 넣은 말은 한 문장씩, 손으로 쓴 건 한 글자씩, 꾹 누르면 모두) ----------
+  window.savaBack = function (ta, phrases, after) {
+    var v = ta.value.replace(/\s+$/, '');
+    var hit = '';
+    (phrases || []).forEach(function (p) { p = String(p).trim(); if (p && p.length > hit.length && v.slice(-p.length) === p && (v.length === p.length || /\s/.test(v.charAt(v.length - p.length - 1)))) hit = p; });
+    if (hit) v = v.slice(0, v.length - hit.length).replace(/\s+$/, '');
+    else { var a = Array.from(ta.value); a.pop(); v = a.join(''); } // 손으로 쓴 건 띄어쓰기까지 한 칸씩
+    ta.value = v; if (after) after();
+  };
+  window.savaBackBtn = function (btn, ta, phrases, after) {
+    var t = 0, longed = false;
+    btn.textContent = '⌫ 지우기'; btn.title = '한 번 누르면 한 칸씩 · 꾹 누르면 모두 지우기';
+    function down() { longed = false; clearTimeout(t); t = setTimeout(function () { longed = true; ta.value = ''; if (after) after(); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {} toast('모두 지웠어요'); }, 650); }
+    function up() { clearTimeout(t); }
+    btn.addEventListener('pointerdown', down); btn.addEventListener('pointerup', up); btn.addEventListener('pointerleave', up); btn.addEventListener('pointercancel', up);
+    btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    btn.addEventListener('click', function () { if (longed) { longed = false; return; } window.savaBack(ta, typeof phrases === 'function' ? phrases() : phrases, after); });
+  };
+
   window.SsakaToast = toast;
   // 📞 전화 걸기: 보낸 사람 번호가 있으면 바로 걸고, 없으면 안드로이드는 연락처 고르기, 아이폰은 안내
   function callBtn(el, tel) {
@@ -1117,7 +1137,7 @@
         });
       }
       $('hereText').addEventListener('input', changed);
-      $('rClear').addEventListener('click', function () { $('hereText').value = ''; changed(); });
+      window.savaBackBtn($('rClear'), $('hereText'), function () { var a = []; RW.forEach(function (w) { (w.tabs || []).forEach(function (g) { a = a.concat(g.items || []); }); if (w.call) a.push(w.call[1]); }); return a; }, changed);
       paintR();
       $('rSend').addEventListener('click', function () {
         var t = rText(); if (!t) { toast('답장을 쓰거나 아래 말을 눌러 주세요'); $('hereText').focus(); return; }
@@ -1496,7 +1516,8 @@
     gChanged();
   }
   $('gText').addEventListener('input', gChanged);
-  $('gClear').addEventListener('click', function () { $('gText').value = ''; gKinds = []; gChanged(); $('gText').focus(); });
+  function gPhrases() { var a = WORLD_G.slice(); GREET.forEach(function (g) { (g.items || []).forEach(function (x) { a.push(x); }); (g.subs || []).forEach(function (x) { a = a.concat(x[1]); }); }); return a; }
+  window.savaBackBtn($('gClear'), $('gText'), gPhrases, function () { if (!askText()) gKinds = []; gChanged(); });
   paintGreet();
 
   function build() {

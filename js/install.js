@@ -29,6 +29,8 @@
     '.si-step small{font-size:12px;color:#888;font-weight:700}.si-step i{font-style:normal;width:62px;height:62px;border-radius:18px;background:#F2F2F4;display:grid;place-items:center;font-size:26px;font-weight:900;color:#1a1a1a}' +
     '.si-step:first-child i{background:#B3132B;color:#fff}' +
     '.si-arrow{font-size:22px;color:#bbb;padding-top:18px}' +
+    '.si-go[hidden]{display:none!important}' +
+    '.si-how{margin:4px 0 12px;padding:0;list-style:none;counter-reset:h}.si-how li{position:relative;padding:0 0 12px 38px;font-size:17px;font-weight:600;line-height:1.55;color:#2b2420;word-break:keep-all;counter-increment:h}.si-how li::before{content:counter(h);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:#B3132B;color:#fff;font-size:15px;font-weight:900;display:grid;place-items:center}.si-how b{color:#B3132B}.si-note{margin:0 0 12px;font-size:15px;color:#7A5A3A;line-height:1.5;word-break:keep-all}' +
     '.si-tip{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:#FBF3F4;font-size:13.5px;color:#7a2a35;line-height:1.5;word-break:keep-all}' +
     '.si-go{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;border:0;border-radius:16px;background:#B3132B;color:#fff;font:inherit;font-size:18px;font-weight:800;text-decoration:none;cursor:pointer}' +
     '.si-later{display:block;width:100%;min-height:44px;margin-top:6px;border:0;background:none;color:#777;font:inherit;font-size:15px;cursor:pointer}' +
@@ -76,11 +78,12 @@
       var ex = el('a', 'si-go', (ios ? '사파리' : '크롬') + '로 열기'); ex.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(u.href);
       b.appendChild(ex);
     } else if (ios) {
-      b.appendChild(el('div', 'si-steps',
-        '<div class="si-step"><i>⬆︎</i>공유 버튼<br><small>(없으면 •••)</small></div><span class="si-arrow">›</span>' +
-        '<div class="si-step"><i>↓</i>목록을<br>위로 올리기</div><span class="si-arrow">›</span>' +
-        '<div class="si-step"><i>⊞</i>홈 화면에<br>추가</div>'));
-      b.appendChild(el('p', 'si-tip', '<b>공유 버튼(□↑)</b>은 주소창 옆에 있어요. 위쪽이든 아래쪽이든 주소창이 있는 곳을 보세요. 마지막에 오른쪽 위 <b>추가</b>를 누르면 끝!'));
+      // 11-21 대표님: 그림 칸을 단추로 알고 누르셔서 → 말로 자세히
+      b.appendChild(el('ol', 'si-how',
+        '<li>주소창 옆에 있는 <b>공유 버튼</b>을 누르세요. 네모 위로 화살표가 솟은 모양(□↑)이에요. 주소창은 화면 맨 아래나 맨 위에 있어요. 안 보이면 점 세 개(•••)를 먼저 누르세요.</li>' +
+        '<li>아래에서 목록이 올라오면 손가락으로 <b>위로 쭉 밀어 올리세요.</b> 그러면 <b>\'홈 화면에 추가\'</b>가 보여요. 그걸 누르세요.</li>' +
+        '<li>오른쪽 위 <b>\'추가\'</b>를 누르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'));
+      b.appendChild(el('p', 'si-note', '※ 이 글은 설명이에요. 여기를 누르지 마시고, 휴대폰 화면에서 직접 찾아 눌러 주세요.'));
     } else {
       // 안드로이드: 크롬이 설치 창을 준비했으면 버튼 한 번, 아니면 메뉴 3칸 안내
       var samsung = /SamsungBrowser/i.test(ua);
@@ -90,11 +93,11 @@
         deferred.prompt(); deferred.userChoice.then(function () { deferred = null; shut(); });
       });
       var guide = el('div', '', '');
-      guide.appendChild(el('div', 'si-steps', samsung
-        ? '<div class="si-step"><i>☰</i>오른쪽 아래<br>메뉴</div><span class="si-arrow">›</span><div class="si-step"><i>＋</i>현재 페이지<br>추가</div><span class="si-arrow">›</span><div class="si-step"><i>⊞</i>홈 화면</div>'
-        : '<div class="si-step"><i>⋮</i>오른쪽 위<br>점 세 개</div><span class="si-arrow">›</span><div class="si-step"><i>⊞</i>홈 화면에 추가<br>(또는 앱 설치)</div><span class="si-arrow">›</span><div class="si-step"><i>✓</i>설치</div>'));
-      guide.appendChild(el('p', 'si-tip', samsung ? '삼성 인터넷이에요. 크롬에서 열면 버튼 한 번으로 설치돼요.' : '메뉴에 안 보이면 크롬 앱으로 sava.kr 을 열어 주세요.'));
-      if (!samsung) { var up = el('div', 'si-point', '<b>👆</b> 여기 ⋮'); up.style.cssText = 'position:fixed;top:8px;right:10px;bottom:auto;z-index:91;background:#fff;padding:6px 12px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.25)'; guide.appendChild(up); }
+      guide.appendChild(el('ol', 'si-how', samsung
+        ? '<li>화면 <b>오른쪽 맨 아래 줄 세 개(☰)</b>를 누르세요.</li><li>메뉴에서 <b>\'현재 페이지 추가\'</b>를 누르세요.</li><li><b>\'홈 화면\'</b>을 고르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'
+        : '<li>크롬 화면 <b>오른쪽 맨 위 점 세 개(⋮)</b>를 누르세요.</li><li>메뉴에서 <b>\'홈 화면에 추가\'</b> 또는 <b>\'앱 설치\'</b>를 누르세요.</li><li><b>\'설치\'</b>(또는 \'추가\')를 누르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'));
+      guide.appendChild(el('p', 'si-note', '※ 이 글은 설명이에요. 여기를 누르지 마시고, 휴대폰 화면에서 직접 찾아 눌러 주세요.'));
+      guide.appendChild(el('p', 'si-tip', samsung ? '크롬 앱에서 sava.kr 을 열면 단추 한 번으로 설치돼요.' : '메뉴에 안 보이면 크롬 앱으로 sava.kr 을 열어 주세요.'));
       function paint() { go.hidden = !deferred; guide.hidden = !!deferred; }
       paint(); window.addEventListener('beforeinstallprompt', function () { setTimeout(paint, 0); });
       b.appendChild(go); b.appendChild(guide);
@@ -126,7 +129,7 @@
     try { navigator.serviceWorker.register(SELF.replace(/js\/install\.js.*$/, 'sw.js')).catch(function () {}); } catch (e) {}
   }
   // ---------- 최신 버전 업데이트 ----------
-  var VER = '2026.11.21-322'; // 올릴 때마다 version.json 과 같이 올림
+  var VER = '2026.11.21-323'; // 올릴 때마다 version.json 과 같이 올림
   var BASE_DIR = SELF ? SELF.replace(/js\/install\.js.*$/, '') : '/';
   var CORE = ['js/install.js', 'js/share.js', 'js/msgimg.js', 'js/designs.js', 'js/render.js', 'js/export.js', 'js/codec.js', 'js/store.js', 'demo/js/card.js', 'css/sk.css', 'css/brand.css', 'sw.js', 'app/', 'make/', 'eodiya/', 'c/'];
   // 휴대폰 브라우저가 묵혀 둔 파일을 서버의 새 파일로 바꿔 둠 (화면은 그대로)

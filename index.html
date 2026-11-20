@@ -232,7 +232,7 @@
 
 <div class="story-bottom" id="storyBottom" aria-label="싸바 소개 이동 메뉴"><button type="button" id="storyBack">← 이전</button><button type="button" class="story-install" id="storyInstall">📲 싸바 설치하기</button></div>
 
-<script src="js/install.js?v=2"></script>
+<script src="js/install.js?v=3"></script>
 <script>
 (function(){if(!/[?&]story=1/.test(location.search))return;document.documentElement.classList.add("story-mode");var b=document.getElementById("storyBack");b.addEventListener("click",function(){if(history.length>1)history.back();else location.href="/kimchi/";});var install=document.getElementById("storyInstall");install.addEventListener("click",function(){if(window.SsakaInstall)SsakaInstall.open();else location.href="/?install=1";});})();
 </script>

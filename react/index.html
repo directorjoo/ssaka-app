@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>순발력 나이 — 싸바</title>
+  <meta name="description" content="빨간불이 초록불로 바뀌는 순간 콕! 5번 평균으로 보는 재미있는 순발력 나이.">
+  <meta name="theme-color" content="#1E1E1E">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/react/">
+  <meta property="og:title" content="🚦 순발력 나이 — 싸바 신호등 대결">
+  <meta property="og:description" content="빨간불이 초록불로 바뀌는 순간 콕! 5번 평균으로 보는 재미있는 순발력 나이.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1E1E1E; --ac: #1E7A46; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A2A2A 0%,#1E1E1E 50%,#111 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .pad { display: grid; place-items: center; align-content: center; gap: 8px; width: 100%; min-height: 300px; margin-top: 14px; border: 0; border-radius: 28px; background: #333; color: #fff; font: inherit; text-align: center; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+    .pad b { display: block; font-size: 34px; font-weight: 900; }
+    .pad span { display: block; font-size: 18px; font-weight: 700; }
+    .pad .lamp { font-size: 70px; line-height: 1; }
+    .pad.wait { background: #B3132B; }
+    .pad.go { background: #1E9E54; }
+    .pad.early { background: #FFC400; color: #1A1A1A; text-shadow: 0 1px 1px rgba(255,255,255,.6); }
+    .pad.shown { background: #1F5FAF; }
+    .tries { display: flex; justify-content: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+    .tries span { min-width: 58px; padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,.14); font-size: 16px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🚦</div>
+    <h1>순발력 나이</h1>
+    <p>빨간불에서 기다렸다가<br>초록불로 바뀌는 순간 콕! 5번 해요.</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <button type="button" class="pad" id="pad"><i class="lamp" style="font-style:normal">👆</i><b>여기를 눌러 시작</b><span>5번 평균으로 순발력 나이를 봐요</span></button>
+  <div class="tries" id="tries"></div>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 재미로 보는 순발력 나이 (평균)</h3>
+    <div><span>⚡ 번개 (10대)</span><span>0.26초 이하</span></div>
+    <div><span>🐆 날쌘돌이 (20대)</span><span>0.30초 이하</span></div>
+    <div><span>🏃 재빠름 (30대)</span><span>0.35초 이하</span></div>
+    <div><span>😊 든든함 (40대)</span><span>0.40초 이하</span></div>
+    <div><span>🚶 여유만만 (50대)</span><span>0.46초 이하</span></div>
+    <div><span>🐢 느긋한 신선</span><span>그 밖</span></div>
+  </div>
+  <div class="more"><a href="../lucky/">🎰 럭키 7초</a><a href="../eye/">👀 내 눈 나이</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  var KEY = 'sava-react-v1', best = load(KEY, 0), pad = $('pad'), st = 'idle', times = [], goAt = 0, waitT = null, early = 0;
+  function paintBest() { $('best').textContent = best ? '내 최고 평균 ' + (best / 1000).toFixed(3) + '초' : ''; }
+  function grade(ms) { return ms <= 260 ? { e: '⚡', t: '번개', a: '10대' } : ms <= 300 ? { e: '🐆', t: '날쌘돌이', a: '20대' } : ms <= 350 ? { e: '🏃', t: '재빠름', a: '30대' } : ms <= 400 ? { e: '😊', t: '든든함', a: '40대' } : ms <= 460 ? { e: '🚶', t: '여유만만', a: '50대' } : { e: '🐢', t: '느긋한 신선', a: '60대 이상' }; }
+  var cm = +qp.get('m'), cn = (qp.get('n') || '').slice(0, 10);
+  if (cm) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님 평균: <b>' + (cm / 1000).toFixed(3) + '초</b><br>더 빨리 누르면 내가 이겨요'; }
+  function set(cls, lamp, b, s) { pad.className = 'pad ' + cls; pad.innerHTML = '<i class="lamp" style="font-style:normal">' + lamp + '</i><b>' + b + '</b><span>' + s + '</span>'; }
+  function tries() { $('tries').innerHTML = times.map(function (t, i) { return '<span>' + (i + 1) + '회 ' + (t / 1000).toFixed(3) + '</span>'; }).join(''); }
+  function arm() {
+    st = 'wait'; set('wait', '🔴', '기다려요…', '초록불이 되면 바로 콕!');
+    clearTimeout(waitT); waitT = setTimeout(function () { st = 'go'; goAt = performance.now(); set('go', '🟢', '지금!', '콕!'); }, 1300 + Math.random() * 2700);
+  }
+  pad.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    if (st === 'idle' || st === 'done') { times = []; early = 0; tries(); $('out').hidden = true; arm(); return; }
+    if (st === 'wait') { clearTimeout(waitT); early++; buzz(200); st = 'early'; set('early', '🟡', '앗, 너무 일러요!', '눌러서 이번 회 다시 하기'); return; }
+    if (st === 'early') { arm(); return; }
+    if (st === 'go') {
+      var ms = Math.round(performance.now() - goAt); times.push(ms); tries(); buzz(25);
+      if (times.length >= 5) return end();
+      st = 'shown'; set('shown', '⏱', (ms / 1000).toFixed(3) + '초', '눌러서 ' + (times.length + 1) + '회째');
+      return;
+    }
+    if (st === 'shown') arm();
+  });
+  var last = null;
+  function end() {
+    st = 'done'; var avg = Math.round(times.reduce(function (a, b) { return a + b; }, 0) / times.length), g = grade(avg);
+    last = { m: avg, g: g }; var nb = !best || avg < best; if (nb) { best = avg; save(KEY, best); }
+    set('shown', g.e, '평균 ' + (avg / 1000).toFixed(3) + '초', '눌러서 한 판 더');
+    var win = cm ? (avg < cm ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : avg === cm ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + ((avg - cm) / 1000).toFixed(3) + '초 느렸어요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">평균 ' + (avg / 1000).toFixed(3) + '초 · 순발력 나이 <b>' + g.a + '</b>' + (nb ? ' · 🏆 내 최고!' : '') + (early ? '<br>부정 출발 ' + early + '번 😅' : '') + '</div>' + win;
+    paintBest(); showOut();
+  }
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/react/');
+    u.searchParams.set('m', last.m); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '🚦 순발력 나이 ' + last.g.a + '! ' + last.g.e + ' ' + (last.m / 1000).toFixed(3) + '초', desc: '초록불 되자마자 콕! 평균 ' + (last.m / 1000).toFixed(3) + '초. 너는 더 빠를까?', btn: '🚦 도전하기' });
+  });
+  paintBest();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

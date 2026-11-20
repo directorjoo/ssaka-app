@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>초성 퀴즈 — 싸바</title>
+  <meta name="description" content="ㅅㄱ = 사과? 시계? 힌트를 보고 같은 초성 중 정답 고르기. 10문제 몇 개 맞힐까?">
+  <meta name="theme-color" content="#FFC400">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/chosung/">
+  <meta property="og:title" content="🔤 초성 퀴즈 — 싸바 10문제 대결">
+  <meta property="og:description" content="ㅅㄱ = 사과? 시계? 힌트를 보고 같은 초성 중 정답 고르기. 10문제 몇 개 맞힐까?">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #FFC400; --ac: #1A1A1A; --fg: #1A1A1A; --sh: 0 1px 1px rgba(255,255,255,.7); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#FFD233 0%,#FFC400 50%,#F2B200 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .ranks { background: rgba(255,255,255,.45); } .ranks div { border-top-color: rgba(0,0,0,.12); }
+    .ghost, .more a { background: rgba(255,255,255,.55); }
+    .go { background: #1A1A1A; color: #FFD233; }
+    .qbox { margin-top: 14px; padding: 18px 14px 14px; border-radius: 24px; background: #fff; color: #1A1A1A; text-align: center; box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); }
+    .qn { font-size: 16px; font-weight: 800; color: #666; }
+    .cat { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 999px; background: #1A1A1A; color: #FFD233; font-size: 18px; font-weight: 900; }
+    .cho { margin: 10px 0 4px; font-size: 64px; font-weight: 900; letter-spacing: .12em; line-height: 1.1; }
+    .bar { height: 8px; border-radius: 99px; background: #eee; overflow: hidden; margin: 8px 0 12px; }
+    .bar i { display: block; height: 100%; width: 100%; background: #B3132B; transform-origin: left; }
+    .ch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ch button { min-height: 64px; border: 0; border-radius: 16px; background: #FFF4CC; color: #1A1A1A; font: inherit; font-size: 23px; font-weight: 900; cursor: pointer; box-shadow: inset 0 0 0 2px #F2B200; }
+    .ch button.ok { background: #1E7A46; color: #fff; box-shadow: none; }
+    .ch button.no { background: #B3132B; color: #fff; box-shadow: none; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🔤</div>
+    <h1>초성 퀴즈</h1>
+    <p>보기 넷이 모두 같은 초성이에요!<br>힌트를 보고 정답을 골라요. 한 문제 10초.</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="stat"><span>✅ <span id="sc">0</span>개</span><span>⏱ <span id="tm">0</span>초</span></div>
+  <div class="qbox" id="qbox" hidden>
+    <div class="qn" id="qn"></div>
+    <div class="cat" id="cat"></div>
+    <div class="cho" id="cho"></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="ch" id="ch"></div>
+  </div>
+  <button type="button" class="go" id="go">▶ 10문제 시작!</button>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 초성 등급 (10문제)</h3>
+    <div><span>🎓 초성 박사</span><span>10개 다 맞힘</span></div>
+    <div><span>🧠 척척박사</span><span>8개 이상</span></div>
+    <div><span>😊 잘했어요</span><span>5개 이상</span></div>
+    <div><span>🌱 한 번 더!</span><span>그 밖</span></div>
+  </div>
+  <div class="more"><a href="../match/">🍒 짝 맞추기</a><a href="../omok/">⚫ 체리랑 오목</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  var Q = [["과일", "사과", "시계", "수건", "생강"], ["과일", "포도", "파도", "푸딩", "판단"], ["과일", "수박", "소방", "신발", "새벽"], ["과일", "딸기", "떡국", "따귀", "뜨개"], ["과일", "참외", "차이", "청어", "처음"], ["동물", "사자", "사진", "수저", "시장"], ["동물", "기린", "가로", "거리", "구름"], ["동물", "오리", "우리", "요리", "위로"], ["음식", "김치", "기차", "가치", "공책"], ["음식", "라면", "로마", "루머", "라마"], ["음식", "만두", "마당", "모델", "모두"], ["나라", "일본", "연봉", "이불", "우비"], ["나라", "독일", "도움", "단어", "동요"], ["나라", "미국", "모기", "문고", "머그"], ["나라", "태국", "탁구", "퇴근", "타격"], ["도시", "부산", "버스", "박수", "보석"], ["도시", "여수", "우산", "의사", "요술"], ["도시", "순천", "사촌", "상추", "식초"], ["도시", "광주", "가지", "감자", "거짓"], ["채소", "오이", "우유", "아이", "여우"], ["직업", "가수", "감사", "교실", "간식"], ["직업", "배우", "바위", "병원", "비용"], ["직업", "감독", "고등", "기도", "계단"], ["운동", "축구", "친구", "창고", "출근"], ["운동", "야구", "악기", "연극", "아기"], ["운동", "당구", "단골", "대구", "도구"], ["운동", "등산", "도시", "단속", "대사"], ["꽃", "장미", "재미", "지문", "주말"], ["꽃", "국화", "공항", "계획", "고향"], ["꽃", "백합", "방학", "보험", "비행"], ["탈것", "택시", "털실", "탄산", "통신"], ["바다 생물", "문어", "마음", "모양", "미용"], ["바다 생물", "꼬막", "꼬마", "꾸밈", "꿀물"], ["음식", "홍어", "호응", "회의", "행운"]];
+  var KEY = 'sava-chosung-v1', best = load(KEY, null), list = [], qi = 0, sc = 0, t0 = 0, tick = null, qT = null, qStart = 0, lock = false;
+  function cho(w) { var L = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'; return w.split('').map(function (c) { return L[Math.floor((c.charCodeAt(0) - 0xAC00) / 588)]; }).join(''); }
+  function paintBest() { $('best').textContent = best ? '내 최고 ' + best.c + '개 · ' + best.s + '초' : ''; }
+  function grade(c) { return c >= 10 ? { e: '🎓', t: '초성 박사' } : c >= 8 ? { e: '🧠', t: '척척박사' } : c >= 5 ? { e: '😊', t: '잘했어요' } : { e: '🌱', t: '한 번 더!' }; }
+  var cc = +qp.get('c'), cs = +qp.get('s'), cn = (qp.get('n') || '').slice(0, 10);
+  if (qp.has('c')) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님 기록: <b>' + cc + '개</b> 맞힘 · ' + cs + '초<br>더 많이(같으면 더 빨리) 맞히면 내가 이겨요'; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function start() {
+    list = shuffle(Q.slice()).slice(0, 10); qi = 0; sc = 0; t0 = Date.now(); $('sc').textContent = '0'; $('out').hidden = true;
+    $('go').hidden = true; $('qbox').hidden = false; clearInterval(tick);
+    tick = setInterval(function () { $('tm').textContent = Math.floor((Date.now() - t0) / 1000); }, 250);
+    ask();
+  }
+  function ask() {
+    var q = list[qi]; lock = false;
+    $('qn').textContent = (qi + 1) + ' / 10'; $('cat').textContent = '힌트: ' + q[0]; $('cho').textContent = cho(q[1]);
+    var ch = $('ch'); ch.innerHTML = '';
+    shuffle(q.slice(1)).forEach(function (w) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = w;
+      b.addEventListener('click', function () { pick(b, w === q[1]); }); ch.appendChild(b);
+    });
+    var bar = $('bar'); bar.style.transition = 'none'; bar.style.transform = 'scaleX(1)'; void bar.offsetWidth;
+    bar.style.transition = 'transform 10s linear'; bar.style.transform = 'scaleX(0)';
+    clearTimeout(qT); qT = setTimeout(function () { pick(null, false); }, 10000);
+  }
+  function pick(b, ok) {
+    if (lock) return; lock = true; clearTimeout(qT);
+    var ans = list[qi][1];
+    Array.prototype.forEach.call($('ch').children, function (x) { if (x.textContent === ans) x.classList.add('ok'); });
+    if (ok) { sc++; $('sc').textContent = sc; buzz(25); } else { if (b) b.classList.add('no'); buzz(150); }
+    setTimeout(function () { qi++; if (qi < 10) ask(); else end(); }, ok ? 650 : 1100);
+  }
+  var last = null;
+  function end() {
+    clearInterval(tick); $('qbox').hidden = true;
+    var s = Math.round((Date.now() - t0) / 1000), g = grade(sc); last = { c: sc, s: s, g: g };
+    var nb = !best || sc > best.c || (sc === best.c && s < best.s); if (nb) { best = { c: sc, s: s }; save(KEY, best); }
+    var win = '';
+    if (qp.has('c')) { var me = sc * 1000 - s, you = cc * 1000 - cs; win = me > you ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : me === you ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + esc(cn || '친구') + '님이 한 수 위!</div>'; }
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">10문제 중 ' + sc + '개 · ' + s + '초' + (nb ? ' · 🏆 내 최고!' : '') + '</div>' + win;
+    $('go').hidden = false; $('go').textContent = '🔁 새 문제로 한 판 더!'; paintBest(); showOut();
+  }
+  $('go').addEventListener('click', start);
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/chosung/');
+    u.searchParams.set('c', last.c); u.searchParams.set('s', last.s); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '🔤 초성 퀴즈 ' + last.c + '개! ' + last.g.e + ' ' + last.g.t, desc: '10문제 중 ' + last.c + '개 맞혔어요. ㅅㄱ = 사과? 시계? 너도 풀어 봐!', btn: '🔤 도전하기' });
+  });
+  paintBest();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

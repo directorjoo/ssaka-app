@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>체리랑 오목 — 싸바</title>
+  <meta name="description" content="체리와 한 판 오목! 다섯 알을 먼저 나란히 놓으면 이겨요. 몇 수 만에 이길까?">
+  <meta name="theme-color" content="#1F5FAF">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/omok/">
+  <meta property="og:title" content="⚫ 체리랑 오목 — 싸바 한 판 승부">
+  <meta property="og:description" content="체리와 한 판 오목! 다섯 알을 먼저 나란히 놓으면 이겨요. 몇 수 만에 이길까?">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1F5FAF; --ac: #1F5FAF; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A6CC0 0%,#1F5FAF 45%,#174C8E 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .bwrap { margin-top: 14px; padding: 8px; border-radius: 18px; background: #5A3420; }
+    canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 12px; touch-action: manipulation; }
+    .lv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .lv button { min-height: 56px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .lv button[aria-pressed="true"] { background: #fff; color: #1F5FAF; }
+    .msg { margin-top: 12px; text-align: center; font-size: 19px; font-weight: 900; text-shadow: var(--sh); min-height: 28px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">⚫⚪</div>
+    <h1>체리랑 오목</h1>
+    <p>나는 검은 돌, 체리는 흰 돌.<br>다섯 알을 먼저 나란히 놓으면 이겨요!</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="lv" role="group" aria-label="난이도">
+    <button type="button" data-l="1" aria-pressed="false">🌱 살살</button>
+    <button type="button" data-l="2" aria-pressed="true">🔥 제대로</button>
+  </div>
+  <div class="msg" id="msg">아무 곳이나 콕! 내가 먼저 둬요</div>
+  <div class="bwrap"><canvas id="cv" aria-label="오목판"></canvas></div>
+  <div class="row2"><button type="button" class="ghost" id="undo">↩ 한 수 무르기</button><button type="button" class="ghost" id="again">🔁 새 판</button></div>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 오목 등급 (체리를 이겼을 때)</h3>
+    <div><span>🏆 오목 9단</span><span>제대로 · 무르기 없이</span></div>
+    <div><span>⚫ 오목 고수</span><span>제대로에서 이김</span></div>
+    <div><span>😊 잘했어요</span><span>살살에서 이김</span></div>
+  </div>
+  <div class="more"><a href="../pool/">🎱 당구 한판</a><a href="../chosung/">🔤 초성 퀴즈</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  var N = 13, KEY = 'sava-omok-v1', rec = load(KEY, { w: 0, l: 0 }), lvl = 2, bd, hist, over, undos, busy = false;
+  var cv = $('cv'), ctx = cv.getContext('2d');
+  var cl = +qp.get('l'), cmv = +qp.get('m'), cn = (qp.get('n') || '').slice(0, 10);
+  if (cmv) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님은 <b>' + cmv + '수</b> 만에 체리를 이겼어요! (' + (cl === 1 ? '살살' : '제대로') + ')<br>더 적은 수로 이기면 내가 이겨요'; if (cl === 1 || cl === 2) lvl = cl; }
+  function paintBest() { $('best').textContent = (rec.w || rec.l) ? '체리 상대 ' + rec.w + '승 ' + rec.l + '패' : ''; }
+  function reset() {
+    bd = []; for (var i = 0; i < N; i++) { bd.push([]); for (var j = 0; j < N; j++) bd[i].push(0); }
+    hist = []; over = false; undos = 0; busy = false; $('out').hidden = true; $('msg').textContent = '아무 곳이나 콕! 내가 먼저 둬요';
+    document.querySelectorAll('.lv button').forEach(function (x) { x.setAttribute('aria-pressed', +x.dataset.l === lvl ? 'true' : 'false'); });
+    draw();
+  }
+  var S = 0, P = 0, C = 0;
+  function size() { var w = cv.clientWidth || 340, d = window.devicePixelRatio || 1; cv.width = w * d; cv.height = w * d; S = w * d; P = S / (N + 1) * .5 + S / (N + 1) * .5; C = (S - 2 * P) / (N - 1); draw(); }
+  function draw() {
+    if (!S) return; ctx.fillStyle = '#E9C27A'; ctx.fillRect(0, 0, S, S);
+    ctx.strokeStyle = '#5A3420'; ctx.lineWidth = Math.max(1, S / 400);
+    for (var i = 0; i < N; i++) { ctx.beginPath(); ctx.moveTo(P, P + i * C); ctx.lineTo(S - P, P + i * C); ctx.stroke(); ctx.beginPath(); ctx.moveTo(P + i * C, P); ctx.lineTo(P + i * C, S - P); ctx.stroke(); }
+    ctx.fillStyle = '#5A3420'; [[3, 3], [3, 9], [9, 3], [9, 9], [6, 6]].forEach(function (p) { ctx.beginPath(); ctx.arc(P + p[0] * C, P + p[1] * C, C * .12, 0, 7); ctx.fill(); });
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) if (bd[y][x]) {
+      var cx = P + x * C, cy = P + y * C, r = C * .44, g = ctx.createRadialGradient(cx - r * .35, cy - r * .35, r * .1, cx, cy, r);
+      if (bd[y][x] === 1) { g.addColorStop(0, '#666'); g.addColorStop(1, '#111'); } else { g.addColorStop(0, '#fff'); g.addColorStop(1, '#d5d5d5'); }
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+    }
+    var L = hist[hist.length - 1]; if (L) { ctx.fillStyle = '#B3132B'; ctx.beginPath(); ctx.arc(P + L[0] * C, P + L[1] * C, C * .14, 0, 7); ctx.fill(); }
+    if (over && over.line) { ctx.strokeStyle = '#B3132B'; ctx.lineWidth = C * .12; ctx.lineCap = 'round'; var a = over.line[0], b = over.line[1]; ctx.beginPath(); ctx.moveTo(P + a[0] * C, P + a[1] * C); ctx.lineTo(P + b[0] * C, P + b[1] * C); ctx.stroke(); }
+  }
+  var D = [[1, 0], [0, 1], [1, 1], [1, -1]];
+  function inb(x, y) { return x >= 0 && y >= 0 && x < N && y < N; }
+  function run(x, y, dx, dy, c) { var k = 0; x += dx; y += dy; while (inb(x, y) && bd[y][x] === c) { k++; x += dx; y += dy; } return { k: k, open: inb(x, y) && bd[y][x] === 0, ex: x - dx, ey: y - dy }; }
+  function five(x, y, c) {
+    for (var d = 0; d < 4; d++) { var a = run(x, y, D[d][0], D[d][1], c), b = run(x, y, -D[d][0], -D[d][1], c); if (a.k + b.k + 1 >= 5) return [[b.ex, b.ey], [a.ex, a.ey]]; }
+    return null;
+  }
+  function val(x, y, c) {
+    var s = 0;
+    for (var d = 0; d < 4; d++) {
+      var a = run(x, y, D[d][0], D[d][1], c), b = run(x, y, -D[d][0], -D[d][1], c), n = a.k + b.k + 1, o = (a.open ? 1 : 0) + (b.open ? 1 : 0);
+      if (n >= 5) s += 100000; else if (n === 4) s += o === 2 ? 10000 : o ? 1500 : 0; else if (n === 3) s += o === 2 ? 1200 : o ? 150 : 0; else if (n === 2) s += o === 2 ? 120 : o ? 20 : 0; else s += o === 2 ? 5 : o;
+    }
+    return s;
+  }
+  function near(x, y) { for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) if (inb(x + dx, y + dy) && bd[y + dy][x + dx]) return true; return false; }
+  function think() {
+    var c = [], dw = lvl === 1 ? .55 : .95;
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) if (!bd[y][x] && near(x, y)) {
+      var at = val(x, y, 2), df = val(x, y, 1), sc = at + df * dw;
+      if (at >= 100000) sc = 1e9; else if (df >= 100000) sc = 1e8;
+      sc += (6 - Math.max(Math.abs(x - 6), Math.abs(y - 6))) * .5 + Math.random();
+      c.push({ x: x, y: y, s: sc });
+    }
+    c.sort(function (a, b) { return b.s - a.s; });
+    if (lvl === 1 && c[0].s < 1e8 && c.length > 3 && Math.random() < .35) return c[1 + Math.floor(Math.random() * 2)];
+    return c[0];
+  }
+  function place(x, y, col) {
+    bd[y][x] = col; hist.push([x, y, col]); var w = five(x, y, col);
+    if (w) { over = { win: col, line: w }; draw(); finish(); return true; }
+    if (hist.length >= N * N) { over = { win: 0 }; draw(); finish(); return true; }
+    return false;
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    e.preventDefault(); if (over || busy) return;
+    var r = cv.getBoundingClientRect(), k = S / r.width, x = Math.round(((e.clientX - r.left) * k - P) / C), y = Math.round(((e.clientY - r.top) * k - P) / C);
+    if (!inb(x, y) || bd[y][x]) return;
+    buzz(15); if (place(x, y, 1)) return; draw();
+    busy = true; $('msg').textContent = '🍒 체리가 생각 중…';
+    setTimeout(function () { var m = think(); busy = false; if (!place(m.x, m.y, 2)) { draw(); $('msg').textContent = '내 차례예요 ⚫'; } }, 380);
+  });
+  var last = null;
+  function finish() {
+    var mine = hist.filter(function (h) { return h[2] === 1; }).length, g, txt;
+    if (over.win === 1) { rec.w++; g = lvl === 2 && !undos ? { e: '🏆', t: '오목 9단' } : lvl === 2 ? { e: '⚫', t: '오목 고수' } : { e: '😊', t: '잘했어요' }; txt = mine + '수 만에 체리를 이겼어요!'; $('msg').textContent = '🎉 내가 이겼다!'; }
+    else if (over.win === 2) { rec.l++; g = { e: '🍒', t: '체리 승!' }; txt = '아깝다! ' + mine + '수 두고 체리한테 졌어요'; $('msg').textContent = '🍒 체리가 이겼어요'; }
+    else { g = { e: '🤝', t: '무승부' }; txt = '판이 꽉 찼어요'; $('msg').textContent = '🤝 무승부'; }
+    save(KEY, rec); last = { win: over.win, m: mine, g: g };
+    var win = cmv && over.win === 1 && cl === lvl ? (mine < cmv ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님보다 빨리 이겼어요!</div>' : mine === cmv ? '<div class="s">🤝 ' + esc(cn || '친구') + '님과 같은 수!</div>' : '<div class="s">😅 ' + esc(cn || '친구') + '님이 ' + (mine - cmv) + '수 덜 뒀어요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + txt + (undos ? ' (무르기 ' + undos + '번)' : '') + '</div>' + win;
+    $('send').textContent = over.win === 1 ? '💬 친구한테 도전장 보내기' : '💬 친구한테 복수 부탁하기';
+    paintBest(); showOut();
+  }
+  $('undo').addEventListener('click', function () {
+    if (busy || !hist.length) return; if (over) { over = false; $('out').hidden = true; }
+    var popped = 0; while (hist.length && popped < 2) { var h = hist.pop(); bd[h[1]][h[0]] = 0; popped++; if (h[2] === 1) break; }
+    undos++; draw(); $('msg').textContent = '↩ 무르기! 내 차례예요';
+  });
+  $('again').addEventListener('click', reset);
+  document.querySelectorAll('.lv button').forEach(function (x) { x.addEventListener('click', function () { lvl = +x.dataset.l; reset(); }); });
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/omok/');
+    if (last.win === 1) { u.searchParams.set('m', last.m); u.searchParams.set('l', lvl); }
+    if (nm) u.searchParams.set('n', nm);
+    var t = last.win === 1 ? '⚫ 체리를 ' + last.m + '수 만에 이겼다! ' + last.g.e + ' ' + last.g.t : '🍒 체리한테 오목 졌어… 복수해 줄 사람?';
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + t, desc: last.win === 1 ? '너는 몇 수 만에 이길래? 체리랑 오목 한 판!' : '체리 오목 생각보다 세요. 네가 대신 이겨 줘!', btn: '⚫ 오목 두기' });
+  });
+  window.addEventListener('resize', size);
+  reset(); size(); paintBest();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

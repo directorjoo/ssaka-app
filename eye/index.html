@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>내 눈 나이는? — 싸바</title>
+  <meta name="description" content="색깔이 살짝 다른 한 칸을 찾아라! 40초 동안 몇 단계까지 갈까? 재미로 보는 눈 나이.">
+  <meta name="theme-color" content="#B3132B">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/eye/">
+  <meta property="og:title" content="👀 내 눈 나이는? — 싸바 다른 색 찾기">
+  <meta property="og:description" content="색깔이 살짝 다른 한 칸을 찾아라! 40초 동안 몇 단계까지 갈까? 재미로 보는 눈 나이.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #B3132B; --ac: #B3132B; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#C8203A 0%,#B3132B 50%,#8E0A1C 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .board { display: grid; gap: 6px; margin-top: 14px; padding: 10px; border-radius: 22px; background: #fff; aspect-ratio: 1; touch-action: manipulation; }
+    .board button { border: 0; padding: 0; border-radius: 10px; cursor: pointer; }
+    .board.bad { animation: shake .3s; }
+    @keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    .ready { display: grid; place-items: center; height: 100%; color: #B3132B; font-size: 22px; font-weight: 900; text-align: center; line-height: 1.5; text-shadow: none; }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">👀</div>
+    <h1>내 눈 나이는?</h1>
+    <p>색깔이 살짝 다른 한 칸을 찾아 콕!<br>40초 동안 몇 단계까지 갈까요? 틀리면 3초 깎여요.</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="stat"><span>🎯 <span id="sc">0</span>단계</span><span>⏱ <span id="tm">40</span>초</span></div>
+  <div class="board" id="board"><div class="ready">아래 시작을 누르면<br>칸이 나와요</div></div>
+  <button type="button" class="go" id="go">▶ 시작!</button>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 재미로 보는 눈 나이</h3>
+    <div><span>🦅 매의 눈 (20대 눈)</span><span>30단계 이상</span></div>
+    <div><span>👓 또렷한 눈 (30대 눈)</span><span>24단계 이상</span></div>
+    <div><span>😊 좋은 눈 (40대 눈)</span><span>18단계 이상</span></div>
+    <div><span>🌿 쉬엄쉬엄 (50대 눈)</span><span>12단계 이상</span></div>
+    <div><span>🍵 눈 좀 쉬어요</span><span>그 밖</span></div>
+  </div>
+  <div class="more"><a href="../react/">🚦 순발력 나이</a><a href="../mole/">🐹 두더지 잡기</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  var KEY = 'sava-eye-v1', best = load(KEY, 0), lv = 0, left = 40, end0 = 0, tick = null, run = false;
+  function paintBest() { $('best').textContent = best ? '내 최고 ' + best + '단계' : ''; }
+  function grade(s) { return s >= 30 ? { e: '🦅', t: '매의 눈', a: '20대' } : s >= 24 ? { e: '👓', t: '또렷한 눈', a: '30대' } : s >= 18 ? { e: '😊', t: '좋은 눈', a: '40대' } : s >= 12 ? { e: '🌿', t: '쉬엄쉬엄 눈', a: '50대' } : { e: '🍵', t: '눈 좀 쉬어요', a: '60대 이상' }; }
+  var cs = +qp.get('s'), cn = (qp.get('n') || '').slice(0, 10);
+  if (qp.has('s')) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님 기록: <b>' + cs + '단계</b>!<br>더 멀리 가면 내가 이겨요'; }
+  function draw() {
+    var n = Math.min(7, 2 + Math.floor(lv / 4)), d = Math.max(4, 26 - lv * 0.85);
+    var h = Math.floor(Math.random() * 360), s = 55 + Math.floor(Math.random() * 25), l = 42 + Math.floor(Math.random() * 16);
+    var odd = Math.floor(Math.random() * n * n), bd = $('board');
+    bd.innerHTML = ''; bd.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
+    for (var i = 0; i < n * n; i++) (function (i) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.style.background = 'hsl(' + h + ',' + s + '%,' + (i === odd ? l + d : l) + '%)';
+      b.setAttribute('aria-label', i === odd ? '다른 칸' : '칸');
+      b.addEventListener('pointerdown', function (e) { e.preventDefault(); tap(i === odd); });
+      bd.appendChild(b);
+    })(i);
+  }
+  function tap(ok) {
+    if (!run) return;
+    if (ok) { lv++; $('sc').textContent = lv; buzz(20); draw(); }
+    else { end0 -= 3000; buzz(160); var bd = $('board'); bd.classList.remove('bad'); void bd.offsetWidth; bd.classList.add('bad'); }
+  }
+  function start() {
+    lv = 0; $('sc').textContent = '0'; $('out').hidden = true; $('go').hidden = true; run = true;
+    end0 = Date.now() + 40000; draw();
+    tick = setInterval(function () { left = Math.ceil((end0 - Date.now()) / 1000); $('tm').textContent = Math.max(0, left); if (left <= 0) end(); }, 150);
+  }
+  var last = null;
+  function end() {
+    run = false; clearInterval(tick); $('tm').textContent = '0';
+    var g = grade(lv), nb = lv > best; last = { s: lv, g: g }; if (nb) { best = lv; save(KEY, best); }
+    $('board').innerHTML = '<div class="ready">' + g.e + ' 끝!</div>'; $('board').style.gridTemplateColumns = '1fr';
+    var win = qp.has('s') ? (lv > cs ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : lv === cs ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + (cs - lv) + '단계 모자라요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + lv + '단계 · 재미로 보는 눈 나이 <b>' + g.a + '</b>' + (nb ? ' · 🏆 내 최고!' : '') + '</div>' + win;
+    $('go').hidden = false; $('go').textContent = '🔁 한 판 더!'; paintBest(); showOut();
+  }
+  $('go').addEventListener('click', start);
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/eye/');
+    u.searchParams.set('s', last.s); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '👀 내 눈 나이는 ' + last.g.a + '! ' + last.g.e + ' ' + last.s + '단계', desc: '다른 색 한 칸 찾기, ' + last.s + '단계까지 갔어요. 너의 눈 나이는?', btn: '👀 내 눈 나이 보기' });
+  });
+  paintBest();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

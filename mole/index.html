@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <title>두더지 잡기 — 싸바</title>
+  <meta name="description" content="30초 동안 튀어나오는 두더지를 콩! 폭탄은 피하고 황금 체리는 +3점.">
+  <meta name="theme-color" content="#1E7A46">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sava.kr/mole/">
+  <meta property="og:title" content="🐹 두더지 잡기 — 싸바 30초 대결">
+  <meta property="og:description" content="30초 동안 튀어나오는 두더지를 콩! 폭탄은 피하고 황금 체리는 +3점.">
+  <meta property="og:image" content="https://sava.kr/img/eodiya-share.png?v=4">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="싸바">
+  <style>
+    :root { --bg: #1E7A46; --ac: #1E7A46; --fg: #fff; --sh: 0 1px 2px rgba(0,0,0,.45); --ink: #1E1E1E; --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    [hidden] { display: none !important; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+    body { min-height: 100svh; background: linear-gradient(180deg,#2A9358 0%,#1E7A46 50%,#155C34 100%); background-attachment: fixed; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+    .top a { display: flex; align-items: center; gap: 6px; color: var(--fg); text-decoration: none; font-weight: 900; font-size: 17px; text-shadow: var(--sh); }
+    .top a img { width: 26px; height: 26px; }
+    .top { padding-right: 104px; }
+    .top .best { font-size: 15px; font-weight: 800; text-shadow: var(--sh); }
+    .hero { text-align: center; margin-top: 12px; }
+    .hero .ic { font-size: 56px; line-height: 1; }
+    .hero h1 { margin: 8px 0 0; font-size: 33px; font-weight: 900; letter-spacing: -0.04em; text-shadow: var(--sh); }
+    .hero p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; word-break: keep-all; text-shadow: var(--sh); }
+    .chal { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; }
+    .go { display: grid; place-items: center; width: 100%; min-height: 68px; margin-top: 14px; border: 0; border-radius: 20px; background: #fff; color: var(--ac); font: inherit; font-size: 21px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 24px -14px rgba(0,0,0,.6); }
+    .ghost { display: grid; place-items: center; width: 100%; min-height: 54px; margin-top: 8px; border: 0; border-radius: 16px; background: rgba(255,255,255,.2); color: var(--fg); font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .kakao { display: grid; place-items: center; width: 100%; min-height: 58px; margin-top: 8px; border: 0; border-radius: 16px; background: #FEE500; color: #3a1d1d; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; }
+    .result { margin-top: 16px; padding: 20px 16px 16px; border-radius: 24px; background: #fff; color: var(--ink); text-align: center; animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop { from { transform: scale(.88); opacity: 0; } to { transform: none; opacity: 1; } }
+    .result .e { font-size: 54px; line-height: 1; }
+    .result h2 { margin: 8px 0 2px; font-size: 28px; font-weight: 900; color: var(--ac); }
+    .result .s { font-size: 18px; font-weight: 800; color: #555; margin-top: 4px; word-break: keep-all; }
+    .name { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+    .name input { flex: 1; min-height: 46px; padding: 0 12px; border: 0; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+    .ranks { margin-top: 18px; padding: 14px; border-radius: 18px; background: rgba(0,0,0,.16); }
+    .ranks h3 { margin: 0 0 6px; font-size: 15px; font-weight: 900; }
+    .ranks div { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid rgba(255,255,255,.25); font-size: 16px; }
+    .ranks div:first-of-type { border-top: 0; }
+    .ranks div span:last-child { font-weight: 800; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .more a { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: rgba(255,255,255,.2); color: var(--fg); text-decoration: none; font-weight: 800; font-size: 16px; }
+    .foot { margin-top: 16px; text-align: center; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .foot a { color: var(--fg); }
+    .stat { display: flex; justify-content: center; gap: 18px; margin-top: 14px; font-size: 20px; font-weight: 900; text-shadow: var(--sh); font-variant-numeric: tabular-nums; }
+
+    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; padding: 14px; border-radius: 24px; background: #6B4A2B; box-shadow: inset 0 4px 0 rgba(0,0,0,.25); touch-action: manipulation; }
+    .hole { position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 50%; background: radial-gradient(ellipse at 50% 70%, #2b1a0c 0 55%, #4a3018 56% 100%); overflow: hidden; cursor: pointer; }
+    .hole span { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; display: grid; place-items: center; font-size: clamp(40px, 15vw, 64px); transform: translateY(105%); transition: transform .12s ease-out; }
+    .hole.up span { transform: translateY(6%); }
+    .hole.hit span { transform: translateY(6%) scale(.8) rotate(-12deg); filter: grayscale(.6); }
+    .pop { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); font-size: 24px; font-weight: 900; color: #FFE14D; text-shadow: 0 2px 3px rgba(0,0,0,.6); pointer-events: none; animation: up .6s ease-out forwards; }
+    .pop.minus { color: #fff; }
+    @keyframes up { to { top: -10%; opacity: 0; } }
+    .legend { display: flex; justify-content: center; gap: 14px; margin-top: 10px; font-size: 16px; font-weight: 800; text-shadow: var(--sh); }
+
+    @media (prefers-reduced-motion: reduce) { .result, * { animation: none !important; } }
+  </style>
+<script src="/js/launch.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="../eodiya/#play"><img src="../img/cherry.webp" alt="">싸바 놀이터</a><span class="best" id="best"></span></div>
+
+  <div class="hero">
+    <div class="ic" aria-hidden="true">🐹</div>
+    <h1>두더지 잡기</h1>
+    <p>30초 동안 튀어나오는 두더지를 콩!<br>폭탄은 피하고, 황금 체리는 꼭 잡아요.</p>
+  </div>
+  <div class="chal" id="chal" hidden></div>
+  <div class="legend"><span>🐹 +1</span><span>🍒 +3</span><span>💣 −2</span></div>
+  <div class="stat"><span>⭐ <span id="sc">0</span>점</span><span>⏱ <span id="tm">30</span>초</span></div>
+  <div class="board" id="board"></div>
+  <button type="button" class="go" id="go">▶ 시작!</button>
+  <div id="out" hidden>
+    <div class="result" id="result"></div>
+    <label class="name">내 이름 <input id="me" maxlength="10" placeholder="도전장에 보일 이름"></label>
+    <button type="button" class="kakao" id="send">💬 친구한테 도전장 보내기</button>
+  </div>
+
+  <div class="ranks">
+    <h3>🏅 두더지 등급</h3>
+    <div><span>👑 두더지 대장</span><span>30점 이상</span></div>
+    <div><span>🔨 망치 고수</span><span>22점 이상</span></div>
+    <div><span>😊 잘했어요</span><span>14점 이상</span></div>
+    <div><span>🌱 한 번 더!</span><span>그 밖</span></div>
+  </div>
+  <div class="more"><a href="../react/">🚦 순발력 나이</a><a href="../eye/">👀 내 눈 나이</a></div>
+
+  <p class="foot">재미로 하는 싸바 놀이예요. 기록은 이 휴대폰에만 남아요.<br><a href="../?story=1">싸바가 뭐지?</a></p>
+</div>
+<script src="../js/install.js?v=2"></script>
+<script src="../js/share.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var qp = new URLSearchParams(location.search);
+  function myName() { try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); return me.from || ''; } catch (e) { return ''; } }
+  if ($('me')) $('me').value = myName();
+  function saveName() { var n = $('me').value.trim(); if (!n) return ''; try { var me = JSON.parse(localStorage.getItem('eodiya-me-v1') || '{}'); me.from = n; localStorage.setItem('eodiya-me-v1', JSON.stringify(me)); } catch (e) {} return n; }
+  function share(o) {
+    if (window.SsakaShare) return SsakaShare({ url: o.url, title: o.title, description: o.desc, imageUrl: 'https://sava.kr/img/eodiya-share.png?v=4', imageWidth: 1000, imageHeight: 600, buttonTitle: o.btn || '나도 해 보기', installTitle: '싸바 설치하기' });
+    if (navigator.share) navigator.share({ title: o.title, text: o.desc, url: o.url }).catch(function () {});
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+  function showOut() { $('out').hidden = false; setTimeout(function () { $('out').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
+
+  var KEY = 'sava-mole-v1', best = load(KEY, 0), holes = [], score = 0, left = 30, run = false, t0 = 0, tick = null, spawnT = null;
+  function paintBest() { $('best').textContent = best ? '내 최고 ' + best + '점' : ''; }
+  function grade(s) { return s >= 30 ? { e: '👑', t: '두더지 대장' } : s >= 22 ? { e: '🔨', t: '망치 고수' } : s >= 14 ? { e: '😊', t: '잘했어요' } : { e: '🌱', t: '한 번 더!' }; }
+  var cs = +qp.get('s'), cn = (qp.get('n') || '').slice(0, 10);
+  if (qp.has('s')) { $('chal').hidden = false; $('chal').innerHTML = '📮 <b>' + esc(cn || '친구') + '</b>님 기록: <b>' + cs + '점</b>!<br>이보다 많이 잡으면 내가 이겨요'; }
+  for (var i = 0; i < 9; i++) (function (i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'hole'; b.setAttribute('aria-label', (i + 1) + '번 구멍');
+    b.innerHTML = '<span></span>'; $('board').appendChild(b);
+    var h = { el: b, kind: null, timer: null }; holes.push(h);
+    b.addEventListener('pointerdown', function (e) { e.preventDefault(); hit(h); });
+  })(i);
+  function popText(h, t, minus) { var p = document.createElement('div'); p.className = 'pop' + (minus ? ' minus' : ''); p.textContent = t; h.el.appendChild(p); setTimeout(function () { p.remove(); }, 650); }
+  function hide(h) { clearTimeout(h.timer); h.kind = null; h.el.classList.remove('up', 'hit'); }
+  function hit(h) {
+    if (!run || !h.kind || h.el.classList.contains('hit')) return;
+    var k = h.kind, d = k === 'gold' ? 3 : k === 'bomb' ? -2 : 1;
+    score = Math.max(0, score + d); $('sc').textContent = score;
+    popText(h, (d > 0 ? '+' : '') + d, d < 0); buzz(d < 0 ? 180 : 25);
+    h.el.classList.add('hit'); clearTimeout(h.timer); h.timer = setTimeout(function () { hide(h); }, 180);
+  }
+  function spawn() {
+    if (!run) return;
+    var el = (Date.now() - t0) / 30000, free = holes.filter(function (h) { return !h.kind; });
+    if (free.length) {
+      var h = free[Math.floor(Math.random() * free.length)], r = Math.random();
+      h.kind = r < .1 ? 'gold' : r < .22 ? 'bomb' : 'mole';
+      h.el.firstChild.textContent = h.kind === 'gold' ? '🍒' : h.kind === 'bomb' ? '💣' : '🐹';
+      h.el.classList.remove('hit'); h.el.classList.add('up');
+      h.timer = setTimeout(function () { hide(h); }, 1050 - el * 450);
+    }
+    spawnT = setTimeout(spawn, 820 - el * 420 + Math.random() * 200);
+  }
+  function start() {
+    holes.forEach(hide); score = 0; left = 30; $('sc').textContent = '0'; $('tm').textContent = '30'; $('out').hidden = true;
+    run = true; t0 = Date.now(); $('go').hidden = true;
+    tick = setInterval(function () { left = 30 - Math.floor((Date.now() - t0) / 1000); $('tm').textContent = Math.max(0, left); if (left <= 0) end(); }, 200);
+    spawn();
+  }
+  var last = null;
+  function end() {
+    run = false; clearInterval(tick); clearTimeout(spawnT); holes.forEach(hide);
+    var g = grade(score), nb = score > best; last = { s: score, g: g };
+    if (nb) { best = score; save(KEY, best); }
+    var win = qp.has('s') ? (score > cs ? '<div class="s" style="color:#1E7A46">🎉 ' + esc(cn || '친구') + '님을 이겼어요!</div>' : score === cs ? '<div class="s">🤝 비겼어요!</div>' : '<div class="s">😅 ' + (cs - score) + '점 모자라요</div>') : '';
+    $('result').innerHTML = '<div class="e">' + g.e + '</div><h2>' + g.t + '</h2><div class="s">' + score + '점' + (nb ? ' · 🏆 내 최고!' : '') + '</div>' + win;
+    $('go').hidden = false; $('go').textContent = '🔁 한 판 더!'; paintBest(); showOut();
+  }
+  $('go').addEventListener('click', start);
+  $('send').addEventListener('click', function () {
+    if (!last) return; var nm = saveName(), u = new URL('https://sava.kr/mole/');
+    u.searchParams.set('s', last.s); if (nm) u.searchParams.set('n', nm);
+    share({ url: u.href, title: (nm ? nm + ': ' : '') + '🐹 두더지 ' + last.s + '점! ' + last.g.e + ' ' + last.g.t, desc: '30초 동안 ' + last.s + '점 잡았어요. 너는 몇 점?', btn: '🔨 도전하기' });
+  });
+  paintBest();
+
+})();
+</script>
+<script src="/js/home.js?v=10" defer></script>
+</body>
+</html>

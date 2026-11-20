@@ -157,16 +157,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fillIcons); else fillIcons();
   function addLang() {
     if (document.querySelector('.sava-lang')) return;
-    var base = 'position:fixed;z-index:9990;top:calc(' + (+(ds.langTop || 10)) + 'px + env(safe-area-inset-top));width:46px;height:46px;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.22)';
+    var base = 'position:fixed;z-index:9990;top:calc(' + (+(ds.langTop || 10)) + 'px + env(safe-area-inset-top));width:36px;height:36px;border:1px solid rgba(110,68,21,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(110,68,21,.16)';
+    // 11-21 홈과 같이: 작은 반투명 흰 동그라미 + 진한 색 아이콘 (가=갈색, A·톱니=체리 레드)
+    if (!document.getElementById('sava-ic-css')) { var cs = document.createElement('style'); cs.id = 'sava-ic-css'; cs.textContent = '.sava-set svg{width:21px;height:21px}.sava-set svg path{fill:#B3132B}.sava-lang svg{width:27px;height:27px}.sava-lang svg text:first-of-type{fill:#5A3A14}.sava-lang svg text:last-of-type{fill:#B3132B}.sava-lang svg path{stroke:#5A3A14}'; document.head.appendChild(cs); }
     var g = document.createElement('button');
     g.type = 'button'; g.className = 'sava-set notranslate'; g.setAttribute('translate', 'no'); g.setAttribute('aria-label', '설정 · 글씨 크기');
     g.innerHTML = ICON_SET;
-    g.style.cssText = base + ';right:calc(10px + env(safe-area-inset-right));background:linear-gradient(145deg,#D4213D,#8E0F22)';
+    g.style.cssText = base + ';right:calc(10px + env(safe-area-inset-right))';
     g.addEventListener('click', function () { if (window.SavaSettings) SavaSettings.open(); });
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'sava-lang notranslate'; b.setAttribute('translate', 'no'); b.setAttribute('aria-label', 'Language 언어');
     b.innerHTML = ICON_LANG;
-    b.style.cssText = base + ';right:calc(64px + env(safe-area-inset-right));background:linear-gradient(145deg,#2E4A8C,#16244A)';
+    b.style.cssText = base + ';right:calc(52px + env(safe-area-inset-right))';
     b.addEventListener('click', function () { if (window.SavaTr) SavaTr.open(); });
     document.body.appendChild(b); document.body.appendChild(g);
   }

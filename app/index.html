@@ -355,6 +355,27 @@
     .nc .wx { position: absolute; right: 18px; top: -46px; z-index: 1; padding: 8px 14px; border-radius: 16px; background: rgba(255,255,255,.88); color: #1E3A55; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
     .nc .wx small { display: block; margin-top: 3px; font-size: 15px; font-weight: 600; }
     .nc a:focus-visible, a.nc:focus-visible { outline: 3px solid #B3132B; outline-offset: 2px; }
+    /* ===== 홈 카드 세로 반으로 (2026-11-21 대표님: "세로 길이를 반으로") — 사진은 카드 바탕으로 깔고 글칸·띠를 얇게 ===== */
+    #v-home .nc { position: relative; margin: 0 18px 20px; border-radius: 20px; }
+    #v-home .nc.has-ph { padding-top: 64px; }
+    #v-home .nc .ph { position: absolute; left: 0; right: 0; top: 0; bottom: 0; height: auto; }
+    #v-home .nc .ph::after { height: 100%; background: linear-gradient(180deg, transparent 0%, transparent 18%, var(--c0) 62%); }
+    #v-home .nc .ph.art { display: grid; place-items: center end; padding-right: 22px; height: auto; background: var(--g); font-size: 60px; }
+    #v-home .nc .tx { padding: 0 18px 10px; }
+    #v-home .nc .tx.np, #v-home .nc.has-art .tx { padding-top: 14px; padding-right: 96px; }
+    #v-home .nc .tx em { font-size: 15px; }
+    #v-home .nc .tx h3 { margin: 0 0 2px; font-size: 26px; }
+    #v-home .nc .tx p { font-size: 15px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #v-home .nc .bar { position: relative; gap: 10px; padding: 7px 12px; }
+    #v-home .nc .bar i { width: 36px; height: 36px; border-radius: 10px; font-size: 20px; }
+    #v-home .nc .bar b { font-size: 17px; }
+    #v-home .nc .bar u, #v-home .nc .bar .pill { min-height: 34px; padding: 0 14px; font-size: 16px; }
+    #v-home .nc .crown { top: -50px; right: 14px; width: 42px; height: 42px; font-size: 22px; }
+    #v-home .nc .wx { top: -54px; right: 14px; padding: 5px 10px; font-size: 20px; }
+    #v-home .nc .eo3 { position: relative; padding: 8px 12px 12px; gap: 6px; }
+    #v-home .nc .eo3 a { min-height: 48px; font-size: 18px; }
+    #v-home .n-h { margin-bottom: 10px; }
+    #v-home .n-h h2 { font-size: 23px; }
     .camp2 { gap: 16px 12px; margin-bottom: 26px; }
     /* 떠 있는 알약 아래 메뉴 — 체리 레드는 지금 누른 메뉴에만 */
     body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
@@ -671,7 +692,7 @@
   };
   // 표준 카드 한 장: o = { pal, href, photo, art, em, title, desc, icon, name, sub, btn, label }
   function ncard(o) {
-    var P = PAL[o.pal], c = el(o.href ? 'a' : 'div', 'nc ' + (P.dk ? 'dk' : 'lt'));
+    var P = PAL[o.pal], c = el(o.href ? 'a' : 'div', 'nc ' + (P.dk ? 'dk' : 'lt') + (o.photo ? ' has-ph' : o.art ? ' has-art' : ''));
     if (o.href) { c.href = o.href; if (o.label) c.setAttribute('aria-label', o.label); }
     ['g', 'b', 't', 's', 'btn', 'c0'].forEach(function (k) { c.style.setProperty('--' + k, P[k]); });
     var ph = el('div', 'ph' + (o.art ? ' art' : ''));

@@ -758,7 +758,7 @@
     var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '오늘의 싸바');
     rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘의 싸바</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
     v.appendChild(rd);
-    homeWeather(rd);
+    // 광주 기온은 지움 (11-21 대표님) — 전국 날씨는 오늘의 싸바 '전국 날씨' 탭에서
 
     // 5. 지금 보내기 좋은 카드
     v.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));

@@ -511,6 +511,15 @@
     #v-home.v2 .v2-mk .sp span { flex: 1; min-width: 0; }
     #v-home.v2 .v2-mk .sp b { display: block; font-size: 17px; font-weight: 800; }
     #v-home.v2 .v2-mk .sp small { display: block; font-size: 15px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #v-home.v2 .v2-td { background: linear-gradient(100deg, rgba(10,28,66,.94) 0%, rgba(17,45,98,.86) 45%, rgba(33,72,130,.55) 100%), url(../img/today-tower.jpg) 70% 35%/cover; color: #fff; }
+    #v-home.v2 .v2-td .tx { padding: 20px 20px 6px; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    #v-home.v2 .v2-td h3 { font-size: 28px; line-height: 1.25; color: #fff; }
+    #v-home.v2 .v2-td .tx p { color: #DCE8FF; }
+    #v-home.v2 .v2-td .ch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 16px 4px; }
+    #v-home.v2 .v2-td .ch span { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 4px 6px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); font-size: 15px; font-weight: 700; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.35); }
+    #v-home.v2 .v2-td .ft { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 12px 16px 16px; }
+    #v-home.v2 .v2-td .lt { color: #fff; font-size: 17px; font-weight: 800; text-decoration: none; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+    #v-home.v2 .v2-td .btn { display: inline-flex; align-items: center; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #FFFFFF, #E3ECFB); color: #0F2E66; font-size: 18px; font-weight: 800; text-decoration: none; }
     #v-home.v2 .v2-mk .sp u, #v-home.v2 .v2-strip u, #v-home.v2 .v2-sv u { text-decoration: none; font-size: 24px; font-weight: 700; }
     /* 오늘의 싸바 — 흰 띠 */
     #v-home.v2 .v2-strip { display: flex; align-items: center; gap: 12px; margin: 0 18px 32px; padding: 14px 18px; border-radius: 20px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
@@ -917,16 +926,19 @@
 
     // 2. 싸바카드(예전 싸바알림판, 11-21 대표님 이름 고름) — 초록, 단추 하나 + 특판은 아래 작은 띠
     var mk = el('section', 'v2c v2-mk');
-    mk.innerHTML = '<div class="tx"><em>🍒 싸바카드</em><h3>모임부터 가게까지,<br>카드 한 장 1분</h3><p>모임공지 · 초대장 · 가게홍보 · 인사</p>' +
+    mk.innerHTML = '<div class="tx"><em>🍒 싸바카드</em><h3>모임부터 가게까지,<br>카드 한 장 1분</h3><p>모임공지 · 초대장 · 가게홍보 · 프로필 · 인사</p>' +
       '<a class="btn" href="#alim">1분에 만들기 ›</a></div>' +
       '<img class="dance" src="../img/cherry-dance-anim.svg" alt="">' +
       '<a class="sp" href="../kimchi/"><i style="background-image:url(../img/gatkimchi-sign.jpg)"></i><span><b>언니김치 특판</b><small>특판 코너에서 가격을 확인하세요</small></span><u>›</u></a>';
     tapGo(mk, '#alim');
     v.appendChild(mk);
 
-    // 3. 오늘의 싸바 — 얇은 흰 띠 한 줄
-    var td = el('a', 'v2-strip'); td.href = '../today/';
-    td.innerHTML = '<i aria-hidden="true">☀️</i><span><b>오늘의 싸바</b><small>검색 안 해도 오늘 소식이 다 와요</small></span><u>›</u>';
+    // 3. 오늘의 싸바 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘의 싸바 = 싸바가 매일 갖다 주는 것
+    var td = el('section', 'v2c v2-td');
+    td.innerHTML = '<div class="tx"><em>☀️ 오늘의 싸바 · 매일 아침</em><h3>검색 안 해도,<br>오늘 소식이 다 와요</h3><p>날씨·뉴스·혜택을 싸바가 아침마다 모아 드려요</p></div>' +
+      '<div class="ch"><span>☀️ 날씨</span><span>🗞️ 뉴스 요약</span><span>🔥 인기 검색어</span><span>💊 건강</span><span>🔔 정부 혜택</span><span>📻 라디오·TV</span></div>' +
+      '<div class="ft"><a class="lt" href="../letter/">💌 아침카드 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
+    tapGo(td, '../today/');
     v.appendChild(td);
 
     // 4. 지금 보내기 좋은 카드 — 그대로

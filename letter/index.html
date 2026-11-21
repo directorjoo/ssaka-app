@@ -43,7 +43,9 @@
     .it i { font-style: normal; font-size: 28px; line-height: 1.1; text-align: center; }
     .it b { display: block; font-size: 18px; font-weight: 900; letter-spacing: -.02em; }
     .it p { margin: 4px 0 0; font-size: 16.5px; line-height: 1.6; word-break: keep-all; }
-    .sum { margin: 10px 0 4px; font-size: 17px; line-height: 1.75; word-break: keep-all; }
+    .sum { margin: 10px 0 4px; font-size: 17px; line-height: 1.75; word-break: keep-all; white-space: pre-line; }
+    .li .ss { white-space: pre-line; }
+    .li .wt { display: block; margin-top: 6px; font-size: 14.5px; color: #8a7f78; }
     .src { margin-top: 16px; padding-top: 12px; border-top: 2px solid #f0e4dc; font-size: 14px; font-weight: 800; color: #8a7f78; }
     .gl { margin-top: 12px; font-size: 14.5px; font-weight: 900; color: #B3132B; }
     .li { display: grid; grid-template-columns: 34px 1fr; gap: 8px; padding: 12px 0; border-top: 1px solid #f3ebe5; color: inherit; text-decoration: none; }
@@ -133,6 +135,9 @@
       c.appendChild(row);
     });
   }
+  var moreDone = false;
+  // 요약을 한 문장씩 줄로 (4줄)
+  function lines4(t) { return String(t).replace(/([.!?](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
   function go() {
     if (!rcv) try { localStorage.setItem('sava-letter-k', k); localStorage.setItem('sava-letter-city', city); } catch (e) {}
     history.replaceState(null, '', '?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)) + (rcv ? '&r=1' : ''));
@@ -141,8 +146,8 @@
     bar(); last = null;
     var p = $('paper'); p.classList.add('writing'); p.innerHTML = '<div class="msg"><span class="pen">✍️</span><br>오늘 카드를 만드는 중이에요<span class="dots"><i>.</i><i>.</i><i>.</i></span><br><small>기사를 읽고 요약하느라 처음엔 30초쯤 걸릴 수 있어요</small></div>';
     var want = k + city;
-    fetch('/api/letter?k=' + k + '&city=' + encodeURIComponent(city)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
-      if (want !== k + city) return; last = d;
+    moreDone = false;
+    function draw(d) {
       var dt = new Date(d.date + 'T00:00:00'), DAYS = '일월화수목금토';
       var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + '께 드리는 소식</div>';
       h += '<div class="hello">' + esc(d.hello) + '</div>';
@@ -150,12 +155,21 @@
         if (d.summary) h += '<p class="sum">' + esc(d.summary) + '</p>';
         if (d.items.length) h += '<div class="src">기사 요약 · 더 보고 싶은 기사만 눌러 원문으로</div>';
         var pg = '';
-        h += d.items.length ? d.items.map(function (x) { var g = x.g && x.g !== pg ? '<div class="gl">' + esc(x.g) + '</div>' : ''; pg = x.g || pg; return g + '<a class="li' + (x.sum ? ' has-s' : '') + '" href="' + esc(x.url) + '" target="_blank" rel="noopener"><i>' + esc(x.icon || '•') + '</i><span><b>' + esc(x.title) + '</b>' + (x.body ? '<small>' + esc(x.body) + '</small>' : '') + (x.sum ? '<span class="ss">' + esc(x.sum) + '</span><span class="og">원문 보기 ›</span>' : '') + '</span></a>'; }).join('') : '<div class="msg">오늘은 새 소식이 없어요. 아래 바로가기에서 확인해 보세요.</div>';
+        h += d.items.length ? d.items.map(function (x) { var g = x.g && x.g !== pg ? '<div class="gl">' + esc(x.g) + '</div>' : ''; pg = x.g || pg; return g + '<a class="li' + (x.sum ? ' has-s' : '') + '" href="' + esc(x.url) + '" target="_blank" rel="noopener"><i>' + esc(x.icon || '•') + '</i><span><b>' + esc(x.title) + '</b>' + (x.body ? '<small>' + esc(x.body) + '</small>' : '') + (x.sum ? '<span class="ss">' + esc(lines4(x.sum)) + '</span><span class="og">원문 보기 ›</span>' : (x.url && !x.tried && !moreDone ? '<span class="wt">✍️ 요약하는 중…</span>' : '')) + '</span></a>'; }).join('') : '<div class="msg">오늘은 새 소식이 없어요. 아래 바로가기에서 확인해 보세요.</div>';
         if (d.links && d.links.length) h += '<div class="go"><b>바로가기</b>' + d.links.map(function (x) { return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(x.t) + ' ›</a>'; }).join('') + '</div>';
       } else
       h += d.items.map(function (x) { return '<div class="it"><i>' + esc(x.icon || '•') + '</i><div><b>' + esc(x.title) + '</b><p>' + esc(x.body) + '</p>' + (x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">원문 보기 ›</a>' : '') + '</div></div>'; }).join('');
       h += '<div class="sign">— 🍒 싸바 드림</div>';
       p.classList.remove('writing'); p.innerHTML = h;
+    }
+    var qs = '?k=' + k + '&city=' + encodeURIComponent(city);
+    fetch('/api/letter' + qs).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+      if (want !== k + city) return; last = d; draw(d);
+      // 나머지 기사도 4줄 요약 (서버가 두 번에 나눠 읽음)
+      if (d.list && d.items.some(function (x) { return x.url && !x.sum && !x.tried; }))
+        fetch('/api/letter' + qs + '&more=1').then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (m) {
+          if (want !== k + city) return; moreDone = true; if (m.items && m.items.length) d.items = m.items; draw(d);
+        }).catch(function () { if (want === k + city) { moreDone = true; draw(d); } });
     }).catch(function () { if (want === k + city) { p.classList.remove('writing'); } if (want === k + city) p.innerHTML = '<div class="msg">카드를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
   }
   $('send').addEventListener('click', function () {

@@ -4,7 +4,8 @@
 //   GET /api/letter?k=actor  : 🎬 배우 — 영화·드라마·연극·뮤지컬·광고 오디션 (구글 뉴스 13갈래 + 더뮤지컬·씨네21, 아래 바로가기 8곳)
 //   &city=전남 (17개 광역자치단체 중 하나 — 날씨 지역, 기본 광주)
 // 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다.
-// 기사마다 원문을 열어 본문을 읽고 AI가 3~4줄로 요약합니다(11-21 대표님: 제목만 나열하면 안 봄). 본문을 못 가져온 기사는 제목·링크만.
+// 기사마다 원문을 열어 본문을 읽고 AI가 4줄로 요약합니다(11-21 대표님: 제목만 나열하면 안 봄 / 11-22: 모든 기사 4줄, 길어져도 됨).
+// 처음 부를 때 앞 7개, 받는 화면이 곧바로 ?more=1로 나머지를 요약해 캐시에 합침(Cloudflare 무료 바깥 요청 50개 한도를 두 번에 나눔). 본문을 못 가져온 기사는 제목·링크만.
 // 주가·환율은 아침카드에 넣지 않음(11-22 대표님: 주식은 따로 탭) — 오늘의 싸바 📈 주식 탭(/api/today?k=stock)에서. market()은 그쪽에서 씀.
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
 // 있으면 더 정확해지는 환경변수: DATA_API_KEY(공공데이터포털 일반 인증키 하나로 관광공사 행사 + 중기부 기업마당 지원사업 둘 다)
@@ -111,7 +112,7 @@ async function programs(env, c, diag) {
 }
 
 // 편지 모양: 맨 위 인사 + 요점 정리(AI가 몇 문장으로) → 아래에 기사·공고 제목과 출처, 원문 링크 목록
-const COMMON = '규칙: 아래 자료 제목들을 읽고 받는 사람에게 오늘 꼭 알릴 것만 골라 요점을 정리한다. 자료에 있는 이름(회사·작품·기관·행사)과 날짜를 그대로 짚어 준다. 자료에 없는 숫자·날짜·사실은 지어내지 않는다. 명언·고사성어·좋은 글귀·교훈, 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)와 마크다운 금지.\n답 형식(다른 말 없이): 첫 줄에 인사 한 줄, 그다음 줄에 요점 3~5문장을 한 문단으로.';
+const COMMON = '규칙: 아래 자료 제목들을 읽고 받는 사람에게 오늘 꼭 알릴 것만 골라 요점을 정리한다. 자료에 있는 이름(회사·작품·기관·행사)과 날짜를 그대로 짚어 준다. 자료에 없는 숫자·날짜·사실은 지어내지 않는다. 명언·고사성어·좋은 글귀·교훈, 정치 다툼, 연예 가십, 사건사고는 넣지 않는다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)와 마크다운 금지.\n답 형식(다른 말 없이): 첫 줄에 인사 한 줄, 그다음 줄부터 요점 7줄 — 한 줄에 한 문장씩, 줄마다 다른 소식이나 할 일(자료가 적으면 5줄까지 줄여도 됨).';
 const RULES = {
   senior: '너는 어르신(60~80대)께 매일 아침 건강 편지를 보내는 동네 보건소 간호사 같은 사람이다. hello는 날씨를 넣어서(예: 어르신, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨에 맞춘 몸 관리 한 마디 + 자료에서 유행 질병, 무료 접종·검진·혜택, 조심할 사기 수법의 요점. ' + COMMON,
   boss: '너는 동네 가게 대표님(자영업자)께 매일 아침 매출에 도움 되는 편지를 보내는 장사 선배다. hello는 날씨를 넣어서(예: 대표님, 싸바? 광주는 오늘 영하 2도예요). summary: 오늘 날씨로 잘 팔릴 것 한 마디 + 자료에서 마감 가까운 지원사업, 사람 몰리는 축제·행사, 장사에 닿는 뉴스의 요점. ' + COMMON,
@@ -205,13 +206,13 @@ async function readOne(x) {
     return { url: u, text };
   } catch (e) { return null; }
 }
-const SUM_RULE = '너는 바쁜 사람에게 기사를 대신 읽어 주는 비서다. 아래 [번호] 기사 본문을 읽고 기사마다 3~4문장으로 요약한다. 받는 사람이 이 요약만 보고 원문을 열지 말지 정할 수 있게: 무엇이 바뀌었는지·누가 해당되는지·언제까지·어떻게 신청하는지·얼마인지를 본문에 있는 대로 먼저. 본문에 없는 숫자·날짜·사실은 절대 지어내지 않는다. 본문이 기사 내용이 아니거나(광고·로그인 안내 등) 너무 짧아 알 수 없으면 그 번호는 "-"만 쓴다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)·마크다운 금지.\n답 형식(다른 말 없이): 기사마다 한 줄에 "[번호] 요약".';
+const SUM_RULE = '너는 바쁜 사람에게 기사를 대신 읽어 주는 비서다. 아래 [번호] 기사 본문을 읽고 기사마다 꼭 4문장으로 요약한다(한 문장이 한 줄 — 받는 화면에서 4줄로 보임, 길어져도 괜찮으니 4문장을 채운다). 받는 사람이 이 요약만 보고 원문을 열지 말지 정할 수 있게: 무엇이 바뀌었는지·누가 해당되는지·언제까지·어떻게 신청하는지·얼마인지를 본문에 있는 대로 먼저. 본문에 없는 숫자·날짜·사실은 절대 지어내지 않는다. 본문이 기사 내용이 아니거나(광고·로그인 안내 등) 너무 짧아 알 수 없으면 그 번호는 "-"만 쓴다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)·마크다운 금지.\n답 형식(다른 말 없이): 기사마다 한 줄에 "[번호] 요약".';
 async function summarize(arts, k, env, key) {
   const who = { senior: '받는 사람: 60~80대 어르신', boss: '받는 사람: 동네 가게 대표님(자영업자)', actor: '받는 사람: 오디션을 찾는 배우' }[k];
   const r = await tfetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
-    body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: SUM_RULE + '\n' + who, messages: [{ role: 'user', content: arts.map(a => '[' + a.n + '] 제목: ' + a.t + '\n본문: ' + a.text).join('\n\n') }] })
+    body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 6000, system: SUM_RULE + '\n' + who, messages: [{ role: 'user', content: arts.map(a => '[' + a.n + '] 제목: ' + a.t + '\n본문: ' + a.text).join('\n\n') }] })
   }, 45000);
   if (!r.ok) return {};
   const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '', out = {};
@@ -270,9 +271,12 @@ async function build(k, city, env) {
     if (tr.length) extra = '\n[지금 인기 검색어] ' + tr.join(', ');
     links = BOSS_LINKS;
   } else {
-    const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d', '오디션 개최 배우 when:30d', '신인 배우 발굴 오디션 when:30d', '숏폼 드라마 배우 모집 when:30d', 'site:themusical.co.kr 오디션 when:60d', 'site:cine21.com 오디션 when:60d'];
+    const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 배우 OR 연기자 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d', '배우 오디션 개최 when:30d', '신인 배우 발굴 오디션 when:30d', '숏폼 드라마 배우 모집 when:30d', 'site:themusical.co.kr 오디션 when:60d', 'site:cine21.com 오디션 when:60d'];
     const got = await Promise.all(qs.map(q => news(q, 12)));
-    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).filter((x, i, a) => a.slice(0, i).filter(y => y.src === x.src).length < 4).slice(0, 20); // 한 곳(출처)에서 최대 4개 — 필름메이커스만 가득 차지 않게
+    // 11-22 대표님: '오디션'만 보면 술·창업자 오디션까지 들어옴 → 제목에 배우·연기 쪽 말이 있어야 하고, 창업·가수 등 다른 오디션은 뺌
+    const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
+    const NOT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
+    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && ACT.test(x.t) && !NOT.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).filter((x, i, a) => a.slice(0, i).filter(y => y.src === x.src).length < 4).slice(0, 20); // 한 곳(출처)에서 최대 4개 — 필름메이커스만 가득 차지 않게
     const ic = t => /뮤지컬/.test(t) ? '🎤' : /연극/.test(t) ? '🎭' : /드라마/.test(t) ? '📺' : /광고|모델|뮤직비디오|뮤비/.test(t) ? '📢' : '🎬';
     groups = [['🎬', '오디션·모집', all.map(x => Object.assign({ icon: ic(x.t) }, x))]];
     links = ACTOR_LINKS;
@@ -288,6 +292,7 @@ async function build(k, city, env) {
   items.slice(0, 20).filter(it => it._x.sum || it.url).forEach(it => { if (!byG[it.g]) { byG[it.g] = []; order.push(it.g); } byG[it.g].push(it); });
   const pick = [];
   for (let i = 0; pick.length < SUM_MAX && order.some(g => byG[g][i]); i++) order.forEach(g => { if (byG[g][i] && pick.length < SUM_MAX) pick.push(byG[g][i]); });
+  pick.forEach(it => { it.tried = 1; });
   const readP = Promise.all(pick.map(it => readOne(it._x)));
   // AI에는 제목만 보내고 짧은 요점만 받음(주소는 안 보냄 → 답이 잘리지 않음)
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
@@ -297,7 +302,7 @@ async function build(k, city, env) {
   const sumP = readP.then(reads => {
     const arts = [];
     reads.forEach((rd, i) => { if (!rd) return; if (rd.url && /^https?:/.test(rd.url) && !/news\.google\.com/.test(rd.url)) pick[i].url = rd.url.slice(0, 600); if (rd.text) arts.push({ n: i + 1, t: pick[i].title, text: rd.text }); });
-    return key && arts.length ? summarize(arts, k, env, key).then(m => { Object.keys(m).forEach(n => { const it = pick[Number(n) - 1]; if (it) it.sum = m[n].slice(0, 400); }); }) : null;
+    return key && arts.length ? summarize(arts, k, env, key).then(m => { Object.keys(m).forEach(n => { const it = pick[Number(n) - 1]; if (it) it.sum = m[n].slice(0, 700); }); }) : null;
   }).catch(() => null);
   let out = null;
   if (key) {
@@ -311,7 +316,7 @@ async function build(k, city, env) {
         const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '';
         // JSON 대신 줄글로 받음 — 기사 제목의 따옴표 때문에 JSON이 깨지는 일을 막음
         const lines = txt.split('\n').map(x => x.trim()).filter(Boolean);
-        if (lines.length >= 2) out = { hello: lines[0], summary: lines.slice(1).join(' ') };
+        if (lines.length >= 2) out = { hello: lines[0], summary: lines.slice(1, 9).map(x => x.replace(/^[-•·\d.)\s]+/, '')).join('\n') };
       }
     } catch (e) { out = null; }
   }
@@ -325,7 +330,7 @@ async function build(k, city, env) {
   return {
     k, city, date: ymd(today), w, list: true, fallback: !ok, market: mk,
     hello: clean(ok ? out.hello : '') .slice(0, 80) || hi + (w && k !== 'actor' ? ' ' + c[2] + '는 오늘 최고 ' + w.max + '도, 최저 ' + w.min + '도예요.' : ''),
-    summary: ok ? clean(out.summary).slice(0, 600) : '',
+    summary: ok ? clean(out.summary).slice(0, 1000) : '',
     items: items.slice(0, 20), links
   };
 }
@@ -338,8 +343,25 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter6/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
-  const hit = await cache.match(ckey); if (hit) return hit;
+  const ckey = new Request(u.origin + '/__letter7/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const hit = await cache.match(ckey);
+  // ?more=1 : 아직 요약 안 한 기사(앞 7개 다음)를 13개까지 더 읽고 요약해 캐시에 합침
+  if (u.searchParams.get('more')) {
+    if (!hit) return json({ error: 'nocache' }, 404);
+    const data = await hit.json(), key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
+    const rest = (data.items || []).filter(it => !it.sum && !it.tried && /^https?:\/\//.test(it.url || '')).slice(0, 13);
+    if (rest.length && key) {
+      rest.forEach(it => { it.tried = 1; });
+      const reads = await Promise.all(rest.map(it => readOne({ url: it.url }).catch(() => null)));
+      const arts = [];
+      reads.forEach((rd, i) => { if (!rd) return; if (rd.url && /^https?:/.test(rd.url) && !/news\.google\.com/.test(rd.url)) rest[i].url = rd.url.slice(0, 600); if (rd.text) arts.push({ n: i + 1, t: rest[i].title, text: rd.text }); });
+      if (arts.length) { const m = await summarize(arts, k, env, key).catch(() => ({})); Object.keys(m).forEach(n => { const it = rest[Number(n) - 1]; if (it) it.sum = m[n].slice(0, 700); }); }
+      const store = new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=10800' } });
+      if (waitUntil) waitUntil(cache.put(ckey, store)); else await cache.put(ckey, store);
+    }
+    return json({ items: data.items || [] }, 200, 0);
+  }
+  if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);
   const res = json(data, 200, 600);

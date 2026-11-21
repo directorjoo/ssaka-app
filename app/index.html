@@ -768,7 +768,7 @@
       { from: [11, 1], to: [12, 31], t: '첫눈\u00a0오면 보내는\u00a0카드', s: '눈 내리는 인사 카드', e: '❄️', bg: '#E2EEFB', k: '첫눈 인사', big: 'FIRST\nSNOW', snow: true, tile: 'linear-gradient(120deg,#3B6C88 0%,#356389 45%,#2A4373 100%)', href: '../make/?ind=greeting&season=snow' },
       { from: [11, 10], to: [1, 31], t: '송년회·신년회\u00a0공지, 카드\u00a0한\u00a0장으로', s: '장소 · 회비 · 참석·불참 답장까지', e: '🥂', bg: '#FFE0E6', k: '송년·신년회', pic: '../img/ex/party-cheers.jpg', big: '송년회\n신년회', href: '../make/?ind=party&season=yearend' },
       // 11-22 대표님: 특강 모집·오늘의 메뉴가 둘 다 같은 만들기 창이라 → 특강 자리에 배우 오디션 소식(💌 오늘도 싸바? 배우 카드로), 일 년 내내
-      { from: [1, 1], to: [12, 31], t: '오늘의 배우 오디션 소식', s: '영화·드라마·연극·뮤지컬 오디션을 매일 아침 모아 드려요', e: '🎬', bg: '#FFE3E6', k: '배우 오디션', pic: '../img/ex/person-actor.jpg', big: '오디션\n소식', href: '../letter/?k=actor' },
+      { from: [1, 1], to: [12, 31], t: '오늘의 배우 오디션 소식', s: '영화·드라마·연극·뮤지컬 오디션을 매일 아침 모아 드려요', e: '🎬', bg: '#FFE3E6', k: '배우 오디션', pic: '../img/ex/actor-snow.jpg', big: '오디션\n소식', href: '../letter/?k=actor' },
       { from: [12, 1], to: [12, 26], t: '크리스마스 카드', s: '연인 · 가족 · 단골손님께', e: '🎄', bg: '#1f4d3a', dark: true, k: '크리스마스', big: 'MERRY\nX-MAS', tile: '#1f4d3a', href: '../make/?ind=greeting&season=xmas' },
       { from: [12, 15], to: [2, 10], t: '새해 인사 미리 만들기', s: '신년회 초대도 함께', e: '🎉', bg: '#FFEFD1', k: '새해 인사', pic: '../img/ex/suncheon-sunset.jpg', big: '2027',  href: '../make/?ind=greeting&season=newyear' },
       { from: [1, 10], to: [2, 10], t: '설 연휴, 엄마 나 도착했어', s: '어디야?로 한 번에', e: '🚗', bg: '#FBE9EC', k: '설 연휴', big: '어디야?', tile: 'linear-gradient(170deg,#CA4138 0%,#B83A36 100%)', href: '../eodiya/' }
@@ -782,7 +782,7 @@
     });
     if (on.length < 2) on = all.slice(0, 4);
     // 두 칸씩 맞게 짝수로 — 모자라면 늘 쓰는 가게 홍보 카드로 채움
-    if (on.length % 2) on.push({ t: '오늘의 메뉴, 카드 한 장으로', s: '단골 단톡·인스타에 바로', e: '🍽️', bg: '#FFE1CF', k: '가게 홍보', pic: '../img/ex/suncheon-jeon.jpg', big: '오늘의\n메뉴', href: '../make/?ind=restaurant' });
+    if (on.length % 2) on.push({ t: '오늘의 메뉴, 카드 한 장으로', s: '단골 단톡·인스타에 바로', e: '🍽️', bg: '#FFE1CF', k: '가게 홍보', pic: '../img/ex/menu-gul.jpg', big: '오늘의\n메뉴', href: '../make/?ind=restaurant' });
     // 백화점 혜택 칸처럼: 위에 큰 사진(또는 색) 칸 + 굵은 글씨, 아래에 [이름] 두 줄 설명
     var g = el('div', 'camp2');
     on.slice(0, 4).forEach(function (c) {

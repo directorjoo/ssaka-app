@@ -6,6 +6,8 @@
 //   GET /api/today?k=yt     : 유튜브 한국 인기 동영상(조회수 많은 순) — Cloudflare 환경변수 YOUTUBE_API_KEY 필요
 // 뉴스는 제목과 원문 링크만 보여 주고(본문 복사 없음), 요약은 제목들만 보고 씁니다.
 // 같은 결과를 Cloudflare 캐시에 30~60분 보관해서 방문자가 많아도 바깥 요청·AI 비용이 늘지 않게 합니다.
+//   GET /api/today?k=market : 📈 코스피·코스닥 + 달러·엔·유로·위안 환율 (아침카드와 같은 market(), 30분 캐시)
+import { market } from './letter.js';
 const MODEL_DEFAULT = 'claude-haiku-5-5';
 function json(o, status, maxAge) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + (maxAge || 0) } });
@@ -66,6 +68,7 @@ async function translate(env, arr) {
 }
 
 async function build(k, env) {
+  if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
   if (k === 'news') {
     const [top, biz] = await Promise.all([
       rss('https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko').then(x => gnews(x, 12)),
@@ -120,8 +123,8 @@ async function build(k, env) {
 
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt|world)$/.test(k)) return json({ error: 'bad-k' }, 400);
-  let ttl = k === 'google' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
+  if (!/^(news|google|gov|yt|world|market)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  let ttl = k === 'google' || k === 'market' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
   const ckey = new Request(u.origin + '/__today/' + k + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, env); } catch (e) { return json({ error: 'source', msg: String(e.message || e).slice(0, 80) }, 502); }

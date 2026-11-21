@@ -238,7 +238,7 @@ async function indexOf(code, yh) {
   } catch (e) {}
   return null;
 }
-async function market() {
+export async function market() {
   const [ks, kq, fx] = await Promise.all([indexOf('KOSPI', '^KS11'), indexOf('KOSDAQ', '^KQ11'), tfetch('https://open.er-api.com/v6/latest/USD', {}, 5000).then(r => r.json()).catch(() => null)]);
   const idx = [], ex = [];
   const f2 = v => v.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });

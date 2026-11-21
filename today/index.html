@@ -20,11 +20,34 @@
     .hd { padding: 0 16px; }
     h1 { margin: 8px 0 2px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; padding-right: 100px; }
     .date { color: var(--ink-2); font-size: 15px; font-weight: 700; }
+    /* 머리 카드 + 유리 판 (11-21 밤, DESIGN 원칙 2·7 / 색 4번 빛 민트 + 22번 유리 판) */
+    .hero { position: relative; margin: 0 14px 10px; padding: 18px 16px 16px; border-radius: 26px; overflow: hidden; background: radial-gradient(ellipse at 70% 20%, #C2DDB9 0%, #ACCEAC 40%, #8FB58F 100%); box-shadow: 0 18px 34px -24px rgba(30,70,20,.7); }
+    .hero::before { content: ""; position: absolute; right: -10px; top: -6px; width: 120px; height: 120px; background: url(../img/deco-leaf.svg) no-repeat center/contain; opacity: .55; pointer-events: none; }
+    .hx { position: relative; padding-right: 92px; }
+    .hx em { display: block; font-style: normal; font-size: 15px; font-weight: 800; color: #284927; }
+    .hero h1 { margin: 6px 0 0; padding: 0; font-size: 28px; line-height: 1.22; font-weight: 900; letter-spacing: -.03em; color: #1A1A1A; }
+    .glass { position: relative; margin-top: 14px; border-radius: 20px; background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.6); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); }
+    .gl-h { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border: 0; background: none; font: inherit; color: #1B331A; text-align: left; cursor: pointer; }
+    .gl-s { flex: 1; min-width: 0; }
+    .gl-s b { display: block; font-size: 17px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gl-s small { display: block; margin-top: 2px; font-size: 15px; font-weight: 700; color: #284927; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gl-h i { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.7); font-style: normal; font-size: 16px; color: #284927; transition: transform .2s; }
+    .gl-h[aria-expanded="true"] i { transform: rotate(180deg); }
+    .gl-b { padding: 0 14px 14px; }
+    .gl-b h4 { margin: 6px 0 8px; font-size: 16px; font-weight: 900; color: #1B331A; }
+    .gl-g { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .gl-g div { padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.72); }
+    .gl-g span { display: block; font-size: 15px; font-weight: 700; color: #4A5A44; }
+    .gl-g b { display: block; margin-top: 1px; font-size: 19px; font-weight: 900; color: #1A1A1A; letter-spacing: -.02em; }
+    .gl-g .up { color: #C62828; } .gl-g .dn { color: #1D5FD1; }
+    .gl-wear { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.72); font-size: 16px; font-weight: 800; color: #1B331A; word-break: keep-all; }
+    .gl-lk { display: flex; gap: 8px; margin-top: 12px; }
+    .gl-lk button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: linear-gradient(100deg, #4B7045 0%, #6EAA66 100%); color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
     /* 동그라미 탭 */
     .circles { padding: 8px 10px 6px; }
     .grp { margin: 0 0 6px; padding: 8px 4px 8px; border-radius: 18px; background: rgba(255,255,255,.55); }
-    .grp h3 { margin: 0 8px 8px; font-size: 14.5px; font-weight: 900; letter-spacing: -.03em; color: var(--g, #8E0A1C); }
-    .grp h3 small { margin-left: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+    .grp h3 { margin: 0 8px 8px; font-size: 17px; font-weight: 900; letter-spacing: -.03em; color: var(--g, #8E0A1C); }
+    .grp h3 small { margin-left: 6px; font-size: 15px; font-weight: 700; color: var(--ink-2); }
     .gr { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 4px; }
     .cb.new i::after { content: 'NEW'; position: absolute; top: -6px; right: -12px; padding: 1px 5px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 10px; font-weight: 900; }
     .cb i { position: relative; }
@@ -36,14 +59,14 @@
     .st .n { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #F3ECE6; font-weight: 900; font-size: 15px; }
     .st.done .n { background: #12924a; color: #fff; }
     .st .tt { flex: 1; font-size: 17px; font-weight: 900; letter-spacing: -.03em; word-break: keep-all; }
-    .st .tt small { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink-2); }
+    .st .tt small { display: block; font-size: 15px; font-weight: 700; color: var(--ink-2); }
     .st .bd { padding: 0 14px 14px; font-size: 16px; line-height: 1.6; word-break: keep-all; }
     .st .bd ol, .st .bd ul { margin: 6px 0; padding-left: 22px; } .st .bd li { margin: 3px 0; }
     .st .bd .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .ck { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: #EAF7EF; font-weight: 900; font-size: 16px; cursor: pointer; }
     .ck input { width: 22px; height: 22px; accent-color: #12924a; }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
-    .chips button { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 14.5px; font-weight: 800; color: #5a4a42; cursor: pointer; }
+    .chips button { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: #5a4a42; cursor: pointer; }
     .chips button[aria-pressed="true"] { background: var(--cc, #B3132B); border-color: var(--cc, #B3132B); color: #fff; }
     .dd { flex: none; align-self: center; min-width: 52px; padding: 3px 6px; border-radius: 999px; background: #FFF0E6; color: #a14a12; font-size: 13px; font-weight: 900; text-align: center; }
     .dd.hot { background: #B3132B; color: #fff; }
@@ -51,7 +74,7 @@
     .pic { display: flex; gap: 10px; padding: 10px 2px; border-bottom: 1px solid #f3ebe5; color: var(--ink); text-decoration: none; }
     .pic img, .pic .ph { flex: none; width: 84px; height: 64px; border-radius: 12px; object-fit: cover; background: #F3ECE6; display: grid; place-items: center; font-size: 26px; }
     .pic b { display: block; font-size: 16.5px; line-height: 1.35; word-break: keep-all; }
-    .pic small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13.5px; line-height: 1.4; }
+    .pic small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 15px; line-height: 1.4; }
     .pic .go { display: inline-block; margin-top: 4px; font-size: 13px; font-weight: 800; color: #1A4FB0; }
     .q { margin: 10px 0; padding: 12px; border-radius: 14px; background: #FAF6F2; }
     .q > b { display: block; font-size: 16px; font-weight: 900; margin-bottom: 6px; word-break: keep-all; }
@@ -67,12 +90,12 @@
     .tbl th { color: var(--ink-2); font-size: 13px; }
     .cb { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; text-decoration: none; color: var(--ink); }
     .cb i { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; font-style: normal; font-size: 24px; background: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c, #ddd), 0 5px 10px -7px rgba(0,0,0,.4); transition: transform .15s; }
-    .cb b { font-size: 13px; font-weight: 800; letter-spacing: -.05em; white-space: nowrap; color: #5a4a42; }
+    .cb b { font-size: 15px; font-weight: 800; letter-spacing: -.05em; white-space: nowrap; color: #5a4a42; }
     .cb[aria-pressed="true"] i { transform: scale(1.06); background: var(--c); }
     .cb[aria-pressed="true"] b { color: var(--ink); }
     .pane { margin: 4px 14px 0; padding: 18px 16px; border-radius: 22px; background: #fff; box-shadow: 0 1px 0 #efe3da, 0 10px 24px -18px rgba(80,30,20,.4); min-height: 240px; }
     .pane h2 { margin: 0 0 4px; font-size: 22px; font-weight: 900; letter-spacing: -.03em; }
-    .pane .src { color: var(--ink-2); font-size: 13.5px; margin-bottom: 12px; }
+    .pane .src { color: var(--ink-2); font-size: 15px; margin-bottom: 12px; }
     .sum { margin: 0 0 14px; padding: 14px 14px 12px; border-radius: 16px; background: #FFF3E6; }
     .sum li { margin: 0 0 6px; font-size: 17px; line-height: 1.5; font-weight: 700; word-break: keep-all; }
     .sum ul { margin: 0; padding-left: 20px; }
@@ -82,7 +105,7 @@
     .nl li { border-bottom: 1px solid #f3ebe5; }
     .nl a { display: flex; gap: 10px; padding: 11px 2px; color: var(--ink); text-decoration: none; font-size: 16.5px; line-height: 1.45; word-break: keep-all; }
     .nl a em { flex: none; min-width: 26px; font-style: normal; font-weight: 900; color: #B3132B; }
-    .nl a small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13.5px; }
+    .nl a small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 15px; }
     .rk a em { font-size: 18px; }
     .rk .tr { flex: none; margin-left: auto; align-self: center; padding: 3px 8px; border-radius: 999px; background: #FFF0E6; color: #a14a12; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
     .msg { padding: 30px 6px; text-align: center; color: var(--ink-2); font-size: 16px; line-height: 1.6; }
@@ -91,7 +114,7 @@
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .lk { display: block; padding: 12px; border-radius: 16px; background: #FFF8F3; border: 1.5px solid #f0e2d8; color: var(--ink); text-decoration: none; }
     .lk b { display: block; font-size: 16px; font-weight: 900; }
-    .lk span { display: block; margin-top: 2px; color: var(--ink-2); font-size: 13px; line-height: 1.4; word-break: keep-all; }
+    .lk span { display: block; margin-top: 2px; color: var(--ink-2); font-size: 15px; line-height: 1.4; word-break: keep-all; }
     /* 전국 날씨 */
     .kw { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .kw button { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px; padding: 10px 10px; border: 0; border-radius: 16px; min-width: 0; background: linear-gradient(160deg, #EEF5FF 0%, #E3EEFB 100%); font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
@@ -109,7 +132,7 @@
     .wx-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
     .wx-row div { padding: 10px 6px; border-radius: 14px; background: #F4F8FF; text-align: center; }
     .wx-row b { display: block; font-size: 18px; font-weight: 900; }
-    .wx-row span { font-size: 13px; color: var(--ink-2); font-weight: 700; }
+    .wx-row span { font-size: 15px; color: var(--ink-2); font-weight: 700; }
     .dust { display: inline-block; padding: 1px 8px; border-radius: 999px; color: #fff; font-size: 13px; font-weight: 800; }
     .wear { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #FFF3E6; font-size: 16.5px; font-weight: 800; word-break: keep-all; }
     .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 14px; text-align: center; }
@@ -117,7 +140,7 @@
     .week i { display: block; font-style: normal; font-size: 22px; margin: 2px 0; }
     .week small { display: block; color: var(--ink-2); font-weight: 700; }
     .cities { display: flex; gap: 6px; overflow-x: auto; margin: 0 -2px 12px; padding: 2px; scrollbar-width: none; }
-    .cities button { flex: none; min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 14.5px; font-weight: 800; color: #5a4a42; cursor: pointer; }
+    .cities button { flex: none; min-height: 38px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #e9dcd2; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: #5a4a42; cursor: pointer; }
     .cities button[aria-pressed="true"] { background: #1A4FB0; border-color: #1A4FB0; color: #fff; }
     /* 건강 */
     .hcard { padding: 18px 16px; border-radius: 18px; background: linear-gradient(135deg, #E9F7EF, #F5FBF7); }
@@ -154,12 +177,19 @@
     .welcome b { color: #B3132B; }
     .welcome .row { display: flex; gap: 8px; margin-top: 10px; }
     .welcome .row .btn { flex: 1; min-height: 46px; font-size: 15.5px; }
-    .backbar { margin: 14px 2px 0; padding: 12px 14px; border-radius: 14px; background: #F3ECE6; color: #5a4a42; font-size: 14.5px; line-height: 1.6; word-break: keep-all; }
+    .backbar { margin: 14px 2px 0; padding: 12px 14px; border-radius: 14px; background: #F3ECE6; color: #5a4a42; font-size: 15.5px; line-height: 1.6; word-break: keep-all; }
   </style>
 </head>
 <body>
 <div class="w">
-  <div class="hd"><h1>☀️ 오늘의 싸바</h1><div class="date" id="date"></div></div>
+  <!-- 11-21 밤 DESIGN 원칙 2·7: 머리말 → 혜택 두 줄 제목 → 유리 판(그 자리에서 ▾ 펼침) -->
+  <section class="hero">
+    <div class="hx"><em>☀️ 오늘의 싸바 · <span id="date"></span></em><h1>검색 안 해도,<br>오늘 소식이 다 와요</h1></div>
+    <div class="glass" id="glass">
+      <button type="button" class="gl-h" id="glH" aria-expanded="false" aria-controls="glB"><span class="gl-s"><b id="glW">☀️ 날씨 불러오는 중…</b><small id="glM">📈 오늘의 시세</small></span><i aria-hidden="true">▾</i></button>
+      <div class="gl-b" id="glB" hidden></div>
+    </div>
+  </section>
   <nav class="circles" id="circles" aria-label="오늘의 채널"></nav>
   <div class="welcome" id="welcome" hidden>🍒 <b>받으신 화면이에요.</b> 아래 내용을 먼저 보시고, 다 보신 뒤에는 위 동그라미를 눌러 싸바의 다른 것도 둘러보세요.<div class="row"><a class="btn l" href="#" id="wtop">⬆️ 둘러보기</a><a class="btn" href="../app/">🏠 싸바 처음 화면</a></div></div>
   <div class="sendbar"><button type="button" class="btn" id="send">★ 이 화면 카톡으로 보내기</button><button type="button" class="btn l" id="copy">🔗 링크</button></div>
@@ -230,6 +260,52 @@
     ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx })[k]();
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
+
+  // ---------- 머리 유리 판: 날씨 한 줄 + 시세 한 줄, 누르면 그 자리에서 펼침 (DESIGN 원칙 7) ----------
+  (function () {
+    var H = $('glH'), B = $('glB'), W = null, M = null, wc = null;
+    try { wc = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
+    if (!wc || !wc[1]) wc = ['광주', 35.1595, 126.8526];
+    function ic(n) { return n === 0 ? ['☀️', '맑음'] : n <= 2 ? ['🌤️', '구름 조금'] : n === 3 ? ['☁️', '흐림'] : n <= 48 ? ['🌫️', '안개'] : n <= 57 ? ['🌦️', '이슬비'] : n <= 67 ? ['🌧️', '비'] : n <= 77 ? ['❄️', '눈'] : n <= 82 ? ['🌦️', '소나기'] : n <= 86 ? ['🌨️', '눈'] : ['⛈️', '천둥번개']; }
+    function wearOf(t) { return t <= 0 ? '🧥 패딩·목도리·장갑 꼭 챙기세요' : t <= 5 ? '🧥 두꺼운 외투에 목도리까지' : t <= 11 ? '🧶 코트나 점퍼, 따뜻하게' : t <= 16 ? '🧥 가벼운 외투 하나' : t <= 22 ? '👕 긴팔 하나면 충분해요' : t <= 27 ? '👕 반팔·얇은 옷' : '🩳 시원하게, 물 자주 드세요'; }
+    function dustOf(v) { return v == null ? '-' : v <= 15 ? '좋음' : v <= 35 ? '보통' : v <= 75 ? '나쁨' : '매우 나쁨'; }
+    function pct(p) { return p == null ? '' : (p > 0 ? ' ▲' : p < 0 ? ' ▼' : ' ') + Math.abs(p).toFixed(2) + '%'; }
+    function cls(p) { return p > 0 ? 'up' : p < 0 ? 'dn' : ''; }
+    function head() {
+      if (W) { var k = ic(W.c); $('glW').textContent = k[0] + ' ' + wc[0] + ' ' + Math.round(W.t) + '° ' + k[1] + (W.p >= 50 ? ' · ☂️ ' + W.p + '%' : ''); }
+      if (M && M.idx && M.idx.length) { var a = M.idx[0]; $('glM').textContent = '📈 ' + a.n + ' ' + a.v + pct(a.pct) + (M.ex && M.ex[0] ? ' · 달러 ' + M.ex[0].v : ''); }
+      else if (M && M.ex && M.ex.length) $('glM').textContent = '💱 달러 ' + M.ex[0].v;
+    }
+    function body() {
+      var h = '';
+      if (W) h += '<h4>☀️ ' + esc(wc[0]) + ' 오늘 날씨</h4><div class="gl-g"><div><span>최고</span><b>' + Math.round(W.hi) + '°</b></div><div><span>최저</span><b>' + Math.round(W.lo) + '°</b></div><div><span>비 올 확률</span><b>' + (W.p || 0) + '%</b></div><div><span>미세먼지</span><b>' + dustOf(W.pm) + '</b></div></div><div class="gl-wear">' + wearOf(W.t) + '</div>';
+      if (M) {
+        h += '<h4 style="margin-top:14px">📈 오늘의 시세</h4><div class="gl-g">';
+        (M.idx || []).forEach(function (x) { h += '<div><span>' + esc(x.n) + '</span><b class="' + cls(x.pct) + '">' + esc(x.v) + '<small style="font-size:15px">' + pct(x.pct) + '</small></b></div>'; });
+        (M.ex || []).forEach(function (x) { h += '<div><span>' + esc(x.n) + '</span><b>' + esc(x.v) + '</b></div>'; });
+        h += '</div>';
+      }
+      if (!h) h = '<div class="gl-wear">잠시 뒤 다시 눌러 주세요.</div>';
+      h += '<div class="gl-lk"><button type="button" data-k="wx">날씨 자세히 ›</button><button type="button" data-k="fx">환율 자세히 ›</button></div>';
+      B.innerHTML = h;
+    }
+    H.addEventListener('click', function () {
+      var open = H.getAttribute('aria-expanded') !== 'true';
+      H.setAttribute('aria-expanded', open ? 'true' : 'false'); B.hidden = !open; if (open) body();
+    });
+    B.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-k]'); if (!b) return;
+      fromLink = false; show(b.dataset.k); var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=' + wc[1] + '&longitude=' + wc[2] + '&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1').then(function (r) { return r.json(); }),
+      fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + wc[1] + '&longitude=' + wc[2] + '&current=pm2_5&timezone=Asia%2FSeoul').then(function (r) { return r.json(); }).catch(function () { return null; })
+    ]).then(function (a) {
+      var j = a[0]; W = { t: j.current.temperature_2m, c: j.current.weather_code, hi: j.daily.temperature_2m_max[0], lo: j.daily.temperature_2m_min[0], p: j.daily.precipitation_probability_max[0] || 0, pm: a[1] && a[1].current ? a[1].current.pm2_5 : null };
+      head(); if (!B.hidden) body();
+    }).catch(function () { $('glW').textContent = '☀️ 오늘 날씨 · 눌러서 보기'; });
+    api('market').then(function (m) { M = m; head(); if (!B.hidden) body(); }).catch(function () { $('glM').textContent = '📈 시세 · 눌러서 보기'; });
+  })();
   function pub(q) { return fetch('/api/public?' + q).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
   function links(arr) { return '<div class="grid2">' + arr.map(function (g) { return '<a class="lk" href="' + g[2] + '" target="_blank" rel="noopener"><b>' + g[0] + '</b><span>' + g[1] + '</span></a>'; }).join('') + '</div>'; }
   function chips(id, arr, sel, color) { return '<div class="chips" id="' + id + '" style="--cc:' + color + '">' + arr.map(function (a) { return '<button type="button" data-v="' + esc(a[0]) + '" aria-pressed="' + (a[0] === sel ? 'true' : 'false') + '">' + esc(a[1]) + '</button>'; }).join('') + '</div>'; }

@@ -631,19 +631,16 @@
     #v-home.v2 .v2-td { background:
       linear-gradient(180deg, #E3E68A 0%, rgba(240,220,120,.6) 10%, rgba(247,207,78,0) 26%),
       radial-gradient(ellipse at 70% 20%, #FFE58A 0%, #F7CF4E 45%, #EDB52E 100%); }
-    #v-home.v2 .v2-td::before { background-image: none; }
-    #v-home.v2 .v2-td .tree { position: absolute; z-index: 0; right: 4px; top: 84px; width: 128px; pointer-events: none; filter: drop-shadow(0 8px 10px rgba(90,60,0,.25)); animation: tdSway 5s ease-in-out infinite; transform-origin: 50% 100%; }
-    @keyframes tdSway { 0%,100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+    /* 11-22 07:56 대표님: 나무는 옆이 아니라 바탕으로 깔아 글씨와 겹치게 — 나무 크게 + 황금 막(왼쪽 진하게)으로 글씨 읽히게 */
+    #v-home.v2 .v2-td::before { z-index: 1; background-size: 100% 100%; background-position: 0 0; background-image: linear-gradient(90deg, rgba(247,207,78,.86) 0%, rgba(247,207,78,.62) 50%, rgba(247,207,78,.18) 100%), linear-gradient(0deg, rgba(237,181,46,.55) 0%, rgba(237,181,46,0) 40%); }
+    #v-home.v2 .v2-td .tree { position: absolute; z-index: 0; right: -60px; top: -14px; width: 380px; max-width: none; pointer-events: none; animation: tdSway 6s ease-in-out infinite; transform-origin: 50% 100%; }
+    @keyframes tdSway { 0%,100% { transform: rotate(-.8deg); } 50% { transform: rotate(.8deg); } }
     @media (prefers-reduced-motion: reduce) { #v-home.v2 .v2-td .tree { animation: none; } }
-    #v-home.v2 .v2-td h3 { white-space: nowrap; text-shadow: 0 0 6px rgba(255,240,190,.8); }
-    #v-home.v2 .v2-td .tx p { padding-right: 128px; word-break: keep-all; }
-    #v-home.v2 .v2-td em, #v-home.v2 .v2-td .tx p, #v-home.v2 .v2-td .lt { color: #5A3E06; }
-    #v-home.v2 .v2-td .ch { padding-top: 20px; }
-    #v-home.v2 .v2-td .ch span { background: rgba(255,255,255,.85); border-color: rgba(110,70,10,.2); color: #3B2A08; }
+    #v-home.v2 .v2-td h3 { text-shadow: 0 0 4px rgba(255,236,170,.95), 0 0 12px rgba(255,236,170,.8); }
+    #v-home.v2 .v2-td em, #v-home.v2 .v2-td .tx p, #v-home.v2 .v2-td .lt { color: #4A3104; text-shadow: 0 0 4px rgba(255,236,170,.95), 0 0 10px rgba(255,236,170,.7); }
+    #v-home.v2 .v2-td .tx p { word-break: keep-all; font-weight: 600; }
+    #v-home.v2 .v2-td .ch span { background: rgba(255,255,255,.88); border-color: rgba(110,70,10,.2); color: #3B2A08; }
     #v-home.v2 .v2-td .btn { background: linear-gradient(180deg, #C98A12, #9A6408); text-shadow: 0 1px 2px rgba(0,0,0,.35); box-shadow: 0 8px 16px -10px rgba(110,70,0,.8); }
-    html.bigtxt #v-home.v2 .v2-td h3 { white-space: normal; }
-    html.bigtxt #v-home.v2 .v2-td .tree { width: 96px; top: auto; bottom: 14px; opacity: .9; }
-    html.bigtxt #v-home.v2 .v2-td .tx p { padding-right: 0; }
     /* 오늘의 싸바 — 흰 띠 */
     #v-home.v2 .v2-strip { display: flex; align-items: center; gap: 12px; margin: 0 18px 32px; padding: 14px 18px; border-radius: 20px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
     #v-home.v2 .v2-strip i { font-style: normal; font-size: 30px; line-height: 1; }

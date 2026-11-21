@@ -133,7 +133,19 @@ const BOSS_LINKS = [
 ];
 
 function mmdd(d) { if (!d) return ''; const t = new Date(d + 9 * 3600e3); return (t.getUTCMonth() + 1) + '/' + t.getUTCDate(); }
-function uniq(arr) { const seen = {}; return arr.filter(x => x && x.t && !seen[x.t] && (seen[x.t] = 1)); }
+// 같은 뉴스는 하나만: 제목에서 [괄호]·기호·띄어쓰기를 빼고 두 글자씩 쪼개 70% 넘게 겹치면 같은 기사로 봄 (매체만 다른 같은 소식 걸러냄)
+function norm(t) { return String(t).replace(/\[[^\]]*\]|\([^)]*\)|<[^>]*>|「|」|『|』/g, ' ').replace(/[^0-9a-zA-Z가-힣]/g, ''); }
+function grams(t) { const g = new Set(); for (let i = 0; i < t.length - 1; i++) g.add(t.slice(i, i + 2)); return g; }
+function same(a, b) { if (!a.size || !b.size) return false; let n = 0; a.forEach(x => { if (b.has(x)) n++; }); return n / Math.min(a.size, b.size) >= 0.7 && n / Math.max(a.size, b.size) >= 0.45; }
+function uniq(arr) {
+  const kept = [];
+  return arr.filter(x => {
+    if (!x || !x.t) return false;
+    const g = grams(norm(x.t));
+    if (kept.some(k => same(k, g))) return false;
+    kept.push(g); return true;
+  });
+}
 
 async function build(k, city, env) {
   const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();

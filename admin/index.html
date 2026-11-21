@@ -8,6 +8,7 @@
   <title>싸바 관리자 · 대표</title>
   <link rel="icon" href="/img/favicon.png">
   <link rel="stylesheet" href="/css/brand.css">
+  <link rel="stylesheet" href="/css/steps.css?v=3">
   <style>
     * { box-sizing: border-box; } [hidden] { display: none !important; }
     html, body { margin: 0; background: #f4f1ec; color: var(--ink); font-family: var(--font); -webkit-text-size-adjust: 100%; }
@@ -70,6 +71,13 @@
     .gate .key { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 18px; text-align: left; }
     .gate .key button { min-height: 48px; border-radius: 14px; border: 0; background: #1a1a1a; color: #fff; font: inherit; font-weight: 800; padding: 0 16px; }
     .toast { position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: rgba(20,20,20,.92); color: #fff; padding: 11px 18px; border-radius: 14px; font-size: 15px; font-weight: 700; z-index: 50; white-space: nowrap; }
+    /* 11-22 쓰기·고르기 화면 정리: 구역을 성격별 묶음으로(고치기·살펴보기·지키기·관리), 수정 요청은 단계 상자 */
+    .gh { display: flex; align-items: center; gap: 8px; margin: 22px 4px 10px; font-size: 15px; font-weight: 900; color: #6b5a50; letter-spacing: -.02em; }
+    .gh::after { content: ''; flex: 1; height: 1px; background: #ddd3c6; }
+    .gh:first-of-type { margin-top: 4px; }
+    #s-claude .stp select { margin-bottom: 0; }
+    #s-claude .stp .btns { margin-top: 0; }
+    .nav i { flex: none; align-self: center; width: 1px; height: 22px; margin: 0 2px; background: #d6ccc0; }
   </style>
 </head>
 <body>
@@ -87,25 +95,38 @@
 
   <div id="main" hidden>
     <nav class="nav">
-      <a href="#s-claude">💬 Claude</a><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><a href="#s-report">🚨 신고·차단</a><a href="#s-req">📝 요청 목록</a><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
+      <a href="#s-claude">💬 Claude</a><a href="#s-req">📝 요청 목록</a><i></i><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><i></i><a href="#s-report">🚨 신고·차단</a><i></i><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
     </nav>
 
+    <div class="gh">🛠️ 고치기</div>
     <section id="s-claude">
       <h2>💬 Claude에게 바로 수정 요청</h2>
-      <select id="where" aria-label="어느 화면">
+      <div class="stp s1"><div class="stp-h"><span class="stp-n">1</span>어느 화면을 고칠까요?</div>
+        <select id="where" aria-label="어느 화면">
         <option>싸바 전체 디자인</option><option>홈 (sava.kr/app/)</option><option>어디야? (/eodiya/)</option><option>싸바알림 · 카드 만들기 (/make/)</option>
         <option>싸바카드 화면 (/c/)</option><option>오늘의 싸바 · 생활 채널 (/today/)</option><option>오늘도 싸바? 아침 소식 (/letter/)</option><option>블로그 글쓰기 (/survey/)</option>
         <option>설정 · 관리 탭</option><option>회원가입 · 로그인 (/join/)</option><option>싸바비앙</option><option>싸바스타</option><option>기타</option>
       </select>
-      <textarea id="ask" placeholder="예: 홈 화면 어디야 버튼을 조금 더 크게, 글씨는 진하게 해 줘"></textarea>
-      <div class="btns">
-        <button type="button" class="claude" id="toClaude">Claude에게 보내기 ↗</button>
-        <button type="button" class="save" id="saveReq">목록에 적어 두기</button>
-        <button type="button" class="copy" id="copyReq">복사</button>
       </div>
-      <p class="muted">"Claude에게 보내기"를 누르면 저장소(ssaka-app)·화면 이름이 붙은 요청문으로 Claude 새 대화가 열려요. 동시에 아래 요청 목록에도 적혀서, 무엇을 맡겼고 무엇이 끝났는지 한눈에 볼 수 있어요.</p>
+      <div class="stp s2"><div class="stp-h"><span class="stp-n">2</span>무엇을 고칠까요?<small>보이는 그대로 적으면 돼요</small></div>
+        <textarea id="ask" placeholder="예: 홈 화면 어디야 버튼을 조금 더 크게, 글씨는 진하게 해 줘"></textarea>
+      </div>
+      <div class="stp s3"><div class="stp-h"><span class="stp-n">3</span>보내거나 적어 두기</div>
+        <div class="btns">
+          <button type="button" class="claude" id="toClaude">Claude에게 보내기 ↗</button>
+          <button type="button" class="save" id="saveReq">목록에 적어 두기</button>
+          <button type="button" class="copy" id="copyReq">복사</button>
+        </div>
+        <p class="muted">"Claude에게 보내기"를 누르면 저장소(ssaka-app)·화면 이름이 붙은 요청문으로 Claude 새 대화가 열리고, 아래 요청 목록에도 적혀요.</p>
+      </div>
     </section>
 
+    <section id="s-req">
+      <h2>📝 수정 요청 목록 <span id="reqN"></span></h2>
+      <div id="reqs"></div>
+    </section>
+
+    <div class="gh">📊 살펴보기</div>
     <section id="s-today">
       <h2>📊 오늘 한눈에 <span id="asof"></span><button type="button" class="sb" id="reload" hidden>🔄 새로</button></h2>
       <div class="tiles" id="tiles"></div>
@@ -123,6 +144,7 @@
       <div id="top"></div>
     </section>
 
+    <div class="gh">🛡️ 지키기</div>
     <section id="s-report">
       <h2>🚨 신고 · 차단</h2>
       <div id="reports"></div>
@@ -131,11 +153,7 @@
       <p class="muted">서로 다른 3명이 신고하면 자동으로 막혀요. 살펴보고 괜찮으면 "풀기", 신고만 지우려면 "신고 지우기".</p>
     </section>
 
-    <section id="s-req">
-      <h2>📝 수정 요청 목록 <span id="reqN"></span></h2>
-      <div id="reqs"></div>
-    </section>
-
+    <div class="gh">⚙️ 관리</div>
     <section id="s-go">
       <h2>🧭 관리 바로가기</h2>
       <div class="links">

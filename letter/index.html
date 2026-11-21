@@ -11,6 +11,7 @@
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css">
+  <link rel="stylesheet" href="../css/steps.css?v=3">
   <style>
     * { box-sizing: border-box; } [hidden] { display: none !important; }
     html, body { margin: 0; background: #FFF8F3; color: var(--ink); font-family: var(--font); }
@@ -83,21 +84,30 @@
     .mkt .fx2 strong { font-size: 18px; }
     .mkt small.n { display: block; margin-top: 8px; font-size: 13.5px; color: #6b7280; }
     .note { margin: 14px 4px 0; color: var(--ink-2); font-size: 13.5px; line-height: 1.6; word-break: keep-all; }
+    /* 11-22 쓰기·고르기 화면 정리: 단계 상자(css/steps.css) — ① 누구에게 ② 어느 지역 → 카드 → ③ 보내기 */
+    .stp .who { background: #F3ECE6; }
+    .stp .cities { margin: 0; padding: 0; border: 0; background: none; }
+    .cities button[aria-pressed="true"] { background: #B3132B; border-color: #B3132B; color: #fff; }
+    #stSend { margin-top: 14px; }
+    #stSend .acts { margin-top: 0; }
+    .rcv #stWho, .rcv #stCity { display: none !important; }
+    .rcv #stSend { border: 1.5px solid #E9E2D8; box-shadow: none; }
   </style>
 </head>
 <body>
 <div class="w">
   <h1>💌 오늘도 싸바?</h1>
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
-  <div class="who" id="who"></div>
-  <div class="cities" id="cities"></div>
+  <section class="stp s1" id="stWho"><div class="stp-h"><span class="stp-n">1</span>누구에게 보낼 소식?<small>받는 분께 맞는 소식만 골라 담아요</small></div><div class="who" id="who"></div></section>
+  <section class="stp s2" id="stCity"><div class="stp-h"><span class="stp-n">2</span>어느 지역 날씨·소식?<small>날씨와 지역 소식이 이 지역으로 들어가요</small></div><div class="cities" id="cities"></div></section>
   <div class="sv" id="svTop" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a></div>
   <article class="paper writing" id="paper"><div class="msg">카드를 만드는 중이에요…</div></article>
   <div class="sv" id="svBot" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a><a class="mk" id="svMake" href="/make/">✨ 싸바에서 내 카드 만들어 보세요</a></div>
+  <section class="stp s3" id="stSend"><div class="stp-h"><span class="stp-n" id="sendN">3</span><span id="sendH">위 카드를 단톡방에 보내기</span><small id="sendS">카톡 말풍선으로 가요 · 받는 분은 카드만 봐요</small></div>
   <div class="acts">
     <button type="button" class="k" id="send">💬 단톡방에 보내기</button>
     <a class="l" href="../today/">☀️ 오늘의 싸바 더 보기</a>
-  </div>
+  </div></section>
   <p class="note">기사마다 AI가 원문을 읽고 서너 줄로 줄였어요. 신청·지원 조건은 꼭 원문에서 확인해 주세요.</p>
 </div>
 <script src="../js/share.js"></script>
@@ -123,11 +133,12 @@
     $('svTop').hidden = false; $('svBot').hidden = false;
     document.querySelector('.sub').textContent = '오늘 바로 쓸 수 있는 것만 골라 보내 드려요.';
     $('send').textContent = '💬 나도 단톡방에 보내기';
+    $('sendN').hidden = true; $('sendH').textContent = '💌 마음에 들면 나도 보내기'; $('sendS').textContent = '내 단톡방에도 이 카드를 그대로 보낼 수 있어요';
   }
   function bar() {
     var w = $('who'); w.innerHTML = '';
     WHO.forEach(function (x) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = x[1] + '<small>' + x[2] + '</small>'; b.setAttribute('aria-pressed', x[0] === k ? 'true' : 'false'); b.addEventListener('click', function () { k = x[0]; go(); }); w.appendChild(b); });
-    var c = $('cities'); c.innerHTML = ''; c.hidden = k === 'actor';
+    var c = $('cities'); c.innerHTML = ''; $('stCity').hidden = k === 'actor'; $('sendN').textContent = k === 'actor' ? '2' : '3';
     GROUPS.forEach(function (g) {
       var row = document.createElement('div'); row.className = 'row';
       var lb = document.createElement('span'); lb.textContent = g[0]; row.appendChild(lb);

@@ -3,7 +3,9 @@
 //   GET /api/letter?k=boss   : 💰 대표님 — 매출 (날씨로 팔 것, 사람 몰리는 행사, 놓치면 손해인 지원·신고, 요즘 뜨는 것, 오늘 할 홍보)
 //   GET /api/letter?k=actor  : 🎬 배우 — 영화·드라마·연극·뮤지컬·광고 오디션 (구글 뉴스 13갈래 + 더뮤지컬·씨네21, 아래 바로가기 8곳)
 //   &city=전남 (17개 광역자치단체 중 하나 — 날씨 지역, 기본 광주)
-// 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다. 뉴스는 제목과 원문 링크만 씁니다.
+// 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다.
+// 기사마다 원문을 열어 본문을 읽고 AI가 3~4줄로 요약합니다(11-21 대표님: 제목만 나열하면 안 봄). 본문을 못 가져온 기사는 제목·링크만.
+// 어르신·대표님 카드 맨 위에 📈 오늘의 시세(코스피·코스닥, 달러·엔·유로·위안 환율).
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
 // 있으면 더 정확해지는 환경변수: DATA_API_KEY(공공데이터포털 일반 인증키 하나로 관광공사 행사 + 중기부 기업마당 지원사업 둘 다)
 //   (예전 이름 TOUR_API_KEY도 그대로 읽음 · 기업마당 사이트에서 따로 받은 키가 있으면 BIZINFO_API_KEY)
@@ -98,7 +100,7 @@ async function programs(env, c, diag) {
       const org = String(x.jrsdInsttNm || '') + ' ' + String(x.excInsttNm || ''), nm = String(x.pblancNm || x.title || ''), head = nm.replace(/^\s*[\[(]?\s*\d{4}년?도?\s*[\])]?\s*/, '').slice(0, 12);
       // 전국 공고만: 지자체가 낸 공고나 제목이 특정 지역으로 시작하는 공고는 뺌
       const regional = anyReg.test(org.replace(/중소벤처기업부|소상공인시장진흥공단|중소기업|창업진흥원|기술보증|신용보증|정보통신산업진흥원|한국/g, '')) || /^\s*\[?(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|충청|전라|경상)/.test(head) || /특별자치|광역시|특별시|[가-힣](시|군|구)청?(\s|$)/.test(org.trim());
-      return { t: nm.slice(0, 90), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), regional, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
+      return { t: nm.slice(0, 90), sum: un(x.bsnsSumryCn || x.description || '').slice(0, 1500), when: when.slice(0, 30), end, org: String(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 20), regional, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
     }).filter(x => x.t && !x.regional && (!/^\d{8}$/.test(x.end) || x.end >= today));
     const dk = x => /^\d{8}$/.test(x.end) ? x.end : '9';
     rows.sort((x, y) => (dk(x) > dk(y) ? 1 : dk(x) < dk(y) ? -1 : 0));
@@ -148,8 +150,113 @@ function uniq(arr) {
   });
 }
 
+// ---------- 기사 원문 가져오기 ----------
+const UA = 'Mozilla/5.0 (Linux; Android 14; SM-S921N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+async function tfetch(url, opt, ms) {
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), ms || 7000);
+  try { return await fetch(url, Object.assign({ signal: ac.signal, redirect: 'follow' }, opt || {})); } finally { clearTimeout(tm); }
+}
+// 구글 뉴스 주소(news.google.com/rss/articles/…)를 진짜 신문사 주소로 풀기
+async function realUrl(u) {
+  const m = String(u).match(/^https:\/\/news\.google\.com\/(?:rss\/)?articles\/([^?#/]+)/);
+  if (!m) return u;
+  const id = m[1];
+  const h = await (await tfetch('https://news.google.com/rss/articles/' + id, { headers: { 'user-agent': UA } }, 6000)).text();
+  const sg = (h.match(/data-n-a-sg="([^"]+)"/) || [])[1], ts = (h.match(/data-n-a-ts="([^"]+)"/) || [])[1];
+  if (!sg || !ts) return '';
+  const inner = JSON.stringify(['garturlreq', [['X', 'X', ['X', 'X'], null, null, 1, 1, 'US:en', null, 1, null, null, null, null, null, 0, 1], 'X', 'X', 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0], id, Number(ts), sg]);
+  const r = await tfetch('https://news.google.com/_/DotsSplashUi/data/batchexecute', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded;charset=UTF-8', 'user-agent': UA }, body: 'f.req=' + encodeURIComponent(JSON.stringify([[['Fbv4je', inner, null, 'generic']]])) }, 6000);
+  const t = await r.text(), part = t.split('\n\n')[1];
+  if (!part) return '';
+  const arr = JSON.parse(part), row = arr.find(x => Array.isArray(x) && x[0] === 'wrb.fr') || arr[0];
+  const out = JSON.parse(row[2])[1];
+  return /^https?:\/\//.test(out) ? out : '';
+}
+function meta(h, n) { const m = h.match(new RegExp('<meta[^>]+(?:property|name)=["\']' + n + '["\'][^>]*content=["\']([^"\']*)', 'i')) || h.match(new RegExp('<meta[^>]+content=["\']([^"\']*)["\'][^>]*(?:property|name)=["\']' + n + '["\']', 'i')); return m ? un(m[1]) : ''; }
+// 신문사 페이지에서 본문 글만 뽑기 (EUC-KR 신문사도 읽음)
+async function articleText(u) {
+  const r = await tfetch(u, { headers: { 'user-agent': UA, 'accept-language': 'ko-KR,ko;q=0.9' } }, 7000);
+  if (!r.ok) return '';
+  const buf = await r.arrayBuffer();
+  let cs = ((r.headers.get('content-type') || '').match(/charset=([\w-]+)/i) || [])[1];
+  let h = new TextDecoder('utf-8').decode(buf);
+  if (!cs) cs = (h.slice(0, 3000).match(/<meta[^>]+charset=["']?([\w-]+)/i) || [])[1];
+  // 깨진 글자(�) 없이 한글이 읽히면 UTF-8 그대로 — 머리말에 charset을 잘못 적은 신문사 대비
+  const utfOk = !/\uFFFD/.test(h) && /[가-힣]/.test(h);
+  if (cs && !/utf-?8/i.test(cs) && !utfOk) { try { h = new TextDecoder(cs.toLowerCase()).decode(buf); } catch (e) {} }
+  h = h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<noscript[\s\S]*?<\/noscript>|<!--[\s\S]*?-->/gi, ' ');
+  const desc = meta(h, 'og:description') || meta(h, 'description');
+  // 1) 본문 칸(신문사마다 이름이 달라 흔한 이름들로 찾음)
+  let body = '';
+  const box = h.match(/<(div|section|article)[^>]+(?:itemprop=["']articleBody["']|id=["'](?:article[_-]?(?:body|txt|text|view|content)|articleBody|newsct_article|dic_area|news[_-]?body(?:_area)?|newsEndContents|view[_-]?content|textBody|article_body)["']|class=["'][^"']*(?:article[_-]?(?:body|txt|text|view|content)|news[_-]?body|view[_-]?con(?:tent)?|story[_-]?news|art_txt|article_body)[^"']*["'])[^>]*>/i);
+  if (box) body = un(h.slice(box.index, box.index + 20000).replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n'));
+  // 2) 없으면 긴 <p> 문단들
+  if (body.length < 200) { const ps = (h.match(/<p[^>]*>[\s\S]*?<\/p>/gi) || []).map(un).filter(x => x.length >= 40).join(' '); if (ps.length > body.length) body = ps; }
+  body = body.replace(/\s+/g, ' ').replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, ' ').trim();
+  const text = (body.length >= 120 ? body : (desc + ' ' + body)).slice(0, 1800);
+  return text.length >= 80 ? text : '';
+}
+async function readOne(x) {
+  if (x.sum) return { url: x.url, text: x.sum };            // 기업마당 공고는 사업개요가 이미 있음
+  if (!/^https?:\/\//.test(x.url || '')) return null;
+  try {
+    const u = await realUrl(x.url); if (!u) return null;
+    const text = await articleText(u);
+    return { url: u, text };
+  } catch (e) { return null; }
+}
+const SUM_RULE = '너는 바쁜 사람에게 기사를 대신 읽어 주는 비서다. 아래 [번호] 기사 본문을 읽고 기사마다 3~4문장으로 요약한다. 받는 사람이 이 요약만 보고 원문을 열지 말지 정할 수 있게: 무엇이 바뀌었는지·누가 해당되는지·언제까지·어떻게 신청하는지·얼마인지를 본문에 있는 대로 먼저. 본문에 없는 숫자·날짜·사실은 절대 지어내지 않는다. 본문이 기사 내용이 아니거나(광고·로그인 안내 등) 너무 짧아 알 수 없으면 그 번호는 "-"만 쓴다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)·마크다운 금지.\n답 형식(다른 말 없이): 기사마다 한 줄에 "[번호] 요약".';
+async function summarize(arts, k, env, key) {
+  const who = { senior: '받는 사람: 60~80대 어르신', boss: '받는 사람: 동네 가게 대표님(자영업자)', actor: '받는 사람: 오디션을 찾는 배우' }[k];
+  const r = await tfetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+    body: JSON.stringify({ model: env.LETTER_MODEL || env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: SUM_RULE + '\n' + who, messages: [{ role: 'user', content: arts.map(a => '[' + a.n + '] 제목: ' + a.t + '\n본문: ' + a.text).join('\n\n') }] })
+  }, 45000);
+  if (!r.ok) return {};
+  const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '', out = {};
+  let cur = null;
+  txt.split('\n').forEach(line => {
+    const m = line.match(/^\s*\[(\d+)\]\s*(.*)$/);
+    if (m) { cur = m[1]; out[cur] = m[2]; } else if (cur && line.trim()) out[cur] += ' ' + line.trim();
+  });
+  Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; });
+  return out;
+}
+// ---------- 📈 오늘의 시세 ----------
+function num(v) { return Number(String(v == null ? '' : v).replace(/,/g, '')); }
+async function indexOf(code, yh) {
+  try {
+    const j = await (await tfetch('https://m.stock.naver.com/api/index/' + code + '/basic', { headers: { 'user-agent': UA } }, 5000)).json();
+    const v = num(j.closePrice), pct = num(j.fluctuationsRatio);
+    if (v > 0) return { v, pct: isFinite(pct) ? pct : null };
+  } catch (e) {}
+  try {
+    const j = await (await tfetch('https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(yh) + '?range=5d&interval=1d', { headers: { 'user-agent': UA } }, 5000)).json();
+    const m = j.chart.result[0].meta, v = m.regularMarketPrice, pv = m.chartPreviousClose || m.previousClose;
+    if (v > 0) return { v, pct: pv ? (v - pv) / pv * 100 : null };
+  } catch (e) {}
+  return null;
+}
+async function market() {
+  const [ks, kq, fx] = await Promise.all([indexOf('KOSPI', '^KS11'), indexOf('KOSDAQ', '^KQ11'), tfetch('https://open.er-api.com/v6/latest/USD', {}, 5000).then(r => r.json()).catch(() => null)]);
+  const idx = [], ex = [];
+  const f2 = v => v.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  if (ks) idx.push({ n: '코스피', v: f2(ks.v), pct: ks.pct == null ? null : Math.round(ks.pct * 100) / 100 });
+  if (kq) idx.push({ n: '코스닥', v: f2(kq.v), pct: kq.pct == null ? null : Math.round(kq.pct * 100) / 100 });
+  const R = fx && fx.rates, krw = R && R.KRW;
+  if (krw) {
+    const won = v => Math.round(v).toLocaleString('ko-KR') + '원';
+    ex.push({ n: '🇺🇸 미국 1달러', v: won(krw) });
+    if (R.JPY) ex.push({ n: '🇯🇵 일본 100엔', v: won(krw / R.JPY * 100) });
+    if (R.EUR) ex.push({ n: '🇪🇺 유럽 1유로', v: won(krw / R.EUR) });
+    if (R.CNY) ex.push({ n: '🇨🇳 중국 1위안', v: won(krw / R.CNY) });
+  }
+  return idx.length || ex.length ? { idx, ex } : null;
+}
+
 async function build(k, city, env) {
-  const c = CITY[city] || CITY['광주'], w = await weather(c), today = kst();
+  const c = CITY[city] || CITY['광주'], mkP = k === 'actor' ? Promise.resolve(null) : market().catch(() => null), w = await weather(c), today = kst();
   let groups = [], extra = '', links = [];
   if (k === 'senior') {
     const N = async (qs, n) => uniq([].concat(...await Promise.all(qs.map(q => news(q, 6))))).sort((x, y) => y.d - x.d).slice(0, n);
@@ -171,11 +278,26 @@ async function build(k, city, env) {
   }
   // 아래 목록: 제목 + 출처(날짜) + 원문 링크
   const items = [];
-  groups.forEach(([icon, label, arr]) => uniq(arr || []).forEach(x => items.push({ icon: x.icon || icon, g: label, title: String(x.t).slice(0, 110), body: [x.src, mmdd(x.d)].filter(Boolean).join(' · ').slice(0, 80), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '' })));
+  groups.forEach(([icon, label, arr]) => uniq(arr || []).forEach(x => items.push({ icon: x.icon || icon, g: label, title: String(x.t).slice(0, 110), body: [x.src, mmdd(x.d)].filter(Boolean).join(' · ').slice(0, 80), url: /^https?:\/\//.test(x.url || '') ? String(x.url).slice(0, 600) : '', _x: x })));
+  // 기사마다 원문 읽기 (앞에서부터 SUM_MAX개 — 바깥 요청 수 한도 때문에)
+  // 기본 7개: Cloudflare 무료는 바깥 요청이 한 번에 50개까지라(기사 하나에 3번) — 유료면 LETTER_SUM_MAX로 늘리기
+  const SUM_MAX = Number(env.LETTER_SUM_MAX) || 7;
+  // 묶음(유행·질병 / 무료·혜택 / 사기 조심 …)마다 골고루 돌아가며 고름
+  const byG = {}, order = [];
+  items.slice(0, 20).filter(it => it._x.sum || it.url).forEach(it => { if (!byG[it.g]) { byG[it.g] = []; order.push(it.g); } byG[it.g].push(it); });
+  const pick = [];
+  for (let i = 0; pick.length < SUM_MAX && order.some(g => byG[g][i]); i++) order.forEach(g => { if (byG[g][i] && pick.length < SUM_MAX) pick.push(byG[g][i]); });
+  const readP = Promise.all(pick.map(it => readOne(it._x)));
   // AI에는 제목만 보내고 짧은 요점만 받음(주소는 안 보냄 → 답이 잘리지 않음)
   const wtxt = w ? c[2] + ' 오늘 ' + w.sky + ', 최고 ' + w.max + '도 최저 ' + w.min + '도, 비 확률 ' + w.rain + '%' + (w.pm10 != null ? ', 미세먼지 ' + w.pm10 + '㎍(초미세 ' + w.pm25 + ')' : '') + ' · 내일 ' + w.tmrMin + '~' + w.tmrMax + '도' : '(날씨 자료 없음)';
   const src = groups.map(([, label, arr]) => '[' + label + ']\n' + ((arr || []).length ? arr.map(x => '- ' + x.t + (x.src ? ' (' + x.src + ')' : '')).join('\n') : '(자료 없음)')).join('\n') + extra;
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
+  // 기사 요약은 맨 위 요점 정리와 함께(동시에) 돌림
+  const sumP = readP.then(reads => {
+    const arts = [];
+    reads.forEach((rd, i) => { if (!rd) return; if (rd.url && /^https?:/.test(rd.url) && !/news\.google\.com/.test(rd.url)) pick[i].url = rd.url.slice(0, 600); if (rd.text) arts.push({ n: i + 1, t: pick[i].title, text: rd.text }); });
+    return key && arts.length ? summarize(arts, k, env, key).then(m => { Object.keys(m).forEach(n => { const it = pick[Number(n) - 1]; if (it) it.sum = m[n].slice(0, 400); }); }) : null;
+  }).catch(() => null);
   let out = null;
   if (key) {
     try {
@@ -192,12 +314,15 @@ async function build(k, city, env) {
       }
     } catch (e) { out = null; }
   }
+  await sumP;
+  items.forEach(it => { delete it._x; });
+  const mk = await mkP;
   const clean = s => String(s || '').replace(/\*/g, '').trim();
   const ok = out && clean(out.summary);
   if (!ok && !items.length) throw new Error('ai');
   const hi = { senior: '어르신, 싸바?', boss: '대표님, 싸바?', actor: '연기자 여러분, 오늘도 좋은 날입니다.' }[k];
   return {
-    k, city, date: ymd(today), w, list: true, fallback: !ok,
+    k, city, date: ymd(today), w, list: true, fallback: !ok, market: mk,
     hello: clean(ok ? out.hello : '') .slice(0, 80) || hi + (w && k !== 'actor' ? ' ' + c[2] + '는 오늘 최고 ' + w.max + '도, 최저 ' + w.min + '도예요.' : ''),
     summary: ok ? clean(out.summary).slice(0, 600) : '',
     items: items.slice(0, 20), links
@@ -212,7 +337,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter4/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter5/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);

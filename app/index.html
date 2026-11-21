@@ -541,6 +541,13 @@
     #v-home.v2 .v2-mk p { color: #575319; opacity: 1; }
     #v-home.v2 .v2-mk .btn { display: inline-flex; align-items: center; margin-top: 14px; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #C8213A, #B3132B); color: #fff; font-size: 18px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 16px -10px rgba(120,10,30,.7); }
     #v-home.v2 .v2-mk .dance { position: absolute; right: 14px; top: 16px; width: 76px; height: auto; pointer-events: none; }
+    /* 11-22 대표님: 싸바카드 칸도 사진 돌리기 — 실제로 만드는 카드 예시가 바뀜 (어디야와 엇갈려 바뀜) */
+    #v-home.v2 .v2-mk .mkph { position: relative; display: block; height: 150px; margin: 0 12px 12px; border-radius: 18px; overflow: hidden; background: #E9E3B0; box-shadow: 0 8px 18px -12px rgba(90,60,10,.7); border: 3px solid #fff; }
+    #v-home.v2 .v2-mk .mkph .ly { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease, transform 6s ease; transform: scale(1.06); }
+    #v-home.v2 .v2-mk .mkph .ly.on { opacity: 1; transform: scale(1); }
+    #v-home.v2 .v2-mk .mkph::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.55)); }
+    #v-home.v2 .v2-mk .mkph b { position: absolute; z-index: 1; left: 12px; bottom: 10px; right: 12px; color: #fff; font-size: 17px; font-weight: 800; text-shadow: 0 1px 4px rgba(0,0,0,.8); transition: opacity .5s; }
+    #v-home.v2 .v2-mk .mkph s { position: absolute; z-index: 1; top: 8px; right: 8px; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.9); color: #B3132B; font-size: 15px; font-weight: 800; text-decoration: none; }
     #v-home.v2 .v2-mk .sp { display: flex; align-items: center; gap: 12px; margin: 0 12px 12px; padding: 10px 14px 10px 10px; border-radius: 18px; background: rgba(255,255,255,.72); color: #1A1A1A; text-decoration: none; box-shadow: 0 6px 14px -10px rgba(120,70,20,.6); }
     #v-home.v2 .v2-mk .sp i { flex: none; width: 46px; height: 46px; border-radius: 12px; background-size: cover; background-position: center; border: 2px solid #fff; }
     #v-home.v2 .v2-mk .sp span { flex: 1; min-width: 0; }
@@ -1036,9 +1043,11 @@
     mk.innerHTML = '<div class="tx"><em>🍒 싸바카드</em><h3>우리 모임 소식도,<br>우리 가게 자랑도</h3><p><span class="bt-long">모임공지 · 초대장 · 가게홍보 · 프로필 · 인사</span><span class="bt-short">모임·가게·프로필 카드</span></p>' +
       '<a class="btn" href="#alim">1분에 만들기 ›</a></div>' +
       '<img class="dance" src="../img/cherry-dance-anim.svg" alt="">' +
+      '<a class="mkph" href="#alim" aria-label="싸바카드 예시 보기"><s>이런 카드</s><b></b></a>' +
       '<a class="sp" href="../kimchi/"><i style="background-image:url(../img/gatkimchi-sign.jpg)"></i><span><b>언니김치 특판</b><small>특판 코너에서 가격을 확인하세요</small></span><u>›</u></a>';
     tapGo(mk, '#alim');
     v.appendChild(mk);
+    rotPics(mk.querySelector('.mkph'), MK_PICS, 2200);
 
     // 3. 오늘의 싸바 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘의 싸바 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
@@ -1089,6 +1098,31 @@
       if (document.hidden) return;
       lys[k].classList.remove('on'); k = (k + 1) % lys.length; lys[k].classList.add('on');
     }, 4500);
+  }
+  // 싸바카드 칸 예시 사진 + 이름 (11-22) — 실제 예시 가게·모임
+  var MK_PICS = [['../img/ex/menu-gul.jpg', '🍽️ 압구정 순천만 · 오늘의 메뉴'], ['../img/ex/party-cheers.jpg', '🥂 송년회·신년회 초대장'],
+    ['../img/ex/actor-snow.jpg', '🎬 배우 프로필'], ['../img/ex/wetland-path.jpg', '⛰️ 동문산악회 공지'],
+    ['../img/ex/jok-class.jpg', '📚 족집게어학원 특강 안내'], ['../img/ex/bonb-lounge.jpg', '💇 비온비 성수점 이벤트'], ['../img/ex/suncheon-sunset.jpg', '🌅 새해 인사 카드']];
+  var rotTimers = [];
+  function rotPics(box, list, delay) {
+    if (!box) return;
+    var cap = box.querySelector('b');
+    var lys = list.map(function (f, i) {
+      var d = document.createElement('span'); d.className = 'ly' + (i ? '' : ' on'); d.style.backgroundImage = 'url(' + f[0] + ')';
+      box.insertBefore(d, box.firstChild); return d;
+    });
+    if (cap) cap.textContent = list[0][1];
+    try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+    var k = 0;
+    function step() {
+      if (!document.body.contains(box)) return;
+      if (!document.hidden) {
+        lys[k].classList.remove('on'); k = (k + 1) % lys.length; lys[k].classList.add('on');
+        if (cap) { cap.style.opacity = 0; setTimeout(function () { cap.textContent = list[k][1]; cap.style.opacity = 1; }, 500); }
+      }
+      rotTimers.push(setTimeout(step, 4500));
+    }
+    rotTimers.push(setTimeout(step, 4500 + (delay || 0)));
   }
   function renderHome() {
     if (HOME_V2) return renderHomeV2();

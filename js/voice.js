@@ -35,15 +35,27 @@
     ta.value = text.slice(0, 100); ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
   function polish(said) {
-    show('카드 말 만드는 중', '“' + said + '”', true);
+    show('말 다듬는 중', '“' + said + '”', true);
     fetch('/api/voice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ say: said, who: who(), dev: dev() }) })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (x) {
         hide();
         if (x.ok && x.j.msg) { put(x.j.msg); tip((x.j.to ? x.j.to + '님께 ' : '') + '보낼 말을 만들었어요. 고쳐도 되고, 아래 [카톡 보내기]를 누르세요'); }
-        else { put(said); tip(x.j && x.j.error === 'limit' ? '오늘은 말로 하기를 많이 썼어요. 들은 말을 그대로 넣었어요' : '들은 말을 그대로 넣었어요. 고쳐서 보내세요'); }
+        else { tip(x.j && x.j.error === 'limit' ? '오늘은 다듬기를 많이 썼어요. 그대로 보내도 돼요' : '지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); }
       })
-      .catch(function () { hide(); put(said); tip('들은 말을 그대로 넣었어요. 고쳐서 보내세요'); });
+      .catch(function () { hide(); tip('지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); });
+  }
+
+  var DEF = /^(싸바\?|어디야\?)?$/;
+  function tidy() {
+    var ta = document.getElementById('gText'); if (!ta) return;
+    var t = ta.value.replace(/\s+/g, ' ').trim();
+    if (DEF.test(t) || t.length < 4) {
+      ta.value = ''; ta.dispatchEvent(new Event('input', { bubbles: true })); ta.focus();
+      tip('키보드의 🎤 단추를 누르고 말하세요. 예) 철수한테 토요일에 밥 먹자고 해 줘 → 그다음 ✨ 다듬기');
+      return;
+    }
+    polish(t);
   }
   function noMic(why) {
     hide();
@@ -83,8 +95,9 @@
     var ta = document.getElementById('gText'); if (!ta) return false;
     var comp = ta.closest('.composer'); if (!comp) return false;
     var row = comp.querySelector('.chint'); if (!row || row.querySelector('.vc-btn')) return true;
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn'; b.textContent = '🎤 말로 하기';
-    b.addEventListener('click', start);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn';
+    b.textContent = '✨ 다듬기';
+    b.addEventListener('click', tidy);
     var clr = row.querySelector('button'); row.insertBefore(b, clr || null);
     return true;
   }

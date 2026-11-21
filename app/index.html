@@ -597,6 +597,29 @@
     #v-home.v2 .v2-half i img { height: 44px; width: auto; display: block; }
     #v-home.v2 .v2-half b { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
     #v-home.v2 .v2-half small { margin-top: 3px; font-size: 15px; color: #6B6259; line-height: 1.35; word-break: keep-all; }
+    /* 11-22 대표님: 놀이터·싸바가 뭐지? 흰 바탕이 심심함 → 표준색 그라데이션 + 장식 + 움직임 + 작은 단추 */
+    #v-home.v2 .v2-half { position: relative; overflow: hidden; isolation: isolate; text-shadow: 0 1px 0 rgba(255,255,255,.75); }
+    #v-home.v2 .v2-half > * { position: relative; z-index: 1; }
+    #v-home.v2 .v2-half.pg { background: linear-gradient(160deg, #CFE7FB 0%, #BFE2D2 48%, #9ACF8E 100%); color: #1E3F1C; } /* 2 하늘 풀밭 */
+    #v-home.v2 .v2-half.ws { background: linear-gradient(160deg, #FFF0DF 0%, #FCD9B8 50%, #F4B98F 100%); color: #5A2A12; } /* 3 살구 크림 */
+    #v-home.v2 .v2-half.pg small { color: #2F5A2B; } #v-home.v2 .v2-half.ws small { color: #7A3E1C; }
+    #v-home.v2 .v2-half .dc { position: absolute; z-index: 0; font-style: normal; line-height: 1; pointer-events: none; opacity: .55; animation: v2fl 5s ease-in-out infinite; }
+    #v-home.v2 .v2-half .dc img { width: 100%; height: auto; display: block; }
+    #v-home.v2 .v2-half.pg .d1 { right: 10px; top: 12px; font-size: 24px; transform: rotate(14deg); }
+    #v-home.v2 .v2-half.pg .d2 { right: 36px; top: 54px; font-size: 18px; animation-delay: -1.6s; }
+    #v-home.v2 .v2-half.pg .d3 { right: 8px; bottom: 44px; font-size: 22px; animation-delay: -3s; }
+    #v-home.v2 .v2-half.ws .d1 { right: 6px; top: 8px; width: 46px; opacity: .9; }
+    #v-home.v2 .v2-half.ws .d2 { right: 44px; top: 50px; width: 22px; opacity: .8; animation-delay: -2s; }
+    #v-home.v2 .v2-half.ws .d3 { right: 4px; bottom: 46px; width: 30px; opacity: .75; animation-delay: -3.4s; }
+    #v-home.v2 .v2-half i { animation: v2hop 2.4s ease-in-out infinite; transform-origin: 50% 100%; }
+    #v-home.v2 .v2-half.ws i { animation-delay: -1.2s; }
+    #v-home.v2 .v2-half .go { align-self: flex-start; margin-top: 12px; padding: 7px 13px; border-radius: 999px; font-size: 15px; font-weight: 800; text-shadow: none; color: #fff; }
+    #v-home.v2 .v2-half.pg .go { background: linear-gradient(180deg, #3A7A33, #2A5E25); }
+    #v-home.v2 .v2-half.ws .go { background: linear-gradient(180deg, #C8452C, #B3132B); }
+    @keyframes v2fl { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+    @keyframes v2hop { 0%, 70%, 100% { transform: translateY(0) scale(1); } 80% { transform: translateY(-7px) scale(1.06, .96); } 90% { transform: translateY(0) scale(1.04, .96); } }
+    @media (prefers-reduced-motion: reduce) { #v-home.v2 .v2-half i, #v-home.v2 .v2-half .dc { animation: none; } }
+    html.bigtxt #v-home.v2 .v2-half .dc { display: none; }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -1036,8 +1059,8 @@
 
     // 6. 놀이터 · 싸바가 뭐지? — 반 칸씩 흰 카드
     var duo = el('div', 'v2-duo');
-    duo.innerHTML = '<a class="v2-half" href="../eodiya/#playground"><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small><span class="bt-long">게임 ' + GAMES.length + '가지 · 무료</span><span class="bt-short">게임 무료</span></small></a>' +
-      '<a class="v2-half" href="../?story=1"><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small><span class="bt-long">카드 한 장이면 다 알아요</span><span class="bt-short">싸바 소개</span></small></a>';
+    duo.innerHTML = '<a class="v2-half pg" href="../eodiya/#playground"><em class="dc d1" aria-hidden="true">🎯</em><em class="dc d2" aria-hidden="true">⭐</em><em class="dc d3" aria-hidden="true">🎲</em><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small><span class="bt-long">게임 ' + GAMES.length + '가지 · 무료</span><span class="bt-short">게임 무료</span></small><span class="go">놀러 가기 ›</span></a>' +
+      '<a class="v2-half ws" href="../?story=1"><em class="dc d1" aria-hidden="true"><img src="../img/deco-cherry.svg" alt=""></em><em class="dc d2" aria-hidden="true"><img src="../img/deco-leaf.svg" alt=""></em><em class="dc d3" aria-hidden="true"><img src="../img/deco-cherry2.svg" alt=""></em><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small><span class="bt-long">카드 한 장이면 다 알아요</span><span class="bt-short">싸바 소개</span></small><span class="go">알아보기 ›</span></a>';
     v.appendChild(duo);
   }
   function renderHome() {

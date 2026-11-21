@@ -85,6 +85,26 @@
 
     .share { display: block; margin: 0 18px; padding: 16px; border: 0; border-radius: 18px; width: calc(100% - 36px); background: #FEE500; color: #191600; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer; }
 
+
+    /* 예전 소개 앞부분 (이름 · 체리 · 믿는 것) — 대표님이 좋다고 해서 그대로 살림 */
+    .story { margin: 24px 18px 28px; padding: 26px 20px; border-radius: 26px; color: #fff; background: linear-gradient(100deg, #5C0512 0%, #7E0A1C 35%, #B3132B 75%, #D8475E 100%); box-shadow: 0 18px 34px -22px rgba(92,5,18,.8); }
+    .story .eb { color: #FFD9DE; letter-spacing: .12em; }
+    .story h2 { margin-top: 6px; font-size: 28px; font-weight: 800; letter-spacing: -.035em; text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+    .story .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 6px; text-align: center; }
+    .story .row div { padding: 14px 6px; border-radius: 18px; background: rgba(255,255,255,.14); }
+    .story .row b { display: block; font-size: 23px; font-weight: 900; }
+    .story .row span { display: block; margin-top: 4px; font-size: 15px; color: #FFE9EC; }
+    .story p { margin-top: 12px; font-size: 17px; line-height: 1.7; color: #FFF1F3; }
+    .story p.big { margin: 18px 0 6px; font-size: 23px; line-height: 1.45; font-weight: 900; color: #fff; text-align: center; }
+    .cherry { display: flex; align-items: center; gap: 16px; margin: 0 18px 28px; padding: 22px 20px; border-radius: 26px; background: #fff; box-shadow: 0 18px 34px -22px rgba(90,40,20,.6); }
+    .cherry img { flex: none; width: 76px; height: auto; }
+    .cherry .eb { letter-spacing: .12em; }
+    .cherry h2 { margin-top: 4px; font-size: 24px; font-weight: 800; letter-spacing: -.03em; }
+    .cherry p { margin-top: 8px; font-size: 17px; line-height: 1.6; color: #4A4038; }
+    .believe { margin-bottom: 8px; }
+    .believe .eb { letter-spacing: .12em; }
+    .believe li i { background: #FFF1F3; font-size: 16px; width: 34px; height: 34px; }
+
     /* 늘 떠 있는 단추 하나 (아래 이전·홈 띠 위) */
     .cta { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(72px + env(safe-area-inset-bottom)); z-index: 40; display: flex; align-items: center; gap: 8px; padding: 15px 28px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 19px; font-weight: 800; text-decoration: none; white-space: nowrap; box-shadow: 0 12px 26px -10px rgba(140,10,30,.7); }
     .cta img { width: 24px; height: auto; }
@@ -100,6 +120,40 @@
     <span class="eb">싸바(Ça va)는 프랑스 말로 "괜찮아?"</span>
     <h1>괜찮아? 한마디로<br><b>사람이 이어집니다</b></h1>
     <p>앱 설치 없이, 카톡 링크 하나로<br>안부 묻고 · 부르고 · 알립니다</p>
+  </section>
+
+
+  <section class="story">
+    <span class="eb">OUR NAME</span>
+    <h2>싸바, 이름 이야기</h2>
+    <div class="row">
+      <div><b>Ça va? ↗</b><span>잘 지내?</span></div>
+      <div><b>Ça va! ↘</b><span>응, 잘 지내!</span></div>
+    </div>
+    <p>프랑스 친구들은 만나면 가장 먼저 "싸바?"를 건넵니다. 문자로는 그냥 sava라고 쓰지요.</p>
+    <p>동아프리카 스와힐리어에도 sawa[사와]라는 말이 있습니다. "괜찮아, 좋아"라는 뜻입니다. 바다 건너 서로 다른 말이지만, 마음은 하나. 안부입니다.</p>
+    <p>우리는 그 짧은 안부에 우리말을 붙였습니다.</p>
+    <p class="big">"싸바? 어디야?"<br>"싸바! 여기야!"</p>
+    <p>멀어진 사람도, 다시 만나야 할 사람도, 이 한마디면 우리는 다시 친구가 됩니다.</p>
+  </section>
+
+  <section class="cherry">
+    <img src="../img/cherry.webp" alt="">
+    <div>
+      <span class="eb">OUR SYMBOL</span>
+      <h2>체리 이야기</h2>
+      <p>체리는 늘 두 알이 한 꼭지에 달려 자랍니다. 혼자보다 둘, 둘보다 우리. 싸바의 체리가 둘인 이유입니다.</p>
+    </div>
+  </section>
+
+  <section class="easy believe">
+    <span class="eb">WHAT WE BELIEVE</span>
+    <h2>싸바가 믿는 것</h2>
+    <ul>
+      <li><i>📲</i><span><b>앱보다 사람이 먼저입니다</b><br>받는 사람은 늘 쓰던 카톡 하나로 바로 엽니다.</span></li>
+      <li><i>🐢</i><span><b>가장 느린 사람에게 맞춥니다</b><br>복잡한 건 질색인 어르신도, 유치원생 우리 아이도 누구나 쉽게 씁니다.</span></li>
+      <li><i>🍒</i><span><b>사람을 이어 주는 일을 합니다</b><br>가족은 안부를 묻고, 연인은 마음을 나누고, 친구는 이유 없이 만납니다.</span></li>
+    </ul>
   </section>
 
   <div class="nums" aria-label="싸바 숫자로 보기">
@@ -158,15 +212,6 @@
     </ul>
   </section>
 
-  <section class="mean">
-    <span class="eb">싸바, 끝만 바꾸면</span>
-    <h2>묻는 말이 되고<br>대답이 됩니다</h2>
-    <div class="row">
-      <div><b>싸바? ↗</b><span>잘 지내?</span></div>
-      <div><b>싸바! ↘</b><span>잘 지내!</span></div>
-    </div>
-    <p>안부 한마디가 사람을 다시 만나게 합니다.</p>
-  </section>
 
   <section class="faq">
     <span class="eb">자주 묻는 질문</span>

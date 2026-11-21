@@ -431,6 +431,8 @@
   /* 사진(인스타·스토리·정사각)용일 때: 사진에 안 들어가는 칸은 감추고, 메뉴 칸은 예약 스위치 없이 바로 */
   .sns-only { display: none; }
   body.dest-sns [data-snsoff], body.dest-sns .kk-only { display: none !important; }
+  /* 용도·업종에 필요 없는 칸은 아예 안 보이게 (applyMedia) */
+  body.no-video [data-sec="video"], body.no-video [data-tab="video"] { display: none !important; }
   body.dest-sns .sns-only { display: block; }
   body.dest-sns legend .sns-only { display: inline; }
   body.dest-sns #resvBox { display: block !important; }
@@ -980,6 +982,8 @@
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
+  var MEDIA_NO_VIDEO = ['funeral', 'greeting', 'party', 'kid', 'senior'];   // 부고·인사·송년회 같은 단순 알림·초대엔 동영상 필요 없음
+  var MEDIA_NO_GAL = ['funeral', 'greeting', 'party', 'event', 'kid', 'senior']; // 단순 초대·알림은 대표 사진 한 장이면 충분
   var design = '';
   var D = window.SsakaDesigns;
   function EX() { var ind = D.industry(industry); return (ind && ind.ex) || TYPES[type].ex; }
@@ -1199,7 +1203,7 @@
     $('snsPv').hidden = !dd; $('pvDest').hidden = !dd;
     $('pvSmall').textContent = dd ? '· 실제로 올라갈 사진 모양 그대로예요' : '· 글자를 누르면 바로 고쳐요';
     if (!dd || !ds) return;
-    $('pvDest').textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용 사진으로 보여 드려요. 입력 칸에 쓰면 사진에 바로 들어가요.';
+    $('pvDest').textContent = ds.i + ' ' + ds.b + '(' + ds.s + ')용 사진으로 보여 드려요. 입력 칸에 쓰면 사진에 바로 들어가요. 동영상·링크 단추·꾸미기는 ' + (dest === 'print' ? '종이' : '사진') + '에 안 들어가서 칸을 숨겼어요.';
     var g = ++snsPvGen, card = buildCard().card;
     try { paintSnsFit(card, dd, ds); } catch (e) {}
     if (snsPvShape !== dest) { $('snsPvImg').removeAttribute('src'); snsPvShape = dest; }
@@ -1389,9 +1393,7 @@
     if (type === 'club') $('gisuOn').checked = !!F.gisu;
     $('placeLeg').textContent = ind.id === 'funeral' ? '빈소' : ind.id === 'wedding' ? '예식장' : '장소';
     if (F.sound !== undefined && typeof soundTouched !== 'undefined' && !soundTouched && $('sound')) $('sound').value = F.sound;
-    var showGal = type === 'profile' || type === 'shop' || type === 'club' || !!F.gal;
-    $('galBox').hidden = !showGal;
-    $('galTitle').textContent = ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
+    applyMedia();
     update();
   }
   var seasonTouched = false;
@@ -1472,11 +1474,12 @@
     // 당근·네이버·카톡 채널·인스타 (https 주소만)
     var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = g(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
     if (Object.keys(lk).length) card.links = lk;
-    if (galList().length) card.gallery = galList();
+    if ($('galBox').hidden) {} // 이 업종엔 사진첩 칸이 없음 — 예전에 올린 사진이 남아 있어도 안 넣음
+    else if (galList().length) card.gallery = galList();
     else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
     if (v('season')) card.season = v('season');
     if (v('motion')) card.motion = v('motion');
-    if (v('clip')) card.clip = v('clip');
+    if (v('clip') && MEDIA_NO_VIDEO.indexOf(industry) < 0) card.clip = v('clip');
     if (g('copyValue')) card.copy = { label: g('copyLabel') || '복사', value: g('copyValue') };
     if (type === 'shop' && $('resvOn').checked) {
       var ires = (D.industry(industry) || {}).res || {};
@@ -2213,6 +2216,18 @@
       showThumb($('image').value);
     });
   }
+  // ---------- 용도(올릴 곳) × 업종에 맞는 칸만 (11-22 대표님: 포스터에 동영상 칸, 초대 카드에 사진 10장 칸이 나오면 헷갈림) ----------
+  // 카톡 카드: 업종에 따라 사진 10장·동영상 / SNS 사진·인쇄: 사진 한 장 이미지라 동영상 없음, 사진판은 3장까지만 들어감
+  function galMax() { return destSns() ? 3 : 10; }
+  function applyMedia() {
+    var ind = (D.industry && D.industry(industry)) || {}, F = ind.form || {}, sns = !!destSns();
+    var showGal = (type === 'profile' || type === 'shop' || type === 'club' || !!F.gal) && MEDIA_NO_GAL.indexOf(industry) < 0;
+    $('galBox').hidden = !showGal;
+    $('galTitle').textContent = sns ? '사진판에 넣을 사진' : ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
+    $('galStatus').textContent = sns ? (dest === 'print' ? '전단·포스터에는 대표 사진 아래 작은 사진 3장까지 들어가요.' : '이 사진에는 대표 사진 아래 작은 사진 3장까지 들어가요.') : '여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.';
+    document.body.classList.toggle('no-video', sns || MEDIA_NO_VIDEO.indexOf(industry) >= 0);
+    try { renderGal(); } catch (e) {}
+  }
   // ---------- 사진 여러 장 (최대 10장) ----------
   function renderGal() {
     var grid = $('galGrid'), add = $('galAdd');
@@ -2225,8 +2240,10 @@
       x.addEventListener('click', function () { var l = galList(); l.splice(i, 1); $('galUrls').value = l.join('\n'); renderGal(); update(); renderGallery(); });
       it.appendChild(im); it.appendChild(x); grid.insertBefore(it, add);
     });
-    add.hidden = list.length >= 10;
-    $('galCount').textContent = list.length + ' / 10장';
+    var mx = galMax();
+    grid.querySelectorAll('.gal-it').forEach(function (n, i) { n.style.opacity = i < mx ? '' : '.35'; }); // 넘친 사진은 흐리게 (이 용도엔 안 들어감, 지우진 않음)
+    add.hidden = list.length >= mx;
+    $('galCount').textContent = list.length + ' / ' + mx + '장' + (list.length > mx ? ' · 앞 ' + mx + '장만 들어가요' : '');
   }
   function uploadOne(file) {
     var keep = null;
@@ -2249,9 +2266,9 @@
     var input = this;
     var files = Array.prototype.filter.call(input.files || [], function (f) { return /^image\//.test(f.type); });
     input.value = '';
-    var room = 10 - galList().length;
-    if (!files.length) return;
-    if (files.length > room) toast('최대 10장까지예요. ' + room + '장만 올릴게요');
+    var room = galMax() - galList().length;
+    if (!files.length || room <= 0) return;
+    if (files.length > room) toast('최대 ' + galMax() + '장까지예요. ' + room + '장만 올릴게요');
     files = files.slice(0, room);
     var done = 0, fail = 0;
     $('galStatus').textContent = '사진 올리는 중… 0 / ' + files.length;
@@ -2849,13 +2866,13 @@
     var food = industry === 'restaurant' || industry === 'cafe';
     var B = { shop: ['🏠', '가게 정보'], club: ['📍', '모임 정보'], profile: ['👤', '내 정보'], greet: ['✉️', '보내는 이'] }[type] || ['🏠', '기본 정보'];
     var C = type === 'shop' ? (food ? ['🍽️', '메뉴·예약'] : ['📝', '소개·예약']) : type === 'club' ? ['🙋', '참석·회비'] : type === 'greet' ? ['💌', '인사말'] : type === 'profile' ? ['📝', '소개'] : ['📝', '내용'];
-    return { design: ['🎨', '디자인'], basic: B, photo: ['📷', '사진 (10장까지)'], video: ['📹', '동영상'], content: C, deco: ['✨', '꾸미기'] };
+    return { design: ['🎨', '디자인'], basic: B, photo: ['📷', destSns() ? '사진' : '사진 (10장까지)'], video: ['📹', '동영상'], content: C, deco: ['✨', '꾸미기'] };
   }
   function tabHead(id) {
     var ex = EX(), nm = ex.name || ex.title || '';
     return {
       basic: [type === 'shop' ? '가게 이름 · 영업시간 · 전화 · 주소를 적어 주세요' : type === 'club' ? '모임 제목 · 날짜 · 장소 · 보내는 사람을 적어 주세요' : '제목 · 이름 · 연락처를 적어 주세요', nm ? '예: ' + [ex.title, ex.subtitle && ex.subtitle.split(' · ')[0], ex.phone].filter(Boolean).join(' · ') : '적는 대로 미리보기에 바로 보여요.'],
-      photo: [type === 'shop' ? '대표 음식 사진 한 장 + 메뉴·매장 사진' : '대표 사진 한 장 + 사진 더 올리기', '대표 사진은 카톡 말풍선에 크게 보여요. 그 아래 사진 더 올리기는 10장까지예요.'],
+      photo: [$('galBox').hidden ? '대표 사진 한 장' : type === 'shop' ? '대표 음식 사진 한 장 + 메뉴·매장 사진' : '대표 사진 한 장 + 사진 더 올리기', destSns() ? ($('galBox').hidden ? '이 용도엔 대표 사진 한 장이면 돼요.' : '대표 사진 한 장 + 작은 사진 3장까지 들어가요.') : $('galBox').hidden ? '대표 사진은 카톡 말풍선과 카드 맨 위에 크게 보여요.' : '대표 사진은 카톡 말풍선에 크게 보여요. 그 아래 사진 더 올리기는 10장까지예요.'],
       video: ['내 동영상 올리기 (선택)', '15초 · 30MB까지. 대표 사진 자리에서 소리 없이 반복돼요.'],
       content: [type === 'shop' ? '메뉴 · 예약 받기' : type === 'club' ? '안내 내용 · 회비 계좌 · 참석 신청' : '내용 · 복사 단추', type === 'shop' && ex.menu ? '예: ' + ex.menu.split('\n').slice(0, 3).map(function (l) { return l.replace(/\s+(\d+)$/, function (m, n) { return ' ' + (+n).toLocaleString() + '원'; }); }).join(' · ') : ''],
       deco: ['움직임 · 시즌 테마 · 열면 나오는 소리 (선택)', '안 골라도 돼요. 받는 사람을 반기는 재미를 더해요.']
@@ -2864,7 +2881,7 @@
   function renderTabs() {
     var D2 = tabDefs(), num = 3, sns = document.body.classList.contains('dest-sns');
     document.querySelectorAll('#form .sec-h').forEach(function (h) {
-      if (!(sns && h.hasAttribute('data-snsoff'))) h.querySelector('span').textContent = num++;
+      if (!(sns && h.hasAttribute('data-snsoff')) && getComputedStyle(h).display !== 'none') h.querySelector('span').textContent = num++;
       var id = h.dataset.sec, d = D2[id] || ['', ''], t = tabHead(id);
       h.querySelector('b').textContent = d[0] + ' ' + d[1] + (t[0] ? ' — ' + t[0] : '');
       h.querySelector('small').textContent = t[1] || '';
@@ -2927,6 +2944,8 @@
       : ds.i + ' ' + ds.b + '(' + ds.s + ')용으로 고르셨어요. 아래 디자인도 실제 올라갈 ' + ds.s.replace('세로 ', '').replace('정사각 ', '') + ' 모양 그대로 보여 드려요. 다 쓰면 완성 화면에서 이 크기 사진이 맨 위에 나와요.';
     // 올릴 곳이 바뀌면 디자인 미리보기를 그 모양으로 다시 그림
     if (paintedDest !== null && paintedDest !== dest) { snsGen++; snsQ = []; renderGallery(); try { if (PHPAL) paintPhotoSug(); } catch (e) {} }
+    try { applyMedia(); } catch (e) {}
+    if (paintedDest !== null && paintedDest !== dest && destSns() && $('clip') && $('clip').value) toast('동영상은 카톡 카드에서만 보여요. 이 용도엔 대표 사진이 들어가요');
     paintedDest = dest;
     try { paintSnsPv(); } catch (e) {}
     try { renderTabs(); } catch (e) {}

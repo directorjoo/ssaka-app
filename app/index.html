@@ -1092,8 +1092,9 @@
     v.appendChild(duo);
   }
   // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)
-  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg', '30%'], ['../img/ex/face3.jpg', '35%'], ['../img/ex/face2.jpg', '30%'],
-    ['../img/ex/face8.jpg', '12%'], ['../img/ex/face6.jpg', '30%'], ['../img/ex/face4.jpg', '30%'], ['../img/ex/face7.jpg', '45%'], ['../img/ex/face5.jpg', '30%']];
+  // 11-22: 얼굴이 오른쪽 위에 크게(클로즈업), 오른쪽을 보던 인물은 미리 좌우 뒤집어 왼쪽(글씨 쪽)을 보게 잘라 둠 — 사진 위쪽 기준
+  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg?v=2', '0%'], ['../img/ex/face3.jpg?v=2', '0%'], ['../img/ex/face2.jpg?v=2', '0%'],
+    ['../img/ex/face8.jpg?v=2', '0%'], ['../img/ex/face6.jpg?v=2', '0%'], ['../img/ex/face4.jpg?v=2', '0%'], ['../img/ex/face7.jpg?v=2', '0%'], ['../img/ex/face5.jpg?v=2', '0%']];
   // 사진 돌리기 공통(11-22): 4.5초마다 사르르, ⏸ 누르면 지금 사진에서 멈추고 기억(다음에 열어도 그 사진), ▶ 누르면 다시
   function picStop(key, v) { try { if (v === undefined) return localStorage.getItem(key); if (v === null) localStorage.removeItem(key); else localStorage.setItem(key, String(v)); } catch (e) { return null; } }
   function rotator(o) { // o: {host, layers, key, delay, onShow(k), btnHost}
@@ -1122,8 +1123,8 @@
     clearTimeout(tm); tm = setTimeout(tick, o.delay || 0);
   }
   // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)
-  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg', '30%'], ['../img/ex/face3.jpg', '35%'], ['../img/ex/face2.jpg', '30%'],
-    ['../img/ex/face8.jpg', '12%'], ['../img/ex/face6.jpg', '30%'], ['../img/ex/face4.jpg', '30%'], ['../img/ex/face7.jpg', '45%'], ['../img/ex/face5.jpg', '30%']];
+  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg?v=2', '30%'], ['../img/ex/face3.jpg?v=2', '35%'], ['../img/ex/face2.jpg?v=2', '30%'],
+    ['../img/ex/face8.jpg?v=2', '12%'], ['../img/ex/face6.jpg?v=2', '30%'], ['../img/ex/face4.jpg?v=2', '30%'], ['../img/ex/face7.jpg?v=2', '45%'], ['../img/ex/face5.jpg?v=2', '30%']];
   function eoFaces(ph) {
     if (!ph) return;
     var sec = ph.parentNode, bg = document.createElement('div'); bg.className = 'bgx';

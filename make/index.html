@@ -10,7 +10,7 @@
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
-  <link rel="stylesheet" href="../css/brand.css">
+  <link rel="stylesheet" href="../css/brand.css?v=2">
   <link rel="stylesheet" href="../css/sk.css?v=91">
   <link rel="stylesheet" href="../css/sk-world.css?v=6">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
@@ -396,6 +396,9 @@
   .use-h { margin: 14px 0 8px; font-size: 15.5px; font-weight: 900; color: #1a1a1a; }
   .use-h small { display: block; margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--muted); }
   .dests { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 4px; }
+  html.bigtxt .dests { grid-template-columns: 1fr; }
+  html.bigtxt .ind-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html.bigtxt header .mk-hero h1 { font-size: 25px; }
   .dests button { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 6px; min-height: 58px; padding: 8px 10px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font: inherit; text-align: left; cursor: pointer; color: var(--text); }
   .dests button i { font-style: normal; font-size: 24px; text-align: center; }
   .dests button b { display: block; font-size: 15px; font-weight: 900; line-height: 1.25; word-break: keep-all; }
@@ -487,9 +490,9 @@
     <form id="form" autocomplete="off" onsubmit="return false">
       <div class="exfill" id="exFillBox" hidden><button type="button" id="exFill">🍒 <b id="exFillName">예시</b>로 채워 보기</button><small>칸마다 어떻게 채우는지 보여 드려요 · ↩ 되돌리기 가능</small></div>
       <div class="tp" data-tab="design">
-      <div class="step" id="d1step">1. 용도 고르기 <span>어디에 올리고, 무엇을 알릴지</span></div>
+      <div class="step" id="d1step">1. 용도 고르기 <span class="bt-hide">어디에 올리고, 무엇을 알릴지</span></div>
       <button type="button" id="resumeBtn" hidden></button>
-      <div class="use-h">어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></div>
+      <div class="use-h">어디에 쓸까요? <small class="bt-hide">나중에 다른 곳 크기로도 만들 수 있어요</small></div>
       <div class="dests" id="dests" role="group" aria-label="올릴 곳"></div>
       <div class="use-h">무엇을 알릴까요?</div>
       <div class="inds" id="inds" role="group" aria-label="용도"></div>

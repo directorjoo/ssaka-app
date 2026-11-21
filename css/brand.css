@@ -11,3 +11,10 @@
   --bg-2: #F6F6F6;
   --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
 }
+
+/* 카톡 큰 글씨 대응 (11-21 밤, launch.js가 <html class="bigtxt">를 붙임)
+   긴 설명은 .bt-long, 짧은 한 줄은 .bt-short — 큰 글씨일 때만 짧은 한 줄로 바뀜.
+   .bt-hide 는 큰 글씨일 때 아예 숨겨도 되는 보조 설명 */
+.bt-short { display: none; }
+html.bigtxt .bt-long, html.bigtxt .bt-hide { display: none !important; }
+html.bigtxt .bt-short { display: inline; }

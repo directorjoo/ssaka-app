@@ -118,6 +118,7 @@ const RULES = {
 
 // 배우 편지 아래 늘 붙는 바로가기 — 공고가 직접 올라오는 곳
 const ACTOR_LINKS = [
+  { t: '⭐ 싸바스타 — 오디션 공고 · 프로필 올리기', url: 'https://sava.kr/star/' },
   { t: '필름메이커스 배우 모집', url: 'https://www.filmmakers.co.kr/actorsAudition' },
   { t: '씨네21 영화인 JOB (오디션·모집)', url: 'https://cine21.com/community/recruit' },
   { t: '더뮤지컬 공연 뉴스 (뮤지컬·연극 오디션)', url: 'https://www.themusical.co.kr/News/List' },

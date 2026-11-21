@@ -560,6 +560,13 @@
     html.pg-only #maker > *:not(.topbar):not(.party):not(.pg-h):not(.pg) { display: none !important; }
     html.pg-only #maker .pg-h, html.pg-only #maker .pg { display: grid; }
     html.pg-only #maker .pg-h { display: block; }
+    /* ===== 말투 탭 큼직하게 + 인사말 칩 (11-21 대표님: 탭은 작게 말고 보기 편하게 큼직큼직) ===== */
+    .gtabs.big, #gTabs.big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; overflow: visible; margin: 6px 0 14px; padding: 0; }
+    .gtabs.big .gtab, #gTabs.big .gtab { width: 100%; min-height: 56px; padding: 4px 4px; border-radius: 14px; border: 2px solid #E6CFC6; background: #FFF8F4; color: #4A2418; font-size: 17px; font-weight: 800; letter-spacing: -0.05em; white-space: normal; word-break: keep-all; line-height: 1.15; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 2px 0 #E6CFC6; }
+    .gtabs.big .gtab[aria-pressed="true"], #gTabs.big .gtab[aria-pressed="true"] { background: #2B1A12; border-color: #2B1A12; color: #fff; box-shadow: 0 3px 0 #000; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+    #gChips .chip, #rChips .chip { min-height: 46px; font-size: 17px; }
+    .chips .chip.dice { background: #FFF3C4; border-color: #E8B923; color: #5A3A00; }
+    .chips .chip.more { background: #F3F1EF; border: 1.5px dashed #A99A90; color: #4A3A30; }
   </style>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&text=%20%21%28%29%2C.03%3A%3F%E2%80%94%E2%80%98%E2%80%99%E2%80%9C%E2%80%9D%E2%80%A6%E3%80%8C%E3%80%8D%EA%B0%80%EA%B0%81%EA%B0%84%EA%B0%88%EA%B0%90%EA%B0%91%EA%B0%93%EA%B0%94%EA%B0%95%EA%B0%99%EA%B0%9A%EA%B0%9C%EA%B1%B0%EA%B1%B1%EA%B1%B7%EA%B1%B8%EA%B2%81%EA%B2%83%EA%B2%8C%EA%B2%A0%EA%B2%A8%EA%B2%B0%EA%B2%BD%EA%B3%81%EA%B3%84%EA%B3%A0%EA%B3%A1%EA%B3%A7%EA%B3%B1%EA%B3%BC%EA%B4%B4%EA%B5%90%EA%B5%AC%EA%B5%AD%EA%B5%B3%EA%B5%B4%EA%B5%BD%EA%B7%80%EA%B7%91%EA%B7%9C%EA%B7%B8%EA%B8%88%EA%B8%8B%EA%B8%B0%EA%B8%B4%EA%B8%B8%EA%B9%80%EA%B9%8A%EA%B9%8C%EA%B9%A8%EA%BD%83%EB%81%84%EB%81%8C%EB%81%9D%EB%81%BC%EB%82%98%EB%82%9C%EB%82%A0%EB%82%A8%EB%82%B4%EB%83%A5%EB%84%88%EB%84%A3%EB%84%A4%EB%85%80%EB%85%84%EB%85%95%EB%85%B8%EB%85%B9%EB%85%BC%EB%86%80%EB%86%93%EB%88%84%EB%88%88%EB%8A%94%EB%8A%98%EB%8B%88%EB%8B%98%EB%8B%A4%EB%8B%A8%EB%8B%AB%EB%8B%AC%EB%8B%AD%EB%8B%B4%EB%8B%B9%EB%8C%80%EB%8D%94%EB%8D%95%EB%8D%98%EB%8D%A4%EB%8D%AE%EB%8D%B0%EB%8F%84%EB%8F%8B%EB%8F%8C%EB%8F%95%EB%8F%99%EB%90%98%EB%90%9C%EB%91%90%EB%91%98%EB%92%B7%EB%93%9D%EB%93%A0%EB%93%A3%EB%93%A4%EB%93%AF%EB%94%94%EB%94%B0%EB%94%B4%EB%95%8C%EB%96%A0%EB%96%A8%EB%98%90%EB%9C%B0%EB%9C%BB%EB%9D%BC%EB%9D%BD%EB%9E%80%EB%9E%8C%EB%9E%91%EB%9E%98%EB%9E%B4%EB%9F%AC%EB%9F%B0%EB%9F%BC%EB%A0%87%EB%A0%88%EB%A0%A4%EB%A1%9C%EB%A1%9D%EB%A1%A0%EB%A3%A8%EB%A5%B4%EB%A5%B8%EB%A5%BC%EB%A6%84%EB%A6%85%EB%A6%87%EB%A6%AC%EB%A6%B0%EB%A6%B4%EB%A6%BD%EB%A7%88%EB%A7%8C%EB%A7%8E%EB%A7%90%EB%A7%9D%EB%A7%B9%EB%A8%B8%EB%A8%B9%EB%A8%BC%EB%A9%80%EB%A9%B0%EB%A9%B4%EB%AA%85%EB%AA%A8%EB%AA%A9%EB%AA%BB%EB%AC%B4%EB%AC%B5%EB%AC%BB%EB%AC%BC%EB%AF%B8%EB%AF%BF%EB%B0%94%EB%B0%95%EB%B0%96%EB%B0%98%EB%B0%9D%EB%B0%A4%EB%B0%B1%EB%B2%84%EB%B2%88%EB%B2%8C%EB%B2%97%EB%B3%84%EB%B3%91%EB%B3%95%EB%B3%B4%EB%B4%84%EB%B4%85%EB%B6%80%EB%B6%81%EB%B6%88%EB%B6%89%EB%B9%84%EB%B9%9A%EB%B9%9B%EB%BF%90%EC%81%98%EC%82%AC%EC%82%B0%EC%82%B4%EC%82%B6%EC%82%BC%EC%83%81%EC%83%88%EC%83%98%EC%83%9D%EC%84%9C%EC%84%A0%EC%84%A4%EC%84%B1%EC%84%B8%EC%85%88%EC%85%B0%EC%86%8C%EC%86%8D%EC%88%98%EC%88%99%EC%88%A8%EC%88%B2%EC%89%AC%EC%8A%A4%EC%8A%A8%EC%8A%AC%EC%8A%B4%EC%8A%B5%EC%8B%9C%EC%8B%9D%EC%8B%A0%EC%8B%AC%EC%8B%AD%EC%8B%B6%EC%8B%B8%EC%8D%A8%EC%93%B8%EC%94%A9%EC%95%84%EC%95%88%EC%95%89%EC%95%8A%EC%95%8C%EC%95%9E%EC%95%A0%EC%95%BC%EC%95%BD%EC%96%91%EC%96%B4%EC%96%B5%EC%96%B8%EC%96%BC%EC%97%86%EC%97%87%EC%97%88%EC%97%90%EC%97%AC%EC%97%B0%EC%97%BC%EC%97%BE%EC%98%80%EC%98%9B%EC%98%A4%EC%98%A5%EC%98%AE%EC%99%80%EC%99%B8%EC%9A%94%EC%9A%A9%EC%9A%B0%EC%9A%B4%EC%9A%B8%EC%9B%80%EC%9B%83%EC%9B%8C%EC%9B%90%EC%9B%94%EC%9C%84%EC%9C%A0%EC%9C%A4%EC%9C%BC%EC%9D%80%EC%9D%84%EC%9D%8C%EC%9D%98%EC%9D%B4%EC%9D%B5%EC%9D%B8%EC%9D%BC%EC%9D%BD%EC%9E%83%EC%9E%85%EC%9E%88%EC%9E%8A%EC%9E%90%EC%9E%91%EC%9E%94%EC%9E%98%EC%9E%A0%EC%9E%A1%EC%9E%A5%EC%A0%80%EC%A0%81%EC%A0%84%EC%A0%88%EC%A0%95%EC%A0%96%EC%A0%9C%EC%A0%B8%EC%A1%8C%EC%A1%B0%EC%A2%81%EC%A3%BC%EC%A3%BD%EC%A4%84%EC%A7%80%EC%A7%81%EC%A7%84%EC%A7%91%EC%A7%93%EC%A7%9D%EC%A9%8C%EC%A9%90%EC%B0%A8%EC%B0%AC%EC%B0%BE%EC%B1%85%EC%B2%98%EC%B2%9C%EC%B2%AB%EC%B2%AD%EC%B3%90%EC%B6%94%EC%B6%98%EC%B9%98%EC%B9%A8%EC%B9%B4%EC%BC%80%EC%BD%A4%ED%82%A4%ED%83%81%ED%83%84%ED%84%B0%ED%85%8C%ED%86%A0%ED%89%81%ED%8A%B8%ED%8B%B0%ED%8C%8C%ED%8C%A8%ED%8D%BC%ED%8E%B4%ED%8E%B8%ED%8E%BC%ED%8F%AC%ED%91%B8%ED%92%80%ED%92%8D%ED%94%84%ED%94%88%ED%94%94%ED%94%BC%ED%95%98%ED%95%99%ED%95%9C%ED%95%A0%ED%95%A8%ED%95%A9%ED%95%B4%ED%96%87%ED%96%88%ED%96%A5%ED%97%88%ED%97%A4%ED%98%80%ED%99%80%ED%99%94%ED%99%A9%ED%9C%A9%ED%9D%90%ED%9D%98%ED%9D%99%ED%9D%AC%ED%9E%88%ED%9E%8C%ED%9E%90%ED%9E%98&display=swap">
 <script src="/js/launch.js?v=3"></script>
@@ -786,6 +793,43 @@
   var IMG_BASE = /(^|\.)sava\.kr$|pages\.dev$/.test(location.hostname) ? 'https://sava.kr/img/' : new URL('../img/', location.href).href; // 카톡이 그림을 잘 가져가도록 정식 주소로
   window.toast = function (m) { toast(m); }; // js/voice.js 도 씀 (11-21)
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
+  // ---------- 인사말 칩 (11-21 대표님: 말이 많아도 깔끔하게) ----------
+  // 처음엔 8개만: 맨 앞(고정 1개) → ⭐ 자주 쓴 말 → 날마다 바뀌는 순서, 끝에 🎲 아무 말이나 · 더 보기
+  var SV_SHOW = 8;
+  function svFav() { try { return JSON.parse(localStorage.getItem('svFav') || '{}') || {}; } catch (e) { return {}; } }
+  window.svFavAdd = function (t) { try { var f = svFav(); f[t] = (f[t] || 0) + 1; localStorage.setItem('svFav', JSON.stringify(f)); } catch (e) {} };
+  function svDayMix(a) { // 같은 날엔 같은 순서, 날이 바뀌면 다른 순서
+    var d = new Date(), s = d.getFullYear() * 400 + d.getMonth() * 31 + d.getDate();
+    return a.map(function (x, i) { var h = 0, k = x + s; for (var j = 0; j < k.length; j++) h = (h * 31 + k.charCodeAt(j)) | 0; return [h, x]; }).sort(function (p, q) { return p[0] - q[0]; }).map(function (p) { return p[1]; });
+  }
+  // o: { items, pin(앞에 고정할 개수), lead(맨 앞에 둘 버튼들), dice(🎲에서 고를 말들), open(전체 펼침?), onOpen(펼침 바꿈), pick(말, 버튼) }
+  window.svChips = function (cb, o) {
+    cb.innerHTML = '';
+    var items = o.items.slice(), pin = items.splice(0, o.pin || 0), fav = svFav();
+    var stars = items.filter(function (x) { return (fav[x] || 0) >= 2; }).sort(function (a, b) { return fav[b] - fav[a]; }).slice(0, 3);
+    var rest = svDayMix(items.filter(function (x) { return stars.indexOf(x) < 0; }));
+    var all = pin.concat(stars, rest), lead = o.lead || [];
+    var room = Math.max(1, SV_SHOW - lead.length), shown = o.open ? all : all.slice(0, room);
+    function mk(t, cls) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (cls ? ' ' + cls : ''); b.textContent = (stars.indexOf(t) >= 0 ? '⭐ ' : '') + t;
+      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
+      return b;
+    }
+    pin.length && shown.length && cb.appendChild(mk(shown[0]));
+    lead.forEach(function (b) { cb.appendChild(b); });
+    shown.slice(pin.length ? 1 : 0).forEach(function (t) { cb.appendChild(mk(t)); });
+    if (o.dice && o.dice.length) {
+      var d = document.createElement('button'); d.type = 'button'; d.className = 'chip dice'; d.textContent = '🎲 아무 말이나';
+      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
+      cb.appendChild(d);
+    }
+    if (all.length > room) {
+      var m = document.createElement('button'); m.type = 'button'; m.className = 'chip more';
+      m.textContent = o.open ? '접기 ▲' : '더 보기 ▼ (' + (all.length - room) + '개 더)';
+      m.addEventListener('click', function () { o.onOpen(!o.open); });
+      cb.appendChild(m);
+    }
+  };
   // ---------- 지우기 = 뒤로 한 칸 (11-21 대표님: 톡 넣은 말은 한 문장씩, 손으로 쓴 건 한 글자씩, 꾹 누르면 모두) ----------
   window.savaBack = function (ta, phrases, after) {
     var v = ta.value.replace(/\s+$/, '');
@@ -1142,28 +1186,34 @@
       // 답장은 질문과 상관없이 마음대로 골라요 (탭만 질문에 맞춰 먼저 열어 줌)
       // 답장 대상: 친구 / 아랫사람 / 윗사람 — 보내는 화면과 같은 세 갈래, 말투가 다름
       var WORLD = ['Hi! (하이 · 안녕!) 👋', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va! (싸바 · 잘 지내!)', 'Ciao! (차오 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Merci! (메르시 · 고마워!)', 'Thank you! (땡큐 · 고마워!)'];
+      // 11-21 대표님: 대답 인사말이 특히 부족 → 다정·재밌게·어르신 말투(하게체)·사투리 크게 늘림
+      var HAGE_RE = ['나야 잘 있네, 자네는 어떤가?', '덕분에 별고 없네', '그럭저럭 사네', '아이고, 이게 누군가!', '반갑네, 이 사람아!', '나도 보고잡았네', '자네 연락 받으니 기운이 나네', '연락 줘서 고맙네', '내가 먼저 했어야 했는데 미안하네', '숨은 붙어 있네 ㅎㅎ', '걱정 말게, 아직 쓸 만하네 😎', '늙어도 마음은 청춘일세', '손주 보는 재미로 사네', '허리가 좀 쑤시지만 견딜 만하네', '막걸리 한잔이면 다 낫겠네 🍶', '자네도 건강 잘 챙기게', '감기 조심하게', '언제 한번 보세나', '날 잡게, 내가 한잔 사겠네 🍶', '지금 가고 있네', '거의 다 왔네, 조금만 기다리게', '어디서 볼 텐가?', '전화 주게, 지금 받을 수 있네 📞', '이따 내가 전화하겠네'];
       var RW = [
         { t: '🤝 친구에게', call: ['전화 줘!', '지금 통화 돼! 전화해 📞'], tabs: [
-          { k: 'hi', t: '💛 안부', items: ['응, 잘 지내! 😊', '나는 싸바! 너는 싸바? 🍒', '그럭저럭 지내~', '별일 없어, 고마워', '밥 먹었어! 너는?', '보고 싶다', '연락 줘서 고마워!', '요즘 좀 바빴어, 미안 🙏', '너는 잘 지내지?', '덕분에 잘 지내', '나도 너 생각했는데!', '요즘 정신없다 ㅠㅠ', '좋은 일 있었어 😆', '조만간 얼굴 보자!', '밥 한번 먹자 🍚', '감기 조심해!', '힘내라, 응원한다 💪', '잘 지내고 있지? 늘 고맙다'] },
+          { k: 'hi', t: '💛 다정하게', items: ['응, 잘 지내! 😊', '나는 싸바! 너는 싸바? 🍒', '그럭저럭 지내~', '별일 없어, 고마워', '밥 먹었어! 너는?', '보고 싶다', '연락 줘서 고마워!', '요즘 좀 바빴어, 미안 🙏', '너는 잘 지내지?', '덕분에 잘 지내', '나도 너 생각했는데!', '요즘 정신없다 ㅠㅠ', '좋은 일 있었어 😆', '조만간 얼굴 보자!', '밥 한번 먹자 🍚', '감기 조심해!', '힘내라, 응원한다 💪', '잘 지내고 있지? 늘 고맙다', '니 덕에 웃는다, 고맙다 친구야', '밥 먹었지! 안 먹었으면 같이 먹자', '말 나온 김에 날 잡자 📅', '나이는 먹어도 마음은 청춘이다'] },
+          { k: 'fun', t: '😄 재밌게', items: ['살아 있다! 생존 신고 완료 ✋', '오~ 웬일이야, 해가 서쪽에서 떴나? 🌄', '니 연락 받으니 오늘 운수 좋은 날이다 🍀', '잘 지내는 척하면서 잘 지냄 ㅋㅋ', '몸은 바쁘고 통장은 한가해 😂', '일하고 먹고 자고 무한 반복 중 🔁', '싸바 싸바! 나 완전 잘 지내 🍒', '나야 늘 잘 지내지 😎', '방금 라면 먹었어 🍜', '이불 밖은 위험해 🛌', '회의 중이라 몰래 답장 중 🤫', '돈 빼고 다 있어 ㅋㅋ 💸', '커피 사주면 나갈게 ☕', '강아지랑 산책 중 🐶', '자다 깼어… 무슨 일이야? 💤', '그런 김에 오늘 한잔 콜? 🍻', '살 빼는 중… 근데 배고파 🍗', '월요병 걸렸어 😵', '로또 되면 쏠게 🎰', '보고 싶어서 연락했지? ㅋㅋ', '나 지금 엄청 바쁜 척 중 🤓', '배고파, 밥 사줘 🍚'] },
+          { k: 'hi', t: '🍶 어르신 말투', items: HAGE_RE },
+          { k: 'hi', t: '🗣️ 사투리', items: ['오메, 이게 누구여!', '아따, 반갑다잉!', '잘 있제~ 니는 어쩌고 지내냐?', '나야 겁나게 잘 지내제 😎', '밥 묵었제, 니는?', '보고잡았다잉', '언제 한번 보자, 날 잡어라', '요새 쪼까 바뻐야 ㅠㅠ', '니가 연락헝께 겁나 좋다', '한잔 콜이여! 🍻'] },
           { k: 'loc', t: '📍 약속', items: ['지금 가는 중! 🏃', '10분 뒤 도착해', '30분쯤 걸려', '거의 다 왔어!', '도착했어! 어디 있어?', '입구 앞이야', '조금 늦어, 미안해 🙏', '차 막혀 🚗', '먼저 들어가 있어', '주차 중이야 🅿️', '집이야 🏠', '밖이야 🚶', '회사야 🏢', '오늘은 못 가, 미안 🙏', '어디서 볼까?', '위치 보내줘 📍'] },
           { k: 'call', t: '📞 전화', items: ['지금 통화 돼! 전화해 📞', '10분 뒤에 통화하자', '이따 내가 전화할게', '저녁에 전화할게', '통화는 어렵고 문자로 해줘', '회의 중이야, 끝나고 전화할게', '운전 중이야, 이따 전화할게 🚗', '방금 전화 못 받았어, 미안!'] },
-          { k: 'fun', t: '😄 재밌게', items: ['싸바 싸바! 나 완전 잘 지내 🍒', '나야 늘 잘 지내지 😎', '방금 라면 먹었어 🍜', '이불 밖은 위험해 🛌', '회의 중이라 몰래 답장 중 🤫', '돈 빼고 다 있어 ㅋㅋ 💸', '커피 사주면 나갈게 ☕', '강아지랑 산책 중 🐶', '자다 깼어… 무슨 일이야? 💤', '목소리 듣고 싶다, 전화해 📞', '오늘은 쉴래, 다음에 꼭! 🙏', '그런 김에 오늘 한잔 콜? 🍻', '살 빼는 중… 근데 배고파 🍗', '월요병 걸렸어 😵', '로또 되면 쏠게 🎰', '보고 싶어서 연락했지? ㅋㅋ', '나 지금 엄청 바쁜 척 중 🤓', '배고파, 밥 사줘 🍚'] },
           { k: 'pic', t: '📷 사진', items: ['잠깐만, 사진 찾아볼게 📷', '많이 컸어! 보고 싶지? 😍', '사진 보내줄게, 기다려!', '너도 사진 좀 보내줘', '오늘 찍은 사진이야 📸', '여기 경치 좀 봐! 🌄'] },
           { k: 'world', t: '🌏 세계 인사', items: WORLD }
         ] },
         { t: '🌱 아랫사람에게', call: ['전화해라', '지금 전화해도 된다 📞'], tabs: [
-          { k: 'hi', t: '💛 안부', items: ['그래, 잘 지낸다 😊', '나는 별일 없다. 너는 잘 지내지?', '연락 줘서 고맙다', '밥은 묵고 다니냐?', '밥 잘 챙겨 먹고 다녀라', '보고 싶구나', '감기 조심하고 건강 잘 챙겨라', '늘 응원한다', '요즘 힘들지? 힘내라 💪', '무리하지 마라', '아프지 말고', '잘하고 있다, 걱정 마라', '네 생각 하고 있었다', '언제 밥 한번 먹자 🍚', '시간 날 때 한번 들러라', '고생 많았다', '네 덕분에 힘이 난다', '부모님께 안부 전해라'] },
+          { k: 'hi', t: '💛 다정하게', items: ['그래, 잘 지낸다 😊', '나는 별일 없다. 너는 잘 지내지?', '연락 줘서 고맙다', '밥은 묵고 다니냐?', '밥 잘 챙겨 먹고 다녀라', '보고 싶구나', '감기 조심하고 건강 잘 챙겨라', '늘 응원한다', '요즘 힘들지? 힘내라 💪', '무리하지 마라', '아프지 말고', '잘하고 있다, 걱정 마라', '네 생각 하고 있었다', '언제 밥 한번 먹자 🍚', '시간 날 때 한번 들러라', '고생 많았다', '네 덕분에 힘이 난다', '부모님께 안부 전해라', '오냐, 잘 지낸다 😊', '이게 누구냐, 반갑다!', '네 문자 보니 하루가 환하다', '나는 늘 그대로다, 걱정 마라', '시간 되면 맛있는 거 사 주마 🍖', '어여 와라, 기다린다'] },
+          { k: 'fun', t: '😄 재밌게', items: ['먼저 연락하다니 다 컸구나 ㅎㅎ', '아이고, 기특하다 👍', '싸바! 나도 잘 지낸다 🍒', '밥은 묵었냐? 나는 묵었다 🍚', '용돈은 필요 없냐? ㅎㅎ 💸', '얼굴 까먹겠다 ㅎㅎ', '살 좀 쪘냐? 보고 싶다 😆', '네가 쏘는 거냐? 🍻', '커피 한잔 사 주마 ☕', '젊음이 부럽구나 😎', '연락 안 하면 서운할 뻔했다 ㅎㅎ'] },
+          { k: 'hi', t: '🍶 어르신 말투', items: HAGE_RE },
+          { k: 'hi', t: '🗣️ 사투리', items: ['오냐, 잘 있다잉', '아따, 반갑다잉!', '밥은 묵었냐? 나는 묵었다', '연락해 줘서 고맙다잉', '보고잡다, 언제 올래?', '나는 걱정 말어라', '아프지 말고 밥 잘 챙겨 묵어라잉', '오메, 우리 강아지 다 컸네', '내려오믄 맛난 거 사 주마', '전화 한번 혀라 📞'] },
           { k: 'loc', t: '📍 약속', items: ['지금 가고 있다 🚶', '10분이면 도착한다', '30분쯤 걸리겠다', '거의 다 왔다', '도착했다. 어디 있니?', '조금 늦겠다, 기다려라', '먼저 들어가 있어라', '천천히 와라, 서두르지 말고', '집에 있다 🏠', '밖에 나와 있다', '오늘은 어렵겠다, 다음에 보자', '위치 보내 봐라 📍'] },
           { k: 'call', t: '📞 전화', items: ['지금 전화해도 된다 📞', '조금 있다 전화해라', '내가 이따 전화하마', '저녁에 전화해라', '지금은 통화가 어렵다, 문자로 해라', '운전 중이다, 이따 전화하마 🚗', '전화 못 받았구나, 다시 해라'] },
-          { k: 'fun', t: '😄 재밌게', items: ['싸바! 나도 잘 지낸다 🍒', '밥은 묵었냐? 나는 묵었다 🍚', '용돈은 필요 없냐? ㅎㅎ 💸', '얼굴 까먹겠다 ㅎㅎ', '살 좀 쪘냐? 보고 싶다 😆', '네가 쏘는 거냐? 🍻', '커피 한잔 사 주마 ☕', '젊음이 부럽구나 😎'] },
           { k: 'pic', t: '📷 사진', items: ['사진 찾아서 보내 주마 📷', '너도 사진 좀 보내 봐라', '아이고, 많이 컸구나! 😍', '손주 사진 좀 보내 다오', '강아지 사진 보내 봐라 🐶', '오늘 찍은 사진이다 📸'] },
           { k: 'world', t: '🌏 세계 인사', items: WORLD }
         ] },
         { t: '🙇 윗사람께', call: ['전화 주세요', '지금 통화 괜찮습니다. 전화 주세요 📞'], tabs: [
-          { k: 'hi', t: '💛 안부', items: ['네, 잘 지내고 있습니다 😊', '덕분에 별일 없습니다', '연락 주셔서 감사합니다', '식사했습니다. 식사하셨어요?', '진지는 잡수셨어요?', '건강은 괜찮으세요?', '요즘 어떻게 지내세요?', '찾아뵙고 싶습니다', '자주 연락 못 드려 죄송합니다', '늘 건강 챙기세요', '날이 추워요, 감기 조심하세요', '무리하지 마시고 푹 쉬세요', '늘 감사드립니다', '보고 싶습니다', '조만간 찾아뵙겠습니다', '덕분에 힘이 납니다', '건강하십니까?', '평안하십니까?'] },
+          { k: 'hi', t: '💛 정중하게', items: ['네, 잘 지내고 있습니다 😊', '덕분에 별일 없습니다', '연락 주셔서 감사합니다', '식사했습니다. 식사하셨어요?', '진지는 잡수셨어요?', '건강은 괜찮으세요?', '요즘 어떻게 지내세요?', '찾아뵙고 싶습니다', '자주 연락 못 드려 죄송합니다', '늘 건강 챙기세요', '날이 추워요, 감기 조심하세요', '무리하지 마시고 푹 쉬세요', '늘 감사드립니다', '보고 싶습니다', '조만간 찾아뵙겠습니다', '덕분에 힘이 납니다', '건강하십니까?', '평안하십니까?', '먼저 연락 주셔서 몸 둘 바를 모르겠습니다 🙇', '제가 먼저 드렸어야 했는데 죄송합니다', '연락 받으니 하루가 환해졌습니다 ☀️', '덕분에 잘 지내고 있으니 걱정 마세요', '늘 챙겨 주셔서 감사합니다', '건강하신 거죠? 그게 제일 궁금했습니다', '조만간 맛있는 거 사 들고 찾아뵙겠습니다'] },
+          { k: 'fun', t: '😄 재치 있게', items: ['형님 문자에 기운이 불끈 납니다 💪', '저 아직 쓸 만합니다 😎', '혼나기 전에 제가 먼저 연락드렸어야 했는데요 😅', '싸바! 저도 잘 지내요 🍒', '덕분에 밥 잘 먹고 다녀요 🍚', '오늘도 열심히 살고 있습니다 💪', '맛있는 거 사 드리러 갈게요 😋', '커피 한잔 대접할게요 ☕', '늘 젊으세요! 😎', '목소리 듣고 싶어요 📞', '아이고 형님, 반갑습니다 😆', '누님 연락에 오늘 하루 횡재했습니다 🍀'] },
           { k: 'loc', t: '📍 약속', items: ['지금 가고 있습니다 🏃', '10분 뒤 도착합니다', '30분쯤 걸리겠습니다', '거의 다 왔습니다', '도착했습니다. 어디 계세요?', '입구 앞에 있습니다', '조금 늦습니다, 죄송합니다 🙏', '먼저 들어가 계세요', '모시러 가겠습니다 🚗', '집에 있습니다 🏠', '밖에 나와 있습니다', '오늘은 어렵습니다, 죄송합니다 🙏', '위치 보내 주세요 📍'] },
           { k: 'call', t: '📞 전화', items: ['지금 통화 괜찮습니다. 전화 주세요 📞', '10분 뒤에 전화드리겠습니다', '이따 제가 전화드리겠습니다', '저녁에 전화드리겠습니다', '지금은 통화가 어려워 문자 드립니다', '회의 중이라 끝나고 전화드리겠습니다', '운전 중이라 이따 전화드리겠습니다 🚗', '전화 못 받아 죄송합니다'] },
-          { k: 'fun', t: '😄 재밌게', items: ['싸바! 저도 잘 지내요 🍒', '덕분에 밥 잘 먹고 다녀요 🍚', '오늘도 열심히 살고 있습니다 💪', '맛있는 거 사 드리러 갈게요 😋', '커피 한잔 대접할게요 ☕', '늘 젊으세요! 😎', '목소리 듣고 싶어요 📞'] },
           { k: 'pic', t: '📷 사진', items: ['사진 찾아서 보내 드릴게요 📷', '잠시만요, 사진 보내 드리겠습니다', '오늘 찍은 사진이에요 📸', '아이들 사진 보내 드려요 😍', '사진 보내 주세요'] },
           { k: 'world', t: '🌏 세계 인사', items: WORLD }
         ] }
@@ -1172,7 +1222,8 @@
       var rWho = /(시죠|세요|셔요|십니까|습니까|셨어요|으세요|드셨|잡수)/.test(qs.join(' ')) ? 1 : 0;
       var rKey = ks.indexOf('call') >= 0 ? 'call' : hasLoc ? 'loc' : ks.indexOf('pic') >= 0 ? 'pic' : ks.indexOf('world') >= 0 ? 'world' : 'hi';
       function rTabsNow() { return RW[rWho].tabs; }
-      function rIdx() { var T = rTabsNow(); for (var i = 0; i < T.length; i++) if (T[i].k === rKey) return i; return 0; }
+      var rTi = -1, rOpen = false; // 고른 탭 번호 (다정하게·어르신 말투·사투리는 k가 같아 번호로 구별)
+      function rIdx() { var T = rTabsNow(); if (rTi >= 0 && rTi < T.length && T[rTi].k === rKey) return rTi; for (var i = 0; i < T.length; i++) if (T[i].k === rKey) return i; return 0; }
       function callText() { return RW[rWho].call[1]; }
       function rText() { return $('hereText').value.replace(/\s+/g, ' ').trim(); }
       // 예시 말을 누르면 글칸 끝에 이어 붙임 → 그대로 보내도 되고 고쳐 써도 됨
@@ -1189,17 +1240,13 @@
       }
       function paintR() {
         var wb = $('rWho'); wb.innerHTML = '';
-        RW.forEach(function (w, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(w.t).indexOf(' '); b.innerHTML = '<i>' + String(w.t).slice(0, sp) + '</i><b>' + String(w.t).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === rWho ? 'true' : 'false'); b.addEventListener('click', function () { rWho = i; paintR(); }); wb.appendChild(b); });
+        RW.forEach(function (w, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(w.t).indexOf(' '); b.innerHTML = '<i>' + String(w.t).slice(0, sp) + '</i><b>' + String(w.t).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === rWho ? 'true' : 'false'); b.addEventListener('click', function () { if (rWho === i) return; rWho = i; rTi = -1; rOpen = false; paintR(); }); wb.appendChild(b); });
         $('callLbl').textContent = RW[rWho].call[0];
-        var T = rTabsNow(), ri = rIdx(); rKey = T[ri].k;
-        var tb = $('rTabs'); tb.innerHTML = '';
-        T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === ri ? 'true' : 'false'); b.addEventListener('click', function () { rKey = g.k; paintR(); }); tb.appendChild(b); });
-        var cb = $('rChips'); cb.innerHTML = '';
-        T[ri].items.forEach(function (t) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t;
-          b.addEventListener('click', function () { if (addText(t)) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
-          cb.appendChild(b);
-        });
+        var T = rTabsNow(), ri = rIdx(); rKey = T[ri].k; rTi = ri;
+        var tb = $('rTabs'); tb.innerHTML = ''; tb.className = 'gtabs big';
+        T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === ri ? 'true' : 'false'); b.addEventListener('click', function () { rKey = g.k; rTi = i; rOpen = false; paintR(); }); tb.appendChild(b); });
+        var dice = []; T.forEach(function (g) { if (g.k === 'fun' || /사투리/.test(g.t)) dice = dice.concat(g.items); });
+        svChips($('rChips'), { items: T[ri].items, pin: ri === 0 ? 1 : 0, dice: /^(hi|fun)$/.test(rKey) ? dice : null, open: rOpen, onOpen: function (v) { rOpen = v; paintR(); }, pick: function (t) { return addText(t); } });
       }
       $('hereText').addEventListener('input', changed);
       window.savaBackBtn($('rClear'), $('hereText'), function () { var a = []; RW.forEach(function (w) { (w.tabs || []).forEach(function (g) { a = a.concat(g.items || []); }); if (w.call) a.push(w.call[1]); }); return a; }, changed);
@@ -1534,54 +1581,63 @@
   }
 
   // ---------- 첫마디 고르기 (최대 3개 이어 붙이기) ----------
-  var GREET = [
-    { k: 'hi', t: '💛 안부 전하기', subs: [
-      ['🤝 친구에게', ['싸바?', '밥은 묵고 다니냐?', '잘 지내?', '별일 없지?', '밥 먹었냐?', '괜찮냐?', '보고 싶다', '통화 괜찮아?', '바빠?', '뭐 좀 물어볼라 그러는데..', '오늘 뭐 해?', '주말에 뭐 해?', '퇴근했어?', '날씨 좋다, 나와!', '비 온다, 우산 챙겨!', '생일 축하해 🎂', '오늘 뭐 먹었어? 사진 보내줘!']],
-      ['🌱 아랫사람에게', ['밥은 묵고 다니냐?', '잘 지내니?', '밥은 챙겨 먹었니?', '요즘 힘들지?', '힘내!', '아프지 마', '고마워', '수고 많았다', '늘 응원한다', '감기 조심해라', '시간 되면 전화 한번 해라', '손주 사진 좀 보내줘', '강아지 사진 보내줘']],
-      ['🙇 윗사람께', ['잘 지내시죠?', '건강하시죠?', '평안하시죠?', '식사는 하셨어요?', '요즘 어떻게 지내세요?', '날이 추워요, 감기 조심하세요', '건강 잘 챙기세요', '늘 감사합니다', '찾아뵙고 싶습니다', '자주 찾아뵙지 못해 죄송합니다', '통화 괜찮으세요?',
-        '잘 지내셔요?', '건강은 괜찮으셔요?', '진지는 잡수셨어요?', '푹 쉬셔요', '감기 조심하셔요',
-        '안녕하십니까?', '건강하십니까?', '평안하십니까?', '요즘 어떻게 지내십니까?', '진지는 드셨습니까?', '찾아뵈어도 되겠습니까?', '통화 괜찮으십니까?']]
-    ] },
-    { k: 'loc', t: '📍 위치 보내기', items: ['어디야?', '지금 어디쯤이야?', '몇 시에 도착해?', '어디서 볼까?'] },
+  // 11-21 대표님: 누구에게 → 말투 탭(큼직하게) → 말 칩 8개 + 🎲 + 더 보기. 하게체·사투리·유머 크게 늘림
+  var HAGE_ASK = ['여보게, 잘 지내는가?', '어찌 사는가?', '보고잡네!', '별고 없는가?', '뭣 하고 지내는가?', '어째 소식이 없는가?', '밥은 먹었는가?', '건강은 어떤가?', '어디 아픈 데는 없는가?', '허리는 좀 괜찮은가?', '아직 정정한가?', '손주는 잘 크는가?', '자네 생각이 나서 몇 자 적네', '자네 없으니 심심하네', '요새 얼굴 보기 힘드네그려', '이 사람아, 연락 좀 하고 사세', '살아 있으면 대답 좀 하게 ㅎㅎ', '무소식이 희소식인가?', '날이 차네, 감기 조심하게', '자네 목소리 듣고 싶네, 전화 한번 주게', '언제 한번 보세', '오늘 저녁 시간 되는가?', '막걸리 한잔 하세 🍶', '첫눈 오면 한잔 하세 ❄️', '요즘도 산에 다니는가? ⛰️'];
+  var SAY = [
+    [ // 🤝 친구에게
+      { k: 'hi', t: '💛 다정하게', items: ['싸바?', '잘 지내?', '별일 없지?', '밥 먹었냐?', '괜찮냐?', '보고 싶다', '통화 괜찮아?', '바빠?', '뭐 좀 물어볼라 그러는데..', '오늘 뭐 해?', '주말에 뭐 해?', '퇴근했어?', '날씨 좋다, 나와!', '비 온다, 우산 챙겨!', '생일 축하해 🎂', '오늘 뭐 먹었어? 사진 보내줘!', '갑자기 니 생각나서', '요즘 사는 맛 좀 나냐?'] },
+      { k: 'fun', t: '😄 재밌게', items: ['살아 있냐? 생존 신고 좀 해라', '요즘 왜 이렇게 조용하냐? 수상해 🤨', '갑자기 니 생각나서. 별 뜻은 없어 ㅋㅋ', '이러다 동창회에서나 보겠다', '이번 주에 안 보면 다음은 내년이다 📅', '니가 연락 안 해서 내가 했다 😤', '소주 한잔 생각나는 날이다 🍶', '커피 마실 사람 여기 붙어라 ☕', '배고프다, 너도 배고프지? 그럼 나와 🍖', '숨은 쉬고 사냐? 😮‍💨', '로또 되면 연락할게… 아직 안 됐어 🎰', '연락 안 하면 서운하다 할 거면서 ㅋㅋ'] },
+      { k: 'hi', t: '🍶 어르신 말투', items: HAGE_ASK },
+      { k: 'hi', t: '🗣️ 사투리', items: ['아따, 잘 있냐잉?', '밥은 묵었냐?', '뭣 하고 사냐?', '오메, 니 얼굴 까묵겄다', '어째 연락이 없다냐?', '보고잡다잉', '언제 한번 보자잉', '나와부러, 한잔 하게 🍶', '살아 있으믄 대답 좀 해라 ㅋㅋ', '겁나게 춥다, 감기 조심혀', '니 생각 나서 문자 해 부렀다'] }
+    ],
+    [ // 🌱 아랫사람에게
+      { k: 'hi', t: '💛 다정하게', items: ['밥은 묵고 다니냐?', '잘 지내니?', '밥은 챙겨 먹었니?', '요즘 힘들지?', '힘내!', '아프지 마', '고마워', '수고 많았다', '늘 응원한다', '감기 조심해라', '시간 되면 전화 한번 해라', '손주 사진 좀 보내줘', '강아지 사진 보내줘', '바쁜 건 좋은데 건강이 먼저다', '힘든 일 있으면 말해라, 들어 줄게', '오늘도 고생했다, 푹 자라 🌙'] },
+      { k: 'fun', t: '😄 재밌게', items: ['밥 굶고 다니면 혼난다 🍚', '얼굴 보기 힘들다, 연예인이냐? 😎', '무소식이 희소식이라지만 소식도 좀 줘라', '용돈 줄까 말까 고민 중이다 ㅎㅎ 💸', '맛있는 거 사 줄 테니 시간 내라 🍖', '얼굴 까먹겠다 ㅎㅎ', '젊음이 부럽구나 😎', '연락 안 하면 쳐들어간다 ㅎㅎ'] },
+      { k: 'hi', t: '🍶 어르신 말투', items: HAGE_ASK },
+      { k: 'hi', t: '🗣️ 사투리', items: ['밥은 묵고 다니냐?', '아따, 우리 강아지 잘 있냐?', '어째 소식이 없다냐?', '밥 꼭 챙겨 묵어라잉', '아프지 말고잉', '언제 한번 내려올 거냐?', '보고잡다, 얼굴 좀 보자', '고생 많제? 힘내라잉 💪', '용돈 필요허믄 말해라 ㅎㅎ', '겁나게 춥다, 따숩게 입어라'] }
+    ],
+    [ // 🙇 윗사람께
+      { k: 'hi', t: '💛 정중하게', items: ['잘 지내시죠?', '건강하시죠?', '평안하시죠?', '식사는 하셨어요?', '요즘 어떻게 지내세요?', '날이 추워요, 감기 조심하세요', '건강 잘 챙기세요', '늘 감사합니다', '찾아뵙고 싶습니다', '자주 찾아뵙지 못해 죄송합니다', '통화 괜찮으세요?', '잘 지내셔요?', '건강은 괜찮으셔요?', '진지는 잡수셨어요?', '푹 쉬셔요', '감기 조심하셔요', '안녕하십니까?', '건강하십니까?', '평안하십니까?', '요즘 어떻게 지내십니까?', '진지는 드셨습니까?', '찾아뵈어도 되겠습니까?', '통화 괜찮으십니까?', '날이 차서 안부 여쭙니다', '문득 생각나서 연락드립니다', '밥 한번 사 드리고 싶습니다 🍚', '맛있는 거 사 들고 찾아뵐게요'] },
+      { k: 'fun', t: '😄 재치 있게', items: ['오늘도 청춘이시지요? 😊', '늘 젊으신 비결 좀 알려 주세요 😎', '덕분에 오늘도 잘 버팁니다', '형님, 소주 한잔 언제 하실래요? 🍶', '누님, 보고 싶어요', '커피 한잔 대접하고 싶습니다 ☕', '꿈에 나오셔서 연락드립니다 😆', '혼나기 전에 먼저 연락드립니다 😅'] }
+    ]
   ];
+  var LOC = { k: 'loc', t: '📍 위치 보내기', items: ['어디야?', '지금 어디쯤이야?', '몇 시에 도착해?', '어디서 볼까?'] };
+  var WHO = ['🤝 친구에게', '🌱 아랫사람에게', '🙇 윗사람께'];
   var WORLD_G = ['Hello! (헬로 · 안녕!)', 'Hola! (올라 · 안녕!)', 'Bonjour! (봉주르 · 안녕!)', 'Ça va? (싸바 · 잘 지내?)', 'Ciao! (차오 · 안녕!)', 'Guten Tag! (구텐 탁 · 안녕하세요)', 'Olá! (올라 · 안녕!)', 'こんにちは (곤니치와 · 안녕하세요)', '你好 (니하오 · 안녕하세요)', 'Xin chào (씬짜오 · 안녕하세요)', 'Sawasdee (사와디 · 안녕하세요)', 'Namaste (나마스떼 · 안녕하세요)', 'Merhaba (메르하바 · 안녕!)', 'Привет (프리벳 · 안녕!)', 'Salam (살람 · 안녕!)', 'Aloha! (알로하 · 안녕!)']; // 세계 인사: 인사말 칩 중 하나(🌏 세계 인사)를 누르면 펼쳐짐 (11-21 대표님)
-  var gWorld = false;
+  var gWorld = false, gOpen = false;
   // 첫마디: 글칸에 직접 쓰거나, 예시 말을 누르면 글칸 끝에 이어 붙음 (답장 화면과 같은 방식)
   var gTab = 0, gSub = 0, gKinds = ['hi'];
+  function gTabsNow() { return SAY[gSub].concat([LOC]); }
   function askText() { return $('gText').value.replace(/\s+/g, ' ').trim(); }
   function gChanged() {
     var t = askText(); $('gClear').hidden = !t;
     if (window.SavaMsgImg && mode === 'ask' && t) { var ah = /어디야\?/.test(t) ? '어디야?' : '싸바?', ab = t.indexOf(ah) === 0 ? t.slice(ah.length).trim() : t; if (ab) SavaMsgImg.soon(ab, { kind: 'ask', head: ah }); }
   }
   function paintGreet() {
-    var tb = $('gTabs'); tb.innerHTML = '';
-    GREET.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; paintGreet(); }); tb.appendChild(b); });
-    var sb = $('gSubs'); sb.innerHTML = ''; var G = GREET[gTab], W = GREET[0]; // 누구에게는 늘 맨 위에 (11-21)
-    W.subs.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(x[0]).indexOf(' '); b.innerHTML = '<i>' + String(x[0]).slice(0, sp) + '</i><b>' + String(x[0]).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { gSub = i; gTab = 0; paintGreet(); }); sb.appendChild(b); });
-    var cb = $('gChips'); cb.innerHTML = '';
-    var list = (G.subs ? G.subs[gSub][1] : G.items).slice();
-    if (G.subs) { list.splice(1, 0, '__world__'); if (gWorld) list = list.slice(0, 2).concat(WORLD_G.map(function (w) { return '\u0001' + w; })).concat(list.slice(2)); }
-    list.forEach(function (t) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip';
-      if (t === '__world__') {
-        b.className = 'chip wchip'; b.textContent = gWorld ? '🌏 세계 인사 접기 ▲' : '🌏 세계 인사 ▼'; b.setAttribute('aria-expanded', gWorld ? 'true' : 'false');
-        b.addEventListener('click', function () { gWorld = !gWorld; paintGreet(); });
-        cb.appendChild(b); return;
-      }
-      var isW = t.charAt(0) === '\u0001'; if (isW) { t = t.slice(1); b.className = 'chip wi'; }
-      b.textContent = t;
-      b.addEventListener('click', function () {
-        var ta = $('gText'), cur = ta.value.replace(/\s+$/, ''), next = (cur ? cur + ' ' : '') + t;
-        if (next.length > 100) { toast('글이 너무 길어요. 조금 지우고 넣어 주세요'); return; }
-        ta.value = next; var k = /통화|바빠|물어볼/.test(t) ? 'call' : /사진/.test(t) ? 'pic' : isW ? 'world' : GREET[gTab].k; if (gKinds.indexOf(k) < 0) gKinds.push(k);
-        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); gChanged();
-      });
-      cb.appendChild(b);
-    });
+    var T = gTabsNow(); if (gTab >= T.length) gTab = 0; var G = T[gTab];
+    var sb = $('gSubs'); sb.innerHTML = ''; // 누구에게는 늘 맨 위에 (11-21)
+    WHO.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = x.indexOf(' '); b.innerHTML = '<i>' + x.slice(0, sp) + '</i><b>' + x.slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { if (gSub === i) return; var wasLoc = T[gTab].k === 'loc'; gSub = i; gTab = wasLoc ? 0 : Math.min(gTab, SAY[i].length - 1); gOpen = false; gWorld = false; paintGreet(); }); sb.appendChild(b); });
+    var tb = $('gTabs'); tb.innerHTML = ''; tb.className = 'gtabs big' + (T.length <= 3 ? ' n3' : '');
+    T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; gOpen = false; gWorld = false; paintGreet(); }); tb.appendChild(b); });
+    var lead = [], first = gTab === 0;
+    if (first) { // 다정하게·정중하게 탭: 맨 앞 말 다음에 🌏 세계 인사
+      var w = document.createElement('button'); w.type = 'button'; w.className = 'chip wchip'; w.textContent = gWorld ? '🌏 세계 인사 접기 ▲' : '🌏 세계 인사 ▼'; w.setAttribute('aria-expanded', gWorld ? 'true' : 'false');
+      w.addEventListener('click', function () { gWorld = !gWorld; paintGreet(); }); lead.push(w);
+      if (gWorld) WORLD_G.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip wi'; b.textContent = t; b.addEventListener('click', function () { if (gAdd(t, 'world') !== false) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } }); lead.push(b); });
+    }
+    var fun = SAY[gSub].filter(function (g) { return g.k === 'fun'; })[0];
+    svChips($('gChips'), { items: G.items, pin: first ? 1 : 0, lead: lead, dice: G.k === 'loc' ? null : fun.items.concat(gSub < 2 ? SAY[gSub][3].items : []), open: gOpen || gWorld,
+      onOpen: function (v) { gOpen = v; paintGreet(); },
+      pick: function (t) { return gAdd(t, /통화|바빠|물어볼|전화/.test(t) ? 'call' : /사진/.test(t) ? 'pic' : G.k === 'loc' ? 'loc' : 'hi'); } });
     gChanged();
   }
+  function gAdd(t, k) {
+    var ta = $('gText'), cur = ta.value.replace(/\s+$/, ''), next = (cur ? cur + ' ' : '') + t;
+    if (next.length > 100) { toast('글이 너무 길어요. 조금 지우고 넣어 주세요'); return false; }
+    ta.value = next; if (gKinds.indexOf(k) < 0) gKinds.push(k); gChanged();
+  }
   $('gText').addEventListener('input', gChanged);
-  function gPhrases() { var a = WORLD_G.slice(); GREET.forEach(function (g) { (g.items || []).forEach(function (x) { a.push(x); }); (g.subs || []).forEach(function (x) { a = a.concat(x[1]); }); }); return a; }
+  function gPhrases() { var a = WORLD_G.concat(LOC.items); SAY.forEach(function (w) { w.forEach(function (g) { a = a.concat(g.items); }); }); return a; }
   window.savaBackBtn($('gClear'), $('gText'), gPhrases, function () { if (!askText()) gKinds = []; gChanged(); });
   paintGreet();
 

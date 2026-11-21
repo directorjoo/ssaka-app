@@ -48,6 +48,40 @@
     .mk-flow li { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; background: rgba(255,255,255,.72); font-size: 15px; font-weight: 800; color: #3B3912; }
     .mk-flow b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #B3132B; color: #fff; font-size: 14px; }
     .mk-dance { position: absolute; right: 12px; top: 14px; width: 72px; height: auto; pointer-events: none; }
+    /* 11-22 덜 심심하게 (js/mkfun.js): 머리 띠 · 업종 이야기 카드 · 쓰기 응원 띠 */
+    .mk-tick { margin: 14px -18px -16px; padding: 9px 0; overflow: hidden; background: rgba(255,255,255,.45); border-top: 1px solid rgba(87,83,25,.12); }
+    .mk-tick-in { display: flex; gap: 8px; width: max-content; animation: mkTick 38s linear infinite; }
+    .mk-tick span { flex: none; padding: 5px 12px; border-radius: 999px; background: #fff; font-size: 15px; font-weight: 700; color: #3B3912; box-shadow: 0 4px 10px -8px rgba(90,80,20,.6); }
+    @keyframes mkTick { to { transform: translateX(-50%); } }
+    .mk-fun { position: relative; margin: 16px 0 6px; padding: 18px 18px 16px; border-radius: 24px; overflow: hidden; background: var(--fg); color: var(--ft); box-shadow: 0 18px 30px -22px rgba(60,40,20,.7); }
+    .mk-fun.pop { animation: mkPop .5s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes mkPop { from { transform: scale(.94) translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .mk-fun-fl { position: absolute; inset: 0; pointer-events: none; }
+    .mk-fun-fl i { position: absolute; bottom: -40px; font-style: normal; opacity: 0; animation: mkFloat 7s ease-in infinite; }
+    @keyframes mkFloat { 0% { transform: translateY(0) rotate(-8deg); opacity: 0; } 15% { opacity: .55; } 80% { opacity: .35; } 100% { transform: translateY(-260px) rotate(12deg); opacity: 0; } }
+    .mk-fun-top { position: relative; display: flex; gap: 12px; align-items: center; }
+    .mk-fun-big { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: rgba(255,255,255,.7); font-size: 38px; animation: mkBob 2.4s ease-in-out infinite; box-shadow: 0 10px 18px -12px rgba(0,0,0,.5); }
+    .mk-fun.is-dark .mk-fun-big { background: rgba(255,255,255,.16); }
+    @keyframes mkBob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-7px) rotate(5deg); } }
+    .mk-fun em { display: block; font-style: normal; font-size: 15px; font-weight: 800; color: var(--fs); }
+    .mk-fun h3 { margin: 4px 0 0; word-break: keep-all; font-size: 22px; line-height: 1.25; font-weight: 900; letter-spacing: -.03em; color: var(--ft); }
+    .mk-fun.is-dark h3 { text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+    .mk-fun-say { position: relative; margin-top: 14px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.7); color: #1A1A1A; }
+    .mk-fun.is-dark .mk-fun-say { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.28); color: #fff; }
+    .mk-fun-say small { display: block; font-size: 15px; font-weight: 700; opacity: .7; }
+    .mk-fun-say b { display: block; margin-top: 2px; font-size: 18px; font-weight: 800; transition: opacity .25s, transform .25s; }
+    .mk-fun-say b::before { content: '“'; margin-right: 2px; opacity: .5; } .mk-fun-say b::after { content: '”'; margin-left: 2px; opacity: .5; }
+    .mk-fun-say b.out { opacity: 0; transform: translateY(-8px); }
+    .mk-fun-tips { position: relative; margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .mk-fun-tips li { word-break: keep-all; display: flex; gap: 8px; align-items: flex-start; font-size: 15.5px; font-weight: 600; line-height: 1.45; color: var(--ft); animation: mkIn .45s both; }
+    .mk-fun-tips b { flex: none; display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; background: var(--fb); color: #fff; font-size: 13px; }
+    .mk-fun.is-dark .mk-fun-tips b { color: #253B66; }
+    @keyframes mkIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+    .mk-fun.calm .mk-fun-big { animation: none; }
+    .mk-cheer { display: flex; gap: 10px; align-items: center; margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; background: var(--fg); color: var(--ft); font-size: 16px; font-weight: 800; line-height: 1.4; }
+    .mk-cheer-c { flex: none; font-size: 24px; display: inline-block; animation: mkBob 2s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .mk-tick-in, .mk-fun-fl i, .mk-fun-big, .mk-cheer-c, .mk-fun.pop, .mk-fun-tips li { animation: none !important; } .mk-fun-fl { display: none; } }
+    html.bigtxt .mk-fun-tips li:nth-child(3) { display: none; }
     header h1 { font-size: 26px; margin: 4px 0 4px; letter-spacing: -0.02em; }
     header p { margin: 0 0 18px; color: var(--muted); font-size: 15px; }
     .layout { display: grid; gap: 20px; }
@@ -939,6 +973,7 @@
 
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=92"></script>
+<script src="../js/mkfun.js?v=1"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=84"></script>
 <script src="../js/reserve.js"></script>
@@ -1394,6 +1429,7 @@
     $('placeLeg').textContent = ind.id === 'funeral' ? '빈소' : ind.id === 'wedding' ? '예식장' : '장소';
     if (F.sound !== undefined && typeof soundTouched !== 'undefined' && !soundTouched && $('sound')) $('sound').value = F.sound;
     applyMedia();
+    try { MkFun.show(ind); } catch (e) {}
     update();
   }
   var seasonTouched = false;
@@ -2975,6 +3011,7 @@
 
   var hadDraft = false;
   try { hadDraft = !!localStorage.getItem(DRAFT); } catch (e) {}
+  try { MkFun.hero(); } catch (e) {}
   industry = loadDraft();
   if (editCard) {
     loadCard(editCard); type = null;

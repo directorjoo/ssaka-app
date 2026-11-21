@@ -444,8 +444,9 @@
   var GROUPS = [
     { id: 'shop', label: '가게·매장', emoji: '🏪', ids: ['restaurant', 'product', 'cafe', 'beauty', 'fitness', 'flower', 'stay'] },
     { id: 'edu', label: '교육·학원', emoji: '📚', ids: ['toefl', 'bigacademy', 'academy', 'entrance', 'tutor', 'arts'] },
-    { id: 'pro', label: '영업·전문직', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
-    { id: 'meet', label: '모임·행사·안부', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting', 'kid', 'senior'] }
+    { id: 'pro', label: '프로필·영업', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
+    { id: 'meet', label: '모임·행사', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event'] },
+    { id: 'life', label: '경조사·안부', emoji: '💌', ids: ['wedding', 'funeral', 'greeting', 'news', 'kid', 'senior'] }
   ];
   // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
   // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
@@ -460,7 +461,7 @@
   function isOpen(id) { return showAll || OPEN.indexOf(id) >= 0; }
   var ALL_GROUPS = GROUPS;
   GROUPS = GROUPS.map(function (g) { return { id: g.id, label: g.label, emoji: g.emoji, ids: g.ids.filter(isOpen) }; }).filter(function (g) { return g.ids.length; });
-  if (!showAll) { var mg = GROUPS.filter(function (g) { return g.id === 'meet'; })[0], sg = GROUPS.filter(function (g) { return g.id === 'shop'; })[0]; if (mg && sg) GROUPS = [mg, sg].concat(GROUPS.filter(function (g) { return g.id === 'pro'; })); }
+  if (!showAll) { var mg = GROUPS.filter(function (g) { return g.id === 'meet'; })[0], sg = GROUPS.filter(function (g) { return g.id === 'shop'; })[0]; if (mg && sg) GROUPS = [mg].concat(GROUPS.filter(function (g) { return g.id === 'life'; }), [sg], GROUPS.filter(function (g) { return g.id === 'pro'; })); }
   function groupOf(id) { return GROUPS.filter(function (g) { return g.ids.indexOf(id) >= 0; })[0] || GROUPS[0]; }
   var api = {
     FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, ALL_GROUPS: ALL_GROUPS, groupOf: groupOf, MOODS: MOODS,

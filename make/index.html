@@ -125,6 +125,18 @@
     /* 업종 고르기: 동그라미로 한눈에 */
     .inds.circ { display: block; overflow: visible; padding-bottom: 0; }
     .ind-gh { margin: 6px 2px 4px; font-size: 13.5px; font-weight: 800; color: var(--muted); }
+    /* 소제목별 체리 탭 박스 (11-21) — 연한 그라데이션 박스 하나에 한 묶음 */
+    .ind-box { margin: 0 0 12px; padding: 12px 8px 6px; border-radius: 20px; background: linear-gradient(160deg, #FFFFFF 0%, var(--bx, #FFF6F0) 100%); box-shadow: 0 0 0 1px var(--bl, #F2E4DC), 0 10px 20px -16px rgba(90,40,20,.45); }
+    .ind-box.g-meet { --bx: #F6E6D6; --bl: #EBD8C6; } /* 3 살구 크림 */
+    .ind-box.g-life { --bx: #EEE6F1; --bl: #E0D3E6; } /* 5 라벤더 안개 (연하게) */
+    .ind-box.g-shop { --bx: #F3F0CC; --bl: #E5E0B0; } /* 1 레몬 안개 */
+    .ind-box.g-pro  { --bx: #E2EBF5; --bl: #CFDCEA; } /* 2 하늘 */
+    .ind-box .ind-gh { display: flex; align-items: center; gap: 6px; margin: 0 6px 2px; color: #1A1A1A; }
+    .ind-box .ind-gh i { font-style: normal; font-size: 19px; }
+    .ind-box .ind-gh b { font-size: 17px; font-weight: 900; letter-spacing: -.02em; }
+    .ind-box .ind-gh small { margin-left: auto; font-size: 15px; font-weight: 600; color: #7a6d64; }
+    .ind-box .ind-grid { margin-bottom: 0; gap: 4px 2px; }
+    .inds.circ .ind-box .ind-grid button { font-size: 15px; }
     .ind-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 4px; margin-bottom: 8px; }
     .inds.circ .ind-grid button { display: grid; justify-items: center; gap: 6px; padding: 4px 0; border: 0; border-radius: 0; background: none; color: var(--text); font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.25; white-space: normal; word-break: keep-all; text-align: center; cursor: pointer; }
     .inds.circ .ind-grid button i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: #fff; box-shadow: 0 0 0 1.5px #E4E4E7, 0 2px 6px rgba(0,0,0,.06); }
@@ -908,7 +920,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=88"></script>
+<script src="../js/designs.js?v=89"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=83"></script>
 <script src="../js/reserve.js"></script>
@@ -986,11 +998,11 @@
     if (!curGroup) curGroup = (D.groupOf ? D.groupOf(industry) : groups[0] || {}).id;
     var old = $('grps'); if (old) old.remove();
     var list = groups.length ? groups : [{ label: '', ids: D.INDUSTRIES.filter(function (x) { return !D.isOpen || D.isOpen(x.id); }).map(function (x) { return x.id; }) }];
-    // 업종이 12개 이하(1차 공개)면 묶음 제목 없이 한 판에
-    var total = list.reduce(function (n, g) { return n + g.ids.length; }, 0);
-    if (total <= 12) list = [{ label: '', ids: list.reduce(function (a, g) { return a.concat(g.ids); }, []) }];
+    // 11-21 대표님: 소제목별로 체리 탭을 박스 하나에 몰아 한눈에 (1차 공개도 묶음 박스로)
     list.forEach(function (g) {
-      if (g.label && list.length > 1) { var h = document.createElement('div'); h.className = 'ind-gh'; h.textContent = (g.emoji ? g.emoji + ' ' : '') + g.label; box.appendChild(h); }
+      var wrap = document.createElement('div'); wrap.className = 'ind-box' + (g.id ? ' g-' + g.id : '');
+      if (g.label) { var h = document.createElement('div'); h.className = 'ind-gh'; h.innerHTML = (g.emoji ? '<i aria-hidden="true">' + g.emoji + '</i>' : '') + '<b></b><small></small>'; h.querySelector('b').textContent = g.label; h.querySelector('small').textContent = g.ids.length + '가지'; wrap.appendChild(h); }
+      box.appendChild(wrap);
       var grid = document.createElement('div'); grid.className = 'ind-grid';
       g.ids.forEach(function (id) {
         var ind = D.industry(id); if (!ind) return;
@@ -1003,7 +1015,7 @@
         b.addEventListener('click', function () { setIndustry(ind.id, true); afterUse(); });
         grid.appendChild(b);
       });
-      box.appendChild(grid);
+      wrap.appendChild(grid);
     });
   }
   function thumb(d, ex) {

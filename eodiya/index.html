@@ -180,6 +180,12 @@
     .cs-d b { display: block; margin-bottom: 8px; font-size: 16px; font-weight: 900; }
     .cs-d div { display: flex; gap: 8px; } .cs-d .cs-n { flex: 1; min-width: 0; }
     .cs-go { flex: none; min-height: 50px; padding: 0 16px; border: 0; border-radius: 14px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .cs-imp { margin: 0 0 12px; padding: 12px; border-radius: 16px; background: #FFF8E6; border: 1.5px solid #F1D9A0; }
+    .cs-imp .cs-ib { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 14px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .cs-imp p { margin: 8px 2px 0; color: #6b5226; font-size: 15px; line-height: 1.55; word-break: keep-all; }
+    .cs-imp ol { margin: 8px 0 0; padding-left: 22px; color: #3d2f17; font-size: 15px; line-height: 1.6; word-break: keep-all; }
+    .cs-imp .cs-del { margin-top: 8px; padding: 0; border: 0; background: none; color: #8a6a3a; font: inherit; font-size: 15px; text-decoration: underline; cursor: pointer; }
+    .cs-h { margin: 12px 4px 2px; color: #8E0A1C; font-size: 15px; font-weight: 900; }
     .cs-tip { margin: 10px 2px 0; color: #7A6448; font-size: 15px; line-height: 1.5; word-break: keep-all; }
     /* 📇 내 번호 주기 (11-22) */
     .mytel-send { display: block; width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 16px; border: 1.5px solid #E9C9CE; background: #FFF1F2; color: #8E0A1C; font: inherit; font-size: 17px; font-weight: 900; text-align: left; cursor: pointer; }
@@ -948,25 +954,100 @@
     var b = bookGet().filter(function (x) { return x.t !== t; }); b.unshift({ n: n, t: t, at: Date.now() });
     try { localStorage.setItem(BOOK, JSON.stringify(b.slice(0, 60))); } catch (e) {}
   }
+  // 📥 내 폰 연락처를 싸바에 넣기 (11-22 대표님: 답장 온 사람은 대개 내 연락처에 있으니 싸바 안에서 바로 찾게)
+  // 아이폰·카톡은 웹이 연락처를 못 여니, 폰 연락처 앱에서 '내보내기'한 .vcf 파일을 골라 넣음. 서버에 안 올리고 이 폰(이 브라우저)에만 저장
+  var PHB = 'sava-phbook-v1';
+  function phGet() { try { return JSON.parse(localStorage.getItem(PHB) || '[]') || []; } catch (e) { return []; } }
+  function normTel(t) { t = String(t || '').replace(/[^\d+]/g, ''); if (/^\+82/.test(t)) t = '0' + t.slice(3).replace(/^0/, ''); return t.replace(/\+/g, ''); }
+  function qpDecode(v) {
+    var bytes = [], i; for (i = 0; i < v.length; i++) { if (v[i] === '=' && /^[0-9A-Fa-f]{2}$/.test(v.substr(i + 1, 2))) { bytes.push(parseInt(v.substr(i + 1, 2), 16)); i += 2; } else bytes.push(v.charCodeAt(i) & 255); }
+    try { return new TextDecoder('utf-8').decode(new Uint8Array(bytes)); } catch (e) { return v; }
+  }
+  function parseVcf(txt) {
+    var raw = txt.replace(/\r\n?/g, '\n').split('\n'), L2 = [];
+    raw.forEach(function (ln) {
+      var last = L2.length - 1;
+      if (last >= 0 && /QUOTED-PRINTABLE/i.test(L2[last]) && /=$/.test(L2[last])) L2[last] = L2[last].slice(0, -1) + ln;
+      else if (last >= 0 && /^[ \t]/.test(ln)) L2[last] += ln.slice(1);
+      else L2.push(ln);
+    });
+    txt = L2.join('\n');
+    var out = [];
+    txt.split(/BEGIN:VCARD/i).forEach(function (card) {
+      var name = '', nn = '', tels = [];
+      card.split('\n').forEach(function (ln) {
+        var c = ln.indexOf(':'); if (c < 0) return;
+        var key = ln.slice(0, c), val = ln.slice(c + 1).trim(), K = key.toUpperCase(), base = K.split(';')[0].replace(/^ITEM\d+\./, '');
+        if (/ENCODING=QUOTED-PRINTABLE/.test(K)) val = qpDecode(val);
+        if (base === 'FN') name = val.replace(/\\,/g, ',').replace(/\\;/g, ';');
+        else if (base === 'N' && !nn) { var p = val.split(';'); nn = ((p[0] || '') + (p[1] || '')).replace(/\\/g, '').trim(); }
+        else if (base === 'TEL') { var t = normTel(val); if (t.length >= 9 && t.length <= 13 && tels.indexOf(t) < 0) tels.push(t); }
+      });
+      name = (name || nn).trim().slice(0, 24);
+      tels.forEach(function (t, k) { out.push({ n: name || fmtTel(t), t: t, m: tels.length > 1 && k ? 1 : 0 }); });
+    });
+    return out;
+  }
+  function phSave(list) {
+    var seen = {}, b = [];
+    list.forEach(function (x) { if (!seen[x.t]) { seen[x.t] = 1; b.push({ n: x.n, t: x.t }); } });
+    b.sort(function (a, c) { return a.n.localeCompare(c.n, 'ko'); });
+    b = b.slice(0, 5000);
+    try { localStorage.setItem(PHB, JSON.stringify(b)); return b.length; } catch (e) { return -1; }
+  }
   function fmtTel(t) { return String(t).replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3'); }
   function callSheet() {
     var old = $('callSheet'); if (old) old.remove();
     var w = document.createElement('div'); w.id = 'callSheet'; w.className = 'csheet';
     w.innerHTML = '<div class="cs-in" role="dialog" aria-label="번호 찾아 전화"><h2>📒 번호 찾아 전화</h2>' +
       (navigator.contacts && navigator.contacts.select ? '<button type="button" class="cs-ph">📱 폰 연락처에서 찾기</button>' : '') +
+      '<div class="cs-imp"></div>' +
       '<input type="search" class="cs-q" placeholder="이름이나 번호로 찾기" aria-label="이름이나 번호로 찾기"><div class="cs-l"></div>' +
       '<div class="cs-d"><b>번호 직접 누르기</b><div><input type="tel" inputmode="tel" class="cs-n" placeholder="010-1234-5678" aria-label="전화번호"><button type="button" class="cs-go">📞 걸기</button></div></div>' +
-      '<p class="cs-tip">' + (isIOS ? '아이폰은 웹에서 폰 연락처를 열 수 없게 막혀 있어요. 싸바로 주고받은 번호는 여기 모여요.' : '싸바로 주고받은 번호가 여기 모여요.') + '</p>' +
+      '<p class="cs-tip">싸바로 주고받은 번호도 여기 저절로 모여요.</p>' +
       '<button type="button" class="cs-x">닫기</button></div>';
     document.body.appendChild(w);
     var L = w.querySelector('.cs-l'), Q = w.querySelector('.cs-q');
-    function paint() {
-      var q = Q.value.replace(/\s|-/g, ''), b = bookGet().filter(function (x) { return !q || x.n.replace(/\s/g, '').indexOf(q) >= 0 || x.t.indexOf(q) >= 0; });
-      L.innerHTML = '';
-      if (!b.length) { var e = document.createElement('p'); e.className = 'cs-e'; e.textContent = bookGet().length ? '찾는 이름이 없어요' : '아직 모인 번호가 없어요 — 아래에 직접 눌러 걸 수 있어요'; L.appendChild(e); return; }
-      b.forEach(function (x) { var a = document.createElement('a'); a.href = 'tel:' + x.t; a.innerHTML = '<b></b><span></span><i>📞</i>'; a.querySelector('b').textContent = x.n; a.querySelector('span').textContent = fmtTel(x.t); L.appendChild(a); });
+    var IMP = w.querySelector('.cs-imp');
+    function impPaint() {
+      var n = phGet().length;
+      IMP.innerHTML = n
+        ? '<p style="margin:0">📒 내 폰 연락처 <b>' + n.toLocaleString() + '명</b>이 싸바에 들어 있어요. 위 칸에 이름을 쳐서 찾으세요.</p><button type="button" class="cs-ib" style="margin-top:8px;background:#fff;color:#8E0A1C;border:1.5px solid #E9C9CE">📥 새로 넣기 (바뀐 연락처)</button><button type="button" class="cs-del">이 폰의 싸바에서 연락처 지우기</button>'
+        : '<button type="button" class="cs-ib">📥 내 폰 연락처 싸바에 넣기</button>' +
+          '<p>한 번만 넣어 두면, 답장 온 사람을 싸바 안에서 이름으로 바로 찾아 전화해요. <b>번호는 서버에 안 올라가고 이 폰에만</b> 저장돼요.</p>' +
+          (isIOS
+            ? '<ol><li>아이폰 <b>연락처</b> 앱 → 왼쪽 위 <b>목록</b></li><li><b>모든 연락처</b>를 꾹 누르기 → <b>내보내기</b> → <b>파일에 저장</b></li><li>여기로 돌아와 위 빨간 단추 → 저장한 파일 고르기</li></ol>'
+            : '<ol><li><b>연락처</b> 앱 → 메뉴(☰ 또는 ⋮) → <b>연락처 관리</b></li><li><b>연락처 가져오기/내보내기</b> → <b>내보내기</b> → 내장 저장공간</li><li>여기로 돌아와 위 빨간 단추 → 만든 .vcf 파일 고르기</li></ol>') +
+          '<p>※ 카톡 안에서 쓰시면 카톡 안에서, 홈 화면 싸바에서 쓰시면 거기서 넣어 주세요 (따로 저장돼요)</p>';
+      var ib = IMP.querySelector('.cs-ib'); ib.addEventListener('click', function () { fi.click(); });
+      var del = IMP.querySelector('.cs-del'); if (del) del.addEventListener('click', function () { try { localStorage.removeItem(PHB); } catch (e) {} toast('연락처를 지웠어요'); impPaint(); paint(); });
     }
-    paint(); Q.addEventListener('input', paint);
+    var fi = document.createElement('input'); fi.type = 'file'; fi.accept = '.vcf,.vcard,text/vcard,text/x-vcard,text/directory'; fi.style.display = 'none'; w.appendChild(fi);
+    fi.addEventListener('change', function () {
+      var f = fi.files && fi.files[0]; fi.value = ''; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        var list = parseVcf(String(rd.result || ''));
+        if (!list.length) { toast('연락처 파일(.vcf)이 아닌 것 같아요'); return; }
+        var n = phSave(list);
+        if (n < 0) { toast('연락처가 너무 많아 다 못 넣었어요'); return; }
+        toast('📒 ' + n.toLocaleString() + '명 넣었어요!'); impPaint(); Q.focus(); paint();
+      };
+      rd.readAsText(f, 'utf-8');
+    });
+    function paint() {
+      var q = Q.value.replace(/\s|-/g, '');
+      function hit(x) { return !q || x.n.replace(/\s/g, '').indexOf(q) >= 0 || x.t.indexOf(q) >= 0; }
+      var b = bookGet().filter(hit), seen = {}; b.forEach(function (x) { seen[x.t] = 1; });
+      var ph = q ? phGet().filter(function (x) { return !seen[x.t] && hit(x); }) : [];
+      L.innerHTML = '';
+      function row(x) { var a = document.createElement('a'); a.href = 'tel:' + x.t; a.innerHTML = '<b></b><span></span><i>📞</i>'; a.querySelector('b').textContent = x.n; a.querySelector('span').textContent = fmtTel(x.t); L.appendChild(a); }
+      function head(t) { var h = document.createElement('p'); h.className = 'cs-h'; h.textContent = t; L.appendChild(h); }
+      if (!b.length && !ph.length) { var e = document.createElement('p'); e.className = 'cs-e'; e.textContent = q ? '찾는 이름이 없어요' : (phGet().length ? '위 칸에 이름을 쳐 보세요' : '아직 모인 번호가 없어요 — 아래에 직접 눌러 걸 수 있어요'); L.appendChild(e); return; }
+      if (b.length) { if (ph.length) head('🍒 싸바로 주고받은 번호'); b.forEach(row); }
+      if (ph.length) { head('📒 내 폰 연락처' + (ph.length > 40 ? ' (앞 40명 — 더 쳐서 좁혀 보세요)' : '')); ph.slice(0, 40).forEach(row); }
+    }
+    impPaint(); paint(); Q.addEventListener('input', paint);
     w.querySelector('.cs-go').addEventListener('click', function () { var t = w.querySelector('.cs-n').value.replace(/[^\d+]/g, ''); if (t.length < 3) { toast('번호를 눌러 주세요'); return; } location.href = 'tel:' + t; });
     var ph = w.querySelector('.cs-ph'); if (ph) ph.addEventListener('click', function () {
       navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) { var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, ''); }).catch(function () {});

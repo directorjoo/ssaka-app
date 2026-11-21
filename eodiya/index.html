@@ -165,6 +165,22 @@
     .pbig a { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; text-decoration: none; color: inherit; }
     .pbig a.yes { color: #fff; }
     .pbig a small { font-size: 15px; font-weight: 700; opacity: .9; }
+    /* 📒 번호 찾아 전화 창 (11-22) */
+    .csheet { position: fixed; inset: 0; z-index: 9995; display: flex; align-items: flex-end; justify-content: center; background: rgba(30,10,10,.55); }
+    .cs-in { width: 100%; max-width: 560px; max-height: 88vh; overflow: auto; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: #fff; text-align: left; }
+    .cs-in h2 { margin: 0 0 12px; font-size: 22px; font-weight: 900; }
+    .cs-ph, .cs-x { display: block; width: 100%; min-height: 52px; margin: 0 0 10px; border-radius: 16px; border: 1.5px solid #E9C9CE; background: #FFF1F2; color: #8E0A1C; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .cs-x { margin: 12px 0 0; background: #F3ECE6; border-color: #F3ECE6; color: #5a4a42; }
+    .cs-q, .cs-n { width: 100%; min-height: 50px; padding: 0 14px; border: 2px solid #333; border-radius: 14px; font: inherit; font-size: 18px; box-sizing: border-box; }
+    .cs-l { margin: 10px 0 6px; }
+    .cs-l a { display: flex; align-items: center; gap: 10px; padding: 12px 6px; border-bottom: 1px solid #F0E6DE; color: #1a1a1a; text-decoration: none; }
+    .cs-l a b { font-size: 18px; font-weight: 900; } .cs-l a span { flex: 1; color: #6b5a50; font-size: 16px; } .cs-l a i { font-style: normal; font-size: 22px; }
+    .cs-e { margin: 10px 2px; color: #6b5a50; font-size: 16px; }
+    .cs-d { margin-top: 14px; padding: 12px; border-radius: 16px; background: #FAF6F2; }
+    .cs-d b { display: block; margin-bottom: 8px; font-size: 16px; font-weight: 900; }
+    .cs-d div { display: flex; gap: 8px; } .cs-d .cs-n { flex: 1; min-width: 0; }
+    .cs-go { flex: none; min-height: 50px; padding: 0 16px; border: 0; border-radius: 14px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .cs-tip { margin: 10px 2px 0; color: #7A6448; font-size: 15px; line-height: 1.5; word-break: keep-all; }
     .pbig { display: grid; gap: 10px; margin-top: 18px; }
     .pbig button { min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; cursor: pointer; }
     .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
@@ -903,17 +919,44 @@
     else { a.href = '#'; a.innerHTML = '📒 번호 찾아 전화'; findCall(a); }
     el.appendChild(document.createTextNode(' ')); el.appendChild(a);
   }
+  // 📒 싸바 연락처: 싸바로 받은 카드에 번호가 있으면 이 폰에 기억 → 아이폰처럼 웹이 폰 연락처를 못 여는 곳에서도 찾아 전화 (11-22)
+  var BOOK = 'sava-book-v1';
+  function bookGet() { try { return JSON.parse(localStorage.getItem(BOOK) || '[]') || []; } catch (e) { return []; } }
+  function bookAdd(n, t) {
+    t = String(t || '').replace(/[^\d+]/g, ''); n = String(n || '').trim().slice(0, 20);
+    if (t.length < 9 || t.length > 15 || !n) return;
+    var b = bookGet().filter(function (x) { return x.t !== t; }); b.unshift({ n: n, t: t, at: Date.now() });
+    try { localStorage.setItem(BOOK, JSON.stringify(b.slice(0, 60))); } catch (e) {}
+  }
+  function fmtTel(t) { return String(t).replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3'); }
+  function callSheet() {
+    var old = $('callSheet'); if (old) old.remove();
+    var w = document.createElement('div'); w.id = 'callSheet'; w.className = 'csheet';
+    w.innerHTML = '<div class="cs-in" role="dialog" aria-label="번호 찾아 전화"><h2>📒 번호 찾아 전화</h2>' +
+      (navigator.contacts && navigator.contacts.select ? '<button type="button" class="cs-ph">📱 폰 연락처에서 찾기</button>' : '') +
+      '<input type="search" class="cs-q" placeholder="이름이나 번호로 찾기" aria-label="이름이나 번호로 찾기"><div class="cs-l"></div>' +
+      '<div class="cs-d"><b>번호 직접 누르기</b><div><input type="tel" inputmode="tel" class="cs-n" placeholder="010-1234-5678" aria-label="전화번호"><button type="button" class="cs-go">📞 걸기</button></div></div>' +
+      '<p class="cs-tip">' + (isIOS ? '아이폰은 웹에서 폰 연락처를 열 수 없게 막혀 있어요. 싸바로 주고받은 번호는 여기 모여요.' : '싸바로 주고받은 번호가 여기 모여요.') + '</p>' +
+      '<button type="button" class="cs-x">닫기</button></div>';
+    document.body.appendChild(w);
+    var L = w.querySelector('.cs-l'), Q = w.querySelector('.cs-q');
+    function paint() {
+      var q = Q.value.replace(/\s|-/g, ''), b = bookGet().filter(function (x) { return !q || x.n.replace(/\s/g, '').indexOf(q) >= 0 || x.t.indexOf(q) >= 0; });
+      L.innerHTML = '';
+      if (!b.length) { var e = document.createElement('p'); e.className = 'cs-e'; e.textContent = bookGet().length ? '찾는 이름이 없어요' : '아직 모인 번호가 없어요 — 아래에 직접 눌러 걸 수 있어요'; L.appendChild(e); return; }
+      b.forEach(function (x) { var a = document.createElement('a'); a.href = 'tel:' + x.t; a.innerHTML = '<b></b><span></span><i>📞</i>'; a.querySelector('b').textContent = x.n; a.querySelector('span').textContent = fmtTel(x.t); L.appendChild(a); });
+    }
+    paint(); Q.addEventListener('input', paint);
+    w.querySelector('.cs-go').addEventListener('click', function () { var t = w.querySelector('.cs-n').value.replace(/[^\d+]/g, ''); if (t.length < 3) { toast('번호를 눌러 주세요'); return; } location.href = 'tel:' + t; });
+    var ph = w.querySelector('.cs-ph'); if (ph) ph.addEventListener('click', function () {
+      navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) { var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, ''); }).catch(function () {});
+    });
+    w.querySelector('.cs-x').addEventListener('click', function () { w.remove(); });
+    w.addEventListener('click', function (e) { if (e.target === w) w.remove(); });
+  }
   function findCall(a) {
     if (!a || a._fc) return; a._fc = 1;
-    a.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (navigator.contacts && navigator.contacts.select) {
-        navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) {
-          var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, '');
-        }).catch(function () { location.href = 'tel:'; });
-      } else if (!isIOS) location.href = 'tel:';
-      else toast('아이폰은 화면 아래 ‘전화’ 앱 → 연락처에서 찾아 걸어 주세요');
-    });
+    a.addEventListener('click', function (e) { e.preventDefault(); callSheet(); });
   }
   function sms(phone, body) {
     var to = String(phone || '').replace(/[^\d+]/g, '');
@@ -1074,6 +1117,7 @@
   // ================= 받는 화면 =================
   if (card) {
     $('maker').hidden = true;
+    if (card.from && card.tel) bookAdd(card.from, card.tel);
     var who = card.from ? card.from + '님이' : '친구가';
     // 답장 보낼 사람 이름 (한 번 쓰면 기억)
     function myName() {

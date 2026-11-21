@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
   <meta name="theme-color" content="#B3132B">
-  <title>싸바 아침카드</title>
-  <meta property="og:title" content="💌 싸바 아침카드 — 오늘 바로 쓸 수 있는 정보만">
+  <title>오늘도 싸바?</title>
+  <meta property="og:title" content="💌 오늘도 싸바? — 오늘 바로 쓸 수 있는 정보만">
   <meta property="og:description" content="어르신은 건강, 대표님은 매출, 배우는 오디션. 매일 아침 쓸모 있는 것만 골라 드려요.">
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
   <link rel="icon" href="../img/favicon.png?v=4">
@@ -85,7 +85,7 @@
 </head>
 <body>
 <div class="w">
-  <h1>💌 싸바 아침카드</h1>
+  <h1>💌 오늘도 싸바?</h1>
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
   <div class="who" id="who"></div>
   <div class="cities" id="cities"></div>
@@ -144,7 +144,7 @@
     fetch('/api/letter?k=' + k + '&city=' + encodeURIComponent(city)).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
       if (want !== k + city) return; last = d;
       var dt = new Date(d.date + 'T00:00:00'), DAYS = '일월화수목금토';
-      var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + ' 아침카드</div>';
+      var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + '께 드리는 소식</div>';
       h += '<div class="hello">' + esc(d.hello) + '</div>';
       if (d.market && ((d.market.idx || []).length || (d.market.ex || []).length)) {
         var mk = d.market;
@@ -169,7 +169,7 @@
     var who = WHO.filter(function (w) { return w[0] === k; })[0];
     var url = location.origin + '/letter/?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)) + '&r=1';
     var desc = '오늘 바로 쓸 수 있는 정보만 골라 드려요'; // 말풍선 작게: 설명은 한 줄만
-    var opt = { title: '💌 싸바 아침카드 · ' + who[1] + ' ' + who[2], description: desc, url: url, imageUrl: 'https://sava.kr/img/today-share.jpg?v=1', imageWidth: 800, imageHeight: 400, buttonTitle: '카드 열기', noButtons: true };
+    var opt = { title: '💌 오늘도 싸바? · ' + who[1] + ' ' + who[2], description: desc, url: url, imageUrl: 'https://sava.kr/img/today-share.jpg?v=1', imageWidth: 800, imageHeight: 400, buttonTitle: '열어 보기', noButtons: true };
     if (window.SsakaShare) SsakaShare(opt); else if (navigator.share) navigator.share({ title: opt.title, text: desc, url: url });
   });
   go();

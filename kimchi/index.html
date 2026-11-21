@@ -38,6 +38,7 @@
     .kakao-bottom{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:1000;padding:8px 9px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eadbd2;box-shadow:0 -4px 18px #00000012;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto}.kakao-bottom .btn{min-width:0;min-height:42px;font-size:12px;line-height:1.2;padding:7px 2px;border-radius:11px;white-space:nowrap;letter-spacing:-.5px}.kakao-bottom .home{background:#7f1d1d;color:#fff}.kakao-bottom .where{background:#fff0e7;color:#8b3c21}.kakao-bottom .play{background:#fce8ec;color:#8b2437}.kakao-bottom .alim{background:#f4eee5;color:#59432d}body{padding-bottom:90px}.cherry-tap{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 0 4px}.cherry-tap img{width:48px;height:48px;object-fit:contain;animation:cherryTap 1.4s ease-in-out infinite}.cherry-tap .barrel{font-size:34px;display:inline-block;transform-origin:center;animation:barrelBump 1.4s ease-in-out infinite}@keyframes cherryTap{0%,100%{transform:translateY(0) rotate(-5deg)}45%{transform:translateY(-7px) rotate(8deg)}60%{transform:translateY(0) rotate(-8deg)}}@keyframes barrelBump{0%,35%,100%{transform:rotate(0)}48%{transform:rotate(-9deg) translateX(-2px)}58%{transform:rotate(8deg) translateX(2px)}}
     .greeting-wide{display:block;width:100%;height:auto;border-radius:14px;margin:4px 0 14px;box-shadow:0 5px 16px #3b21151c}.kimchi-shot{margin:8px 0 0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 5px 16px #3b21151c}.kimchi-shot img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.kimchi-shot figcaption{padding:11px 16px 13px;font-size:18px;line-height:1.5;font-weight:800;color:#7f1d1d;text-align:center;word-break:keep-all}
     .acct-copy{display:block;width:100%;margin-top:10px;min-height:48px;border:0;border-radius:12px;background:#b3132b;color:#fff;font:inherit;font-size:18px;font-weight:900;cursor:pointer}.acct-copy.done{background:#2f7a62}
+    .replay{position:fixed;right:10px;top:calc(54px + env(safe-area-inset-top));z-index:50;width:44px;height:44px;border-radius:50%;border:1px solid rgba(110,68,21,.18);background:rgba(255,255,255,.92);color:#B3132B;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px rgba(110,68,21,.16)}.replay svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   </style>
 </head>
 <body>
@@ -183,6 +184,15 @@ fit();window.addEventListener('resize',fit);if(document.fonts&&document.fonts.re
     catch(e){alert('주문 정보를 싸바 앱으로 전달하지 못했습니다. 다시 시도해 주세요.');}
   }
   document.getElementById('orderKakao').addEventListener('click',goSavaOrder);})();
+</script>
+<script src="/js/sound.js"></script>
+<script>
+// 11-22 대표님: 언니김치 소리나게 — 열자마자 "여수 언니 갓김치 왔어요!"(막히면 화면 처음 누를 때), 오른쪽 위 🔊 다시 듣기
+(function(){if(!window.SsakaSound)return;var id='kimchi';
+var b=document.createElement('button');b.className='replay';b.type='button';b.setAttribute('aria-label','소리 다시 듣기');
+b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>';
+b.addEventListener('click',function(){SsakaSound.play(id);});document.body.appendChild(b);
+SsakaSound.tryAutoplay(id).then(function(ok){if(ok)return;var once=function(e){if(e.target.closest&&e.target.closest('.replay'))return;document.removeEventListener('pointerdown',once,true);SsakaSound.play(id);};document.addEventListener('pointerdown',once,true);});})();
 </script>
 </body>
 </html>

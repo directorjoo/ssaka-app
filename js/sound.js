@@ -12,6 +12,7 @@
     { id: 'thanks',  group: '정중하게 (손님·어른께)', label: '💐 찾아주셔서 감사합니다!', say: '찾아주셔서 감사합니다!', tone: 'ding', pitch: 1.1, rate: 1.0 },
     { id: 'news',    group: '정중하게 (손님·어른께)', label: '📣 좋은 소식 전해드려요!',  say: '좋은 소식 전해드려요!',  tone: 'fanfare', pitch: 1.15, rate: 1.0 },
     { id: 'invite',  group: '정중하게 (손님·어른께)', label: '💌 소중한 분을 초대합니다', say: '소중한 분을 초대합니다', tone: 'ding', pitch: 1.1, rate: 0.95 },
+    { id: 'kimchi',  group: '정중하게 (손님·어른께)', label: '🥬 여수 언니 갓김치 왔어요!', say: '여수 언니 갓김치 왔어요! 올해도 작년 가격 그대로예요!', tone: 'fanfare', pitch: 1.15, rate: 1.0 },
     { id: 'wassa',   group: '싸카', label: '📮 싸카 왔싸!',   say: '싸카 왔싸!',   tone: 'ding' },
     { id: 'ssakka',  group: '싸카', label: '🎵 싸카싸카!',    say: '싸카 싸카!',   tone: 'double' },
     { id: 'sose',    group: '싸카', label: '🔫 쏘세요!',      say: '쏘세요!',      tone: 'pop' },

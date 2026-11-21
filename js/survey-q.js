@@ -497,32 +497,39 @@
     car: ['싸바모터스', '잘 지내? 하고 고객 안부를 묻는 매장', '2014년', '신차·중고차 상담 전문', '신차·리스·중고차 매입', '광주 매매단지', '평일 9시~19시', '상담석 4개, 전시장', '시승, 탁송, 커피', '할부 설계, 월 부담을 줄여 드려서', '처음이면 견적 상담부터', '월 30만~60만 원대', '출고 후 1년 점검 안내', '싸바카드 보여 주면 블랙박스 무료', '이달 출고 혜택', '연말 할인, 봄 신차', '차량에 보험 함께', '믿고 살 수 있는 차를 권하고 싶어서', '매매단지가 가까워서', '첫 고객이 지금도 연락해요', '판매가 줄었을 때, 소개 고객 덕분에', '내 가족 차라고 생각한다', '20년 경력 정비 실장님', '정비사', '정비소에서 배웠어요', '믿고 샀어요', '두 번째 차도 여기서', '아침 8시', '전시 차량 점검', '고객별 견적', '토요일 오후', '차량 사진 찍기', '내일 상담 확인', '연말엔 할인, 봄엔 신차', '직장인, 사장님, 첫차 사는 분', 'SUV', '할부 되나요? → 다양하게 돼요', '아이 카시트 장착 도와드려요', '혼자 오셔도 편하게 상담해요', '법인 차량 10대까지', '출고 기념 사진', '설명이 친절했어요', '○○역에서 차로 10분', '매매단지 3동', '근처 맛집 골목', '비 오는 날엔 실내 전시장에서', '차 바꿀 때 연락 주세요']
   };
   // 업종 → 특별 질문 묶음, 부르는 말
+  // 11-22 업종 묶음을 싸바 표준 9묶음(designs.js GROUPS)과 같은 이름·색으로 — id가 묶음 색(g-food 등)
   var IND = [
-    { g: '가게·매장', list: [
+    { id: 'food', g: '🍽️ 음식·카페', list: [
       { id: 'restaurant', label: '음식점', e: '🍲', set: 'restaurant', w: '가게', c: '손님' },
-      { id: 'cafe', label: '카페·베이커리', e: '☕', set: 'cafe', w: '카페', c: '손님' },
+      { id: 'cafe', label: '카페·베이커리', e: '☕', set: 'cafe', w: '카페', c: '손님' }
+    ] },
+    { id: 'shop', g: '🛍️ 매장·서비스', list: [
       { id: 'beauty', label: '미용·네일', e: '💅', set: 'beauty', w: '샵', c: '손님' },
       { id: 'fitness', label: '헬스·필라테스', e: '💪', set: 'fitness', w: '센터', c: '회원' },
       { id: 'flower', label: '꽃집·공방', e: '💐', set: 'flower', w: '가게', c: '손님' },
       { id: 'stay', label: '숙박·펜션', e: '🏝️', set: 'stay', w: '숙소', c: '손님' }
     ] },
-    { g: '교육·학원', list: [
+    { id: 'edu', g: '📚 학원', list: [
       { id: 'toefl', label: '토플·어학원', e: '🌍', set: 'academy', w: '학원', c: '학생', h: '원장님' },
       { id: 'bigacademy', label: '대형 어학원', e: '🏫', set: 'academy', w: '학원', c: '학생', h: '원장님' },
       { id: 'academy', label: '보습·내신학원', e: '📚', set: 'academy', w: '학원', c: '학생', h: '원장님' },
-      { id: 'entrance', label: '입시·수능', e: '🎯', set: 'academy', w: '학원', c: '학생', h: '원장님' },
+      { id: 'entrance', label: '입시·수능', e: '🎯', set: 'academy', w: '학원', c: '학생', h: '원장님' }
+    ] },
+    { id: 'tutor', g: '✏️ 과외·예체능', list: [
       { id: 'tutor', label: '과외 선생님', e: '✏️', set: 'academy', w: '공부방', c: '학생', h: '선생님' },
       { id: 'arts', label: '예체능·코딩', e: '🎨', set: 'academy', w: '학원', c: '학생', h: '원장님' }
     ] },
-    { g: '사람·전문직', list: [
-      { id: 'freelancer', label: '강사·프리랜서', e: '🎤', set: 'person', w: '일터', c: '의뢰인', over: PERSON },
-      { id: 'director', label: '감독·크리에이터', e: '🎥', set: 'person', w: '일터', c: '관객', h: '감독님', over: PERSON },
-      { id: 'actor', label: '배우·모델', e: '🎬', set: 'person', w: '일터', c: '관객', h: '배우님', over: PERSON },
+    { id: 'sales', g: '🤝 영업·상담', list: [
+      { id: 'insurance', label: '보험설계사', e: '🛡️', set: 'person', w: '사무실', c: '고객', h: '팀장님', over: PERSON },
       { id: 'newcar', label: '자동차 영업', e: '🚘', set: 'car', w: '매장', c: '고객' },
       { id: 'usedcar', label: '중고차', e: '🚙', set: 'car', w: '매장', c: '고객' },
-      { id: 'insurance', label: '보험설계사', e: '🛡️', set: 'person', w: '사무실', c: '고객', h: '팀장님', over: PERSON },
-      { id: 'sales', label: '영업·금융', e: '💼', set: 'person', w: '사무실', c: '고객', over: PERSON },
-      { id: 'realty', label: '부동산', e: '🏠', set: 'person', w: '사무소', c: '손님', over: PERSON }
+      { id: 'realty', label: '부동산', e: '🏠', set: 'person', w: '사무소', c: '손님', over: PERSON },
+      { id: 'sales', label: '영업·금융', e: '💼', set: 'person', w: '사무실', c: '고객', over: PERSON }
+    ] },
+    { id: 'pro', g: '🎬 프로필·창작', list: [
+      { id: 'actor', label: '배우·모델', e: '🎬', set: 'person', w: '일터', c: '관객', h: '배우님', over: PERSON },
+      { id: 'director', label: '감독·크리에이터', e: '🎥', set: 'person', w: '일터', c: '관객', h: '감독님', over: PERSON },
+      { id: 'freelancer', label: '강사·프리랜서', e: '🎤', set: 'person', w: '일터', c: '의뢰인', over: PERSON }
     ] }
   ];
   var BY = {}; IND.forEach(function (g) { g.list.forEach(function (x) { BY[x.id] = x; }); });

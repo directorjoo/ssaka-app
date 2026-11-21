@@ -189,6 +189,30 @@
     .stk span, .pane .src span { font-size: 15px; font-weight: 800; }
     .up { color: #C62828; } .dn { color: #1D5FD1; }
     .sth { margin: 16px 0 8px; font-size: 17px; font-weight: 900; }
+    /* 11-22 오늘의 싸바 묶음 상자 — 업종 9색 상자와 같은 틀(머리 띠 진한 색+흰 글씨+그림자, 같은 색 연한 바탕, 2px 테두리, 상자 사이 14px). 고르기 화면이라 '한 화면 2~3색' 예외 */
+    .circles { padding: 8px 14px 6px; }
+    .grp { margin: 0 0 14px; padding: 0 6px 10px; border-radius: 20px; overflow: hidden; background: var(--bx); border: 2px solid var(--bl); box-shadow: 0 8px 18px -14px rgba(60,30,20,.5); }
+    .grp:last-child { margin-bottom: 0; }
+    .grp h3 { display: flex; align-items: center; gap: 6px; margin: 0 -6px 10px; padding: 10px 14px; background: var(--bh); color: #fff; font-size: 19px; text-shadow: 0 1px 2px rgba(0,0,0,.45); }
+    .grp h3 small { margin-left: 2px; color: rgba(255,255,255,.92); font-size: 15px; font-weight: 700; }
+    .grp h3 .cnt { margin-left: auto; flex: none; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.18); color: #fff; font-size: 14px; font-weight: 800; text-shadow: none; }
+    .grp.tb-am   { --bh: #D9822B; --bx: #FFF1E2; --bl: #F0C595; } /* 주황 — 아침 해 */
+    .grp.tb-hot  { --bh: #D04A3A; --bx: #FFEDE9; --bl: #F3BDB3; } /* 코랄 빨강 — 화제 */
+    .grp.tb-biz  { --bh: #8A6A4A; --bx: #F5EFE8; --bl: #D8C6B2; } /* 갈색 — 대표님(영업·상담과 같은 색) */
+    .grp.tb-sen  { --bh: #3F9A5C; --bx: #EAF6EC; --bl: #B7DDBF; } /* 초록 — 어르신(소식·안심과 같은 색) */
+    .grp.tb-trip { --bh: #1E9AA0; --bx: #E5F6F6; --bl: #A9DCDD; } /* 청록 — 나들이 */
+    .grp.tb-mkt  { --bh: #2C4A7A; --bx: #E9EEF7; --bl: #B6C4DC; } /* 남색 — 주식·환율 */
+    html.bigtxt .grp h3 small { display: none; }
+    /* 2가지짜리 두 묶음(나들이·주식)은 반씩 나란히 — 화면 덜 길게 */
+    .circles { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; }
+    .circles .grp { grid-column: 1 / -1; }
+    .circles .grp.tb-trip, .circles .grp.tb-mkt { grid-column: auto; }
+    .grp.tb-trip h3, .grp.tb-mkt h3 { font-size: 17px; padding: 10px 10px; gap: 4px; white-space: nowrap; letter-spacing: -.04em; }
+    .grp.tb-trip h3 .cnt, .grp.tb-mkt h3 .cnt { padding: 2px 7px; font-size: 13px; }
+    .grp.tb-trip h3 small, .grp.tb-mkt h3 small { display: none; }
+    .grp.tb-trip .gr, .grp.tb-mkt .gr { grid-template-columns: 1fr 1fr; }
+    html.bigtxt .circles { grid-template-columns: 1fr; }
+    html.bigtxt .grp.tb-trip .gr, html.bigtxt .grp.tb-mkt .gr { grid-template-columns: repeat(3, 1fr); }
   </style>
 </head>
 <body>
@@ -215,30 +239,32 @@
   var now = new Date(), DAYS = '일월화수목금토';
   $('date').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
   // 동그라미 탭 — 옆으로 밀지 않고 한 화면에 모두 보이게, 쓰는 사람별로 네 묶음
+  // 11-22 쓰기·고르기 화면 정리: 성격별 6묶음 상자(머리 띠 색 + 연한 바탕 + 테두리, 'N가지' 알약) — 업종 9색 상자와 같은 틀
   var G = [
-    { h: '🌅 매일 보기', s: '아침마다 한 번씩', g: '#8E0A1C', c: [
+    { id: 'am', h: '🌅 매일 아침', s: '날씨·뉴스부터', c: [
       { k: 'letter', t: '오늘도 싸바?', i: '💌', c: '#d9466a', href: '../letter/' },
       { k: 'news', t: '뉴스 요약', i: '🗞️', c: '#B3132B' },
       { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' },
-      { k: 'kwx', t: '전국 날씨', i: '🗺️', c: '#0E6BA8' },
+      { k: 'kwx', t: '전국 날씨', i: '🗺️', c: '#0E6BA8' }] },
+    { id: 'hot', h: '🔥 지금 화제·방송', s: '많이 보는 것', c: [
       { k: 'google', t: '구글 검색어', i: '🔥', c: '#E8710A' },
       { k: 'yt', t: '유튜브 인기', i: '▶️', c: '#e62117' },
       { k: 'naver', t: '네이버', i: '🟢', c: '#03C75A' },
       { k: 'world', t: '세계 방송', i: '🌏', c: '#0b4ea2' },
       { k: 'radio', t: '라디오·TV', i: '📻', c: '#6a3a9c', href: '../radio/' }] },
-    { h: '🏪 대표님', s: '매출에 도움 되는 것만', g: '#7a3fb0', c: [
+    { id: 'biz', h: '🏪 대표님', s: '매출에 도움 되는 것만', c: [
       { k: 'biz', t: '혜택 알리미', i: '🔔', c: '#7a3fb0', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
       { k: 'sns', t: 'SNS 만들기', i: '📱', c: '#E1306C', n: 1 },
       { k: 'card', t: '싸바카드', i: '🍒', c: '#B3132B', href: '../make/' }] },
-    { h: '👵 어르신·가족', s: '건강과 살림', g: '#12924a', c: [
+    { id: 'sen', h: '👵 어르신·가족', s: '건강과 살림', c: [
       { k: 'health', t: '건강', i: '💊', c: '#12924a' },
       { k: 'senior', t: '어르신 혜택', i: '🎁', c: '#c2410c' },
       { k: 'insure', t: '보험 점검', i: '🛡️', c: '#0f766e', n: 1 }] },
-    { h: '🎪 나들이·관광', s: '한국관광공사 정보', g: '#0b4ea2', c: [
+    { id: 'trip', h: '🎪 나들이', s: '한국관광공사 정보', c: [
       { k: 'fest', t: '축제·행사', i: '🎪', c: '#db2777', n: 1 },
       { k: 'near', t: '내 주변', i: '📍', c: '#0369a1', n: 1 }] },
-    { h: '📈 주식·환율', s: '따로 모아 봐요', g: '#1A4FB0', c: [
+    { id: 'mkt', h: '📈 주식·환율', s: '따로 모아 봐요', c: [
       { k: 'stock', t: '주식', i: '📈', c: '#C62828', n: 1 },
       { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' }] }
   ];
@@ -252,8 +278,8 @@
   if (!C.some(function (x) { return x.k === cur && !x.href; })) cur = 'news';
   var bar = $('circles');
   G.forEach(function (g) {
-    var box = el('div', 'grp'); box.style.setProperty('--g', g.g);
-    var h = el('h3', '', g.h); h.appendChild(el('small', 'bt-hide', g.s)); box.appendChild(h);
+    var box = el('section', 'grp tb-' + g.id);
+    var h = el('h3', '', g.h); h.appendChild(el('small', 'bt-hide', g.s)); h.appendChild(el('span', 'cnt', g.c.length + '가지')); box.appendChild(h);
     var row = el('div', 'gr'); box.appendChild(row);
     g.c.forEach(function (x) {
       var b = el(x.href ? 'a' : 'button', 'cb' + (x.n ? ' new' : '')); if (x.href) b.href = x.href; else b.type = 'button';

@@ -20,13 +20,13 @@
   document.head.appendChild(css);
 
   var ov = document.createElement('div'); ov.className = 'vc-ov';
-  ov.innerHTML = '<div class="vc-box"><div class="vc-mic">🎤</div><div class="vc-t">듣고 있어요</div><div class="vc-s"></div><div class="vc-ex">예) 철수한테 토요일에 밥 먹자고 해 줘</div><button type="button" class="vc-x">그만</button></div>';
+  ov.innerHTML = '<div class="vc-box"><div class="vc-mic">🎤</div><div class="vc-t">듣고 있어요</div><div class="vc-s"></div><div class="vc-ex">예) 철수한테 토요일에 밥 먹자고 해 줘</div><button type="button" class="vc-x">다 말했어요 ✓</button><div class="vc-ex" style="margin-top:12px">바깥을 누르면 취소</div></div>';
   document.body.appendChild(ov);
   var $t = ov.querySelector('.vc-t'), $s = ov.querySelector('.vc-s'), $ex = ov.querySelector('.vc-ex');
   var rec = null, heard = '', done = false, wd = 0;
   var inKakao = /KAKAOTALK/i.test(navigator.userAgent);
 
-  function show(t, s, busy) { ov.classList.add('on'); ov.classList.toggle('busy', !!busy); $t.textContent = t; $s.textContent = s || ''; $ex.style.display = busy ? 'none' : ''; }
+  function show(t, s, busy) { ov.classList.add('on'); ov.classList.toggle('busy', !!busy); $t.textContent = t; $s.textContent = s || ''; $ex.style.display = busy ? 'none' : ''; ov.querySelector('.vc-x').textContent = busy ? '취소' : '다 말했어요 ✓'; }
   function hide() { ov.classList.remove('on'); }
   function tip(m) { if (typeof window.toast === 'function') window.toast(m); else alert(m); }
   function who() { var b = document.querySelector('#gSubs .gsub[aria-pressed="true"] b'); return b ? b.textContent.replace(/에게|께/g, '').trim() : '친구'; }
@@ -42,9 +42,9 @@
       .then(function (x) {
         hide();
         if (x.ok && x.j.msg) { put(x.j.msg); tip((x.j.to ? x.j.to + '님께 ' : '') + '보낼 말을 만들었어요. 고쳐도 되고, 아래 [카톡 보내기]를 누르세요'); }
-        else { tip(x.j && x.j.error === 'limit' ? '오늘은 다듬기를 많이 썼어요. 그대로 보내도 돼요' : '지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); }
+        else { put(said); tip(x.j && x.j.error === 'limit' ? '오늘은 다듬기를 많이 썼어요. 그대로 보내도 돼요' : '지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); }
       })
-      .catch(function () { hide(); tip('지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); });
+      .catch(function () { hide(); put(said); tip('지금은 다듬기가 안 돼요. 그대로 고쳐서 보내세요'); });
   }
 
   var DEF = /^(싸바\?|어디야\?)?$/;
@@ -73,10 +73,11 @@
     } catch (e) { return noMic(); }
     rec.onresult = function (e) {
       var s = ''; for (var i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
-      heard = s.trim(); $s.textContent = heard;
+      s = s.trim(); if (s) { heard = s; $s.textContent = heard; } // 빈 결과로 덮어쓰지 않음 (아이폰, 11-21)
     };
     rec.onerror = function (e) {
-      clearTimeout(wd); done = true;
+      clearTimeout(wd); if (done) return; done = true;
+      if (heard.length >= 2) return polish(heard); // 오류라도 들은 말은 살림 (11-21)
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') noMic('마이크 허락이 필요해요. 막혀 있으면 키보드의 🎤 단추로 말해 주세요');
       else if (e.error === 'no-speech') { hide(); tip('아무 말도 안 들렸어요. 다시 눌러 말해 주세요'); }
       else if (e.error !== 'aborted') noMic();
@@ -89,7 +90,13 @@
     wd = setTimeout(function () { if (!started && !done) { quit(); noMic(); } }, 3000); // 3초 안에 안 열리면 키보드 🎤로
   }
   function quit() { done = true; clearTimeout(wd); if (rec) { try { rec.onend = rec.onerror = rec.onresult = null; rec.abort(); } catch (e) {} } rec = null; hide(); }
-  ov.querySelector('.vc-x').addEventListener('click', function (e) { e.stopPropagation(); quit(); }); // 무슨 상태든 바로 닫힘 (11-21)
+  function finish() {
+    if (ov.classList.contains('busy')) return quit();
+    var h = heard; done = true; clearTimeout(wd);
+    if (rec) { try { rec.onend = rec.onerror = rec.onresult = null; rec.abort(); } catch (e) {} } rec = null;
+    if (h.length >= 2) polish(h); else { hide(); tip('아무 말도 안 들렸어요. 다시 눌러 말해 주세요'); }
+  }
+  ov.querySelector('.vc-x').addEventListener('click', function (e) { e.stopPropagation(); finish(); }); // 무슨 상태든 바로 닫힘 (11-21)
   ov.addEventListener('click', function (e) { if (e.target === ov) quit(); });
 
   function mount() {

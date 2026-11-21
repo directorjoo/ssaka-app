@@ -154,6 +154,17 @@
     .rmemo label { display: block; margin: 0 2px 6px; font-size: 17px; font-weight: 900; color: #3A2A14; }
     .rmemo label small { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; color: #7A6448; }
     .rmemo textarea { min-height: 72px; }
+    /* 답장하는 사람 번호 칸 + 답장 받는 화면 (11-22) */
+    .rname .rtel-l { margin-top: 14px; }
+    .rname .rtel-l em { font-style: normal; font-weight: 600; color: var(--ink-2); font-size: 15px; }
+    .rtel { display: flex; gap: 8px; }
+    .rtel input { flex: 1; min-width: 0; }
+    .rtel button { flex: none; min-height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid #E9C9CE; background: #fff; color: #8E0A1C; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .re-q { font-size: 34px !important; line-height: 1.25; word-break: keep-all; color: #B3132B; }
+    .re-memo { text-align: left; font-size: 18px; font-weight: 700; }
+    .pbig a { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; text-decoration: none; color: inherit; }
+    .pbig a.yes { color: #fff; }
+    .pbig a small { font-size: 15px; font-weight: 700; opacity: .9; }
     .pbig { display: grid; gap: 10px; margin-top: 18px; }
     .pbig button { min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; cursor: pointer; }
     .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
@@ -741,6 +752,20 @@
     <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
   </section>
 
+  <!-- ===== 답장 받는 화면 (놀자·여기야 답장, 11-22) ===== -->
+  <section id="viewRe" hidden style="text-align:center">
+    <img src="../img/cherry-dance-anim.svg" alt="" width="220" height="194" style="display:block;margin:-6px auto -6px">
+    <div class="who" id="reWho" style="text-align:center"></div>
+    <p class="pact" id="reAct" hidden style="text-align:center"></p>
+    <h1 class="q re-q" id="reText"></h1>
+    <div class="memo re-memo" id="reMemo" hidden></div>
+    <div class="pbig">
+      <a class="yes re-call" id="reCall" href="#">📞 전화 걸기</a>
+      <a class="no re-find" id="reFind" href="#">📒 번호 찾아 전화하기</a>
+    </div>
+    <a class="mk" href="./#play">나도 <b>친구야 놀자!</b> 보내기</a>
+  </section>
+
   <!-- ===== 받는 화면: 친구야 놀자! ===== -->
   <section id="viewPlay" hidden style="text-align:center">
     <img src="../img/cherry-dance-anim.svg" alt="" width="250" height="221" style="display:block;margin:-10px auto -8px">
@@ -875,17 +900,20 @@
     tel = String(tel || '').replace(/[^\d+]/g, '');
     var a = document.createElement('a'); a.className = 'callme'; a.innerHTML = '📞 전화 걸기';
     if (tel.length >= 9) { a.href = 'tel:' + tel; }
-    else {
-      a.href = '#'; a.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (navigator.contacts && navigator.contacts.select) {
-          navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) {
-            var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, '');
-          }).catch(function () { toast('휴대폰 연락처에서 찾아 전화해 주세요'); });
-        } else toast('보낸 분이 번호를 안 넣었어요. 휴대폰 연락처에서 찾아 전화해 주세요');
-      });
-    }
+    else { a.href = '#'; a.innerHTML = '📒 번호 찾아 전화'; findCall(a); }
     el.appendChild(document.createTextNode(' ')); el.appendChild(a);
+  }
+  function findCall(a) {
+    if (!a || a._fc) return; a._fc = 1;
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (navigator.contacts && navigator.contacts.select) {
+        navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) {
+          var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, '');
+        }).catch(function () { location.href = 'tel:'; });
+      } else if (!isIOS) location.href = 'tel:';
+      else toast('아이폰은 화면 아래 ‘전화’ 앱 → 연락처에서 찾아 걸어 주세요');
+    });
   }
   function sms(phone, body) {
     var to = String(phone || '').replace(/[^\d+]/g, '');
@@ -1014,7 +1042,7 @@
     if (prepend) where.insertBefore(n, where.firstChild); else where.appendChild(n);
   }
   topNav(document.querySelector('#maker .topbar'), true);
-  ['viewAsk', 'viewCome', 'viewPlay'].forEach(function (id) { var v = $(id); if (v) topNav(v, true); });
+  ['viewAsk', 'viewCome', 'viewPlay', 'viewRe'].forEach(function (id) { var v = $(id); if (v) topNav(v, true); });
   function composer(taId, label, sendId, sendText, showIf) {
     var ta = $(taId); if (!ta) return;
     var c = document.createElement('div'); c.className = 'composer';
@@ -1050,21 +1078,31 @@
     // 답장 보낼 사람 이름 (한 번 쓰면 기억)
     function myName() {
       var i = $('rName'); var n = i ? i.value.trim() : '';
-      if (n) { try { localStorage.setItem(DRAFT_ME, JSON.stringify({ from: n })); } catch (e) {} }
+      if (n) { try { var o0 = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); o0.from = n; var t0 = myTelR(); if (t0 || ($('rTel') && !$('rTel').value.trim())) o0.tel = $('rTel') ? $('rTel').value.trim() : o0.tel; localStorage.setItem(DRAFT_ME, JSON.stringify(o0)); } catch (e) {} }
       return n;
     }
+    // 답장하는 사람 번호 (선택) — 넣으면 답장 받은 분이 📞 한 번에 전화 (11-22 대표님)
+    function myTelR() { var i = $('rTel'); var t = i ? i.value.replace(/[^\d+]/g, '') : ''; return t.length >= 9 && t.length <= 15 ? t : ''; }
     function nameBox(before) {
       if (!before || $('rName')) return;
       var w = document.createElement('div'); w.className = 'rname';
-      w.innerHTML = '<label for="rName">✏️ 먼저 내 이름을 적어 주세요<span>누가 답했는지 알 수 있어요 · 한 번 쓰면 기억해요</span></label><input type="text" id="rName" maxlength="12" placeholder="예: 홍길동">';
+      w.innerHTML = '<label for="rName">✏️ 먼저 내 이름을 적어 주세요<span>누가 답했는지 알 수 있어요 · 한 번 쓰면 기억해요</span></label><input type="text" id="rName" maxlength="12" placeholder="예: 홍길동">' +
+        '<label for="rTel" class="rtel-l">📞 내 전화번호 <em>(선택)</em><span>넣으면 받는 분이 한 번에 전화할 수 있어요</span></label>' +
+        '<div class="rtel"><input type="tel" id="rTel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678"><button type="button" id="rTelPick" hidden>📒 연락처</button></div>';
       before.parentNode.insertBefore(w, before);
-      try { var me = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); if (me.from) $('rName').value = me.from; } catch (e) {}
+      try { var me = JSON.parse(localStorage.getItem(DRAFT_ME) || '{}'); if (me.from) $('rName').value = me.from; if (me.tel) $('rTel').value = me.tel; } catch (e) {}
+      if (navigator.contacts && navigator.contacts.select) {
+        $('rTelPick').hidden = false;
+        $('rTelPick').addEventListener('click', function () {
+          navigator.contacts.select(['tel'], { multiple: false }).then(function (r) { var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) $('rTel').value = t; }).catch(function () {});
+        });
+      }
     }
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
     // 11-21 07:50 대표님: 답만 하고 닫으면 싸바는 끝 → 답장 화면마다 '싸바가 뭐지?' 카드, 답장 보내고 돌아오면 안내 창
     (function () {
       var ICON = '../img/cherry.webp';
-      ['viewAsk', 'viewCome', 'viewPlay'].forEach(function (id) {
+      ['viewAsk', 'viewCome', 'viewPlay', 'viewRe'].forEach(function (id) {
         var v = $(id); if (!v) return;
         var a = document.createElement('a'); a.className = 'sv-inv'; a.href = '../?story=1';
         a.innerHTML = '<img src="' + ICON + '" alt=""><div><b>싸바가 뭐지?</b><span>싸바(Ça va)는 프랑스 말로<br>"괜찮아? 괜찮아!"</span></div><em>보기 ›</em>';
@@ -1096,6 +1134,10 @@
       if (!name && $('rName')) { toast('✏️ 누가 답했는지 알 수 있게 맨 위에 이름을 먼저 적어 주세요'); $('rName').scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $('rName').focus(); }, 350); return; }
       var title = o.mi ? (name ? name + '님 답장이 왔어요' : '답장이 왔어요') : o.title === '여기야!' ? (name ? name + '님이 여기 있대요' : '여기야!') : (name ? name + ': ' : '') + o.title;
       if (o.mi) { o.img = o.mi.url; o.w = o.mi.w; o.h = o.mi.h; }
+      var rt = myTelR();
+      if ($('rTel') && $('rTel').value.trim() && !rt) { toast('전화번호를 다시 확인해 주세요 (안 넣어도 돼요)'); $('rTel').focus(); return; }
+      if (rt) o.desc = (o.desc ? o.desc + '\n' : '') + '📞 ' + rt.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
+      if (o.re && window.SsakaCodec) o.url = BASE + '?d=' + SsakaCodec.encode({ m: 're', from: name, tel: rt, r: o.re, memo: o.memo || '', act: o.act || '', t: Date.now() });
       var url = o.url || BASE;
       if (window.__svSent) window.__svSent();
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
@@ -1103,10 +1145,22 @@
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide || o.nb, installUrl: BASE + '?install=1' });
     }
-    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk').forEach(function (a) { a.style.display = 'none'; });
+    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk, #viewRe .mk').forEach(function (a) { a.style.display = 'none'; });
     else if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
-    if (card.m === 'play') {
+    if (card.m === 're') {
+      $('viewRe').hidden = false;
+      document.title = (card.from || '친구') + '님 답장 · 싸바';
+      $('reWho').textContent = (card.from || '친구') + '님 답장';
+      $('reText').textContent = card.r || '답장이 왔어요';
+      if (card.act) { $('reAct').hidden = false; $('reAct').textContent = card.act; }
+      if (card.memo) { $('reMemo').hidden = false; $('reMemo').textContent = '💬 ' + card.memo; }
+      var rtel = String(card.tel || '').replace(/[^\d+]/g, '');
+      if (rtel.length >= 9) { $('reCall').href = 'tel:' + rtel; $('reCall').innerHTML = '📞 ' + (card.from || '') + ' 전화 걸기<small>' + rtel.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3') + '</small>'; }
+      else { $('reCall').hidden = true; }
+      findCall($('reFind'));
+      playSound('play');
+    } else if (card.m === 'play') {
       $('viewPlay').hidden = false;
       nameBox(document.querySelector('#viewPlay .pbig'));
       document.title = '친구야 놀자! · 싸바';
@@ -1141,7 +1195,7 @@
         b.addEventListener('click', function () {
           var yes = b.classList.contains('yes');
           var pm = ($('pMemo').value || '').trim();
-          reply({ title: b.dataset.r, desc: pm ? '💬 ' + pm : '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes && !window.SAVA_QUIET ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
+          reply({ re: b.dataset.r, memo: pm, act: card.act || '', title: b.dataset.r, desc: pm ? '💬 ' + pm : '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: '답장 보기' });
         });
       });
       playSound(card.sound || 'play');
@@ -1189,7 +1243,7 @@
       }
       if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
       document.querySelectorAll('.reply').forEach(function (b) {
-        b.addEventListener('click', function () { var cm = ($('cMemo') ? $('cMemo').value : '').trim(); reply({ title: b.dataset.r, desc: cm ? '💬 ' + cm : '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
+        b.addEventListener('click', function () { var cm = ($('cMemo') ? $('cMemo').value : '').trim(); reply({ re: b.dataset.r, memo: cm, title: b.dataset.r, desc: cm ? '💬 ' + cm : '', img: 'eodiya-reply2.png?v=1', btn: '답장 보기' }); });
       });
       playSound(card.sound || 'here');
     } else {

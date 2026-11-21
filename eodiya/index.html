@@ -149,6 +149,11 @@
     #playBox label.l { font-size: 15px; color: var(--ink); margin: 16px 0 8px; }
     #playBox label.l:first-of-type { margin-top: 0; }
     .pact { font-size: 30px; font-weight: 900; letter-spacing: -0.03em; margin: 0 0 8px; }
+    /* 받는 화면 글칸 (11-22 대표님: '좋아! 갈게'만 누르지 말고 하고 싶은 말도 같이) */
+    .rmemo { text-align: left; }
+    .rmemo label { display: block; margin: 0 2px 6px; font-size: 17px; font-weight: 900; color: #3A2A14; }
+    .rmemo label small { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; color: #7A6448; }
+    .rmemo textarea { min-height: 72px; }
     .pbig { display: grid; gap: 10px; margin-top: 18px; }
     .pbig button { min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; cursor: pointer; }
     .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
@@ -726,6 +731,7 @@
       <a class="big ghost" id="cGoogle">구글맵<small>길찾기</small></a>
     </div>
     <div class="sec-t">한 번에 답장하기</div>
+    <div class="rta rmemo" style="margin-top:14px"><label for="cMemo">✍️ 하고 싶은 말 <small>안 써도 돼요 · 아래 단추와 같이 가요</small></label><textarea id="cMemo" rows="2" maxlength="200" placeholder="예: 주차하고 바로 갈게"></textarea></div>
     <div class="replies">
       <button type="button" class="reply" data-r="지금 가는 중! 🏃">🏃 가는 중!</button>
       <button type="button" class="reply" data-r="10분 뒤 도착해요">⏱ 10분 뒤</button>
@@ -750,6 +756,7 @@
       <a class="big ghost" id="pGoogle">구글맵<small>길찾기</small></a>
     </div>
     <div class="pbig">
+      <div class="rta rmemo"><label for="pMemo">✍️ 하고 싶은 말 <small>안 써도 돼요 · 아래 단추와 같이 가요</small></label><textarea id="pMemo" rows="2" maxlength="200" placeholder="예: 7시까지 갈게! 뭐 먹을까?"></textarea></div>
       <button type="button" class="yes" data-r="좋아! 갈게 🍒">🍒 좋아! 갈게</button>
       <div class="row2">
         <button type="button" class="no" data-r="조금 늦게 갈게 ⏰">⏰ 조금 늦게</button>
@@ -1133,7 +1140,8 @@
       document.querySelectorAll('#viewPlay .pbig button').forEach(function (b) {
         b.addEventListener('click', function () {
           var yes = b.classList.contains('yes');
-          reply({ title: b.dataset.r, desc: '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes && !window.SAVA_QUIET ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
+          var pm = ($('pMemo').value || '').trim();
+          reply({ title: b.dataset.r, desc: pm ? '💬 ' + pm : '친구야 놀자! ' + (card.act || '') + ' 답장', img: yes ? 'eodiya-ok.png?v=4' : 'eodiya-reply.png?v=4', btn: yes && !window.SAVA_QUIET ? '나도 놀자 보내기' : '답장 보기', url: BASE + '#play' });
         });
       });
       playSound(card.sound || 'play');
@@ -1181,7 +1189,7 @@
       }
       if (card.here) document.querySelector('#viewCome .sec-t').textContent = '찾아가면서 답장하기';
       document.querySelectorAll('.reply').forEach(function (b) {
-        b.addEventListener('click', function () { reply({ title: b.dataset.r, desc: '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
+        b.addEventListener('click', function () { var cm = ($('cMemo') ? $('cMemo').value : '').trim(); reply({ title: b.dataset.r, desc: cm ? '💬 ' + cm : '', img: 'eodiya-reply2.png?v=1', btn: '다시 묻기' }); });
       });
       playSound(card.sound || 'here');
     } else {

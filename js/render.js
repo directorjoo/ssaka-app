@@ -156,8 +156,10 @@
     main.appendChild(hero);
 
     var pics = (card.gallery || []).filter(Boolean).slice(0, 10);
+    // 청첩장: 다른 모바일 청첩장처럼 사진을 크게 길게 (첫 장 넓게 → 두 장씩), 인사말 아래에
+    var longGal = /^wedding-/.test(String(card.design || '')), galEl = null;
     if (pics.length) {
-      var gal = el('div', 'sk-gal');
+      var gal = galEl = el('div', 'sk-gal' + (longGal ? ' sk-gal-long' : ''));
       gal.setAttribute('aria-label', '사진 ' + pics.length + '장');
       pics.forEach(function (src, i) {
         var b = el(live ? 'button' : 'div', 'sk-gal-i');
@@ -167,7 +169,8 @@
         if (live) on(b, function () { openViewer(root, pics, i); });
         gal.appendChild(b);
       });
-      main.appendChild(gal);
+      if (longGal) gal.insertBefore(el('p', 'sk-gal-h', 'GALLERY'), gal.firstChild);
+      if (!longGal) main.appendChild(gal);
     }
 
     if (card.sos && c.phone) {
@@ -206,6 +209,7 @@
       });
       main.appendChild(ul);
     }
+    if (longGal && galEl) main.appendChild(galEl);
     wrap.appendChild(main);
 
     if (card.video && /^https:\/\//i.test(String(card.video))) { // 영상 주소는 https만 (javascript: 같은 위험한 주소 막기)

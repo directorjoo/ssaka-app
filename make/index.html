@@ -11,7 +11,7 @@
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=91">
+  <link rel="stylesheet" href="../css/sk.css?v=92">
   <link rel="stylesheet" href="../css/sk-world.css?v=8">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <meta property="og:title" content="1분 만에 싸바 카드 만들기">
@@ -940,7 +940,7 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=92"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=83"></script>
+<script src="../js/render.js?v=84"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -2223,8 +2223,8 @@
     var ind = (D.industry && D.industry(industry)) || {}, F = ind.form || {}, sns = !!destSns();
     var showGal = (type === 'profile' || type === 'shop' || type === 'club' || !!F.gal) && MEDIA_NO_GAL.indexOf(industry) < 0;
     $('galBox').hidden = !showGal;
-    $('galTitle').textContent = sns ? '사진판에 넣을 사진' : ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
-    $('galStatus').textContent = sns ? (dest === 'print' ? '전단·포스터에는 대표 사진 아래 작은 사진 3장까지 들어가요.' : '이 사진에는 대표 사진 아래 작은 사진 3장까지 들어가요.') : '여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.';
+    $('galTitle').textContent = sns ? '사진판에 넣을 사진' : industry === 'wedding' ? '💍 웨딩 사진 (카드에 크게 길게 나와요)' : ind.gallery ? '프로필 사진 더 올리기' : (type === 'shop' ? '메뉴·매장 사진 더 올리기' : type === 'club' ? '모임 사진 더 올리기' : '사진 더 올리기');
+    $('galStatus').textContent = sns ? (dest === 'print' ? '전단·포스터에는 대표 사진 아래 작은 사진 3장까지 들어가요.' : '이 사진에는 대표 사진 아래 작은 사진 3장까지 들어가요.') : (industry === 'wedding' ? '여러 장을 한 번에 고를 수 있어요. 인사말 아래에 첫 장은 크게, 그다음은 두 장씩 길게 이어져요. 누르면 크게 봐요.' : '여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.');
     document.body.classList.toggle('no-video', sns || MEDIA_NO_VIDEO.indexOf(industry) >= 0);
     try { renderGal(); } catch (e) {}
   }

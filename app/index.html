@@ -559,7 +559,8 @@
     /* 11-22: 언니김치 특판은 싸바카드에서 빼서 따로 카드 하나 (16:9 사진 + 글씨 + 단추) */
     #v-home.v2 .v2-kc { background: #fff; color: #1A1A1A; }
     #v-home.v2 .v2-kc .kp { display: block; aspect-ratio: 16 / 9; background: url(../img/kimchi-wide.jpg) center/cover; position: relative; }
-    #v-home.v2 .v2-kc .kp s { position: absolute; top: 12px; left: 12px; padding: 4px 11px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 15px; font-weight: 800; text-decoration: none; }
+    #v-home.v2 .v2-kc { margin-top: 28px; }
+    #v-home.v2 .v2-kc .kp s { position: absolute; top: 12px; left: 12px; padding: 8px 18px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; text-decoration: none; box-shadow: 0 6px 16px -6px rgba(0,0,0,.6); }
     #v-home.v2 .v2-kc .kt { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
     #v-home.v2 .v2-kc .kt span { flex: 1; min-width: 0; }
     #v-home.v2 .v2-kc .kt b { display: block; font-size: 21px; font-weight: 900; letter-spacing: -0.02em; }
@@ -1069,10 +1070,6 @@
     tapGo(mk, '#alim');
     v.appendChild(mk);
     rotPics(mk.querySelector('.mkph'), MK_PICS, 2200);
-    // 언니김치 특판 — 따로 카드 (11-22)
-    var kc = el('a', 'v2c v2-kc'); kc.href = '../kimchi/'; kc.setAttribute('aria-label', '여수 언니 갓김치 특판 보기');
-    kc.innerHTML = '<span class="kp"><s>🔥 특판</s></span><span class="kt"><span><b>여수 언니 갓김치</b><small>5kg 60,000원 · 배송비 포함 · 작년 가격 그대로</small></span><u>보러 가기 ›</u></span>';
-    v.appendChild(kc);
 
     // 3. 오늘의 싸바 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘의 싸바 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
@@ -1102,6 +1099,10 @@
     duo.innerHTML = '<a class="v2-half pg" href="../eodiya/#playground"><em class="dc d1" aria-hidden="true">🎯</em><em class="dc d2" aria-hidden="true">⭐</em><em class="dc d3" aria-hidden="true">🎲</em><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small><span class="bt-long">게임 ' + GAMES.length + '가지 · 무료</span><span class="bt-short">게임 무료</span></small><span class="go">놀러 가기 ›</span></a>' +
       '<a class="v2-half ws" href="../?story=1"><em class="dc d1" aria-hidden="true"><img src="../img/deco-cherry.svg" alt=""></em><em class="dc d2" aria-hidden="true"><img src="../img/deco-leaf.svg" alt=""></em><em class="dc d3" aria-hidden="true"><img src="../img/deco-cherry2.svg" alt=""></em><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small><span class="bt-long">카드 한 장이면 다 알아요</span><span class="bt-short">싸바 소개</span></small><span class="go">알아보기 ›</span></a>';
     v.appendChild(duo);
+    // 언니김치 특판 — 따로 카드, 홈 맨 아래 (11-22 대표님)
+    var kc = el('a', 'v2c v2-kc'); kc.href = '../kimchi/'; kc.setAttribute('aria-label', '여수 언니 갓김치 특판 보기');
+    kc.innerHTML = '<span class="kp"><s>🔥 특판</s></span><span class="kt"><span><b>여수 언니 갓김치</b><small>5kg 60,000원 · 배송비 포함 · 작년 가격 그대로</small></span><u>보러 가기 ›</u></span>';
+    v.appendChild(kc);
   }
   // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)
   // 11-22: 얼굴이 오른쪽 위에 크게(클로즈업), 오른쪽을 보던 인물은 미리 좌우 뒤집어 왼쪽(글씨 쪽)을 보게 잘라 둠 — 사진 위쪽 기준

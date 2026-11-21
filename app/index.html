@@ -627,6 +627,23 @@
     #v-home.v2 .v2-td .lt { color: #1B331A; font-size: 17px; font-weight: 800; text-decoration: none; }
     #v-home.v2 .v2-td .btn { display: inline-flex; align-items: center; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #3A6438, #284927); color: #fff; font-size: 18px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 16px -10px rgba(30,70,20,.8); }
     #v-home.v2 .v2-mk .sp u, #v-home.v2 .v2-strip u, #v-home.v2 .v2-sv u { text-decoration: none; font-size: 24px; font-weight: 700; }
+    /* 11-22 대표님: 오늘의 싸바 = 황금 바탕 + 체리나무(대표님이 보낸 그림) — A2안. 위는 싸바카드 아래 연두에서 이어짐 */
+    #v-home.v2 .v2-td { background:
+      linear-gradient(180deg, #E3E68A 0%, rgba(240,220,120,.6) 10%, rgba(247,207,78,0) 26%),
+      radial-gradient(ellipse at 70% 20%, #FFE58A 0%, #F7CF4E 45%, #EDB52E 100%); }
+    #v-home.v2 .v2-td::before { background-image: none; }
+    #v-home.v2 .v2-td .tree { position: absolute; z-index: 0; right: 4px; top: 84px; width: 128px; pointer-events: none; filter: drop-shadow(0 8px 10px rgba(90,60,0,.25)); animation: tdSway 5s ease-in-out infinite; transform-origin: 50% 100%; }
+    @keyframes tdSway { 0%,100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+    @media (prefers-reduced-motion: reduce) { #v-home.v2 .v2-td .tree { animation: none; } }
+    #v-home.v2 .v2-td h3 { white-space: nowrap; text-shadow: 0 0 6px rgba(255,240,190,.8); }
+    #v-home.v2 .v2-td .tx p { padding-right: 128px; word-break: keep-all; }
+    #v-home.v2 .v2-td em, #v-home.v2 .v2-td .tx p, #v-home.v2 .v2-td .lt { color: #5A3E06; }
+    #v-home.v2 .v2-td .ch { padding-top: 20px; }
+    #v-home.v2 .v2-td .ch span { background: rgba(255,255,255,.85); border-color: rgba(110,70,10,.2); color: #3B2A08; }
+    #v-home.v2 .v2-td .btn { background: linear-gradient(180deg, #C98A12, #9A6408); text-shadow: 0 1px 2px rgba(0,0,0,.35); box-shadow: 0 8px 16px -10px rgba(110,70,0,.8); }
+    html.bigtxt #v-home.v2 .v2-td h3 { white-space: normal; }
+    html.bigtxt #v-home.v2 .v2-td .tree { width: 96px; top: auto; bottom: 14px; opacity: .9; }
+    html.bigtxt #v-home.v2 .v2-td .tx p { padding-right: 0; }
     /* 오늘의 싸바 — 흰 띠 */
     #v-home.v2 .v2-strip { display: flex; align-items: center; gap: 12px; margin: 0 18px 32px; padding: 14px 18px; border-radius: 20px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
     #v-home.v2 .v2-strip i { font-style: normal; font-size: 30px; line-height: 1; }
@@ -1095,7 +1112,7 @@
 
     // 3. 오늘의 싸바 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘의 싸바 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
-    td.innerHTML = '<div class="tx"><em>☀️ 오늘의 싸바 · 매일 아침</em><h3>검색 안 해도,<br>오늘 소식이 다 와요</h3><p><span class="bt-long">날씨·뉴스·혜택을 싸바가 아침마다 모아 드려요</span><span class="bt-short">날씨·뉴스·혜택 매일</span></p></div>' +
+    td.innerHTML = '<img class="tree" src="../img/today-tree.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 오늘의 싸바 · 매일 아침</em><h3>검색 안 해도,<br>오늘 소식이 다 와요</h3><p><span class="bt-long">날씨·뉴스·혜택을 싸바가 아침마다 모아 드려요</span><span class="bt-short">날씨·뉴스·혜택 매일</span></p></div>' +
       '<div class="ch"><span>☀️ 날씨</span><span>🗞️ 뉴스 요약</span><span>🔥 인기 검색어</span><span>💊 건강</span><span>🔔 정부 혜택</span><span>📻 라디오·TV</span></div>' +
       '<div class="ft"><a class="lt" href="../letter/">💌 오늘도 싸바? 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
     tapGo(td, '../today/');

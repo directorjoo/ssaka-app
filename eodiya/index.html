@@ -181,6 +181,11 @@
     .cs-d div { display: flex; gap: 8px; } .cs-d .cs-n { flex: 1; min-width: 0; }
     .cs-go { flex: none; min-height: 50px; padding: 0 16px; border: 0; border-radius: 14px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
     .cs-tip { margin: 10px 2px 0; color: #7A6448; font-size: 15px; line-height: 1.5; word-break: keep-all; }
+    /* 📇 내 번호 주기 (11-22) */
+    .mytel-send { display: block; width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 16px; border: 1.5px solid #E9C9CE; background: #FFF1F2; color: #8E0A1C; font: inherit; font-size: 17px; font-weight: 900; text-align: left; cursor: pointer; }
+    .mytel-send small { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; color: #7A4A50; }
+    .tnum { margin: 4px 0 0; font-size: 26px; font-weight: 900; letter-spacing: .02em; color: #1a1a1a; }
+    .tsaved { margin: 14px 4px 0; font-size: 15px; line-height: 1.5; color: #4A6A40; font-weight: 700; word-break: keep-all; }
     .pbig { display: grid; gap: 10px; margin-top: 18px; }
     .pbig button { min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; cursor: pointer; }
     .pbig .yes { border: 0; background: var(--ssaka); color: #fff; box-shadow: 0 14px 30px -16px rgba(179,19,43,.9); }
@@ -713,6 +718,7 @@
       <label class="l" for="myTel" style="margin-top:12px">내 전화번호 <span class="opt">(선택)</span></label>
       <input type="tel" id="myTel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678">
       <p class="telnote">넣으면 받는 사람이 📞 한 번에 전화할 수 있어요. 안 넣어도 돼요.</p>
+      <button type="button" class="mytel-send" id="sendMyTel">📇 내 번호 카톡으로 주기<small>받은 사람 싸바 연락처·폰 연락처에 저장돼요</small></button>
     </div>
 
     <div class="send">
@@ -766,6 +772,20 @@
       <button type="button" class="reply" data-r="조금 늦어요, 미안해요 🙏">🙏 조금 늦어</button>
     </div>
     <a class="mk" href="./">나도 <b>어디야?</b> 보내기</a>
+  </section>
+
+  <!-- ===== 받는 화면: 내 번호 (📇, 11-22) ===== -->
+  <section id="viewTel" hidden style="text-align:center">
+    <img src="../img/cherry-dance-anim.svg" alt="" width="200" height="177" style="display:block;margin:-6px auto -4px">
+    <div class="who" id="tWho" style="text-align:center"></div>
+    <h1 class="q re-q" id="tName"></h1>
+    <p class="tnum" id="tNum"></p>
+    <div class="pbig">
+      <a class="yes" id="tCall" href="#">📞 전화 걸기</a>
+      <a class="no" id="tSave" href="#">📒 폰 연락처에 저장</a>
+    </div>
+    <p class="tsaved">✅ 싸바 연락처에도 저장했어요 — 어디야 받는 화면의 ‘📒 번호 찾아 전화’에서 찾을 수 있어요</p>
+    <a class="mk" href="./#tel">나도 <b>내 번호</b> 주기</a>
   </section>
 
   <!-- ===== 답장 받는 화면 (놀자·여기야 답장, 11-22) ===== -->
@@ -1085,7 +1105,7 @@
     if (prepend) where.insertBefore(n, where.firstChild); else where.appendChild(n);
   }
   topNav(document.querySelector('#maker .topbar'), true);
-  ['viewAsk', 'viewCome', 'viewPlay', 'viewRe'].forEach(function (id) { var v = $(id); if (v) topNav(v, true); });
+  ['viewAsk', 'viewCome', 'viewPlay', 'viewRe', 'viewTel'].forEach(function (id) { var v = $(id); if (v) topNav(v, true); });
   function composer(taId, label, sendId, sendText, showIf) {
     var ta = $(taId); if (!ta) return;
     var c = document.createElement('div'); c.className = 'composer';
@@ -1146,7 +1166,7 @@
     // 11-21 07:50 대표님: 답만 하고 닫으면 싸바는 끝 → 답장 화면마다 '싸바가 뭐지?' 카드, 답장 보내고 돌아오면 안내 창
     (function () {
       var ICON = '../img/cherry.webp';
-      ['viewAsk', 'viewCome', 'viewPlay', 'viewRe'].forEach(function (id) {
+      ['viewAsk', 'viewCome', 'viewPlay', 'viewRe', 'viewTel'].forEach(function (id) {
         var v = $(id); if (!v) return;
         var a = document.createElement('a'); a.className = 'sv-inv'; a.href = '../?story=1';
         a.innerHTML = '<img src="' + ICON + '" alt=""><div><b>싸바가 뭐지?</b><span>싸바(Ça va)는 프랑스 말로<br>"괜찮아? 괜찮아!"</span></div><em>보기 ›</em>';
@@ -1189,10 +1209,27 @@
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide || o.nb, installUrl: BASE + '?install=1' });
     }
-    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk, #viewRe .mk').forEach(function (a) { a.style.display = 'none'; });
+    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk, #viewRe .mk, #viewTel .mk').forEach(function (a) { a.style.display = 'none'; });
     else if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
-    if (card.m === 're') {
+    if (card.m === 'tel') {
+      $('viewTel').hidden = false;
+      var tt = String(card.tel || '').replace(/[^\d+]/g, ''), tn = card.from || '친구';
+      document.title = tn + '님 전화번호 · 싸바';
+      $('tWho').textContent = tn + '님이 번호를 보냈어요';
+      $('tName').textContent = tn;
+      $('tNum').textContent = fmtTel(tt);
+      $('tCall').href = 'tel:' + tt;
+      // 폰 연락처에 저장: 연락처 파일(.vcf) — 아이폰은 '새로운 연락처' 창이 열림
+      $('tSave').addEventListener('click', function (e) {
+        e.preventDefault();
+        var v = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:' + tn + '\r\nN:' + tn + ';;;;\r\nTEL;TYPE=CELL:' + tt + '\r\nNOTE:싸바(sava.kr)로 받은 번호\r\nEND:VCARD\r\n';
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([v], { type: 'text/vcard;charset=utf-8' })); a.download = tn + '.vcf';
+        document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500);
+        toast('열린 창에서 ‘연락처 추가’를 눌러 주세요 (카톡 안이면 오른쪽 위 ⋮ → 다른 브라우저로 열기)');
+      });
+      playSound('hi');
+    } else if (card.m === 're') {
       $('viewRe').hidden = false;
       document.title = (card.from || '친구') + '님 답장 · 싸바';
       $('reWho').textContent = (card.from || '친구') + '님 답장';
@@ -1798,6 +1835,16 @@
     var onlyWhere = mode === 'ask' && askText() === '어디야?';
     return { url: url, title: title, desc: desc, phone: phone, img: mode === 'ask' ? (onlyWhere ? 'eodiya-ask.png?v=7' : 'eodiya-hi.png?v=1') : null };
   }
+  // 📇 내 번호 카톡으로 주기
+  $('sendMyTel').addEventListener('click', function () {
+    var from = $('from').value.trim(), t = myTel();
+    if (!from) { toast('내 이름을 먼저 적어 주세요'); $('from').focus(); return; }
+    if (!t) { toast('내 전화번호를 적어 주세요'); $('myTel').focus(); return; }
+    remember();
+    var url = BASE + '?d=' + SsakaCodec.encode({ m: 'tel', from: from, tel: t, t: Date.now() });
+    window.SsakaShare({ title: '📇 ' + from + ' 전화번호', description: fmtTel(t) + ' · 누르면 바로 전화하거나 연락처에 저장해요', imageUrl: IMG_BASE + 'eodiya-ok.png?v=4', imageWidth: 800, imageHeight: 800, url: url, buttonTitle: '번호 받기', installTitle: '싸바 설치하기', noButtons: false, installUrl: BASE + '?install=1' });
+  });
+  if (location.hash === '#tel' && !card) setTimeout(function () { var b = $('sendMyTel'); if (b) { b.scrollIntoView({ block: 'center' }); if (!$('from').value.trim()) $('from').focus(); else if (!$('myTel').value.trim()) $('myTel').focus(); } }, 400);
   $('sendKakao').addEventListener('click', function () {
     var b = build(); if (!b) return;
     if (mode !== 'ask') { shareKakao(b.title, b.desc, b.url, b.img); return; }

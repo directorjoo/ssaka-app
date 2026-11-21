@@ -513,10 +513,19 @@
     #v-home.v2 .v2-eo .ph { height: 190px; background-size: cover; background-position: center 40%; }
     #v-home.v2 .v2-eo .ph::after { content: ""; position: absolute; left: 0; right: 0; top: 110px; height: 80px; background: linear-gradient(180deg, rgba(110,10,34,0) 0%, #6E0A22 100%); }
     /* 11-22 대표님: 어디야 사진이 체리 → AI 인물 얼굴로 천천히 바뀜(시험). 겹친 층을 하나씩 사르르 */
-    #v-home.v2 .v2-eo .ph { position: relative; }
-    #v-home.v2 .v2-eo .ph .ly { position: absolute; inset: 0; background-size: cover; background-position: center 40%; opacity: 0; transition: opacity 1.4s ease; }
-    #v-home.v2 .v2-eo .ph .ly.on { opacity: 1; }
-    #v-home.v2 .v2-eo .ph::after { z-index: 1; }
+    /* 11-22 04:30 대표님: 사람 사진일 때는 체리색을 완전히 빼고 사진이 칸 전체, 글씨·단추만 위에 */
+    #v-home.v2 .v2-eo .bgx { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    #v-home.v2 .v2-eo .bgx .ly { position: absolute; inset: 0; background-size: cover; background-position: center 30%; opacity: 0; transition: opacity 1.4s ease; }
+    #v-home.v2 .v2-eo .bgx .ly.ch { bottom: auto; height: 190px; background-position: center 40%; }
+    #v-home.v2 .v2-eo .bgx .ly.on { opacity: 1; }
+    #v-home.v2 .v2-eo .bgx::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.25) 60%, rgba(0,0,0,.5) 100%); opacity: 0; transition: opacity 1.4s ease; }
+    #v-home.v2 .v2-eo.face .bgx::after { opacity: 1; }
+    #v-home.v2 .v2-eo .ph::after { transition: opacity 1.4s ease; }
+    #v-home.v2 .v2-eo.face .ph::after { opacity: 0; }
+    #v-home.v2 .v2-eo.bgon .ph { background-image: none !important; }
+    #v-home.v2 .v2-eo > .ph, #v-home.v2 .v2-eo > .tx, #v-home.v2 .v2-eo > .b3 { position: relative; z-index: 1; }
+    #v-home.v2 .v2-eo.face .tx { text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 2px 12px rgba(0,0,0,.6); }
+    #v-home.v2 .v2-eo.face .b3 a { background: rgba(255,255,255,.92); }
     #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -52px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
     #v-home.v2 .v2-eo h3, #v-home.v2 .v2-mk h3 { font-size: 28px; line-height: 1.25; }
     #v-home.v2 .v2-eo .b3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px 16px; }
@@ -1086,17 +1095,19 @@
     if (!ph) return;
     clearInterval(eoTimer);
     try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
-    ph.style.backgroundImage = 'none';
+    var sec = ph.parentNode, bg = document.createElement('div'); bg.className = 'bgx';
     var lys = EO_FACES.map(function (f, i) {
-      var d = document.createElement('span'); d.className = 'ly' + (i ? '' : ' on');
-      d.style.backgroundImage = 'url(' + f[0] + ')'; d.style.backgroundPosition = 'center ' + f[1];
-      ph.appendChild(d); return d;
+      var d = document.createElement('span'); d.className = 'ly' + (i ? '' : ' ch on');
+      d.style.backgroundImage = 'url(' + f[0] + ')'; if (i) d.style.backgroundPosition = 'center ' + f[1];
+      bg.appendChild(d); return d;
     });
+    sec.insertBefore(bg, sec.firstChild); sec.classList.add('bgon');
     var k = 0;
     eoTimer = setInterval(function () {
-      if (!document.body.contains(ph)) { clearInterval(eoTimer); return; }
+      if (!document.body.contains(sec)) { clearInterval(eoTimer); return; }
       if (document.hidden) return;
       lys[k].classList.remove('on'); k = (k + 1) % lys.length; lys[k].classList.add('on');
+      sec.classList.toggle('face', k > 0); // 사람 사진이면 체리색 빼기
     }, 4500);
   }
   // 싸바카드 칸 예시 사진 + 이름 (11-22) — 실제 예시 가게·모임

@@ -493,7 +493,8 @@
     #v-home.v2 .v2-eo { background: linear-gradient(180deg, #6E0A22 0%, #5A0819 55%, #42050F 100%); }
     #v-home.v2 .v2-eo .ph { height: 190px; background-size: cover; background-position: center 40%; }
     #v-home.v2 .v2-eo .ph::after { content: ""; position: absolute; left: 0; right: 0; top: 110px; height: 80px; background: linear-gradient(180deg, rgba(110,10,34,0) 0%, #6E0A22 100%); }
-    #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -34px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -52px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    #v-home.v2 .v2-eo h3, #v-home.v2 .v2-mk h3 { font-size: 28px; line-height: 1.25; }
     #v-home.v2 .v2-eo .b3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px 16px; }
     #v-home.v2 .v2-eo .b3 a { display: grid; place-items: center; gap: 2px; padding: 12px 4px; border-radius: 18px; background: #fff; color: #B3132B; text-decoration: none; text-align: center; }
     #v-home.v2 .v2-eo .b3 a:active { transform: scale(.96); }
@@ -909,14 +910,14 @@
     // 1. 어디야 — 가장 크게 (싸바의 얼굴)
     var eo = el('section', 'v2c v2-eo');
     eo.innerHTML = '<div class="ph" style="background-image:url(../img/eodiya-cherry12.jpg)"></div>' +
-      '<div class="tx"><h3>어디야?</h3><p>잘 지내? 한마디에 답장이 와요</p></div>' +
+      '<div class="tx"><em>🍒 어디야?</em><h3>보고 싶은 사람,<br>한마디로 부르세요</h3></div>' +
       '<div class="b3"><a href="../eodiya/#ask"><b>싸바?</b><small>안부 전하기</small></a><a href="../eodiya/#come"><b>여기야!</b><small>위치 보내기</small></a><a href="../eodiya/#play"><b>놀자!</b><small>친구 부르기</small></a></div>';
     tapGo(eo, '../eodiya/');
     v.appendChild(eo);
 
     // 2. 싸바알림판 — 초록, 단추 하나 + 특판은 아래 작은 띠
     var mk = el('section', 'v2c v2-mk');
-    mk.innerHTML = '<div class="tx"><em>가게홍보 · 모임공지 · 초대장</em><h3>싸바알림판</h3><p>카드 한 장 만들어 SNS에 알리세요</p>' +
+    mk.innerHTML = '<div class="tx"><em>📣 싸바알림판</em><h3>가게 홍보 카드,<br>1분이면 끝</h3><p>가게홍보 · 모임공지 · 초대장</p>' +
       '<a class="btn" href="#alim">1분에 만들기 ›</a></div>' +
       '<img class="dance" src="../img/cherry-dance-anim.svg" alt="">' +
       '<a class="sp" href="../kimchi/"><i style="background-image:url(../img/gatkimchi-sign.jpg)"></i><span><b>언니김치 특판</b><small>특판 코너에서 가격을 확인하세요</small></span><u>›</u></a>';
@@ -925,7 +926,7 @@
 
     // 3. 오늘의 싸바 — 얇은 흰 띠 한 줄
     var td = el('a', 'v2-strip'); td.href = '../today/';
-    td.innerHTML = '<i aria-hidden="true">☀️</i><span><b>오늘의 싸바</b><small>뉴스 · 날씨 · 정부 혜택 · 라디오</small></span><u>›</u>';
+    td.innerHTML = '<i aria-hidden="true">☀️</i><span><b>오늘의 싸바</b><small>검색 안 해도 오늘 소식이 다 와요</small></span><u>›</u>';
     v.appendChild(td);
 
     // 4. 지금 보내기 좋은 카드 — 그대로
@@ -936,13 +937,13 @@
 
     // 5. 싸바비앙 — 황금 넓은 띠 (입점 시작되면 맨 위로)
     var sv = el('a', 'v2c v2-sv'); sv.href = '../savabien/'; sv.setAttribute('aria-label', '싸바비앙 명품 콜렉션');
-    sv.innerHTML = '<div class="in"><span class="k" aria-hidden="true">👑</span><span class="t"><em>명품 콜렉션</em><b>싸바비앙<small>SAVABIEN</small></b><small class="d">명인의 손끝에서 태어난 명품</small></span></div>';
+    sv.innerHTML = '<div class="in"><span class="k" aria-hidden="true">👑</span><span class="t"><em>명품 콜렉션</em><b>싸바비앙<small>SAVABIEN</small></b><small class="d">명인의 손끝을 집에서 만나요</small></span></div>';
     v.appendChild(sv);
 
     // 6. 놀이터 · 싸바가 뭐지? — 반 칸씩 흰 카드
     var duo = el('div', 'v2-duo');
     duo.innerHTML = '<a class="v2-half" href="../eodiya/#playground"><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small>게임 ' + GAMES.length + '가지 · 무료</small></a>' +
-      '<a class="v2-half" href="../?story=1"><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small>카드 한 장이면 다 알아요</small></a>';
+      '<a class="v2-half" href="../what/"><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small>카드 한 장이면 다 알아요</small></a>';
     v.appendChild(duo);
   }
   function renderHome() {

@@ -185,6 +185,13 @@
     .cs-imp p { margin: 8px 2px 0; color: #6b5226; font-size: 15px; line-height: 1.55; word-break: keep-all; }
     .cs-imp ol { margin: 8px 0 0; padding-left: 22px; color: #3d2f17; font-size: 15px; line-height: 1.6; word-break: keep-all; }
     .cs-imp .cs-del { margin-top: 8px; padding: 0; border: 0; background: none; color: #8a6a3a; font: inherit; font-size: 15px; text-decoration: underline; cursor: pointer; }
+    .imp-open { background: #FFF8E6; border-color: #F1D9A0; color: #6b4a10; } .imp-open small { color: #7A6448; }
+    .st { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0 0; }
+    .st > b { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #B3132B; color: #fff; font-size: 16px; line-height: 28px; text-align: center; }
+    .st > div { flex: 1; color: #2b2112; font-size: 16.5px; line-height: 1.5; word-break: keep-all; }
+    .mk { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 5px; padding: 6px 10px; border-radius: 12px; background: #fff; border: 1px solid #E6D6B8; color: #555; font-size: 15px; }
+    .mk em { font-style: normal; padding: 2px 8px; border-radius: 8px; border: 2px solid #B3132B; color: #0A60D6; font-weight: 800; background: #fff; }
+    .imp-help { margin: 10px 2px 0; color: #7A6448; font-size: 15px; line-height: 1.5; word-break: keep-all; }
     .cs-h { margin: 12px 4px 2px; color: #8E0A1C; font-size: 15px; font-weight: 900; }
     .cs-tip { margin: 10px 2px 0; color: #7A6448; font-size: 15px; line-height: 1.5; word-break: keep-all; }
     /* 📇 내 번호 주기 (11-22) */
@@ -725,6 +732,7 @@
       <input type="tel" id="myTel" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="010-1234-5678">
       <p class="telnote">넣으면 받는 사람이 📞 한 번에 전화할 수 있어요. 안 넣어도 돼요.</p>
       <button type="button" class="mytel-send" id="sendMyTel">📇 내 번호 카톡으로 주기<small>받은 사람 싸바 연락처·폰 연락처에 저장돼요</small></button>
+      <button type="button" class="mytel-send imp-open" id="openImp">📒 내 연락처 싸바에 넣기<small>답장 온 사람을 이름으로 바로 찾아 전화 · 한 번만</small></button>
     </div>
 
     <div class="send">
@@ -996,10 +1004,10 @@
     try { localStorage.setItem(PHB, JSON.stringify(b)); return b.length; } catch (e) { return -1; }
   }
   function fmtTel(t) { return String(t).replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3'); }
-  function callSheet() {
+  function callSheet(mode) {
     var old = $('callSheet'); if (old) old.remove();
     var w = document.createElement('div'); w.id = 'callSheet'; w.className = 'csheet';
-    w.innerHTML = '<div class="cs-in" role="dialog" aria-label="번호 찾아 전화"><h2>📒 번호 찾아 전화</h2>' +
+    w.innerHTML = '<div class="cs-in" role="dialog" aria-label="번호 찾아 전화"><h2>' + (mode === 'imp' ? '📒 내 연락처 싸바에 넣기' : '📒 번호 찾아 전화') + '</h2>' +
       (navigator.contacts && navigator.contacts.select ? '<button type="button" class="cs-ph">📱 폰 연락처에서 찾기</button>' : '') +
       '<div class="cs-imp"></div>' +
       '<input type="search" class="cs-q" placeholder="이름이나 번호로 찾기" aria-label="이름이나 번호로 찾기"><div class="cs-l"></div>' +
@@ -1013,12 +1021,19 @@
       var n = phGet().length;
       IMP.innerHTML = n
         ? '<p style="margin:0">📒 내 폰 연락처 <b>' + n.toLocaleString() + '명</b>이 싸바에 들어 있어요. 위 칸에 이름을 쳐서 찾으세요.</p><button type="button" class="cs-ib" style="margin-top:8px;background:#fff;color:#8E0A1C;border:1.5px solid #E9C9CE">📥 새로 넣기 (바뀐 연락처)</button><button type="button" class="cs-del">이 폰의 싸바에서 연락처 지우기</button>'
-        : '<button type="button" class="cs-ib">📥 내 폰 연락처 싸바에 넣기</button>' +
-          '<p>한 번만 넣어 두면, 답장 온 사람을 싸바 안에서 이름으로 바로 찾아 전화해요. <b>번호는 서버에 안 올라가고 이 폰에만</b> 저장돼요.</p>' +
+        : '<p style="margin:0 0 4px;font-size:16.5px;color:#3d2f17"><b>한 번만 넣어 두면</b>, 답장 온 사람을 이름으로 바로 찾아 전화해요. 번호는 <b>이 폰에만</b> 저장돼요.</p>' +
           (isIOS
-            ? '<ol><li>아이폰 <b>연락처</b> 앱 → 왼쪽 위 <b>목록</b></li><li><b>모든 연락처</b>를 꾹 누르기 → <b>내보내기</b> → <b>파일에 저장</b></li><li>여기로 돌아와 위 빨간 단추 → 저장한 파일 고르기</li></ol>'
-            : '<ol><li><b>연락처</b> 앱 → 메뉴(☰ 또는 ⋮) → <b>연락처 관리</b></li><li><b>연락처 가져오기/내보내기</b> → <b>내보내기</b> → 내장 저장공간</li><li>여기로 돌아와 위 빨간 단추 → 만든 .vcf 파일 고르기</li></ol>') +
-          '<p>※ 카톡 안에서 쓰시면 카톡 안에서, 홈 화면 싸바에서 쓰시면 거기서 넣어 주세요 (따로 저장돼요)</p>';
+            ? '<div class="st"><b>1</b><div>아이폰 <b>연락처</b> 앱을 여세요<br><span class="mk">전화 앱 아래 <em>연락처</em> 를 눌러도 돼요</span></div></div>' +
+              '<div class="st"><b>2</b><div>맨 위 왼쪽 <b>목록</b>을 누르세요<br><span class="mk"><em>‹ 목록</em> 연락처</span></div></div>' +
+              '<div class="st"><b>3</b><div><b>모든 연락처</b>를 손가락으로 <b>꾹</b> 누르면 메뉴가 떠요 → <b>내보내기</b><br><span class="mk">모든 연락처 👆꾹 → <em>내보내기</em></span></div></div>' +
+              '<div class="st"><b>4</b><div><b>파일에 저장</b> → 오른쪽 위 <b>저장</b><br><span class="mk"><em>파일에 저장</em> → <em>저장</em></span></div></div>' +
+              '<div class="st"><b>5</b><div>싸바로 돌아와 아래 빨간 단추 → <b>파일 선택</b> → <b>최근 항목</b>에서 방금 저장한 연락처 파일을 누르세요</div></div>'
+            : '<div class="st"><b>1</b><div><b>연락처</b> 앱을 여세요</div></div>' +
+              '<div class="st"><b>2</b><div>메뉴 <b>☰</b>(또는 ⋮) → <b>연락처 관리</b><br><span class="mk"><em>☰</em> → <em>연락처 관리</em></span></div></div>' +
+              '<div class="st"><b>3</b><div><b>연락처 가져오기/내보내기</b> → <b>내보내기</b> → 내장 저장공간 → <b>내보내기</b><br><span class="mk"><em>내보내기</em> → <em>내장 저장공간</em></span></div></div>' +
+              '<div class="st"><b>4</b><div>싸바로 돌아와 아래 빨간 단추 → <b>최근</b>(또는 내 파일)에서 <b>.vcf</b> 연락처 파일을 누르세요</div></div>') +
+          '<button type="button" class="cs-ib" style="margin-top:14px">📥 저장한 연락처 파일 고르기</button>' +
+          '<p class="imp-help">어려우면 자녀·손주에게 이 화면을 보여 주세요. 1분이면 끝나요.<br>※ 카톡 안 싸바와 홈 화면 싸바는 따로 저장돼요 — 주로 쓰는 곳에서 넣어 주세요.</p>';
       var ib = IMP.querySelector('.cs-ib'); ib.addEventListener('click', function () { fi.click(); });
       var del = IMP.querySelector('.cs-del'); if (del) del.addEventListener('click', function () { try { localStorage.removeItem(PHB); } catch (e) {} toast('연락처를 지웠어요'); impPaint(); paint(); });
     }
@@ -1048,6 +1063,7 @@
       if (ph.length) { head('📒 내 폰 연락처' + (ph.length > 40 ? ' (앞 40명 — 더 쳐서 좁혀 보세요)' : '')); ph.slice(0, 40).forEach(row); }
     }
     impPaint(); paint(); Q.addEventListener('input', paint);
+    if (mode === 'imp') { var cin = w.querySelector('.cs-in'), ph0 = w.querySelector('.cs-ph'); if (ph0) ph0.style.display = 'none'; IMP.parentNode.insertBefore(IMP, IMP.parentNode.querySelector('h2').nextSibling); cin.scrollTop = 0; }
     w.querySelector('.cs-go').addEventListener('click', function () { var t = w.querySelector('.cs-n').value.replace(/[^\d+]/g, ''); if (t.length < 3) { toast('번호를 눌러 주세요'); return; } location.href = 'tel:' + t; });
     var ph = w.querySelector('.cs-ph'); if (ph) ph.addEventListener('click', function () {
       navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (r) { var t = r && r[0] && r[0].tel && r[0].tel[0]; if (t) location.href = 'tel:' + String(t).replace(/[^\d+]/g, ''); }).catch(function () {});
@@ -1917,6 +1933,7 @@
     return { url: url, title: title, desc: desc, phone: phone, img: mode === 'ask' ? (onlyWhere ? 'eodiya-ask.png?v=7' : 'eodiya-hi.png?v=1') : null };
   }
   // 📇 내 번호 카톡으로 주기
+  $('openImp').addEventListener('click', function () { callSheet('imp'); });
   $('sendMyTel').addEventListener('click', function () {
     var from = $('from').value.trim(), t = myTel();
     if (!from) { toast('내 이름을 먼저 적어 주세요'); $('from').focus(); return; }

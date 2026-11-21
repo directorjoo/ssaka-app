@@ -555,7 +555,16 @@
     #v-home.v2 .v2-mk .btn { display: inline-flex; align-items: center; margin-top: 14px; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #C8213A, #B3132B); color: #fff; font-size: 18px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 16px -10px rgba(120,10,30,.7); }
     #v-home.v2 .v2-mk .dance { position: absolute; right: 14px; top: 16px; width: 76px; height: auto; pointer-events: none; }
     /* 11-22 대표님: 싸바카드 칸도 사진 돌리기 — 실제로 만드는 카드 예시가 바뀜 (어디야와 엇갈려 바뀜) */
-    #v-home.v2 .v2-mk .mkph { position: relative; display: block; height: 150px; margin: 0 12px 12px; border-radius: 18px; overflow: hidden; background: #E9E3B0; box-shadow: 0 8px 18px -12px rgba(90,60,10,.7); border: 3px solid #fff; }
+    #v-home.v2 .v2-mk .mkph { position: relative; display: block; aspect-ratio: 16 / 9; margin: 0; overflow: hidden; background: #E9E3B0; } /* 11-22 대표님: 가로 꽉 차게 16:9 */
+    /* 11-22: 언니김치 특판은 싸바카드에서 빼서 따로 카드 하나 (16:9 사진 + 글씨 + 단추) */
+    #v-home.v2 .v2-kc { background: #fff; color: #1A1A1A; }
+    #v-home.v2 .v2-kc .kp { display: block; aspect-ratio: 16 / 9; background: url(../img/kimchi-wide.jpg) center/cover; position: relative; }
+    #v-home.v2 .v2-kc .kp s { position: absolute; top: 12px; left: 12px; padding: 4px 11px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 15px; font-weight: 800; text-decoration: none; }
+    #v-home.v2 .v2-kc .kt { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
+    #v-home.v2 .v2-kc .kt span { flex: 1; min-width: 0; }
+    #v-home.v2 .v2-kc .kt b { display: block; font-size: 21px; font-weight: 900; letter-spacing: -0.02em; }
+    #v-home.v2 .v2-kc .kt small { display: block; margin-top: 2px; font-size: 15px; color: #6B5A4E; }
+    #v-home.v2 .v2-kc .kt u { flex: none; text-decoration: none; padding: 10px 16px; border-radius: 999px; background: linear-gradient(180deg, #C8213A, #B3132B); color: #fff; font-size: 16px; font-weight: 800; }
     #v-home.v2 .v2-mk .mkph .ly { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease, transform 6s ease; transform: scale(1.06); }
     #v-home.v2 .v2-mk .mkph .ly.on { opacity: 1; transform: scale(1); }
     #v-home.v2 .v2-mk .mkph::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.55)); }
@@ -1056,11 +1065,14 @@
     mk.innerHTML = '<div class="tx"><em>🍒 싸바카드</em><h3>우리 모임 소식도,<br>우리 가게 자랑도</h3><p><span class="bt-long">모임공지 · 초대장 · 가게홍보 · 프로필 · 인사</span><span class="bt-short">모임·가게·프로필 카드</span></p>' +
       '<a class="btn" href="#alim">1분에 만들기 ›</a></div>' +
       '<img class="dance" src="../img/cherry-dance-anim.svg" alt="">' +
-      '<a class="mkph" href="#alim" aria-label="싸바카드 예시 보기"><s>이런 카드</s><b></b></a>' +
-      '<a class="sp" href="../kimchi/"><i style="background-image:url(../img/gatkimchi-sign.jpg)"></i><span><b>언니김치 특판</b><small>특판 코너에서 가격을 확인하세요</small></span><u>›</u></a>';
+      '<a class="mkph" href="#alim" aria-label="싸바카드 예시 보기"><s>이런 카드</s><b></b></a>';
     tapGo(mk, '#alim');
     v.appendChild(mk);
     rotPics(mk.querySelector('.mkph'), MK_PICS, 2200);
+    // 언니김치 특판 — 따로 카드 (11-22)
+    var kc = el('a', 'v2c v2-kc'); kc.href = '../kimchi/'; kc.setAttribute('aria-label', '여수 언니 갓김치 특판 보기');
+    kc.innerHTML = '<span class="kp"><s>🔥 특판</s></span><span class="kt"><span><b>여수 언니 갓김치</b><small>5kg 60,000원 · 배송비 포함 · 작년 가격 그대로</small></span><u>보러 가기 ›</u></span>';
+    v.appendChild(kc);
 
     // 3. 오늘의 싸바 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘의 싸바 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');

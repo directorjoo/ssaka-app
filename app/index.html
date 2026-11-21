@@ -897,6 +897,7 @@
   }
   // ===== 새 홈 시안 v2 (11-21) — sava.kr/app/?v2 로 열 때만. 지금 홈은 그대로 =====
   // 원칙: 카드 틀 하나로 통일, 큰 색은 체리·초록·금색 셋, 나머지는 흰 카드, 카드 사이 28px, 설명 한 줄
+  var HOME_V2 = /[?&]v2\b/.test(location.search); // 처음 열 때 한 번만 확인 (주소가 바뀌어도 시안 유지)
   function renderHomeV2() {
     var v = $('v-home'); v.innerHTML = ''; v.classList.add('v2');
     var now = new Date();
@@ -945,7 +946,7 @@
     v.appendChild(duo);
   }
   function renderHome() {
-    if (/[?&]v2\b/.test(location.search)) return renderHomeV2();
+    if (HOME_V2) return renderHomeV2();
     var v = $('v-home'); v.innerHTML = '';
     var now = new Date();
     var hi = el('div', 'n-hello');
@@ -1246,7 +1247,7 @@
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
-    try { history.replaceState(null, '', name === 'home' ? location.pathname : '#' + name); } catch (e) {}
+    try { history.replaceState(null, '', name === 'home' ? location.pathname + (HOME_V2 ? '?v2' : '') : (HOME_V2 ? '?v2' : '') + '#' + name); } catch (e) {}
     window.scrollTo(0, 0);
   }
   function renderAll() { show(current); refreshDots(); }

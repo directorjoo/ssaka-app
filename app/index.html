@@ -1122,9 +1122,6 @@
     if (reduce && !stopped) { bt.hidden = true; return; } // 움직임 줄이기면 첫 사진만
     clearTimeout(tm); tm = setTimeout(tick, o.delay || 0);
   }
-  // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)
-  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg?v=2', '30%'], ['../img/ex/face3.jpg?v=2', '35%'], ['../img/ex/face2.jpg?v=2', '30%'],
-    ['../img/ex/face8.jpg?v=2', '12%'], ['../img/ex/face6.jpg?v=2', '30%'], ['../img/ex/face4.jpg?v=2', '30%'], ['../img/ex/face7.jpg?v=2', '45%'], ['../img/ex/face5.jpg?v=2', '30%']];
   function eoFaces(ph) {
     if (!ph) return;
     var sec = ph.parentNode, bg = document.createElement('div'); bg.className = 'bgx';

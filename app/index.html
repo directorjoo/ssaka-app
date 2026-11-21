@@ -577,7 +577,10 @@
     #v-home.v2 .v2-kc { background: #fff; color: #1A1A1A; }
     #v-home.v2 .v2-kc .kp { display: block; aspect-ratio: 16 / 9; background: url(../img/kimchi-wide.jpg) center/cover; position: relative; }
     #v-home.v2 .v2-kc { margin-top: 28px; }
-    #v-home.v2 .v2-kc .kp s { position: absolute; top: 12px; left: 12px; padding: 10px 22px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 34px; font-weight: 900; letter-spacing: -0.02em; text-decoration: none; box-shadow: 0 6px 16px -6px rgba(0,0,0,.6); }
+    /* 11-22 대표님: 빨간 특판이 너무 셈 → '싸바 특판', 글씨 2/3(34→23px), 부드러운 체리색 + 어제 알림판처럼 흔들리는 광고판 */
+    #v-home.v2 .v2-kc .kp s { position: absolute; top: 14px; left: 14px; padding: 7px 15px; border-radius: 999px; background: linear-gradient(180deg, #FCE4E8, #F7CDD5); color: #9E1530; border: 2px solid #fff; font-size: 23px; font-weight: 900; letter-spacing: -0.02em; text-decoration: none; text-shadow: 0 1px 0 #fff; box-shadow: 0 6px 14px -6px rgba(0,0,0,.45); transform-origin: 50% -14px; animation: kcSwing 1.8s ease-in-out infinite; }
+    @keyframes kcSwing { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+    @media (prefers-reduced-motion: reduce) { #v-home.v2 .v2-kc .kp s { animation: none; } }
     #v-home.v2 .v2-kc .kt { display: flex; align-items: center; gap: 12px; padding: 14px 16px 16px; }
     #v-home.v2 .v2-kc .kt span { flex: 1; min-width: 0; }
     #v-home.v2 .v2-kc .kt b { display: block; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
@@ -1120,7 +1123,7 @@
     v.appendChild(duo);
     // 언니김치 특판 — 따로 카드, 홈 맨 아래 (11-22 대표님)
     var kc = el('a', 'v2c v2-kc'); kc.href = '../kimchi/'; kc.setAttribute('aria-label', '여수 언니 갓김치 특판 보기');
-    kc.innerHTML = '<span class="kp"><s>🔥 특판</s></span><span class="kt"><span><b>여수 언니 갓김치</b><small>5kg 60,000원 · 배송비 포함 · 작년 가격 그대로</small></span><u>보러 가기 ›</u></span>';
+    kc.innerHTML = '<span class="kp"><s>🍒 싸바 특판</s></span><span class="kt"><span><b>여수 언니 갓김치</b><small>5kg 60,000원 · 배송비 포함 · 작년 가격 그대로</small></span><u>보러 가기 ›</u></span>';
     v.appendChild(kc);
   }
   // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)

@@ -198,6 +198,7 @@
     .dcols button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px 0 8px; border-radius: 999px; border: 1.5px solid #E5E5E5; background: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
     .dcols button i { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
     .dcols button[aria-pressed="true"] { border-color: #B3132B; box-shadow: 0 0 0 2px #B3132B inset; }
+    .dcols button.ph-best { position: relative; } .dcols button.ph-best::after { content: "📸"; position: absolute; top: -9px; right: -6px; font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
     @media (min-width: 860px) { .inds { flex-wrap: wrap; overflow: visible; } }
     /* 휴대폰: 디자인 12가지를 옆으로 밀지 않고 3칸 격자로 한눈에 */
     @media (max-width: 859px) {
@@ -1377,8 +1378,65 @@
     var more = []; (vivs.length ? vivs : mid).forEach(function (c) { if (more.length < 3 && more.every(function (m) { return dist(m, c) > 70; })) more.push(c); });
     return { dom: dom.hex, viv: viv, more: more.map(function (c) { return c.hex; }), show: [dom.hex, viv].concat(more.map(function (c) { return c.hex; })).filter(function (v, i, a) { return a.indexOf(v) === i; }).slice(0, 5) };
   }
+  // ---------- 📸 원칙 3: 사진 색에서 바탕 고르기 (투데이 카드) ----------
+  // 투데이 카드는 사진 아래쪽이 바탕 맨 위 색(g[0])으로 번짐 → 사진 아래 띠 색과 가장 가까운 표준 12색을 고름
+  var PHEDGE = null, PHDOM = null, colTouched = false, edgeFor = '';
+  function lab(h) {
+    var n = parseInt(String(h).replace('#', ''), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) { v /= 255; return v > 0.04045 ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92; });
+    var X = (c[0] * 0.4124 + c[1] * 0.3576 + c[2] * 0.1805) / 0.95047, Y = c[0] * 0.2126 + c[1] * 0.7152 + c[2] * 0.0722, Z = (c[0] * 0.0193 + c[1] * 0.1192 + c[2] * 0.9505) / 1.08883;
+    var f = function (t) { return t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116; };
+    return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
+  }
+  function dE(a, b) { // 색상(hue)을 가장 따지고, 진하기·밝기는 덜 (번짐이 밝기를 메워 줌)
+    a = lab(a); b = lab(b);
+    var C1 = Math.hypot(a[1], a[2]), C2 = Math.hypot(b[1], b[2]), dh = Math.atan2(a[2], a[1]) - Math.atan2(b[2], b[1]), H = 2 * Math.sqrt(C1 * C2) * Math.sin(dh / 2);
+    return Math.sqrt(Math.pow((a[0] - b[0]) * 0.3, 2) + Math.pow((C1 - C2) * 0.6, 2) + H * H);
+  }
+  function photoEdge(img) { // 사진 아래 20% 띠의 평균색 (가운데를 더 쳐줌)
+    var W = 40, H = 50, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var x = cv.getContext('2d'); x.drawImage(img, 0, 0, W, H);
+    var d = x.getImageData(0, Math.floor(H * 0.8), W, H - Math.floor(H * 0.8)).data, r = 0, g = 0, b = 0, n = 0;
+    for (var i = 0; i < d.length; i += 4) { var px = (i / 4) % W, w = 1 - Math.abs(px - W / 2) / W; r += d[i] * w; g += d[i + 1] * w; b += d[i + 2] * w; n += w; }
+    return hx(r / n, g / n, b / n);
+  }
+  function todayMatch(id) { // 같은 투데이 묶음에서 사진에 가장 맞는 색의 디자인 id
+    if (!PHEDGE || !D.colorsOf) return null;
+    var vs = D.colorsOf(id); if (!vs.length || vs[0].style !== 'today') return null;
+    var best = null, bd = 1e9;
+    vs.forEach(function (d) { var g = (d.pal && d.pal.g) || [d.colors.bg]; var sc = dE(PHEDGE, g[0]) * 0.75 + (PHDOM ? dE(PHDOM, g[1] || g[0]) * 0.25 : 0); if (sc < bd) { bd = sc; best = d.id; } });
+    return best;
+  }
+  function edgeLoad(u) { // 사진이 바뀌면 아래 띠 색을 다시 재고, 투데이 카드면 바탕을 맞춰 줌
+    if (!u) { PHEDGE = PHDOM = null; edgeFor = ''; return; }
+    if (edgeFor === u) return;
+    edgeFor = u;
+    var im = new Image(), blob = localPics[u];
+    im.onload = function () {
+      try { PHEDGE = photoEdge(im); PHDOM = photoColors(im).dom; } catch (e) { PHEDGE = PHDOM = null; return; }
+      if (edgeFor !== u) return;
+      var cd = D.get(design), m = cd && cd.style === 'today' && !colTouched ? todayMatch(design) : null;
+      if (m && m !== design) {
+        var t = document.querySelector('.tcard[data-id="' + design + '"]'), nd = D.get(m);
+        if (t && nd) { var ex = EX(), shown = Object.assign({}, ex, { title: v('title') || ex.title, subtitle: v('subtitle') || ex.subtitle, body: v('body') || ex.body, name: v('name') || ex.name }); t.replaceWith(thumb(nd, shown)); }
+        setDesign(m);
+        toast('📸 사진 색에 맞춰 바탕을 \'' + (nd && nd.colorName || '') + '\'(으)로 바꿨어요');
+      } else paintCols();
+      renderTodayThumb();
+    };
+    if (blob) im.src = URL.createObjectURL(blob); else { im.crossOrigin = 'anonymous'; im.src = (window.SsakaExport && SsakaExport._h.viaPic) ? SsakaExport._h.viaPic(u) : u; }
+  }
+  function renderTodayThumb() { // 갤러리의 투데이 칸도 사진에 맞는 색으로 (고른 디자인이 투데이가 아닐 때)
+    var cd = D.get(design);
+    document.querySelectorAll('.tcard').forEach(function (t) {
+      var d = D.get(t.dataset.id); if (!d || d.style !== 'today' || (cd && cd.style === 'today')) return;
+      var m = todayMatch(d.id); if (!m || m === d.id) return;
+      var ex = EX(), shown = Object.assign({}, ex, { title: v('title') || ex.title, subtitle: v('subtitle') || ex.subtitle, body: v('body') || ex.body, name: v('name') || ex.name });
+      t.replaceWith(thumb(D.get(m), shown));
+    });
+  }
   function makePhotoSug() {
     var u = v('image');
+    try { if (u !== edgeFor) edgeLoad(u); else if (PHEDGE) renderTodayThumb(); } catch (e) {}
     if (!u) { PHPAL = null; PHFOR = ''; $('phSug').hidden = true; $('phTip').hidden = false; return; }
     if (PHFOR === u && PHPAL) return paintPhotoSug();
     var im = new Image(), blob = localPics[u];
@@ -1404,13 +1462,16 @@
     var vs = D.colorsOf ? D.colorsOf(design) : [];
     box.hidden = vs.length < 2; box.innerHTML = '';
     if (box.hidden) return;
-    var lab = document.createElement('span'); lab.textContent = '🎨 색'; box.appendChild(lab);
+    var mt = todayMatch(design);
+    var lb = document.createElement('span'); lb.textContent = mt ? '🎨 색 · 📸=사진에 맞는 색' : '🎨 색'; box.appendChild(lb);
     vs.forEach(function (d) {
       var b = document.createElement('button'); b.type = 'button';
       var i = document.createElement('i'); i.style.background = d.colors.g ? 'linear-gradient(160deg,' + d.colors.g.join(',') + ')' : 'linear-gradient(135deg,' + d.colors.bg + ' 50%,' + d.colors.accent + ' 50%)';
-      b.appendChild(i); b.setAttribute('aria-label', '색 ' + (d.c || ''));
+      b.appendChild(i); b.setAttribute('aria-label', '색 ' + (d.c || '') + (d.id === mt ? ' (사진에 맞는 색)' : ''));
+      if (d.id === mt) { b.classList.add('ph-best'); b.title = '사진에 맞는 색'; }
       b.setAttribute('aria-pressed', d.id === design ? 'true' : 'false');
       b.addEventListener('click', function () {
+        colTouched = true;
         var t = document.querySelector('.tcard[data-id="' + design + '"]');
         design = d.id;
         if (t) { var ex = EX(), shown = Object.assign({}, ex, { title: v('title') || ex.title, subtitle: v('subtitle') || ex.subtitle, body: v('body') || ex.body, name: v('name') || ex.name }); t.replaceWith(thumb(d, shown)); }

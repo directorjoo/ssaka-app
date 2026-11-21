@@ -22,7 +22,8 @@
   ov.innerHTML = '<div class="vc-box"><div class="vc-mic">🎤</div><div class="vc-t">듣고 있어요</div><div class="vc-s"></div><div class="vc-ex">예) 철수한테 토요일에 밥 먹자고 해 줘</div><button type="button" class="vc-x">그만</button></div>';
   document.body.appendChild(ov);
   var $t = ov.querySelector('.vc-t'), $s = ov.querySelector('.vc-s'), $ex = ov.querySelector('.vc-ex');
-  var rec = null, heard = '', done = false;
+  var rec = null, heard = '', done = false, wd = 0;
+  var inKakao = /KAKAOTALK/i.test(navigator.userAgent);
 
   function show(t, s, busy) { ov.classList.add('on'); ov.classList.toggle('busy', !!busy); $t.textContent = t; $s.textContent = s || ''; $ex.style.display = busy ? 'none' : ''; }
   function hide() { ov.classList.remove('on'); }
@@ -51,6 +52,7 @@
     if (ta) { ta.focus(); }
   }
   function start() {
+    if (inKakao) return noMic('카톡 안에서는 마이크가 안 열려요. 글칸을 누르고 키보드의 🎤 단추로 말해 주세요');
     if (!SR) return noMic('이 화면은 말 듣기를 못 해요. 크롬·사파리에서 sava.kr을 열거나, 키보드의 🎤 단추로 말해 주세요');
     heard = ''; done = false;
     try {
@@ -61,16 +63,21 @@
       heard = s.trim(); $s.textContent = heard;
     };
     rec.onerror = function (e) {
-      done = true;
+      clearTimeout(wd); done = true;
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') noMic('마이크 허락이 필요해요. 막혀 있으면 키보드의 🎤 단추로 말해 주세요');
       else if (e.error === 'no-speech') { hide(); tip('아무 말도 안 들렸어요. 다시 눌러 말해 주세요'); }
       else if (e.error !== 'aborted') noMic();
     };
-    rec.onend = function () { if (done) return; done = true; if (heard.length >= 2) polish(heard); else { hide(); tip('아무 말도 안 들렸어요. 다시 눌러 말해 주세요'); } };
+    rec.onend = function () { clearTimeout(wd); if (done) return; done = true; if (heard.length >= 2) polish(heard); else { hide(); tip('아무 말도 안 들렸어요. 다시 눌러 말해 주세요'); } };
+    var started = false;
+    rec.onstart = function () { started = true; clearTimeout(wd); wd = setTimeout(function () { if (!done) { try { rec.stop(); } catch (e) {} } }, 12000); };
     show('듣고 있어요', '');
-    try { rec.start(); } catch (e) { noMic(); }
+    try { rec.start(); } catch (e) { return noMic(); }
+    wd = setTimeout(function () { if (!started && !done) { quit(); noMic(); } }, 3000); // 3초 안에 안 열리면 키보드 🎤로
   }
-  ov.querySelector('.vc-x').addEventListener('click', function () { if (rec && !ov.classList.contains('busy')) { try { rec.stop(); } catch (e) {} } else { hide(); } });
+  function quit() { done = true; clearTimeout(wd); if (rec) { try { rec.onend = rec.onerror = rec.onresult = null; rec.abort(); } catch (e) {} } rec = null; hide(); }
+  ov.querySelector('.vc-x').addEventListener('click', function (e) { e.stopPropagation(); quit(); }); // 무슨 상태든 바로 닫힘 (11-21)
+  ov.addEventListener('click', function (e) { if (e.target === ov) quit(); });
 
   function mount() {
     var ta = document.getElementById('gText'); if (!ta) return false;

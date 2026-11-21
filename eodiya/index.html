@@ -20,6 +20,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="../css/brand.css?v=2">
+  <link rel="stylesheet" href="../css/steps.css?v=1">
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
@@ -659,14 +660,18 @@
       <button type="button" class="mode" data-mode="play" aria-pressed="false"><i><img src="../img/cherry-dance-anim.svg?v=1" alt="" width="40" height="40" style="display:block;margin:-4px 0"></i><b>놀자!</b><span>친구들 불러<br>함께 놀아요</span><em class="sh">친구 부르기</em></button>
     </div>
 
-    <div class="box" id="askBox">
-      <div class="gstep first" id="gWho">🙋 누구에게 보내요?</div>
-      <div class="gsubs" id="gSubs"></div>
-      <div class="gtabs" id="gTabs"></div>
-      <div class="gstep">👇 보내고 싶은 말을 톡! <small>여러 개 눌러도 돼요</small></div>
-      <div class="chips" id="gChips"></div>
-      <div class="rta"><textarea id="gText" maxlength="100" rows="1" placeholder="고른 말이 여기 들어가요">싸바?</textarea><button type="button" id="gClear">지우기</button></div>
-      <div class="note" style="margin-top:8px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
+    <div class="box stp-wrap" id="askBox">
+      <section class="stp s1" id="gWho"><h3 class="stp-h"><span class="stp-n">1</span>누구에게 보내요?</h3><div class="gsubs" id="gSubs"></div></section>
+      <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>어떤 말투로 할까요?</h3><div class="gtabs" id="gTabs"></div></section>
+      <section class="stp s3"><h3 class="stp-h"><span class="stp-n">3</span>보낼 말을 톡! <small>여러 개 눌러도 돼요 · 직접 써도 돼요</small></h3>
+        <div id="gChips"></div>
+        <div class="rta"><textarea id="gText" maxlength="100" rows="1" placeholder="고른 말이 여기 들어가요">싸바?</textarea><button type="button" id="gClear">지우기</button></div>
+      </section>
+      <section class="stp opt" id="gLocBox"><h3 class="stp-h"><span class="stp-n">📍</span>위치도 물어볼까요? <small>선택 · 안 눌러도 돼요</small></h3>
+        <div class="chips" id="gLoc"></div>
+        <button type="button" class="stp-go" id="goCome">📍 내 위치를 보내려면 → 여기야!</button>
+      </section>
+      <div class="note" style="margin-top:10px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
     </div>
 
     <div class="box" id="comeBox" hidden>
@@ -858,12 +863,12 @@
     <input type="file" id="photoIn" accept="image/*" multiple hidden>
     <div class="rbox" id="rBox">
     <div class="rtitle">💬 문자로 답하기</div>
-    <div class="gstep first">🙋 누구에게 답해요?</div>
-    <div class="gsubs" id="rWho" aria-label="누구에게 답하나요"></div>
-    <div class="gtabs" id="rTabs"></div>
-    <div class="gstep">👇 보내고 싶은 말을 톡! <small>여러 개 눌러도 돼요</small></div>
-    <div class="chips" id="rChips"></div>
+    <section class="stp s1"><h3 class="stp-h"><span class="stp-n">1</span>누구에게 답해요?</h3><div class="gsubs" id="rWho" aria-label="누구에게 답하나요"></div></section>
+    <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>어떤 말로 답할까요?</h3><div class="gtabs" id="rTabs"></div></section>
+    <section class="stp s3"><h3 class="stp-h"><span class="stp-n">3</span>보낼 말을 톡! <small>여러 개 눌러도 돼요 · 직접 써도 돼요</small></h3>
+    <div id="rChips"></div>
     <div class="rta"><textarea id="hereText" maxlength="100" rows="1" placeholder="고른 답장이 여기 들어가요"></textarea><button type="button" id="rClear" hidden>지우기</button></div>
+    </section>
     <div class="bubble" id="rPrev" hidden></div>
     <button type="button" class="big red" id="rSend" style="margin-top:12px;width:100%;display:block">💬 답장 보내기</button>
     </div>
@@ -923,6 +928,69 @@
       m.addEventListener('click', function () { o.onOpen(!o.open); });
       cb.appendChild(m);
     }
+  };
+  // ---------- 성격별 묶음 (11-22 대표님: 같은 성격 말끼리 소제목 아래 모아 고르기 쉽게) ----------
+  // 규칙은 위에서부터 먼저 맞는 묶음으로. 마지막 묶음은 나머지 전부
+  var SV_GRP = {
+    ask: [['📞 연락·만남', /통화|전화|바빠|물어볼|보세|보자|볼까|한잔|막걸리|소주|커피|나와|시간 되|시간 내|찾아뵙|찾아뵈|사 드리|사 들고|사 줄|산에|들러|내려올|사진|퇴근|주말|저녁|오늘 뭐|날씨 좋|대접/],
+          ['🍚 밥·건강', /밥|식사|진지|묵었|묵고|묵어|먹|건강|아프|감기|추워|춥|차네|차서|허리|정정|챙겨|쉬셔|쉬세|자라|우산|비 온|굶/],
+          ['💗 마음 전하기', /보고|생각|그립|고마|감사|응원|힘내|수고|고생|죄송|축하|부럽|심심|덕분|청춘|젊|비결|기특|용돈|서운/],
+          ['👋 안부 묻기', /./]],
+    fun: [['🙋 생존 신고', /살아|생존|숨은|조용|수상|소식|연락 안|까먹|연예인|동창회|이러다|무소식|꿈에|혼나기/],
+          ['🍻 불러내기', /소주|커피|한잔|나와|배고|밥 사|사 줄|사 주|시간 내|이번 주|쳐들어|대접|붙어라|맛있는/],
+          ['😆 장난·칭찬', /./]],
+    re:  [['📅 만나요', /보자|보세|날 잡|찾아뵙|들러|와라|사 주|사 들고|사 드리|한잔|커피|가고|다 왔|어디서|전화|쏘는|쏠게|콜|대접|나갈게|모시러|어여|올래|내려오/],
+          ['🍚 밥·건강', /밥|식사|진지|묵었|묵고|묵어|먹었|먹자|먹고|먹어|건강|감기|아프|무리|쉬세|허리|라면|배고|살 빼/],
+          ['💗 마음 전하기', /고마|감사|보고|생각|반갑|누구|미안|죄송|응원|힘|기특|환|횡재|운수|몸 둘|서운|부럽|챙겨/],
+          ['😊 잘 지내요', /./]]
+  };
+  var SV_GRP_SHOW = { ask: ['👋', '🍚', '💗', '📞'], fun: ['🙋', '🍻', '😆'], re: ['😊', '💗', '🍚', '📅'] };
+  window.svGroupOf = function (items, kind) {
+    var R = SV_GRP[kind]; if (!R) return [['', items.slice()]];
+    var out = R.map(function (r) { return [r[0], []]; });
+    items.forEach(function (t) { for (var i = 0; i < R.length; i++) if (R[i][1].test(t)) { out[i][1].push(t); return; } });
+    out = out.filter(function (g) { return g[1].length; });
+    var ord = SV_GRP_SHOW[kind]; // 보이는 차례는 고르는 차례와 따로 (안부 먼저)
+    return ord ? out.sort(function (a, b) { return ord.indexOf(a[0].slice(0, 2)) - ord.indexOf(b[0].slice(0, 2)); }) : out;
+  };
+  // o: { groups:[[소제목, 말들]], first(맨 앞 고정 말), lead(첫 묶음 맨 앞 버튼들), dice, open, onOpen, pick }
+  // 접힌 때는 묶음마다 4개, 펼치면 모두. 소제목이 하나뿐이면 소제목 없이
+  var SV_GROUP_SHOW = 4;
+  window.svGroups = function (cb, o) {
+    cb.innerHTML = '';
+    var fav = svFav(), hidden = 0, many = o.groups.length > 1 && !!o.groups[0][0];
+    function mk(t, star) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = (star ? '⭐ ' : '') + t;
+      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
+      return b;
+    }
+    o.groups.forEach(function (g, gi) {
+      var list = g[1].slice(), head = [];
+      if (gi === 0 && o.first && list.indexOf(o.first) >= 0) { list.splice(list.indexOf(o.first), 1); head = [o.first]; }
+      var stars = list.filter(function (x) { return (fav[x] || 0) >= 2; }).sort(function (a, b) { return fav[b] - fav[a]; }).slice(0, 2);
+      var all = head.concat(stars, svDayMix(list.filter(function (x) { return stars.indexOf(x) < 0; })));
+      var lead = gi === 0 ? (o.lead || []) : [];
+      var room = Math.max(1, SV_GROUP_SHOW - (lead.length ? 1 : 0)), shown = o.open ? all : all.slice(0, room);
+      hidden += all.length - shown.length;
+      var box = document.createElement('div'); box.className = 'grp';
+      if (many) { var h = document.createElement('div'); h.className = 'grp-h'; h.innerHTML = g[0] + ' <em>' + all.length + '</em>'; box.appendChild(h); }
+      var c = document.createElement('div'); c.className = 'chips';
+      shown.forEach(function (t, i) { c.appendChild(mk(t, stars.indexOf(t) >= 0)); if (i === 0) lead.forEach(function (b) { c.appendChild(b); }); });
+      box.appendChild(c); cb.appendChild(box);
+    });
+    var tail = document.createElement('div'); tail.className = 'grp-tail';
+    if (o.dice && o.dice.length) {
+      var d = document.createElement('button'); d.type = 'button'; d.className = 'chip dice'; d.textContent = '🎲 아무 말이나';
+      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
+      tail.appendChild(d);
+    }
+    if (hidden > 0 || o.open) {
+      var m = document.createElement('button'); m.type = 'button'; m.className = 'chip more';
+      m.textContent = o.open ? '접기 ▲' : '더 보기 ▼ (' + hidden + '개 더)';
+      m.addEventListener('click', function () { o.onOpen(!o.open); });
+      tail.appendChild(m);
+    }
+    if (tail.childNodes.length) cb.appendChild(tail);
   };
   // ---------- 지우기 = 뒤로 한 칸 (11-21 대표님: 톡 넣은 말은 한 문장씩, 손으로 쓴 건 한 글자씩, 꾹 누르면 모두) ----------
   window.savaBack = function (ta, phrases, after) {
@@ -1495,10 +1563,11 @@
         RW.forEach(function (w, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = String(w.t).indexOf(' '); b.innerHTML = '<i>' + String(w.t).slice(0, sp) + '</i><b>' + String(w.t).slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === rWho ? 'true' : 'false'); b.addEventListener('click', function () { if (rWho === i) return; rWho = i; rTi = -1; rOpen = false; paintR(); }); wb.appendChild(b); });
         $('callLbl').textContent = RW[rWho].call[0];
         var T = rTabsNow(), ri = rIdx(); rKey = T[ri].k; rTi = ri;
-        var tb = $('rTabs'); tb.innerHTML = ''; tb.className = 'gtabs big';
+        var tb = $('rTabs'); tb.innerHTML = ''; tb.className = 'gtabs big n' + T.length;
         T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === ri ? 'true' : 'false'); b.addEventListener('click', function () { rKey = g.k; rTi = i; rOpen = false; paintR(); }); tb.appendChild(b); });
         var dice = []; T.forEach(function (g) { if (g.k === 'fun' || /사투리/.test(g.t)) dice = dice.concat(g.items); });
-        svChips($('rChips'), { items: T[ri].items, pin: ri === 0 ? 1 : 0, dice: /^(hi|fun)$/.test(rKey) ? dice : null, open: rOpen, onOpen: function (v) { rOpen = v; paintR(); }, pick: function (t) { return addText(t); } });
+        var G = T[ri], gk = G.k === 'fun' ? 'fun' : G.k === 'hi' ? 're' : '';
+        svGroups($('rChips'), { groups: svGroupOf(G.items, gk), first: ri === 0 ? G.items[0] : '', dice: /^(hi|fun)$/.test(rKey) ? dice : null, open: rOpen, onOpen: function (v) { rOpen = v; paintR(); }, pick: function (t) { return addText(t); } });
       }
       $('hereText').addEventListener('input', changed);
       window.savaBackBtn($('rClear'), $('hereText'), function () { var a = []; RW.forEach(function (w) { (w.tabs || []).forEach(function (g) { a = a.concat(g.items || []); }); if (w.call) a.push(w.call[1]); }); return a; }, changed);
@@ -1859,7 +1928,7 @@
   var gWorld = false, gOpen = false;
   // 첫마디: 글칸에 직접 쓰거나, 예시 말을 누르면 글칸 끝에 이어 붙음 (답장 화면과 같은 방식)
   var gTab = 0, gSub = 0, gKinds = ['hi'];
-  function gTabsNow() { return SAY[gSub].concat([LOC]); }
+  function gTabsNow() { return SAY[gSub]; } // 11-22: 위치는 말투 탭에 안 섞고 아래 📍 선택 칸으로
   function askText() { return $('gText').value.replace(/\s+/g, ' ').trim(); }
   function gChanged() {
     var t = askText(); $('gClear').hidden = !t;
@@ -1868,8 +1937,8 @@
   function paintGreet() {
     var T = gTabsNow(); if (gTab >= T.length) gTab = 0; var G = T[gTab];
     var sb = $('gSubs'); sb.innerHTML = ''; // 누구에게는 늘 맨 위에 (11-21)
-    WHO.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = x.indexOf(' '); b.innerHTML = '<i>' + x.slice(0, sp) + '</i><b>' + x.slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { if (gSub === i) return; var wasLoc = T[gTab].k === 'loc'; gSub = i; gTab = wasLoc ? 0 : Math.min(gTab, SAY[i].length - 1); gOpen = false; gWorld = false; paintGreet(); }); sb.appendChild(b); });
-    var tb = $('gTabs'); tb.innerHTML = ''; tb.className = 'gtabs big' + (T.length <= 3 ? ' n3' : '');
+    WHO.forEach(function (x, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gsub'; var sp = x.indexOf(' '); b.innerHTML = '<i>' + x.slice(0, sp) + '</i><b>' + x.slice(sp + 1) + '</b>'; b.setAttribute('aria-pressed', i === gSub ? 'true' : 'false'); b.addEventListener('click', function () { if (gSub === i) return; gSub = i; gTab = Math.min(gTab, SAY[i].length - 1); gOpen = false; gWorld = false; paintGreet(); }); sb.appendChild(b); });
+    var tb = $('gTabs'); tb.innerHTML = ''; tb.className = 'gtabs big n' + T.length;
     T.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'gtab'; b.textContent = g.t; b.setAttribute('aria-pressed', i === gTab ? 'true' : 'false'); b.addEventListener('click', function () { gTab = i; gOpen = false; gWorld = false; paintGreet(); }); tb.appendChild(b); });
     var lead = [], first = gTab === 0;
     if (first) { // 다정하게·정중하게 탭: 맨 앞 말 다음에 🌏 세계 인사
@@ -1878,9 +1947,11 @@
       if (gWorld) WORLD_G.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip wi'; b.textContent = t; b.addEventListener('click', function () { if (gAdd(t, 'world') !== false) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } }); lead.push(b); });
     }
     var fun = SAY[gSub].filter(function (g) { return g.k === 'fun'; })[0];
-    svChips($('gChips'), { items: G.items, pin: first ? 1 : 0, lead: lead, dice: G.k === 'loc' ? null : fun.items.concat(gSub < 2 ? SAY[gSub][3].items : []), open: gOpen || gWorld,
+    svGroups($('gChips'), { groups: svGroupOf(G.items, G.k === 'fun' ? 'fun' : 'ask'), first: first ? G.items[0] : '', lead: lead, dice: fun.items.concat(gSub < 2 ? SAY[gSub][3].items : []), open: gOpen || gWorld,
       onOpen: function (v) { gOpen = v; paintGreet(); },
-      pick: function (t) { return gAdd(t, /통화|바빠|물어볼|전화/.test(t) ? 'call' : /사진/.test(t) ? 'pic' : G.k === 'loc' ? 'loc' : 'hi'); } });
+      pick: function (t) { return gAdd(t, /통화|바빠|물어볼|전화/.test(t) ? 'call' : /사진/.test(t) ? 'pic' : 'hi'); } });
+    var lc = $('gLoc'); lc.innerHTML = ''; // 📍 위치 묻는 말 (선택)
+    LOC.items.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.addEventListener('click', function () { if (gAdd(t, 'loc') !== false) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } }); lc.appendChild(b); });
     gChanged();
   }
   function gAdd(t, k) {
@@ -1892,6 +1963,7 @@
   function gPhrases() { var a = WORLD_G.concat(LOC.items); SAY.forEach(function (w) { w.forEach(function (g) { a = a.concat(g.items); }); }); return a; }
   window.savaBackBtn($('gClear'), $('gText'), gPhrases, function () { if (!askText()) gKinds = []; gChanged(); });
   paintGreet();
+  $('goCome').addEventListener('click', function () { var m = document.querySelector('.mode[data-mode="come"]'); if (m) { m.click(); m.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
 
   function build() {
     var from = $('from').value.trim(), phone = '';

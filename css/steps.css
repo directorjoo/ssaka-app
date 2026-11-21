@@ -1,0 +1,31 @@
+/* 싸바 공통 "쓰기 화면" 틀 (11-22 대표님: 모든 쓰기·고르기 화면을 같은 틀로)
+   ① 단계 상자 .stp — 번호 동그라미 + 제목, 상자마다 바탕이 달라 단계가 한눈에
+   ② 묶음 소제목 .grp-h — 같은 성격의 말끼리 모아 고르기 쉽게
+   ③ 선택 칸 .stp.opt — 점선 테두리, "안 눌러도 돼요"
+   한 화면 2~3색 원칙: 연분홍(1) · 크림(2) · 흰색(3) + 선택 칸은 점선만 */
+.stp-wrap { padding: 12px !important; }
+.stp { position: relative; margin: 0 0 12px; padding: 14px 12px 14px; border-radius: 18px; border: 1.5px solid #F1DCD6; background: #fff; }
+.stp:last-child { margin-bottom: 0; }
+.stp.s1 { background: linear-gradient(180deg, #FFF3F5 0%, #FFE9ED 100%); border-color: #F6CDD5; }
+.stp.s2 { background: linear-gradient(180deg, #FFFAF1 0%, #FFF1DC 100%); border-color: #F1DDBB; }
+.stp.s3 { background: #fff; border: 2px solid #B3132B; box-shadow: 0 8px 18px -14px rgba(179,19,43,.6); }
+.stp.opt { background: #FFFDF9; border: 2px dashed #E3C2BA; }
+.stp-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 0 0 12px; font-size: 20px; font-weight: 900; color: #2b2420; letter-spacing: -0.04em; line-height: 1.25; }
+.stp-n { flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #B3132B; color: #fff; font-size: 16px; font-weight: 900; box-shadow: 0 2px 0 #7A0C1C; }
+.stp.opt .stp-n { background: #fff; color: #B3132B; border: 2px solid #B3132B; box-shadow: none; font-size: 15px; }
+.stp-h small { flex-basis: 100%; padding-left: 38px; font-size: 15px; font-weight: 700; color: #7A5A3A; letter-spacing: -0.03em; }
+.stp > .gsubs, .stp > .gtabs { margin-bottom: 0 !important; }
+/* 묶음 소제목 */
+.grp { margin: 0 0 12px; }
+.grp:last-child { margin-bottom: 0; }
+.grp-h { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 16px; font-weight: 900; color: #8E0F22; letter-spacing: -0.03em; }
+.grp-h::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, #F0C9D0, transparent); }
+.grp-h em { font-style: normal; font-size: 14px; font-weight: 700; color: #A88; }
+.grp .chips { gap: 7px; }
+.grp-tail { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #EBD5D0; }
+/* 말투 탭이 4개·2개면 두 줄 두 칸 */
+#gTabs.big.n2, #gTabs.big.n4, .gtabs.big.n2, .gtabs.big.n4 { grid-template-columns: repeat(2, 1fr) !important; }
+/* 선택 칸 안 이동 단추 */
+.stp-go { display: block; width: 100%; margin-top: 10px; min-height: 46px; border-radius: 14px; border: 1.5px solid #B3132B; background: #fff; color: #B3132B; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+html.bigtxt .stp-h small { display: none; }
+html.bigtxt .grp-h em { display: none; }

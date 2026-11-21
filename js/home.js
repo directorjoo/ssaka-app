@@ -176,15 +176,15 @@
     if (document.querySelector('.sava-dock')) return;
     var st = document.createElement('style');
     var shift = (ds.shift || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
-    st.textContent = ':root{--sava-dock:calc(' + DOCK + 'px + env(safe-area-inset-bottom))}' +
-      '.sava-dock{position:fixed;left:0;right:0;bottom:0;z-index:9980;height:var(--sava-dock);padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box;background:rgba(255,255,255,.97);border-top:1px solid rgba(0,0,0,.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font:800 15px/1 ' + FONT + '}' +
-      '.sava-dock-in{max-width:560px;height:' + DOCK + 'px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:8px 12px;box-sizing:border-box}' +
-      '.sava-dock button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:14px;background:#F3F1EE;color:#1a1a1a;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}' +
+    // 11-21 디자인 기준서 원칙 9: 앱스토어식 떠 있는 유리 알약 (홈 아래 메뉴와 같은 모양)
+    st.textContent = ':root{--sava-dock:calc(' + (DOCK + 14) + 'px + env(safe-area-inset-bottom))}' +
+      '.sava-dock{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:9980;max-width:536px;margin:0 auto;height:' + DOCK + 'px;box-sizing:border-box;border-radius:999px;background:rgba(255,255,255,.82);box-shadow:0 0 0 1px rgba(255,255,255,.7) inset,0 12px 30px -12px rgba(60,20,20,.4);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);font:800 16px/1 ' + FONT + '}' +
+      '.sava-dock-in{height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:6px;box-sizing:border-box}' +
+      '.sava-dock button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:999px;background:none;color:#4a423c;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s}' +
       '.sava-dock button b{font-size:18px;line-height:1}' +
-      '.sava-dock .p{background:#3B4250;color:#fff;box-shadow:0 3px 0 #252A33}' +
-      '.sava-dock .h{background:#B3132B;color:#fff;box-shadow:0 3px 0 #7E0C1E}' +
-      '.sava-dock .k{background:#FFF6C2;color:#3A1D1D;box-shadow:0 3px 0 #E5D27A;border:1px solid #F0DC7A}' +
-      '.sava-dock button:active{transform:translateY(2px);box-shadow:none}'+'.sava-dock button:focus-visible{outline:3px solid #B3132B;outline-offset:2px}' +
+      '.sava-dock .h{background:linear-gradient(180deg,#FFE8EB 0%,#FBD7DD 100%);color:#B3132B}' +
+      '.sava-dock .k{background:#FFF6C2;color:#3A1D1D}' +
+      '.sava-dock button:active{transform:scale(.95)}'+'.sava-dock button:focus-visible{outline:3px solid #B3132B;outline-offset:2px}' +
       '.sava-dock-sp{height:var(--sava-dock)}' +
       '.toast{bottom:calc(var(--sava-dock) + 18px) !important}' +
       (shift.length ? shift.join(',') + '{bottom:var(--sava-dock) !important}' : '') +
@@ -193,7 +193,7 @@
     var n = document.createElement('nav');
     n.className = 'sava-dock'; n.setAttribute('aria-label', '이동');
     n.innerHTML = '<div class="sava-dock-in"><button type="button" class="p" aria-label="이전 화면으로"><b aria-hidden="true">‹</b>이전</button>' +
-      '<button type="button" class="h" aria-label="싸바 홈으로"><b aria-hidden="true">🏠</b>홈</button>' +
+      '<button type="button" class="h" aria-label="싸바 홈으로"><b aria-hidden="true">🍒</b>홈</button>' +
       '<button type="button" class="k" aria-label="카카오톡 대화방으로 돌아가기 (보내기 아님)"><b aria-hidden="true">↩</b>카톡방으로</button></div>';
     n.querySelector('.p').addEventListener('click', goBack);
     n.querySelector('.h').addEventListener('click', goHome);

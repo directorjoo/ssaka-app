@@ -1,0 +1,62 @@
+/* 싸바 체리 탭 — 동그라미 고르기 단추를 체리 한 알 모양으로 (2026-11-21, docs/DESIGN.md 원칙 9)
+   몸통: 위가 살짝 들어가고 아래가 통통한 체리 / 꼭지·잎: ::before 그림 / 고르면 체리 레드 테두리 + 연분홍 속
+   쓰는 곳: 싸바카드 "무엇을 알릴까요?"(make .inds.circ), 오늘의 싸바 생활 채널(today .cb)
+   새 곳에 쓰려면: 동그라미 아이콘 칸에 class="chy" 를 붙이고, 고른 상태는 부모의 aria-pressed="true" 또는 .on */
+
+.chy,
+.inds.circ .ind-grid button i,
+.cb i {
+  position: relative;
+  overflow: visible;
+  margin-top: 14px;                 /* 꼭지 자리 */
+  border-radius: 50% 50% 47% 47% / 44% 44% 56% 56% !important;
+}
+.chy::before,
+.inds.circ .ind-grid button i::before,
+.cb i::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -17px;
+  width: 30px;
+  height: 22px;
+  transform: translateX(-34%);
+  pointer-events: none;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 22'%3E%3Cpath d='M11 21.5C11 14 13 7 17.5 2.5' fill='none' stroke='%236B4423' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M17.5 3.5c3-3.2 8.6-3.4 11.5-1.6-1.8 3.6-7.4 5.4-11.5 1.6z' fill='%233E8E3A'/%3E%3Cpath d='M18.6 3.3c3-.9 6.2-1.2 9.2-1.2' fill='none' stroke='%23246B22' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+/* 몸통 윗가운데 살짝 들어간 자리 + 반짝 빛 */
+.chy::after,
+.inds.circ .ind-grid button i::after,
+.cb i::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  top: 18%;
+  width: 22%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .85);
+  transform: rotate(-28deg);
+  pointer-events: none;
+}
+
+/* 고른 체리: 체리 레드 테두리 + 연분홍 속 (오늘의 싸바는 채널 색 그대로) */
+[aria-pressed="true"] > .chy,
+.on > .chy,
+.inds.circ .ind-grid button[aria-pressed="true"] i {
+  background: #FFE3E7 !important;
+  box-shadow: 0 0 0 3px #B3132B, 0 6px 14px -4px rgba(179, 19, 43, .45) !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [aria-pressed="true"] > .chy,
+  .inds.circ .ind-grid button[aria-pressed="true"] i,
+  .cb[aria-pressed="true"] i { animation: chyPop .32s ease-out; }
+}
+@keyframes chyPop { 0% { transform: scale(.9); } 60% { transform: scale(1.1); } 100% { transform: scale(1.04); } }
+
+/* 오늘의 싸바 NEW 딱지는 빛 대신 딱지 그대로 (체리 오른쪽 어깨) */
+.cb.new i::after {
+  left: auto; right: -14px; top: 4px; width: auto; height: auto;
+  transform: none; border-radius: 999px; background: #B3132B;
+  padding: 1px 5px; color: #fff; font-size: 10px; font-weight: 900; line-height: 1.5;
+}

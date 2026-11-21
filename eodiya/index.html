@@ -784,6 +784,7 @@
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var BASE = new URL('./', location.href).href.split('?')[0];
   var IMG_BASE = /(^|\.)sava\.kr$|pages\.dev$/.test(location.hostname) ? 'https://sava.kr/img/' : new URL('../img/', location.href).href; // 카톡이 그림을 잘 가져가도록 정식 주소로
+  window.toast = function (m) { toast(m); }; // js/voice.js 도 씀 (11-21)
   function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 2200); }
   // ---------- 지우기 = 뒤로 한 칸 (11-21 대표님: 톡 넣은 말은 한 문장씩, 손으로 쓴 건 한 글자씩, 꾹 누르면 모두) ----------
   window.savaBack = function (ta, phrases, after) {
@@ -1646,5 +1647,6 @@
 })();
 </script>
 <script src="/js/home.js?v=12" defer></script>
+<script src="/js/voice.js?v=1" defer></script>
 </body>
 </html>

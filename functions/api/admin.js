@@ -98,7 +98,12 @@ export async function onRequest({ request, env }) {
     ideasNew: await one(db, 'SELECT COUNT(*) AS n FROM ideas WHERE st = \'new\''),
     rosters: await one(db, 'SELECT COUNT(*) AS n FROM roster_meta'),
     rosterPeople: await one(db, 'SELECT COUNT(*) AS n FROM roster'),
-    kimchiWeek: await one(db, 'SELECT COUNT(*) AS n FROM kimchi_orders WHERE created >= ?', week0)
+    kimchiWeek: await one(db, 'SELECT COUNT(*) AS n FROM kimchi_orders WHERE created >= ?', week0),
+    // 11-22: 언니김치 페이지(sava.kr/kimchi/)는 만든 카드가 아니라 따로 셈 — cid 'kimchi'
+    kimchiViewToday: await one(db, 'SELECT COALESCE(SUM(n),0) AS n FROM card_stats WHERE cid = \'kimchi\' AND ev = \'view\' AND day = ?', td),
+    kimchiViewWeek: await one(db, 'SELECT COALESCE(SUM(n),0) AS n FROM card_stats WHERE cid = \'kimchi\' AND ev = \'view\' AND day >= ?', wk),
+    kimchiShareWeek: await one(db, 'SELECT COALESCE(SUM(n),0) AS n FROM card_stats WHERE cid = \'kimchi\' AND ev IN (\'share\',\'copy\') AND day >= ?', wk),
+    kimchiOrderTapWeek: await one(db, 'SELECT COALESCE(SUM(n),0) AS n FROM card_stats WHERE cid = \'kimchi\' AND ev = \'order\' AND day >= ?', wk)
   };
   // 14일 추이: 새 회원 · 새 카드 · 카드 열람
   const trend = [];
@@ -112,7 +117,8 @@ export async function onRequest({ request, env }) {
   }
   // 이번 주 많이 열린 카드
   const topRows = await all(db, 'SELECT s.cid, SUM(s.n) AS n, c.d FROM card_stats s LEFT JOIN cards c ON c.id = s.cid WHERE s.ev = \'view\' AND s.day >= ? GROUP BY s.cid ORDER BY n DESC LIMIT 10', wk);
-  const top = topRows.map(r => Object.assign({ cid: r.cid, n: r.n, gone: !r.d }, r.d ? decodeTitle(r.d) : { title: '', design: '' }));
+  const PAGES = { kimchi: { title: '🥬 언니김치 특판 페이지', design: 'sava.kr/kimchi', href: '/kimchi/' } };
+  const top = topRows.map(r => PAGES[r.cid] ? Object.assign({ cid: r.cid, n: r.n }, PAGES[r.cid]) : Object.assign({ cid: r.cid, n: r.n, gone: !r.d }, r.d ? decodeTitle(r.d) : { title: '', design: '' }));
   // 신고 · 차단
   const repRows = await all(db, 'SELECT r.cid, COUNT(*) AS n, MAX(r.at) AS at, GROUP_CONCAT(DISTINCT r.why) AS why, c.d, b.why AS bwhy FROM reports r LEFT JOIN cards c ON c.id = r.cid LEFT JOIN blocked b ON b.cid = r.cid GROUP BY r.cid ORDER BY at DESC LIMIT 50');
   const reports = repRows.map(r => Object.assign({ cid: r.cid, n: r.n, at: r.at, why: String(r.why || '').slice(0, 80), blocked: !!r.bwhy }, r.d ? decodeTitle(r.d) : { title: '' }));

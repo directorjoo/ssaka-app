@@ -156,8 +156,12 @@ fit();window.addEventListener('resize',fit);if(document.fonts&&document.fonts.re
     if(navigator.share){navigator.share({url:URL}).catch(function(e){if(e&&e.name!=='AbortError')copy(URL);});}
     else{copy(URL);}
   }
+  // 11-22 대표님: 관리자에서 눌러 본 사람 통계가 안 잡혀 → 열람·공유·주문 단추 횟수를 싸바 통계로 (누가 눌렀는지는 저장 안 함, 같은 사람 하루 한 번)
+  function stat(ev){try{var b=JSON.stringify({ev:ev,s:'kimchi'});if(navigator.sendBeacon&&navigator.sendBeacon('/api/stats',new Blob([b],{type:'application/json'})))return;fetch('/api/stats',{method:'POST',headers:{'content-type':'application/json'},body:b,keepalive:true}).catch(function(){});}catch(e){}}
+  stat('view');
+  kakaoBtn.addEventListener('click',function(){stat('share');});
   kakaoBtn.addEventListener('click',kakaoShare);
-  document.getElementById('copyLink').addEventListener('click',function(){copy(URL);});
+  document.getElementById('copyLink').addEventListener('click',function(){stat('copy');copy(URL);});
   var count=1,price=60000;
   function update(){document.getElementById('qty').textContent=count;document.getElementById('total').textContent='총 '+(count*price).toLocaleString('ko-KR')+'원';}
   document.getElementById('minus').addEventListener('click',function(){count=Math.max(1,count-1);update();});
@@ -183,6 +187,7 @@ fit();window.addEventListener('resize',fit);if(document.fonts&&document.fonts.re
     try{sessionStorage.setItem('sava-kimchi-draft',JSON.stringify(d));location.href='/app/orders/';}
     catch(e){alert('주문 정보를 싸바 앱으로 전달하지 못했습니다. 다시 시도해 주세요.');}
   }
+  document.getElementById('orderKakao').addEventListener('click',function(){stat('order');});
   document.getElementById('orderKakao').addEventListener('click',goSavaOrder);})();
 </script>
 <script src="/js/sound.js"></script>

@@ -200,7 +200,8 @@
     T.appendChild(tile('✍️ 블로그 글', num(o.posts), '계정에 저장된 글'));
     T.appendChild(tile('💡 읽을 의견', num(o.ideasNew), '새로 온 것'));
     T.appendChild(tile('📋 참석 명단', num(o.rosters), '신청 ' + num(o.rosterPeople) + '명'));
-    if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일'));
+    if (o.kimchiViewToday != null) T.appendChild(tile('🥬 김치 페이지 열어 본 사람', num(o.kimchiViewToday), '오늘 · 7일 ' + num(o.kimchiViewWeek) + ' · 공유 ' + num(o.kimchiShareWeek), o.kimchiViewToday > 0));
+    if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일 · 주문 단추 누름 ' + num(o.kimchiOrderTapWeek || 0)));
     T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '오늘도 싸바? 받을 수 있는 회원'));
     $('lkIdea').textContent = o.ideasNew ? '읽을 것 ' + o.ideasNew + '개' : '채택 · 쿠폰';
     chart(); top(); reports(); reqs(); setup();
@@ -224,7 +225,7 @@
     if (!D.top.length) { L.appendChild(el('p', 'muted', '이번 주에 열린 카드가 아직 없어요.')); return; }
     D.top.forEach(function (x, i) {
       var r = el('div', 'row'); r.appendChild(el('span', 'n', String(i + 1)));
-      var t = el('a', 't', x.title || (x.gone ? '(지운 카드)' : '(제목 없음)')); t.href = '/c/?s=' + x.cid; t.target = '_blank'; t.rel = 'noopener';
+      var t = el('a', 't', x.title || (x.gone ? '(지운 카드)' : '(제목 없음)')); t.href = x.href || ('/c/?s=' + x.cid); t.target = '_blank'; t.rel = 'noopener';
       t.appendChild(el('small', '', x.cid + (x.design ? ' · ' + x.design : '')));
       r.appendChild(t); r.appendChild(el('span', 'v', '👀 ' + num(x.n))); L.appendChild(r);
     });

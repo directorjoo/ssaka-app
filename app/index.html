@@ -945,9 +945,9 @@
       location.href = url;
     });
   }
-  // ===== 새 홈 시안 v2 (11-21) — sava.kr/app/?v2 로 열 때만. 지금 홈은 그대로 =====
+  // ===== 새 홈 v2 (11-21 시안 → 11-22 정식 홈). 예전 홈은 sava.kr/app/?v1 =====
   // 원칙: 카드 틀 하나로 통일, 큰 색은 체리·초록·금색 셋, 나머지는 흰 카드, 카드 사이 28px, 설명 한 줄
-  var HOME_V2 = /[?&]v2\b/.test(location.search); // 처음 열 때 한 번만 확인 (주소가 바뀌어도 시안 유지)
+  var HOME_V2 = !/[?&]v1\b/.test(location.search); // 11-22 대표님: 새 홈 v2가 정식 홈. 예전 홈은 ?v1로만
   // 홈 날씨 한 줄 (Open-Meteo, 키 없이 무료) — 30분 기억해서 홈 열 때마다 부르지 않음
   function homeWxLine(a) {
     var c = null; try { c = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
@@ -1336,7 +1336,7 @@
     document.querySelectorAll('.tab[data-v]').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.v === (name === 'inbox' || name === 'resv' ? 'more' : name === 'blog' ? 'alim' : name) ? 'true' : 'false'); });
     document.querySelector('.top h1').textContent = TITLES[name];
     ({ home: renderHome, alim: renderAlim, blog: function () { alimTab = 'blog'; renderAlim(); }, inbox: renderInbox, resv: renderResv, more: renderMore })[name]();
-    try { history.replaceState(null, '', name === 'home' ? location.pathname + (HOME_V2 ? '?v2' : '') : (HOME_V2 ? '?v2' : '') + '#' + name); } catch (e) {}
+    try { history.replaceState(null, '', name === 'home' ? location.pathname + (HOME_V2 ? '' : '?v1') : (HOME_V2 ? '' : '?v1') + '#' + name); } catch (e) {}
     window.scrollTo(0, 0);
   }
   function renderAll() { show(current); refreshDots(); }

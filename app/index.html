@@ -512,6 +512,11 @@
     #v-home.v2 .v2-eo { background: linear-gradient(180deg, #6E0A22 0%, #5A0819 55%, #42050F 100%); }
     #v-home.v2 .v2-eo .ph { height: 190px; background-size: cover; background-position: center 40%; }
     #v-home.v2 .v2-eo .ph::after { content: ""; position: absolute; left: 0; right: 0; top: 110px; height: 80px; background: linear-gradient(180deg, rgba(110,10,34,0) 0%, #6E0A22 100%); }
+    /* 11-22 대표님: 어디야 사진이 체리 → AI 인물 얼굴로 천천히 바뀜(시험). 겹친 층을 하나씩 사르르 */
+    #v-home.v2 .v2-eo .ph { position: relative; }
+    #v-home.v2 .v2-eo .ph .ly { position: absolute; inset: 0; background-size: cover; background-position: center 40%; opacity: 0; transition: opacity 1.4s ease; }
+    #v-home.v2 .v2-eo .ph .ly.on { opacity: 1; }
+    #v-home.v2 .v2-eo .ph::after { z-index: 1; }
     #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -52px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
     #v-home.v2 .v2-eo h3, #v-home.v2 .v2-mk h3 { font-size: 28px; line-height: 1.25; }
     #v-home.v2 .v2-eo .b3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px 16px; }
@@ -1024,6 +1029,7 @@
       '<div class="b3"><a href="../eodiya/#ask"><b>싸바?</b><small>안부 전하기</small></a><a href="../eodiya/#come"><b>여기야!</b><small>위치 보내기</small></a><a href="../eodiya/#play"><b>놀자!</b><small>친구 부르기</small></a></div>';
     tapGo(eo, '../eodiya/');
     v.appendChild(eo);
+    eoFaces(eo.querySelector('.ph'));
 
     // 2. 싸바카드(예전 싸바알림판, 11-21 대표님 이름 고름) — 초록, 단추 하나 + 특판은 아래 작은 띠
     var mk = el('section', 'v2c v2-mk');
@@ -1062,6 +1068,27 @@
     duo.innerHTML = '<a class="v2-half pg" href="../eodiya/#playground"><em class="dc d1" aria-hidden="true">🎯</em><em class="dc d2" aria-hidden="true">⭐</em><em class="dc d3" aria-hidden="true">🎲</em><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small><span class="bt-long">게임 ' + GAMES.length + '가지 · 무료</span><span class="bt-short">게임 무료</span></small><span class="go">놀러 가기 ›</span></a>' +
       '<a class="v2-half ws" href="../?story=1"><em class="dc d1" aria-hidden="true"><img src="../img/deco-cherry.svg" alt=""></em><em class="dc d2" aria-hidden="true"><img src="../img/deco-leaf.svg" alt=""></em><em class="dc d3" aria-hidden="true"><img src="../img/deco-cherry2.svg" alt=""></em><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small><span class="bt-long">카드 한 장이면 다 알아요</span><span class="bt-short">싸바 소개</span></small><span class="go">알아보기 ›</span></a>';
     v.appendChild(duo);
+  }
+  // 어디야 사진 돌리기(11-22 시험): 체리 → 어머니·아이·학생·친구… → 다시 체리. 모두 AI 인물(대표님 제공)
+  var EO_FACES = [['../img/eodiya-cherry12.jpg', '40%'], ['../img/ex/face1.jpg', '30%'], ['../img/ex/face3.jpg', '35%'], ['../img/ex/face2.jpg', '30%'],
+    ['../img/ex/face8.jpg', '12%'], ['../img/ex/face6.jpg', '30%'], ['../img/ex/face4.jpg', '30%'], ['../img/ex/face7.jpg', '45%'], ['../img/ex/face5.jpg', '30%']];
+  var eoTimer = 0;
+  function eoFaces(ph) {
+    if (!ph) return;
+    clearInterval(eoTimer);
+    try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+    ph.style.backgroundImage = 'none';
+    var lys = EO_FACES.map(function (f, i) {
+      var d = document.createElement('span'); d.className = 'ly' + (i ? '' : ' on');
+      d.style.backgroundImage = 'url(' + f[0] + ')'; d.style.backgroundPosition = 'center ' + f[1];
+      ph.appendChild(d); return d;
+    });
+    var k = 0;
+    eoTimer = setInterval(function () {
+      if (!document.body.contains(ph)) { clearInterval(eoTimer); return; }
+      if (document.hidden) return;
+      lys[k].classList.remove('on'); k = (k + 1) % lys.length; lys[k].classList.add('on');
+    }, 4500);
   }
   function renderHome() {
     if (HOME_V2) return renderHomeV2();

@@ -451,17 +451,20 @@
   // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
   // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
   var OPEN = ['restaurant', 'product', 'actor', 'party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting'];
-  var showAll = false;
+  // 11-21 대표님: 싸바에서 하기로 한 업종은 모두 보여 줌 (1차 공개 제한 풂). 1차만 보려면 ?all=0 (한 번이면 기억) / 되돌리기 ?all=1
+  var showAll = true;
   try {
     var qa = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('all') : null;
-    if (qa === '1') localStorage.setItem('sava-all', '1');
-    if (qa === '0') localStorage.removeItem('sava-all');
-    showAll = localStorage.getItem('sava-all') === '1';
+    if (qa === '0') localStorage.setItem('sava-all', '0');
+    if (qa === '1') localStorage.removeItem('sava-all');
+    showAll = localStorage.getItem('sava-all') !== '0';
   } catch (e) {}
   function isOpen(id) { return showAll || OPEN.indexOf(id) >= 0; }
   var ALL_GROUPS = GROUPS;
   GROUPS = GROUPS.map(function (g) { return { id: g.id, label: g.label, emoji: g.emoji, ids: g.ids.filter(isOpen) }; }).filter(function (g) { return g.ids.length; });
-  if (!showAll) { var mg = GROUPS.filter(function (g) { return g.id === 'meet'; })[0], sg = GROUPS.filter(function (g) { return g.id === 'shop'; })[0]; if (mg && sg) GROUPS = [mg].concat(GROUPS.filter(function (g) { return g.id === 'life'; }), [sg], GROUPS.filter(function (g) { return g.id === 'pro'; })); }
+  // 순서: 모임·행사 → 경조사·안부 → 가게·매장 → 교육·학원 → 프로필·영업 (연말 모임 철이라 모임 먼저)
+  var G_ORDER = ['meet', 'life', 'shop', 'edu', 'pro'];
+  GROUPS.sort(function (a, b) { return G_ORDER.indexOf(a.id) - G_ORDER.indexOf(b.id); });
   function groupOf(id) { return GROUPS.filter(function (g) { return g.ids.indexOf(id) >= 0; })[0] || GROUPS[0]; }
   var api = {
     FONTS: FONTS, STYLES: STYLES, INDUSTRIES: INDUSTRIES, GROUPS: GROUPS, ALL_GROUPS: ALL_GROUPS, groupOf: groupOf, MOODS: MOODS,

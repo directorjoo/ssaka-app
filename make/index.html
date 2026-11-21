@@ -920,7 +920,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=89"></script>
+<script src="../js/designs.js?v=90"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=83"></script>
 <script src="../js/reserve.js"></script>
@@ -2956,7 +2956,7 @@
   ['name', 'phone'].forEach(function (f) { $(f).addEventListener('change', function () { if ($('name').value.trim() && $('phone').value.trim()) saveMe(); }); });
   var qInd = new URLSearchParams(location.search).get('ind');
   if (qInd && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
-  else if (qInd && D.isOpen && !D.isOpen(qInd)) setTimeout(function () { toast((D.industry(qInd) || {}).label + ' 카드는 곧 열려요! 지금은 모임·행사·안부와 음식점 카드를 만들 수 있어요'); }, 600);
+  else if (qInd && D.isOpen && !D.isOpen(qInd)) setTimeout(function () { toast((D.industry(qInd) || {}).label + ' 카드는 곧 열려요!'); }, 600);
   // 1차 공개에 없는 업종이 남아 있으면(예전 초안) 첫 공개 업종으로 (단, 고치기 중인 카드는 그대로)
   if (D.isOpen && !D.isOpen(industry) && !editCard) { industry = D.GROUPS[0].ids[0]; design = D.list(industry)[0].id; }
   var qSeason = new URLSearchParams(location.search).get('season');

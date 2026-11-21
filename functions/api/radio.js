@@ -17,10 +17,13 @@ function json(o, status, maxAge) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + (maxAge || 0), 'access-control-allow-origin': '*' } });
 }
 // 받은 글에서 첫 번째 m3u8 주소를 찾음 (JSON이든 글자든)
+// 11-22: 다시 듣기(타임머신·DVR) 주소가 먼저 오면 지난 방송이 나와서 — 생방송 주소를 먼저 고름
+const OLD = /timemachine|time_machine|timeshift|dvr|catchup|replay|vod|_tm[\/_.]/i;
 function firstUrl(t) {
   t = String(t || '').replace(/\\\//g, '/');
-  const m = t.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/);
-  if (m) return m[0].replace(/^http:/, 'https:');
+  const all = t.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/g) || [];
+  const m = all.filter(u => !OLD.test(u))[0] || all[0];
+  if (m) return m.replace(/^http:/, 'https:');
   const s = t.trim();
   return /^https?:\/\//.test(s) ? s.replace(/^http:/, 'https:') : '';
 }

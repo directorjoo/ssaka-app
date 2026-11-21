@@ -106,6 +106,19 @@
     var st = $('nowState'); st.textContent = '지금 싸바에서 안 나와요 · ';
     if (c[5]) { var a = document.createElement('a'); a.href = c[5]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '방송사 화면에서 듣기 ›'; a.style.cssText = 'color:#FFD400;font-weight:900'; st.appendChild(a); }
   }
+  // 생방송 맞추기(11-22 대표님: KBS FM 틀면 지난 방송이 나옴) — 방송사가 몇 시간치 '다시 듣기 창'을 같이 주면
+  // 아이폰은 그 맨 앞(지난 방송)부터 틂 → 들을 수 있는 끝(지금 생방송)에서 3초 앞으로 옮김
+  var liveDone = 0;
+  function toLive() {
+    try {
+      var sk = au.seekable; if (!sk || !sk.length) return false;
+      var end = sk.end(sk.length - 1); if (!isFinite(end) || end <= 0) return false;
+      if (end - au.currentTime > 20) au.currentTime = Math.max(sk.start(sk.length - 1), end - 3);
+      return true;
+    } catch (e) { return false; }
+  }
+  function liveSoon(my) { liveDone = 0; [0, 400, 1200, 2500, 5000].forEach(function (t) { setTimeout(function () { if (my === tries && !liveDone && toLive()) liveDone = 1; }, t); }); }
+  au.addEventListener('loadedmetadata', function () { if (!liveDone && toLive()) liveDone = 1; });
   function play(c) {
     stop(); cur = c; save(c[0]); tries++; var my = tries;
     $('now').hidden = false; $('nowName').textContent = '📻 ' + c[1]; state('🍒 채널 맞추는 중…'); mark();
@@ -113,10 +126,12 @@
       if (my !== tries) return;
       if (!j.url) throw 0;
       var native = au.canPlayType('application/vnd.apple.mpegurl');
+      liveSoon(my);
       if (native) { au.src = j.url; return au.play(); }
       return loadHls().then(function (H) {
         if (!H || !H.isSupported()) { au.src = j.url; return au.play(); }
-        hls = new H(); hls.loadSource(j.url); hls.attachMedia(au);
+        hls = new H({ startPosition: -1, liveSyncDurationCount: 3, liveMaxLatencyDurationCount: 10 }); hls.loadSource(j.url); hls.attachMedia(au);
+        hls.on(H.Events.LEVEL_LOADED, function (e, d) { if (my === tries && d && d.details && d.details.live && hls && hls.liveSyncPosition && hls.liveSyncPosition - au.currentTime > 20) au.currentTime = hls.liveSyncPosition; });
         hls.on(H.Events.ERROR, function (e, d) { if (d && d.fatal && my === tries) fallback(c); });
         return au.play();
       });

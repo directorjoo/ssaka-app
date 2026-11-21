@@ -153,6 +153,12 @@
     { bg: '#faf6ef', paper: '#ffffff', ink: '#2a1a1c', accent: '#b3132b' },
     { bg: '#f3f5ee', paper: '#ffffff', ink: '#1c2a20', accent: '#2f6b4f' },
     { bg: '#14161b', paper: '#1f2229', ink: '#f3efe8', accent: '#e8b04a' }]);
+  // 투데이 카드 (11-22, DESIGN.md 원칙 2·3·4): 앱스토어 투데이식 — 큰 사진 → 아래가 바탕색으로 번짐 → 머리말 · 두 줄 제목 · 설명 → 유리 판 → 단추
+  // 바탕은 표준 12색 그라데이션(g: 위→아래 색 멈춤, band: 아래 띠). bg = 사진이 번져 드는 맨 위 색
+  W('today', '투데이 카드', 'modern', 'sanskr', [
+    { bg: '#832823', paper: '#ffffff', ink: '#2a1412', accent: '#B3132B', g: ['#832823', '#913A37', '#9E4945', '#AF5C59'], band: ['#7B2D29', '#AF5C58'] },   // 8 와인 장미
+    { bg: '#EFE5DA', paper: '#ffffff', ink: '#2a1d12', accent: '#8A4B1F', g: ['#EFE5DA', '#F1DECB', '#E5D3C1'], band: ['#E8DED4', '#D9C2AA'] },               // 3 살구 크림
+    { bg: '#3B6C88', paper: '#ffffff', ink: '#13243a', accent: '#253B66', g: ['#3B6C88', '#356389', '#2A4373'], band: ['#2F587A', '#253B66'] }]);           // 10 바다 남색
   var SC_FAMS = ['sunset', 'insta'];
   STYLES.glass.mood = 'modern';
   var GLASS_PICK = [0, 3, 7];
@@ -315,7 +321,8 @@
       // 바탕 위에서 보이는 강조색 (선·작은 장식용)
       accentLine: ensure(p.accent, p.bg, 3),
       c1: c1, onC1: readableOn(c1), c2: c2, onC2: readableOn(c2), c3: c3, onC3: readableOn(c3),
-      blob1: p.c1 || p.accent, blob2: p.c2 || p.paper, blob3: p.c3 || p.bg
+      blob1: p.c1 || p.accent, blob2: p.c2 || p.paper, blob3: p.c3 || p.bg,
+      g: p.g || null, band: p.band || null
     };
   }
 
@@ -351,9 +358,10 @@
   // 12가지는 화면 구조부터 다르고(색만 바꾼 반복 없음), 디자인마다 색 3벌을 따로 고를 수 있어요.
   // 같은 12가지가 SNS 이미지(인스타·카톡 채널·네이버·당근·블로그·유튜브…)에도 똑같은 모양으로 나옵니다 (js/export.js).
   // 예전 1~12번 · -w1~36 · 순천만 시안 번호는 쓰지 않아요. 예전 링크는 그 업종의 1번 디자인으로 보여 줍니다.
-  var TWELVE = ['sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
-  var CALM = ['minimal', 'hanji', 'nordic', 'gold']; // 부고: 가게 차양(paris)·네온 같은 들뜬 모양은 빼고 차분한 것만
+  var TWELVE = ['today', 'sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
+  var CALM = ['minimal', 'hanji', 'nordic', 'gold', 'today']; // 부고: 가게 차양(paris)·네온 같은 들뜬 모양은 빼고 차분한 것만
   var COLOR_NAMES = {
+    today: ['와인 장미', '살구 크림', '바다 남색'],
     sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
     minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],
     pastel: ['분홍', '하늘', '연두'], gold: ['진녹·금', '남색·금', '검정·금'],
@@ -395,7 +403,7 @@
   function legacy(id) {
     var m = String(id || '').match(/^([a-z]+)-/);
     var l = m && BY_INDUSTRY[m[1]];
-    return l && l[0] || null;
+    return l && (l.filter(function (d) { return d.style !== 'today'; })[0] || l[0]) || null; // 예전 링크는 예전 1번 모양 그대로
   }
   function colorsOf(id) { var d = BY_ID[id]; return d ? (FAMILY_OF[d.industry + '-' + d.style] || [id]).map(function (k) { return BY_ID[k]; }) : []; }
 
@@ -423,6 +431,8 @@
       '--blob1': c.blob1, '--blob2': c.blob2, '--blob3': c.blob3
     };
     Object.keys(map).forEach(function (k) { s.setProperty(k, map[k]); });
+    if (c.g) { s.setProperty('--grad', 'linear-gradient(180deg,' + c.g.join(',') + ')'); s.setProperty('--band', 'linear-gradient(90deg,' + (c.band || c.g).join(',') + ')'); }
+    else { s.removeProperty('--grad'); s.removeProperty('--band'); }
     s.setProperty('--f-title', (FONTS[d.font] || FONTS.sys).stack);
     s.setProperty('--f-body', FONTS.sys.stack);
     el.setAttribute('data-style', d.style);
@@ -437,7 +447,8 @@
     if (card && card.sos) return BY_ID['senior-1'];
     var byTpl = { profile: 'actor', club: 'club', shop: 'restaurant', safe: 'senior', greet: 'greeting' };
     if (card && card.theme === 'dark') return BY_ID['actor-mdark-1'];
-    return (BY_INDUSTRY[byTpl[card && card.template] || 'actor'] || [])[0];
+    var fl = BY_INDUSTRY[byTpl[card && card.template] || 'actor'] || [];
+    return fl.filter(function (d) { return d.style !== 'today'; })[0] || fl[0];
   }
 
   // 업종 4묶음 (홈·만들기 화면에서 묶어서 보여줌)

@@ -873,6 +873,47 @@
   function safeY(W, H) { var g = geo(W, H); return g.tall ? { top: Math.round(H * 0.1), bot: Math.round(H * 0.86) } : { top: 0, bot: H }; }
 
   var LAYS = {};
+  // 0. 투데이 카드 (11-22) — 표준 12색 그라데이션 바탕, 큰 사진이 아래로 바탕에 번짐, 두 줄 큰 제목, 유리 판 목록
+  LAYS.today = function (ctx, W, H, D, P) {
+    var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), stops = P.g || [P.bg, P.bg];
+    var bgG = function (x0, y0, x1, y1) { return grad(ctx, x0, y0, x1, y1, stops.map(function (c, i) { return [i / Math.max(1, stops.length - 1), c]; })); };
+    ctx.fillStyle = bgG(0, 0, 0, H); ctx.fillRect(0, 0, W, H);
+    var dark = lumOf(P.bg) < 0.5, ink = P.onBg, sub = P.subBg, shadow = dark ? 'rgba(0,0,0,.28)' : 'rgba(255,255,255,.55)';
+    var panel = dark ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)', line = dark ? 'rgba(255,255,255,.26)' : 'rgba(0,0,0,.08)', fl = foot(D);
+    function glass(x, y, w, h) { ctx.fillStyle = panel; round(ctx, x, y, w, h, 28 * u); ctx.fill(); ctx.strokeStyle = line; ctx.lineWidth = 2 * u; round(ctx, x, y, w, h, 28 * u); ctx.stroke(); }
+    function fadeOver(x0, y0, x1, y1) { // 사진 끝을 바탕색으로 번지게
+      var gg = ctx.createLinearGradient(x0, y0, x1, y1), c = hexRgb(P.bg).join(',');
+      gg.addColorStop(0, 'rgba(' + c + ',0)'); gg.addColorStop(1, 'rgba(' + c + ',1)'); ctx.fillStyle = gg;
+    }
+    if (g.land) {
+      var pw = W * 0.5; pic(ctx, D.main, 0, 0, pw, H, D, { fill: dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.05)', fam: fam });
+      fadeOver(pw * 0.55, 0, pw, 0); ctx.fillRect(pw * 0.55, 0, pw * 0.45 + 2, H);
+      var tx = pw + 20 * u, tw = W - tx - 64 * u, y = 64 * u;
+      y = tBlock(ctx, D.head, { x: tx, y: y, w: tw, size: 28 * u, min: 20 * u, fam: FONT, weight: 700, color: sub, lines: 1 }) + 12 * u;
+      y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 72 * u, min: 40 * u, fam: fam, weight: 900, color: ink, lines: 2, lh: 1.14, shadow: shadow }) + 12 * u;
+      if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: sub, lines: 1 }) + 22 * u;
+      var bh = H - y - (fl.length ? 100 * u : 50 * u);
+      if (D.items.length && bh > 90 * u) { glass(tx - 18 * u, y, tw + 36 * u, bh); iList(ctx, D.items, { x: tx + 10 * u, y: y + 18 * u, w: tw - 20 * u, h: bh - 36 * u, fs: 30 * u, min: 22 * u, color: ink, pcolor: ink, sep: line, gap: 1.75 }); }
+      if (fl.length) tBlock(ctx, fl[0], { x: tx, y: H - 74 * u, w: tw, size: 30 * u, min: 22 * u, fam: FONT, weight: 700, color: ink, lines: 1 });
+      return;
+    }
+    var phH = Math.round(H * (D.pf ? (g.tall ? 0.56 : 0.62) : (g.tall ? 0.46 : 0.5)));
+    pic(ctx, D.main, 0, 0, W, phH, D, { fill: dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.05)', fam: fam });
+    fadeOver(0, phH * 0.55, 0, phH); ctx.fillRect(0, phH * 0.55, W, phH * 0.45 + 2);
+    var x = 64 * u, w = W - 128 * u, T = { x: x, w: w, size: (g.tall ? 104 : 88) * u, min: 48 * u, fam: fam, weight: 900, color: ink, lines: 2, lh: 1.14, shadow: shadow };
+    var th = tBlock(ctx, D.title, Object.assign({ dry: 1, y: 0 }, T)), hh = 44 * u, shh = D.sub ? 50 * u : 0;
+    var yy = Math.max(sf.top + 40 * u, phH - th - hh - shh * 0.4 - 10 * u);
+    yy = tBlock(ctx, D.head, { x: x, y: yy, w: w, size: 32 * u, min: 22 * u, fam: FONT, weight: 700, color: sub, lines: 1 }) + 12 * u;
+    yy = tBlock(ctx, D.title, Object.assign({ y: yy }, T)) + 14 * u;
+    if (D.sub) yy = tBlock(ctx, D.sub, { x: x, y: yy, w: w, size: 32 * u, min: 22 * u, fam: FONT, weight: 600, color: sub, lines: 1 }) + 28 * u;
+    var end = sf.bot - (fl.length ? 110 * u : 50 * u), bh2 = end - yy;
+    if (D.items.length && bh2 > 100 * u) { glass(x - 14 * u, yy, w + 28 * u, bh2); iList(ctx, D.items, { x: x + 18 * u, y: yy + 22 * u, w: w - 36 * u, h: bh2 - 44 * u, fs: (g.tall ? 38 : 34) * u, min: 24 * u, color: ink, pcolor: ink, sep: line, gap: 1.75 }); }
+    if (fl.length) {
+      var pillH = 74 * u, py = sf.bot - pillH - 26 * u, txt = fl.join('  ·  ');
+      ctx.fillStyle = P.band ? grad(ctx, 0, 0, W, 0, [[0, P.band[0]], [1, P.band[P.band.length - 1]]]) : P.accent; round(ctx, x - 14 * u, py, w + 28 * u, pillH, pillH / 2); ctx.fill();
+      tBlock(ctx, txt, { x: x + 20 * u, y: py + pillH * 0.24, w: w - 40 * u, size: 32 * u, min: 20 * u, fam: FONT, weight: 800, color: ink, align: 'center', lines: 1 });
+    }
+  };
   // 1. 순천만 노을 — 하늘·해·물결·갈대, 아치 사진, 가운데 명조
   LAYS.sunset = function (ctx, W, H, D, P) {
     var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H);

@@ -544,6 +544,17 @@
     #v-home.v2 .v2-mk .sp u { color: #B3132B; }
     /* 오늘의 싸바 — 미색에서 초록으로 섞임 + 체리 알·잎 */
     #v-home.v2 .v2-td { background: radial-gradient(ellipse at 60% 35%, #ACCEAC 0%, #99BD99 45%, #8FB58F 100%); } /* 11-21 17:12 B안: 4번 빛 민트 */
+    /* 11-22 대표님: 위 카드 색이 아래 카드 윗부분에서 이어지게 — 싸바카드 위는 어디야 체리색에서 시작, 오늘의 싸바 위는 연두에서 시작해 원래 색과 섞이며 내려옴 */
+    #v-home.v2 .v2-mk { background:
+      linear-gradient(180deg, #6E0A22 0px, #8E1530 34px, rgba(196,74,86,.78) 70px, rgba(232,170,150,.38) 118px, rgba(236,231,191,0) 170px),
+      linear-gradient(110deg, #E8E78D 0%, #ECE7BF 45%, #C8D7DA 100%); }
+    #v-home.v2 .v2-mk .tx em { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.55); }
+    #v-home.v2 .v2-mk .tx h3 { text-shadow: 0 0 3px rgba(255,255,255,.9), 0 1px 6px rgba(255,255,255,.7); }
+    #v-home.v2 .v2-mk .tx { padding-top: 22px; }
+    #v-home.v2 .v2-mk .tx h3 { margin-top: 16px; }
+    #v-home.v2 .v2-td { background:
+      linear-gradient(180deg, #E3E68A 0%, rgba(214,226,150,.85) 14%, rgba(186,212,160,.45) 32%, rgba(172,206,172,0) 52%),
+      radial-gradient(ellipse at 60% 35%, #ACCEAC 0%, #99BD99 45%, #8FB58F 100%); }
     #v-home.v2 .v2-td::before {
       background-image: url(../img/deco-leaf.svg), url(../img/deco-cherry.svg), url(../img/deco-leaf2.svg), url(../img/deco-cherry2.svg);
       background-size: 48px auto, 24px auto, 26px auto, 20px auto;

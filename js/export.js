@@ -878,7 +878,7 @@
     var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), stops = P.g || [P.bg, P.bg];
     var bgG = function (x0, y0, x1, y1) { return grad(ctx, x0, y0, x1, y1, stops.map(function (c, i) { return [i / Math.max(1, stops.length - 1), c]; })); };
     ctx.fillStyle = bgG(0, 0, 0, H); ctx.fillRect(0, 0, W, H);
-    var dark = lumOf(P.bg) < 0.5, ink = P.onBg, sub = P.subBg, shadow = dark ? 'rgba(0,0,0,.28)' : 'rgba(255,255,255,.55)';
+    var dark = lumOf(P.bg) < 0.5, ink = P.onBg, sub = P.subBg, shadow = (dark || /^#f{6}$/i.test(ink)) ? 'rgba(0,0,0,.32)' : 'rgba(255,255,255,.55)';
     var panel = dark ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)', line = dark ? 'rgba(255,255,255,.26)' : 'rgba(0,0,0,.08)', fl = foot(D);
     function glass(x, y, w, h) { ctx.fillStyle = panel; round(ctx, x, y, w, h, 28 * u); ctx.fill(); ctx.strokeStyle = line; ctx.lineWidth = 2 * u; round(ctx, x, y, w, h, 28 * u); ctx.stroke(); }
     function fadeOver(x0, y0, x1, y1) { // 사진 끝을 바탕색으로 번지게

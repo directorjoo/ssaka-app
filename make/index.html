@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css?v=2">
   <link rel="stylesheet" href="../css/sk.css?v=91">
-  <link rel="stylesheet" href="../css/sk-world.css?v=7">
+  <link rel="stylesheet" href="../css/sk-world.css?v=8">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <meta property="og:title" content="1분 만에 싸바 카드 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
@@ -936,14 +936,14 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=91"></script>
+<script src="../js/designs.js?v=92"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=83"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=91"></script>
+<script src="../js/export.js?v=92"></script>
 <script src="../js/pack.js?v=5"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1284,7 +1284,7 @@
     var lab = document.createElement('span'); lab.textContent = '🎨 색'; box.appendChild(lab);
     vs.forEach(function (d) {
       var b = document.createElement('button'); b.type = 'button';
-      var i = document.createElement('i'); i.style.background = 'linear-gradient(135deg,' + d.colors.bg + ' 50%,' + d.colors.accent + ' 50%)';
+      var i = document.createElement('i'); i.style.background = d.colors.g ? 'linear-gradient(160deg,' + d.colors.g.join(',') + ')' : 'linear-gradient(135deg,' + d.colors.bg + ' 50%,' + d.colors.accent + ' 50%)';
       b.appendChild(i); b.setAttribute('aria-label', '색 ' + (d.c || ''));
       b.setAttribute('aria-pressed', d.id === design ? 'true' : 'false');
       b.addEventListener('click', function () {
@@ -2589,7 +2589,7 @@
     var pb = $('expPals'); pb.innerHTML = '';
     (D.colorsOf ? D.colorsOf(sel.id) : []).forEach(function (d) {
       var b = document.createElement('button'); b.type = 'button';
-      var i = document.createElement('i'); i.style.background = 'linear-gradient(135deg,' + d.colors.bg + ' 55%,' + d.colors.accent + ' 55%)';
+      var i = document.createElement('i'); i.style.background = d.colors.g ? 'linear-gradient(160deg,' + d.colors.g.join(',') + ')' : 'linear-gradient(135deg,' + d.colors.bg + ' 55%,' + d.colors.accent + ' 55%)';
       b.appendChild(i); b.appendChild(document.createTextNode(d.colorName || ''));
       b.setAttribute('aria-pressed', d.id === sel.id ? 'true' : 'false');
       b.addEventListener('click', function () { frameLay = d.id; var cc = current(); if (cc) makeFrames(cc); });

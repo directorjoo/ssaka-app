@@ -510,11 +510,11 @@
 .sk[data-style="today"] .sk-nophoto .sk-mono { font-size: 72px; font-weight: 900; color: color-mix(in srgb, var(--on-bg) 30%, transparent); }
 .sk[data-style="today"] .sk-titles { position: relative; z-index: 1; margin-top: -84px; padding: 0 22px; }
 .sk[data-style="today"] .sk-photo.sk-nophoto + .sk-titles { margin-top: -20px; }
-.sk[data-style="today"] .sk-kick { display: inline-block; margin: 0 0 10px; padding: 0; font-family: var(--f-body); font-size: 16px; font-weight: 700; letter-spacing: -.01em; color: var(--sub-bg); }
+.sk[data-style="today"] .sk-kick { text-shadow: var(--tsh, none); display: inline-block; margin: 0 0 10px; padding: 0; font-family: var(--f-body); font-size: 16px; font-weight: 700; letter-spacing: -.01em; color: var(--sub-bg); }
 .sk[data-style="today"] .sk-kick::before, .sk[data-style="today"] .sk-kick::after { content: none; }
 .sk[data-style="today"] .sk-title { font-size: clamp(32px, 9.4vw, 42px); font-weight: 900; line-height: 1.18; letter-spacing: -.035em; color: var(--on-bg);
-  text-shadow: 0 2px 10px color-mix(in srgb, var(--bg) 75%, transparent); }
-.sk[data-style="today"] .sk-sub { margin-top: 10px; font-size: 16px; font-weight: 600; color: var(--sub-bg); text-shadow: 0 1px 6px color-mix(in srgb, var(--bg) 70%, transparent); }
+  text-shadow: var(--tsh, 0 2px 10px color-mix(in srgb, var(--bg) 75%, transparent)); }
+.sk[data-style="today"] .sk-sub { margin-top: 10px; font-size: 16px; font-weight: 600; color: var(--sub-bg); text-shadow: var(--tsh, 0 1px 6px color-mix(in srgb, var(--bg) 70%, transparent)); }
 .sk[data-style="today"] .sk-gal { margin-top: 20px; }
 .sk[data-style="today"] .sk-gal-i { width: 120px; aspect-ratio: 1 / 1; border-radius: 16px; }
 .sk[data-style="today"] .sk-list { margin-top: 22px; padding: 6px 18px; border-radius: 20px;

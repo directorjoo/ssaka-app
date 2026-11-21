@@ -157,8 +157,23 @@
   // 바탕은 표준 12색 그라데이션(g: 위→아래 색 멈춤, band: 아래 띠). bg = 사진이 번져 드는 맨 위 색
   W('today', '투데이 카드', 'modern', 'sanskr', [
     { bg: '#832823', paper: '#ffffff', ink: '#2a1412', accent: '#B3132B', g: ['#832823', '#913A37', '#9E4945', '#AF5C59'], band: ['#7B2D29', '#AF5C58'] },   // 8 와인 장미
-    { bg: '#EFE5DA', paper: '#ffffff', ink: '#2a1d12', accent: '#8A4B1F', g: ['#EFE5DA', '#F1DECB', '#E5D3C1'], band: ['#E8DED4', '#D9C2AA'] },               // 3 살구 크림
-    { bg: '#3B6C88', paper: '#ffffff', ink: '#13243a', accent: '#253B66', g: ['#3B6C88', '#356389', '#2A4373'], band: ['#2F587A', '#253B66'] }]);           // 10 바다 남색
+    { bg: '#EFE5DA', paper: '#ffffff', ink: '#2a1d12', accent: '#8A4B1F', g: ['#EFE5DA', '#F1DECB', '#E5D3C1'], band: ['#E8DED4', '#D9C2AA'], calm: 1 },     // 3 살구 크림
+    { bg: '#3B6C88', paper: '#ffffff', ink: '#13243a', accent: '#253B66', g: ['#3B6C88', '#356389', '#2A4373'], band: ['#2F587A', '#253B66'], calm: 1 },     // 10 바다 남색
+    // 11-22 늘림: 표준 12색 나머지 9벌 (on = 제목 색, sub = 머리말·설명 색 — 기준표 그대로)
+    { bg: '#E8E78D', paper: '#ffffff', ink: '#1A1A1A', accent: '#575319', g: ['#E8E78D', '#ECE7BF', '#C8D7DA'], band: ['#D3CC78', '#B2BEC0'], on: '#1A1A1A', sub: '#575319' },             // 1 레몬 안개
+    { bg: '#C3D7F1', paper: '#ffffff', ink: '#1A1A1A', accent: '#1E3A55', g: ['#C3D7F1', '#D5DEE9', '#93B976'], band: ['#96B17D', '#C6CAAC'], on: '#1A1A1A', sub: '#1E3A55' },             // 2 하늘 풀밭
+    { bg: '#ACCEAC', paper: '#ffffff', ink: '#1A1A1A', accent: '#284927', g: ['#ACCEAC', '#99BD99', '#8FB58F'], band: ['#80A780', '#8FB58F'], on: '#1A1A1A', sub: '#284927' },             // 4 빛 민트
+    { bg: '#AF92BA', paper: '#ffffff', ink: '#1A1A1A', accent: '#3F2C3C', g: ['#AF92BA', '#B2A6B6', '#B1ACB0'], band: ['#A090B4', '#9FA19A'], on: '#1A1A1A', sub: '#3F2C3C', calm: 1 },   // 5 라벤더 안개
+    { bg: '#A7A29B', paper: '#ffffff', ink: '#1A1A1A', accent: '#3B2B1C', g: ['#A7A29B', '#B7A088', '#C8AD8F'], band: ['#837664', '#AF977D'], on: '#1A1A1A', sub: '#3B2B1C', calm: 1 },   // 6 회색 캐러멜
+    { bg: '#DD8C7C', paper: '#ffffff', ink: '#2a1412', accent: '#9F4946', g: ['#DD8C7C', '#CE7C6A', '#9F4946'], band: ['#92403F', '#BB4A4A'], on: '#FFFFFF', sub: '#FDF1ED' },             // 7 코랄 노을
+    { bg: '#B4AB47', paper: '#ffffff', ink: '#1c2a14', accent: '#3E6B33', g: ['#B4AB47', '#74A569', '#69985E'], band: ['#6B9C5E', '#6E975D'], on: '#FFFFFF', sub: '#F4FBE8' },             // 9 햇살 초록
+    { bg: '#E73924', paper: '#ffffff', ink: '#2a1008', accent: '#9D2515', g: ['#E73924', '#E03121', '#9D2515', '#5C1408'], band: ['#5C1408', '#7A1C0E'], on: '#FFFFFF', sub: '#FFE3DD' },  // 11 세일 레드
+    { bg: '#CA4138', paper: '#ffffff', ink: '#2a1210', accent: '#B83A36', g: ['#CA4138', '#C03F3C', '#B83A36'], band: ['#B83A36', '#D0463C'], on: '#FFFFFF', sub: '#FFE6E2' }]);           // 12 크리에이터 레드
+  // 투데이 카드는 업종 사진에 어울리는 색부터 보여 줌 (위 목록 순서 번호, 0부터) — 없으면 업종마다 돌려서
+  var TODAY_FIRST = { restaurant: 0, product: 10, cafe: 1, beauty: 6, fitness: 9, flower: 8, stay: 2,
+    toefl: 4, bigacademy: 2, academy: 3, entrance: 5, tutor: 1, arts: 9,
+    insurance: 2, newcar: 7, usedcar: 7, realty: 4, sales: 2, freelancer: 3, actor: 11, director: 0,
+    club: 9, alumni: 7, party: 0, greeting: 11, event: 8, wedding: 1, funeral: 6, news: 2 };
   var SC_FAMS = ['sunset', 'insta'];
   STYLES.glass.mood = 'modern';
   var GLASS_PICK = [0, 3, 7];
@@ -310,13 +325,14 @@
   function colorsFor(styleKey, p) {
     var onBg = ensure(p.ink, p.bg, 7);
     if (contrast(onBg, p.bg) < 7) onBg = readableOn(p.bg);
+    if (p.on) onBg = p.on; // 기준표에서 정한 제목 색 (아래로 진해지는 그라데이션은 맨 위 색만 보고 고르면 틀림)
     var ink = ensure(p.ink, p.paper, 7);
     var accent = solid(p.accent);
     var c1 = solid(p.c1 || p.accent), c2 = solid(p.c2 || p.accent), c3 = solid(p.c3 || p.accent);
     return {
       bg: p.bg, paper: p.paper,
       ink: ink, sub: ensure(mix(ink, p.paper, 0.38), p.paper, 4.5),
-      onBg: onBg, subBg: ensure(mix(onBg, p.bg, 0.38), p.bg, 4.5),
+      onBg: onBg, subBg: p.sub || ensure(mix(onBg, p.bg, 0.38), p.bg, 4.5),
       accent: accent, onAccent: readableOn(accent),
       // 바탕 위에서 보이는 강조색 (선·작은 장식용)
       accentLine: ensure(p.accent, p.bg, 3),
@@ -361,7 +377,7 @@
   var TWELVE = ['today', 'sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
   var CALM = ['minimal', 'hanji', 'nordic', 'gold', 'today']; // 부고: 가게 차양(paris)·네온 같은 들뜬 모양은 빼고 차분한 것만
   var COLOR_NAMES = {
-    today: ['와인 장미', '살구 크림', '바다 남색'],
+    today: ['와인 장미', '살구 크림', '바다 남색', '레몬 안개', '하늘 풀밭', '빛 민트', '라벤더 안개', '회색 캐러멜', '코랄 노을', '햇살 초록', '세일 레드', '크리에이터 레드'],
     sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
     minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],
     pastel: ['분홍', '하늘', '연두'], gold: ['진녹·금', '남색·금', '검정·금'],
@@ -390,13 +406,17 @@
       var st = STYLES[fk], ids = [];
       var pals = fk === 'glass' ? GLASS_PICK.map(function (k) { return st.palettes[k]; }) : st.palettes;
       var first = ind.id === 'restaurant' ? 0 : (n + fi) % 3; // 업종마다 처음 보이는 색을 돌려서 같은 디자인도 업종별로 다르게
-      for (var pi = 0; pi < 3; pi++) {
-        var d = { id: ind.id + '-' + fk + '-' + (pi + 1), industry: ind.id, no: fi + 1, name: st.label, colorName: COLOR_NAMES[fk][pi], c: pi + 1,
+      var firstId = null;
+      if (fk === 'today') first = TODAY_FIRST[ind.id] != null ? TODAY_FIRST[ind.id] : (n + fi) % pals.length;
+      for (var pi = 0; pi < pals.length; pi++) {
+        if (ind.calm && fk === 'today' && !pals[pi].calm) continue; // 부고엔 차분한 색만 (살구 크림·바다 남색·라벤더 안개·회색 캐러멜)
+        var d = { id: ind.id + '-' + fk + '-' + (pi + 1), industry: ind.id, no: fi + 1, name: st.label, colorName: COLOR_NAMES[fk][pi], c: ids.length + 1,
           style: fk, font: st.title, mood: st.mood || 'modern', badge: BADGE[ind.id] || '', pal: pals[pi], colors: colorsFor(fk, pals[pi]) };
         BY_ID[d.id] = d; ids.push(d.id);
+        if (pi === first) firstId = d.id;
       }
       FAMILY_OF[ind.id + '-' + fk] = ids;
-      list.push(BY_ID[ids[first]]);
+      list.push(BY_ID[firstId || ids[0]]);
     });
   });
   // 예전 디자인 번호 → 같은 업종 1번 (지난 링크가 깨지지 않게만)
@@ -433,6 +453,7 @@
     Object.keys(map).forEach(function (k) { s.setProperty(k, map[k]); });
     if (c.g) { s.setProperty('--grad', 'linear-gradient(180deg,' + c.g.join(',') + ')'); s.setProperty('--band', 'linear-gradient(90deg,' + (c.band || c.g).join(',') + ')'); }
     else { s.removeProperty('--grad'); s.removeProperty('--band'); }
+    if (c.g && /^#f{6}$/i.test(c.onBg)) s.setProperty('--tsh', '0 2px 12px rgba(0,0,0,.38)'); else s.removeProperty('--tsh'); // 흰 글씨엔 검은 그림자 (코랄 노을·햇살 초록처럼 위가 밝은 바탕)
     s.setProperty('--f-title', (FONTS[d.font] || FONTS.sys).stack);
     s.setProperty('--f-body', FONTS.sys.stack);
     el.setAttribute('data-style', d.style);

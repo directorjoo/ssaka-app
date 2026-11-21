@@ -7,7 +7,24 @@
 // 뉴스는 제목과 원문 링크만 보여 주고(본문 복사 없음), 요약은 제목들만 보고 씁니다.
 // 같은 결과를 Cloudflare 캐시에 30~60분 보관해서 방문자가 많아도 바깥 요청·AI 비용이 늘지 않게 합니다.
 //   GET /api/today?k=market : 📈 코스피·코스닥 + 달러·엔·유로·위안 환율 (아침카드와 같은 market(), 30분 캐시)
-import { market } from './letter.js';
+//   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
+import { market, indexOf } from './letter.js';
+const f2 = v => v.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const rp = p => p == null || !isFinite(p) ? null : Math.round(p * 100) / 100;
+async function stock() {
+  const IDX = [['코스피', 'KOSPI', '^KS11'], ['코스닥', 'KOSDAQ', '^KQ11'], ['🇺🇸 다우', null, '^DJI'], ['🇺🇸 나스닥', null, '^IXIC'], ['🇺🇸 S&P 500', null, '^GSPC'], ['🇯🇵 니케이', null, '^N225']];
+  const STK = [['삼성전자', '005930'], ['SK하이닉스', '000660'], ['LG에너지솔루션', '373220'], ['현대차', '005380'], ['NAVER', '035420'], ['카카오', '035720']];
+  const [ia, sa, m] = await Promise.all([
+    Promise.all(IDX.map(x => indexOf(x[1], x[2]).catch(() => null))),
+    Promise.all(STK.map(x => indexOf(x[1], x[1] + '.KS', 'stock').catch(() => null))),
+    market().catch(() => null)
+  ]);
+  const idx = [], stk = [];
+  ia.forEach((q, i) => { if (q) idx.push({ n: IDX[i][0], v: f2(q.v), pct: rp(q.pct) }); });
+  sa.forEach((q, i) => { if (q) stk.push({ n: STK[i][0], code: STK[i][1], v: Math.round(q.v).toLocaleString('ko-KR') + '원', pct: rp(q.pct) }); });
+  if (!idx.length && !stk.length) return null;
+  return { at: kst().toISOString().slice(0, 16).replace('T', ' '), idx, stk, ex: m && m.ex ? m.ex.slice(0, 1) : [] };
+}
 const MODEL_DEFAULT = 'claude-haiku-5-5';
 function json(o, status, maxAge) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + (maxAge || 0) } });
@@ -68,6 +85,7 @@ async function translate(env, arr) {
 }
 
 async function build(k, env) {
+  if (k === 'stock') { const s = await stock(); if (!s) throw new Error('no-stock'); return s; }
   if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
   if (k === 'news') {
     const [top, biz] = await Promise.all([
@@ -123,8 +141,8 @@ async function build(k, env) {
 
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt|world|market)$/.test(k)) return json({ error: 'bad-k' }, 400);
-  let ttl = k === 'google' || k === 'market' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
+  if (!/^(news|google|gov|yt|world|market|stock)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  let ttl = k === 'google' || k === 'market' || k === 'stock' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
   const ckey = new Request(u.origin + '/__today/' + k + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, env); } catch (e) { return json({ error: 'source', msg: String(e.message || e).slice(0, 80) }, 502); }

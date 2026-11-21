@@ -146,13 +146,6 @@
       var dt = new Date(d.date + 'T00:00:00'), DAYS = '일월화수목금토';
       var h = '<div class="date">' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + DAYS[dt.getDay()] + '요일 · ' + esc(WHO.filter(function (w) { return w[0] === k; })[0][1]) + '께 드리는 소식</div>';
       h += '<div class="hello">' + esc(d.hello) + '</div>';
-      if (d.market && ((d.market.idx || []).length || (d.market.ex || []).length)) {
-        var mk = d.market;
-        h += '<div class="mkt"><h3>📈 오늘의 시세</h3>' +
-          ((mk.idx || []).length ? '<div class="ix">' + mk.idx.map(function (x) { var c = x.pct == null ? '' : '<span class="' + (x.pct >= 0 ? 'up">▲ ' : 'dn">▼ ') + Math.abs(x.pct).toFixed(2) + '%</span>'; return '<div><b>' + esc(x.n) + '</b><strong>' + esc(x.v) + '</strong>' + c + '</div>'; }).join('') + '</div>' : '') +
-          ((mk.ex || []).length ? '<div class="fx2">' + mk.ex.map(function (x) { return '<div><b>' + esc(x.n) + '</b><strong>' + esc(x.v) + '</strong></div>'; }).join('') + '</div>' : '') +
-          '<small class="n">주가는 마지막 장 마감 기준, 환율은 참고용 기준 환율이에요. 은행에서 바꿀 땐 수수료가 붙어요.</small></div>';
-      }
       if (d.list) {
         if (d.summary) h += '<p class="sum">' + esc(d.summary) + '</p>';
         if (d.items.length) h += '<div class="src">기사 요약 · 더 보고 싶은 기사만 눌러 원문으로</div>';

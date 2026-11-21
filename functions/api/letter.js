@@ -5,7 +5,7 @@
 //   &city=전남 (17개 광역자치단체 중 하나 — 날씨 지역, 기본 광주)
 // 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다.
 // 기사마다 원문을 열어 본문을 읽고 AI가 3~4줄로 요약합니다(11-21 대표님: 제목만 나열하면 안 봄). 본문을 못 가져온 기사는 제목·링크만.
-// 어르신·대표님 카드 맨 위에 📈 오늘의 시세(코스피·코스닥, 달러·엔·유로·위안 환율).
+// 주가·환율은 아침카드에 넣지 않음(11-22 대표님: 주식은 따로 탭) — 오늘의 싸바 📈 주식 탭(/api/today?k=stock)에서. market()은 그쪽에서 씀.
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
 // 있으면 더 정확해지는 환경변수: DATA_API_KEY(공공데이터포털 일반 인증키 하나로 관광공사 행사 + 중기부 기업마당 지원사업 둘 다)
 //   (예전 이름 TOUR_API_KEY도 그대로 읽음 · 기업마당 사이트에서 따로 받은 키가 있으면 BIZINFO_API_KEY)
@@ -225,9 +225,9 @@ async function summarize(arts, k, env, key) {
 }
 // ---------- 📈 오늘의 시세 ----------
 function num(v) { return Number(String(v == null ? '' : v).replace(/,/g, '')); }
-async function indexOf(code, yh) {
-  try {
-    const j = await (await tfetch('https://m.stock.naver.com/api/index/' + code + '/basic', { headers: { 'user-agent': UA } }, 5000)).json();
+async function indexOf(code, yh, kind) {
+  if (code) try {
+    const j = await (await tfetch('https://m.stock.naver.com/api/' + (kind || 'index') + '/' + code + '/basic', { headers: { 'user-agent': UA } }, 5000)).json();
     const v = num(j.closePrice), pct = num(j.fluctuationsRatio);
     if (v > 0) return { v, pct: isFinite(pct) ? pct : null };
   } catch (e) {}
@@ -238,6 +238,7 @@ async function indexOf(code, yh) {
   } catch (e) {}
   return null;
 }
+export { indexOf };
 export async function market() {
   const [ks, kq, fx] = await Promise.all([indexOf('KOSPI', '^KS11'), indexOf('KOSDAQ', '^KQ11'), tfetch('https://open.er-api.com/v6/latest/USD', {}, 5000).then(r => r.json()).catch(() => null)]);
   const idx = [], ex = [];
@@ -256,7 +257,7 @@ export async function market() {
 }
 
 async function build(k, city, env) {
-  const c = CITY[city] || CITY['광주'], mkP = k === 'actor' ? Promise.resolve(null) : market().catch(() => null), w = await weather(c), today = kst();
+  const c = CITY[city] || CITY['광주'], mkP = Promise.resolve(null), w = await weather(c), today = kst();
   let groups = [], extra = '', links = [];
   if (k === 'senior') {
     const N = async (qs, n) => uniq([].concat(...await Promise.all(qs.map(q => news(q, 6))))).sort((x, y) => y.d - x.d).slice(0, n);
@@ -337,7 +338,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter5/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter6/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
   let data; try { data = await build(k, city, env); } catch (e) { return json({ error: 'build', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (data.fallback) return json(data, 200, 0);

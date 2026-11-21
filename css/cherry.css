@@ -8,7 +8,7 @@
 .cb i {
   position: relative;
   overflow: visible;
-  margin-top: 14px;                 /* 꼭지 자리 */
+  margin-top: 11px;                 /* 새싹 자리 */
   border-radius: 50% 50% 47% 47% / 44% 44% 56% 56% !important;
 }
 .chy::before,
@@ -17,12 +17,12 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: -17px;
+  top: -13px;
   width: 30px;
-  height: 22px;
-  transform: translateX(-34%);
+  height: 17px;
+  transform: translateX(-50%);
   pointer-events: none;
-  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 22'%3E%3Cpath d='M11 21.5C11 14 13 7 17.5 2.5' fill='none' stroke='%236B4423' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M17.5 3.5c3-3.2 8.6-3.4 11.5-1.6-1.8 3.6-7.4 5.4-11.5 1.6z' fill='%233E8E3A'/%3E%3Cpath d='M18.6 3.3c3-.9 6.2-1.2 9.2-1.2' fill='none' stroke='%23246B22' stroke-width='.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 17'%3E%3Cpath d='M15 16.5V10' stroke='%23558B2F' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M15 10C11 11 4.5 9 3.5 2.5 9.5 1.5 14 5 15 10z' fill='%2366BB4A'/%3E%3Cpath d='M15 10c1-5 5.5-8.5 11.5-7.5-1 6.5-7.5 8.5-11.5 7.5z' fill='%234CA545'/%3E%3C/svg%3E");
 }
 /* 몸통 윗가운데 살짝 들어간 자리 + 반짝 빛 */
 .chy::after,
@@ -40,12 +40,20 @@
   pointer-events: none;
 }
 
-/* 고른 체리: 체리 레드 테두리 + 연분홍 속 (오늘의 싸바는 채널 색 그대로) */
+/* 11-21 대표님: 새싹(F) 꼭지 + 테두리는 싸바 체리 레드, 속은 흰색으로 깔끔하게 (모든 체리 탭 같은 모양) */
+.chy,
+.inds.circ .ind-grid button i,
+.cb i {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 0 2px #B3132B, 0 4px 10px -6px rgba(120, 10, 30, .35) !important;
+}
+/* 고른 체리: 속은 그대로 흰색, 테두리만 굵게 + 체리빛 번짐 */
 [aria-pressed="true"] > .chy,
 .on > .chy,
-.inds.circ .ind-grid button[aria-pressed="true"] i {
-  background: #FFE3E7 !important;
-  box-shadow: 0 0 0 3px #B3132B, 0 6px 14px -4px rgba(179, 19, 43, .45) !important;
+.inds.circ .ind-grid button[aria-pressed="true"] i,
+.cb[aria-pressed="true"] i {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 0 4px #B3132B, 0 0 0 8px rgba(179, 19, 43, .14), 0 8px 16px -6px rgba(179, 19, 43, .45) !important;
 }
 @media (prefers-reduced-motion: no-preference) {
   [aria-pressed="true"] > .chy,
@@ -60,3 +68,5 @@
   transform: none; border-radius: 999px; background: #B3132B;
   padding: 1px 5px; color: #fff; font-size: 10px; font-weight: 900; line-height: 1.5;
 }
+
+.cb[aria-pressed="true"] b { color: #B3132B; }

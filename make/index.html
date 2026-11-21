@@ -536,6 +536,13 @@
   .dn-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 2px; }
   .dn-foot > * { min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E3C2BA; background: #fff; color: #5A3A30; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; cursor: pointer; }
   .dn-foot > [hidden] { display: none; }
+  /* 11-22 2단계 디자인 고르기도 상자로 (업종 바로 만들기로 들어오면 여기부터 보임) — 바깥 분홍 점선 틀은 걷어냄 */
+  .tp[data-tab="design2"] { padding: 14px 10px; background: #fff; border: 1.5px solid #E4E4E7; }
+  .d2box { margin-bottom: 12px; }
+  .d2col:has(> #dCols[hidden]) { display: none; }
+  .d2box .dcols { margin: 0; }
+  .d2box .phsug-tip { margin: 0; }
+  #cmpBody .tp[data-tab="design2"] { border: 0; padding: 0; }
   /* 11-22 대표님: 붉은 기운 바탕 빼고 깨끗하게 — 흰색 + 옅은 미색만 (이 화면 1단계 상자·3단계 쓰기 칸·완성 화면) */
   .stp.s1, .done-box .stp.s1 { background: #fff; border-color: #E9E2D8; }
   .stp.s2, .done-box .stp.s2 { background: #FFFCF5; border-color: #EFE6D6; }
@@ -587,16 +594,21 @@
       <div id="d2home">
       <div class="tp" data-tab="design2">
       <div class="step" id="d2step">2. 디자인 고르기 <span id="designInfo"></span></div>
-      <div class="hint" id="d2hint" style="margin:-4px 0 10px">눈으로 보고 마음에 드는 걸 누르세요. 다 쓰고 나서 다른 디자인·색과 다시 비교해 볼 수 있어요.</div>
+      <div class="d2dest" id="d2dest" hidden></div>
+      <section class="stp s1 d2box"><h3 class="stp-h"><span class="stp-n">1</span>마음에 드는 모양 고르기 <small id="d2hint">눈으로 보고 누르세요 · 다 쓰고 나서 다시 비교할 수 있어요</small></h3>
+      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
+      </section>
+      <section class="stp s2 d2box d2col"><h3 class="stp-h"><span class="stp-n">2</span>색 고르기 <small>같은 모양 그대로, 색만 바뀌어요</small></h3>
+      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
+      </section>
+      <section class="stp opt d2box"><h3 class="stp-h"><span class="stp-n">+</span>내 사진에 맞춘 디자인 <small>선택 · 안 해도 돼요</small></h3>
       <div class="phsug" id="phSug" hidden>
         <div class="phsug-h">📸 <b>내 사진에 어울리는 디자인</b> <span>사진 색을 뽑아 만들었어요</span></div>
         <div class="phsug-cols" id="phCols"></div>
         <div class="gallery phsug-g" id="phGal" role="group" aria-label="사진 색 디자인"></div>
       </div>
       <div class="phsug-tip" id="phTip">💡 대표 사진을 올리면 사진 색에 맞춘 디자인 3가지를 만들어 드려요</div>
-      <div class="d2dest" id="d2dest" hidden></div>
-      <div class="gallery" id="gallery" role="group" aria-label="디자인"></div>
-      <div class="dcols" id="dCols" role="group" aria-label="디자인 색" hidden></div>
+      </section>
       <button type="button" id="d2next">✅ 이 디자인으로 — 다음: 내용 적기 ›</button>
       </div>
       </div>

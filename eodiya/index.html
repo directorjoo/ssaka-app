@@ -20,7 +20,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/steps.css?v=1">
+  <link rel="stylesheet" href="../css/steps.css?v=2">
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; background: #fff; color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
@@ -674,12 +674,15 @@
       <div class="note" style="margin-top:10px">친구는 카톡에서 눌러서 위치·문자·사진으로 바로 답장해요.</div>
     </div>
 
-    <div class="box" id="comeBox" hidden>
+    <div class="box stp-wrap" id="comeBox" hidden>
+      <section class="stp s1"><h3 class="stp-h"><span class="stp-n">1</span>내 위치 잡기</h3>
       <button type="button" class="big red" id="useGps">📍 지금 내 위치 잡기</button>
       <div class="note" id="placeNote">"어디야?" 문자를 받았으면 이것만 누르고 보내면 돼요.</div>
       <iframe class="map" id="mapPrev" title="내 위치 지도" hidden loading="lazy"></iframe>
+      </section>
+      <section class="stp opt"><h3 class="stp-h"><span class="stp-n">2</span>약속 장소·시간 <small>선택 · 따로 정할 때만</small></h3>
       <details class="more-opt">
-        <summary>약속 장소 · 시간을 따로 정하려면</summary>
+        <summary>▾ 눌러서 장소·시간 정하기</summary>
         <button type="button" class="pbtn" id="usePost" style="margin-top:6px">🔍 주소 찾기</button>
         <input type="text" id="placeName" maxlength="60" placeholder="장소 이름 (예: 강남역 11번 출구)" style="margin-top:8px">
         <label class="l">만나는 시간</label>
@@ -691,32 +694,35 @@
         </div>
         <input type="time" id="timeAt" hidden style="margin-top:8px">
       </details>
+      </section>
       <div class="rta"><textarea id="memo" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 2번 출구 앞 편의점!"></textarea><button type="button" id="cClear">지우기</button></div>
     </div>
 
-    <div class="box" id="playBox" hidden>
+    <div class="box stp-wrap" id="playBox" hidden>
       <div class="bubble"><img src="../img/cherry-dance-anim.svg" alt="" width="34" height="34" style="vertical-align:-9px"> <b id="playPrev">친구야 놀자!</b></div>
-      <label class="l" style="margin-top:16px">폰으로 같이 놀까?</label>
-      <div class="acts">
-        <a class="act" href="../shoot/" style="display:grid;place-items:center;text-decoration:none;color:inherit;background:#FFD84D;border-color:#1A1A1A">🪜 사다리 한판?</a>
-        <a class="act" href="../pool/" style="display:grid;place-items:center;text-decoration:none;color:#fff;background:#1F5FAF;border-color:#1F5FAF">🎱 당구 한판?</a>
-      </div>
-      <label class="l">만나서 뭐 할까?</label>
-      <div class="acts" id="acts">
-        <button type="button" class="act" aria-pressed="true">☕ 차 한잔</button>
-        <button type="button" class="act" aria-pressed="false">🍽️ 식사하자</button>
-        <button type="button" class="act" aria-pressed="false">🚶 산책</button>
-        <button type="button" class="act" aria-pressed="false">♟️ 바둑·장기</button>
-        <button type="button" class="act" aria-pressed="false">🎤 노래방</button>
-        <button type="button" class="act" aria-pressed="false">⛰️ 등산</button>
-        <button type="button" class="act" aria-pressed="false">🃏 화투 한 판</button>
-        <button type="button" class="act" aria-pressed="false">🍶 한잔하자</button>
-        <button type="button" class="act" aria-pressed="false">🥃 소주 한잔</button>
-        <button type="button" class="act" aria-pressed="false">🎱 당구 한판</button>
-        <button type="button" class="act" aria-pressed="false">💬 수다 떨자</button>
-      </div>
-      <label class="l">언제?</label>
-      <div class="chips" id="playWhen">
+      <section class="stp s1" style="margin-top:12px"><h3 class="stp-h"><span class="stp-n">1</span>만나서 뭐 할까? <small>하나 고르세요</small></h3>
+        <div id="acts">
+        <div class="grp"><div class="grp-h">🍽️ 먹고 마시기</div><div class="acts">
+          <button type="button" class="act" aria-pressed="true">☕ 차 한잔</button>
+          <button type="button" class="act" aria-pressed="false">🍽️ 식사하자</button>
+          <button type="button" class="act" aria-pressed="false">🍶 한잔하자</button>
+          <button type="button" class="act" aria-pressed="false">🥃 소주 한잔</button>
+        </div></div>
+        <div class="grp"><div class="grp-h">🎲 놀이</div><div class="acts">
+          <button type="button" class="act" aria-pressed="false">🎤 노래방</button>
+          <button type="button" class="act" aria-pressed="false">🎱 당구 한판</button>
+          <button type="button" class="act" aria-pressed="false">♟️ 바둑·장기</button>
+          <button type="button" class="act" aria-pressed="false">🃏 화투 한 판</button>
+          <button type="button" class="act" aria-pressed="false">💬 수다 떨자</button>
+        </div></div>
+        <div class="grp"><div class="grp-h">🚶 바깥 활동</div><div class="acts">
+          <button type="button" class="act" aria-pressed="false">🚶 산책</button>
+          <button type="button" class="act" aria-pressed="false">⛰️ 등산</button>
+        </div></div>
+        </div>
+      </section>
+      <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>언제?</h3>
+        <div class="chips" id="playWhen">
         <button type="button" class="chip" data-w="now" aria-pressed="true">지금 당장</button>
         <button type="button" class="chip" data-w="60" aria-pressed="false">1시간 뒤</button>
         <button type="button" class="chip" data-w="lunch" aria-pressed="false">점심 12시</button>
@@ -724,10 +730,18 @@
         <button type="button" class="chip" data-w="dinner" aria-pressed="false">저녁 6시</button>
         <button type="button" class="chip" data-w="tmr" aria-pressed="false">내일 오전 10시</button>
       </div>
-      <label class="l" for="playPlace">어디서?</label>
-      <input type="text" id="playPlace" maxlength="40" placeholder="예: 경로당, 시장 앞 다방, 공원 정자">
-      <button type="button" class="pbtn" id="playGps" style="width:100%;margin-top:8px">📍 내가 있는 곳으로 부르기</button>
-      <div class="rta"><textarea id="playText" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 늦으면 전화해!"></textarea><button type="button" id="pClear">지우기</button></div>
+      </section>
+      <section class="stp s3"><h3 class="stp-h"><span class="stp-n">3</span>어디서? <small>안 써도 돼요</small></h3>
+        <input type="text" id="playPlace" maxlength="40" placeholder="예: 경로당, 시장 앞 다방, 공원 정자" aria-label="어디서">
+        <button type="button" class="pbtn" id="playGps" style="width:100%;margin-top:8px">📍 내가 있는 곳으로 부르기</button>
+        <div class="rta"><textarea id="playText" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 늦으면 전화해!"></textarea><button type="button" id="pClear">지우기</button></div>
+      </section>
+      <section class="stp opt"><h3 class="stp-h"><span class="stp-n">🎮</span>폰으로 같이 놀까? <small>선택 · 각자 폰으로 바로 한판</small></h3>
+        <div class="acts">
+          <a class="act" href="../shoot/" style="display:grid;place-items:center;text-decoration:none;color:inherit;background:#FFD84D;border-color:#1A1A1A">🪜 사다리 한판?</a>
+          <a class="act" href="../pool/" style="display:grid;place-items:center;text-decoration:none;color:#fff;background:#1F5FAF;border-color:#1F5FAF">🎱 당구 한판?</a>
+        </div>
+      </section>
     </div>
 
     <div class="box">

@@ -472,13 +472,17 @@
     return fl.filter(function (d) { return d.style !== 'today'; })[0] || fl[0];
   }
 
-  // 업종 4묶음 (홈·만들기 화면에서 묶어서 보여줌)
+  // 업종 묶음 (11-22 대표님: 성격·종류별로 더 잘게 나눠 알아보기 쉽게) — 홈·만들기 화면에서 묶어서 보여줌
   var GROUPS = [
-    { id: 'shop', label: '가게·매장', emoji: '🏪', ids: ['restaurant', 'product', 'cafe', 'beauty', 'fitness', 'flower', 'stay'] },
-    { id: 'edu', label: '교육·학원', emoji: '📚', ids: ['toefl', 'bigacademy', 'academy', 'entrance', 'tutor', 'arts'] },
-    { id: 'pro', label: '프로필·영업', emoji: '💼', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales', 'freelancer', 'actor', 'director'] },
     { id: 'meet', label: '모임·행사', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event'] },
-    { id: 'life', label: '경조사·안부', emoji: '💌', ids: ['wedding', 'funeral', 'greeting', 'news', 'kid', 'senior'] }
+    { id: 'life', label: '경조사·인사', emoji: '💌', ids: ['wedding', 'funeral', 'greeting'] },
+    { id: 'care', label: '소식·안심', emoji: '🛡️', ids: ['news', 'kid', 'senior'] },
+    { id: 'food', label: '음식·카페', emoji: '🍽️', ids: ['restaurant', 'cafe'] },
+    { id: 'shop', label: '매장·서비스', emoji: '🛍️', ids: ['product', 'beauty', 'fitness', 'flower', 'stay'] },
+    { id: 'edu', label: '학원', emoji: '📚', ids: ['toefl', 'bigacademy', 'academy', 'entrance'] },
+    { id: 'tutor', label: '과외·예체능', emoji: '✏️', ids: ['tutor', 'arts'] },
+    { id: 'sales', label: '영업·상담', emoji: '🤝', ids: ['insurance', 'newcar', 'usedcar', 'realty', 'sales'] },
+    { id: 'pro', label: '프로필·창작', emoji: '🎬', ids: ['actor', 'director', 'freelancer'] }
   ];
   // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
   // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
@@ -494,8 +498,8 @@
   function isOpen(id) { return showAll || OPEN.indexOf(id) >= 0; }
   var ALL_GROUPS = GROUPS;
   GROUPS = GROUPS.map(function (g) { return { id: g.id, label: g.label, emoji: g.emoji, ids: g.ids.filter(isOpen) }; }).filter(function (g) { return g.ids.length; });
-  // 순서: 모임·행사 → 경조사·안부 → 가게·매장 → 교육·학원 → 프로필·영업 (연말 모임 철이라 모임 먼저)
-  var G_ORDER = ['meet', 'life', 'shop', 'edu', 'pro'];
+  // 순서: 모임 → 경조사 → 소식·안심 → 음식·카페 → 매장 → 학원 → 과외 → 영업 → 프로필 (연말 모임 철이라 모임 먼저)
+  var G_ORDER = ['meet', 'life', 'care', 'food', 'shop', 'edu', 'tutor', 'sales', 'pro'];
   GROUPS.sort(function (a, b) { return G_ORDER.indexOf(a.id) - G_ORDER.indexOf(b.id); });
   function groupOf(id) { return GROUPS.filter(function (g) { return g.ids.indexOf(id) >= 0; })[0] || GROUPS[0]; }
   var api = {

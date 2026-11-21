@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="../css/sk.css?v=92">
   <link rel="stylesheet" href="../css/sk-world.css?v=8">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
+  <link rel="stylesheet" href="../css/steps.css?v=2">
   <meta property="og:title" content="1분 만에 싸바 카드 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
@@ -173,6 +174,12 @@
     .ind-box.g-life { --bx: #EEE6F1; --bl: #E0D3E6; } /* 5 라벤더 안개 (연하게) */
     .ind-box.g-shop { --bx: #F3F0CC; --bl: #E5E0B0; } /* 1 레몬 안개 */
     .ind-box.g-pro  { --bx: #E2EBF5; --bl: #CFDCEA; } /* 2 하늘 */
+    .ind-box.g-care { --bx: #E6F0E4; --bl: #D2E2CE; } /* 4 빛 민트 연하게 */
+    .ind-box.g-food { --bx: #FBE3D6; --bl: #F0CDBB; } /* 7 코랄 노을 연하게 */
+    .ind-box.g-edu, .ind-box.g-tutor { --bx: #E4EEF7; --bl: #D0DEEB; }
+    .ind-box.g-sales { --bx: #ECE9E4; --bl: #DCD6CD; } /* 6 회색 캐러멜 연하게 */
+    .ind-box .ind-gh { padding-bottom: 6px; border-bottom: 1px dashed rgba(0,0,0,.12); margin-bottom: 6px !important; }
+    .ind-box .ind-gh b { font-size: 18px !important; }
     .ind-box .ind-gh { display: flex; align-items: center; gap: 6px; margin: 0 6px 2px; color: #1A1A1A; }
     .ind-box .ind-gh i { font-style: normal; font-size: 19px; }
     .ind-box .ind-gh b { font-size: 17px; font-weight: 900; letter-spacing: -.02em; }
@@ -528,10 +535,10 @@
       <div class="tp" data-tab="design">
       <div class="step" id="d1step">1. 용도 고르기 <span class="bt-hide">어디에 올리고, 무엇을 알릴지</span></div>
       <button type="button" id="resumeBtn" hidden></button>
-      <div class="use-h">어디에 쓸까요? <small class="bt-hide">나중에 다른 곳 크기로도 만들 수 있어요</small></div>
-      <div class="dests" id="dests" role="group" aria-label="올릴 곳"></div>
-      <div class="use-h">무엇을 알릴까요?</div>
-      <div class="inds" id="inds" role="group" aria-label="용도"></div>
+      <section class="stp s1"><h3 class="stp-h"><span class="stp-n">1</span>어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></h3>
+      <div class="dest-groups" id="dests" role="group" aria-label="올릴 곳"></div></section>
+      <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>무엇을 알릴까요? <small>종류별로 묶었어요 · 하나만 고르세요</small></h3>
+      <div class="inds" id="inds" role="group" aria-label="용도"></div></section>
       <div class="use-go" id="useGo">👆 고르면 거기에 맞는 디자인이 바로 아래에 나와요</div>
       <div class="hlinks" id="hLinks" hidden></div>
       </div>
@@ -972,7 +979,7 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=92"></script>
+<script src="../js/designs.js?v=93"></script>
 <script src="../js/mkfun.js?v=1"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=84"></script>
@@ -2956,14 +2963,21 @@
   var DEST_BY = {}; DESTS.forEach(function (d) { DEST_BY[d.id] = d; });
   var dest = 'kakao';
   try { var sd = localStorage.getItem('sava-dest'); if (DEST_BY[sd]) dest = sd; } catch (e) {}
+  // 11-22 대표님: 올릴 곳도 종류별로 — 카톡 / SNS / 인쇄
+  var DEST_GROUPS = [['💬 카톡으로', ['kakao', 'kch']], ['📱 SNS에 올리기', ['feed', 'story', 'square']], ['🖨️ 종이로 인쇄', ['print']]];
   function renderDests() {
-    var box = $('dests'); box.innerHTML = '';
-    DESTS.forEach(function (d) {
+    var outer = $('dests'); outer.innerHTML = '';
+    DEST_GROUPS.forEach(function (g) {
+      var w = document.createElement('div'); w.className = 'grp';
+      var h = document.createElement('div'); h.className = 'grp-h'; h.textContent = g[0]; w.appendChild(h);
+      var box = document.createElement('div'); box.className = 'dests'; w.appendChild(box); outer.appendChild(w);
+      g[1].forEach(function (id) { var d = DEST_BY[id]; if (!d) return;
       var b = document.createElement('button'); b.type = 'button'; b.dataset.dest = d.id;
       b.innerHTML = '<i aria-hidden="true">' + d.i + '</i><span><b>' + d.b + '</b><small>' + d.s + '</small></span>';
       b.setAttribute('aria-pressed', d.id === dest ? 'true' : 'false');
       b.addEventListener('click', function () { setDest(d.id); });
       box.appendChild(b);
+      });
     });
     paintDest();
   }

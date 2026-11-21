@@ -697,7 +697,7 @@
 </nav>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="../js/designs.js?v=92"></script>
+<script src="../js/designs.js?v=93"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/install.js?v=3"></script>
 <script src="../js/share.js"></script>
@@ -852,7 +852,7 @@
   }
   // 업종별로 바로 만들기 — 27개 업종을 모두 보여 줌 (아직 안 연 업종은 '준비 중')
   function industries(v) {
-    var ORDER = ['meet', 'life', 'shop', 'edu', 'pro'];
+    var ORDER = ['meet', 'life', 'care', 'food', 'shop', 'edu', 'tutor', 'sales', 'pro'];
     var all = (D.ALL_GROUPS || D.GROUPS || []).slice().sort(function (a, b) { return ORDER.indexOf(a.id) - ORDER.indexOf(b.id); });
     all.forEach(function (grp) {
       var h = el('div', 'grp'); h.appendChild(document.createTextNode(grp.emoji + ' ' + grp.label + ' '));

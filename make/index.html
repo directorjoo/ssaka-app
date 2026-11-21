@@ -536,6 +536,19 @@
   .dn-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 2px; }
   .dn-foot > * { min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E3C2BA; background: #fff; color: #5A3A30; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; cursor: pointer; }
   .dn-foot > [hidden] { display: none; }
+  /* 11-22 대표님: 붉은 기운 바탕 빼고 깨끗하게 — 흰색 + 옅은 미색만 (이 화면 1단계 상자·3단계 쓰기 칸·완성 화면) */
+  .stp.s1, .done-box .stp.s1 { background: #fff; border-color: #E9E2D8; }
+  .stp.s2, .done-box .stp.s2 { background: #FFFCF5; border-color: #EFE6D6; }
+  .stp.opt, .done-box .more-dest.stp.opt { background: #fff; border-color: #DDD3C6; }
+  #form > .sec-h, #form > .sec-h[data-sec="basic"] { background: #fff; border-color: #E9E2D8; }
+  #form > .sec-h[data-sec="photo"], #form > .sec-h[data-sec="video"] { background: #FFFCF5; border-color: #EFE6D6; }
+  #form > .sec-h[data-sec="deco"] { background: #fff; border-color: #DDD3C6; }
+  #form > fieldset[data-sg] { border-left-color: #E9E2D8; }
+  #form > fieldset[data-sg="basic"], #form > fieldset[data-sg="deco"] { background: #fff; }
+  #form > fieldset[data-sg="photo"], #form > fieldset[data-sg="video"] { background: #FFFCF5; border-left-color: #EFE6D6; }
+  #form > fieldset[data-sg="deco"] { border-left-color: #DDD3C6; }
+  #form > fieldset[data-sg] > legend::after { background: linear-gradient(90deg, #E6DCCD, transparent); }
+  .dn-foot > * { border-color: #DDD3C6; }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>

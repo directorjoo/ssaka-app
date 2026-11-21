@@ -1,7 +1,7 @@
 // 싸바 아침편지 — 단톡방에 매일 아침 보내는 "쓸모 있는 정보만" 편지
 //   GET /api/letter?k=senior : 💊 어르신 — 건강 (날씨에 맞춘 몸 관리, 유행 질병, 무료 접종·검진, 제철 밥상, 사기 조심)
 //   GET /api/letter?k=boss   : 💰 대표님 — 매출 (날씨로 팔 것, 사람 몰리는 행사, 놓치면 손해인 지원·신고, 요즘 뜨는 것, 오늘 할 홍보)
-//   GET /api/letter?k=actor  : 🎬 배우 — 영화·드라마·연극·뮤지컬·광고 오디션 (마감 가까운 순)
+//   GET /api/letter?k=actor  : 🎬 배우 — 영화·드라마·연극·뮤지컬·광고 오디션 (구글 뉴스 13갈래 + 더뮤지컬·씨네21, 아래 바로가기 8곳)
 //   &city=전남 (17개 광역자치단체 중 하나 — 날씨 지역, 기본 광주)
 // 명언·고사성어·정치 다툼·연예 가십·사건사고는 넣지 않습니다. 뉴스는 제목과 원문 링크만 씁니다.
 // 같은 편지를 3시간 동안 캐시해서 여러 사람이 열어도 AI·바깥 요청 비용이 늘지 않습니다.
@@ -119,7 +119,12 @@ const RULES = {
 // 배우 편지 아래 늘 붙는 바로가기 — 공고가 직접 올라오는 곳
 const ACTOR_LINKS = [
   { t: '필름메이커스 배우 모집', url: 'https://www.filmmakers.co.kr/actorsAudition' },
+  { t: '씨네21 영화인 JOB (오디션·모집)', url: 'https://cine21.com/community/recruit' },
+  { t: '더뮤지컬 공연 뉴스 (뮤지컬·연극 오디션)', url: 'https://www.themusical.co.kr/News/List' },
   { t: '네이버 뉴스 · 배우 오디션', url: 'https://search.naver.com/search.naver?where=news&sort=1&query=' + encodeURIComponent('배우 오디션 모집') },
+  { t: '네이버 뉴스 · 뮤지컬·연극 오디션', url: 'https://search.naver.com/search.naver?where=news&sort=1&query=' + encodeURIComponent('뮤지컬 연극 오디션 개최') },
+  { t: '쇼스타 앱 (배우 오디션 지원)', url: 'https://apps.apple.com/kr/app/id6747015500' },
+  { t: '캐스팅 앱 (보조출연 공고)', url: 'https://apps.apple.com/kr/app/id6742736481' },
   { t: '영화진흥위원회(영진위)', url: 'https://www.kofic.or.kr' }
 ];
 const BOSS_LINKS = [
@@ -144,9 +149,9 @@ async function build(k, city, env) {
     if (tr.length) extra = '\n[지금 인기 검색어] ' + tr.join(', ');
     links = BOSS_LINKS;
   } else {
-    const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d'];
+    const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d', '오디션 개최 배우 when:30d', '신인 배우 발굴 오디션 when:30d', '숏폼 드라마 배우 모집 when:30d', 'site:themusical.co.kr 오디션 when:60d', 'site:cine21.com 오디션 when:60d'];
     const got = await Promise.all(qs.map(q => news(q, 12)));
-    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).slice(0, 20);
+    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).filter((x, i, a) => a.slice(0, i).filter(y => y.src === x.src).length < 4).slice(0, 20); // 한 곳(출처)에서 최대 4개 — 필름메이커스만 가득 차지 않게
     const ic = t => /뮤지컬/.test(t) ? '🎤' : /연극/.test(t) ? '🎭' : /드라마/.test(t) ? '📺' : /광고|모델|뮤직비디오|뮤비/.test(t) ? '📢' : '🎬';
     groups = [['🎬', '오디션·모집', all.map(x => Object.assign({ icon: ic(x.t) }, x))]];
     links = ACTOR_LINKS;

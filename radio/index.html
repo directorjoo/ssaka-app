@@ -62,10 +62,8 @@
   // [채널 id, 이름, 설명, 로고 글자, 로고 색, 안 될 때 열 방송사 듣기 화면]
   var RADIO = [
     ['cbs939', 'CBS 음악FM', '93.9MHz · 가요·팝·클래식', 'CBS<br>93.9', '#e4572e', 'https://www.cbs.co.kr/'],
-    ['kbs1fm', 'KBS 클래식FM', '93.1MHz · 클래식·국악', 'KBS<br>1FM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=24'],
-    ['kbs2fm', 'KBS 쿨FM', '89.1MHz · 가요·팝', 'KBS<br>쿨FM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=25'],
-    ['kbs2r', 'KBS 해피FM', '106.1MHz · 트로트·추억의 노래', 'KBS<br>해피', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=22'],
-    ['kbs1r', 'KBS 1라디오', '97.3MHz · 뉴스·시사', 'KBS<br>1R', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=21'],
+    ['kbs2fm', 'KBS 쿨FM', 'FM 89.1MHz · 가요·팝', 'KBS<br>쿨FM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=25'],
+    ['kbs1r', 'KBS 1라디오 (AM)', 'AM 711kHz · 뉴스·시사', 'KBS<br>AM', '#1d3f8f', 'https://onair.kbs.co.kr/index.html?sname=onair&stype=live&ch_code=21'],
     ['mbcfm4u', 'MBC FM4U', '91.9MHz · 가요·팝', 'MBC<br>FM4U', '#111', 'https://mini.imbc.com/'],
     ['mbcsfm', 'MBC 표준FM', '95.9MHz · 시사·가요', 'MBC<br>표준', '#111', 'https://mini.imbc.com/'],
     ['sbspower', 'SBS 파워FM', '107.7MHz · 가요·팝', 'SBS<br>파워', '#0a7a3f', 'https://www.sbs.co.kr/radio/gorealra.html'],
@@ -75,9 +73,18 @@
     ['gugak', '국악방송', '99.1MHz · 우리 소리', '국악<br>99.1', '#7a5a2a', 'https://www.gugakfm.co.kr/']
   ];
   var TV = [
+    // 기본 넷(대표님 11-22: KBS·MBC·SBS·YTN) + 싸바가 더한 채널(종편·보도·교육은 유튜브 공식 생방송 찾기 — 로그인 없이 나옴)
+    ['KBS 1TV · 2TV', 'KBS 온에어 (지역에 따라 일부 프로그램 제한)', 'KBS', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS'],
+    ['MBC', 'MBC 온에어 (로그인 안 하면 미리보기만 — 무료 가입하면 계속)', 'MBC', '#111', 'https://onair.imbc.com', '600780511', 'MBC'],
+    ['SBS', 'SBS 온에어 (로그인 안 하면 미리보기만 — 무료 가입하면 계속)', 'SBS', '#0a7a3f', 'https://www.sbs.co.kr/live', '', 'SBS'],
     ['YTN 24시간 뉴스', '공식 홈페이지 생방송', 'YTN', '#0b4ea2', 'https://www.ytn.co.kr/_hd/hd_live.html', '353117998', 'YTN'],
-    ['KBS 1TV · 2TV', 'KBS 온에어 (지역에 따라 일부 프로그램 제한)', 'KBS', '#1d3f8f', 'https://onair.kbs.co.kr', '928368733', 'KBS 콩'],
-    ['유튜브 생방송 뉴스', '지금 생방송 중인 뉴스 채널 찾기', '▶︎', '#e62117', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', '']
+    ['연합뉴스TV', '24시간 뉴스 · 유튜브 생방송', '연합<br>TV', '#00539b', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('연합뉴스TV 생방송') + '&sp=EgJAAQ%253D%253D', '', ''],
+    ['JTBC 뉴스', '유튜브 생방송', 'JTBC', '#222', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('JTBC 뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', ''],
+    ['MBN 뉴스', '유튜브 생방송', 'MBN', '#e1251b', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('MBN 뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', ''],
+    ['채널A 뉴스', '유튜브 생방송', '채널A', '#004a99', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('채널A 뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', ''],
+    ['TV조선 뉴스', '유튜브 생방송', 'TV<br>조선', '#c8102e', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('TV조선 뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', ''],
+    ['EBS', 'EBS 온에어 · 교육·다큐', 'EBS', '#6b8e23', 'https://www.ebs.co.kr/onair', '', ''],
+    ['유튜브 생방송 뉴스', '지금 생방송 중인 뉴스 채널 모두 찾기', '▶︎', '#e62117', 'https://www.youtube.com/results?search_query=' + encodeURIComponent('뉴스 생방송') + '&sp=EgJAAQ%253D%253D', '', '']
   ];
   function appUrl(id, name) {
     if (ios && id) return 'https://apps.apple.com/kr/app/id' + id;

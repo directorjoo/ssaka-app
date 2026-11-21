@@ -95,7 +95,7 @@
 
   <div id="main" hidden>
     <nav class="nav">
-      <a href="#s-claude">💬 Claude</a><a href="#s-req">📝 요청 목록</a><i></i><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><i></i><a href="#s-report">🚨 신고·차단</a><i></i><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
+      <a href="#s-claude">💬 Claude</a><a href="#s-req">📝 요청 목록</a><i></i><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><i></i><a href="#s-report">🚨 신고·차단</a><a href="#s-story">📖 싸바스토리</a><i></i><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
     </nav>
 
     <div class="gh">🛠️ 고치기</div>
@@ -151,6 +151,12 @@
       <h2 style="margin-top:16px">⛔ 지금 막힌 카드</h2>
       <div id="blocked"></div>
       <p class="muted">서로 다른 3명이 신고하면 자동으로 막혀요. 살펴보고 괜찮으면 "풀기", 신고만 지우려면 "신고 지우기".</p>
+    </section>
+
+    <section id="s-story">
+      <h2>📖 싸바스토리 원고 <span id="stN"></span></h2>
+      <div id="stories"></div>
+      <p class="muted">sava.kr/story/ '내 이야기 올리기'로 온 원고예요. "올리기"를 누르면 싸바스토리 목록 맨 앞에 바로 보여요. 연락처는 여기서만 보여요.</p>
     </section>
 
     <div class="gh">⚙️ 관리</div>
@@ -222,7 +228,7 @@
     if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일 · 주문 단추 누름 ' + num(o.kimchiOrderTapWeek || 0)));
     T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '오늘도 싸바? 받을 수 있는 회원'));
     $('lkIdea').textContent = o.ideasNew ? '읽을 것 ' + o.ideasNew + '개' : '채택 · 쿠폰';
-    chart(); top(); reports(); reqs(); setup();
+    chart(); top(); reports(); reqs(); stories(); setup();
   }
   function chart() {
     var C = $('chart'); C.innerHTML = '';
@@ -312,6 +318,28 @@
         b('✅ 끝남', '', function () { api({ op: 'reqdone', id: x.id }).then(load); });
       } else b('다시 할 일로', '', function () { api({ op: 'reqopen', id: x.id }).then(load); });
       b('지우기', 'red', function () { if (confirm('이 요청을 지울까요?')) api({ op: 'reqdel', id: x.id }).then(load); });
+      d.appendChild(a); L.appendChild(d);
+    });
+  }
+  function stories() {
+    var L = $('stories'), S = D.stories || []; L.innerHTML = '';
+    var nw = S.filter(function (x) { return x.st === 'new'; }).length, ok = S.filter(function (x) { return x.st === 'ok'; }).length;
+    $('stN').textContent = '새 원고 ' + nw + ' · 올림 ' + ok;
+    if (!S.length) { L.appendChild(el('p', 'muted', '아직 온 원고가 없어요.')); return; }
+    var LB = { 'new': '🟠 새 원고', ok: '✅ 올림', no: '⏸ 안 올림' };
+    S.forEach(function (x) {
+      var d = el('div', 'req' + (x.st === 'no' ? ' done' : ''));
+      d.appendChild(el('div', 'meta', LB[x.st] + ' · ' + (x.kind === 'real' ? '실화' : '지어낸 이야기') + ' · ' + (x.by || '익명') + ' · ' + when(x.at) + (x.contact ? ' · 📮 ' + x.contact : '')));
+      d.appendChild(el('p', '', '「' + x.title + '」' + (x.line ? '  💬 ' + x.line : '')));
+      var body = el('p', '', x.text.length > 160 ? x.text.slice(0, 160) + '…' : x.text); body.style.fontSize = '15px'; body.style.color = '#5a4e44'; d.appendChild(body);
+      var a = el('div', 'a');
+      function b(txt, cls, fn) { var e = el('button', 'sb ' + (cls || ''), txt); e.type = 'button'; e.addEventListener('click', fn); a.appendChild(e); }
+      if (x.text.length > 160) b('전체 읽기', '', function () { body.textContent = body.textContent.length > 170 ? x.text.slice(0, 160) + '…' : x.text; });
+      if (x.st !== 'ok') b('✅ 올리기', 'dark', function () { api({ op: 'storyok', id: x.id }).then(function () { toast('싸바스토리에 올렸어요'); load(); }); });
+      if (x.st === 'ok') b('내리기', '', function () { api({ op: 'storyno', id: x.id }).then(load); });
+      if (x.st === 'new') b('안 올림', '', function () { api({ op: 'storyno', id: x.id }).then(load); });
+      if (x.st === 'ok') { var v = el('a', 'sb', '보기 ↗'); v.href = '/story/#u' + x.id; v.target = '_blank'; a.appendChild(v); }
+      b('지우기', 'red', function () { if (confirm('이 원고를 지울까요? 되돌릴 수 없어요.')) api({ op: 'storydel', id: x.id }).then(load); });
       d.appendChild(a); L.appendChild(d);
     });
   }

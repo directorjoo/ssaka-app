@@ -4,9 +4,11 @@
 // POST /api/admin {op:'block'|'unblock', cid}
 // POST /api/admin {op:'req', text, where}  → Claude에게 맡길 수정 요청 적어 두기
 // POST /api/admin {op:'reqdone'|'reqopen'|'reqdel', id}
+// POST /api/admin {op:'storyok'|'storyno'|'storynew'|'storydel', id}  → 싸바스토리 원고 올리기·내리기·지우기
 // 개인정보: 회원 숫자만 셈. 이름·전화번호·카카오 번호는 이 화면에 내보내지 않음.
 
 import { currentUser } from './auth/[[path]].js';
+import { storyTable } from './story.js';
 
 function json(o, status) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'private, no-store' } });
@@ -66,6 +68,12 @@ export async function onRequest({ request, env }) {
     const id = parseInt(b.id, 10);
     if (id > 0 && b.op === 'reqdone') { await db.prepare('UPDATE admin_reqs SET st = \'done\', done_at = ? WHERE id = ?').bind(Date.now(), id).run(); return json({ ok: 1 }); }
     if (id > 0 && b.op === 'reqopen') { await db.prepare('UPDATE admin_reqs SET st = \'open\', done_at = NULL WHERE id = ?').bind(id).run(); return json({ ok: 1 }); }
+    if (id > 0 && /^story(ok|no|new|del)$/.test(b.op)) {
+      await storyTable(db);
+      if (b.op === 'storydel') await db.prepare('DELETE FROM stories WHERE id = ?').bind(id).run();
+      else { const st = b.op.slice(5); await db.prepare('UPDATE stories SET st = ?, ok_at = CASE WHEN ? = \'ok\' THEN ? ELSE ok_at END WHERE id = ?').bind(st, st, Date.now(), id).run(); }
+      return json({ ok: 1 });
+    }
     if (id > 0 && b.op === 'reqdel') { await db.prepare('DELETE FROM admin_reqs WHERE id = ?').bind(id).run(); return json({ ok: 1 }); }
     return json({ error: 'bad' }, 400);
   }
@@ -124,9 +132,11 @@ export async function onRequest({ request, env }) {
   const reports = repRows.map(r => Object.assign({ cid: r.cid, n: r.n, at: r.at, why: String(r.why || '').slice(0, 80), blocked: !!r.bwhy }, r.d ? decodeTitle(r.d) : { title: '' }));
   const blRows = await all(db, 'SELECT b.cid, b.why, b.at, c.d FROM blocked b LEFT JOIN cards c ON c.id = b.cid ORDER BY b.at DESC LIMIT 50');
   const blocked = blRows.map(r => Object.assign({ cid: r.cid, why: r.why, at: r.at }, r.d ? decodeTitle(r.d) : { title: '' }));
+  try { await storyTable(db); } catch (e) {}
+  const stories = await all(db, 'SELECT id, kind, title, by, text, line, contact, st, at FROM stories ORDER BY (st = \'new\') DESC, at DESC LIMIT 60');
   const reqs = await all(db, 'SELECT id, text, place, st, at, done_at FROM admin_reqs ORDER BY (st = \'open\') DESC, at DESC LIMIT 100');
 
-  return json({ ok: 1, by: ad.by, nick: ad.nick || '', at: now, users, cards, views, other, trend, top, reports, blocked, reqs,
+  return json({ ok: 1, by: ad.by, nick: ad.nick || '', at: now, users, cards, views, other, trend, top, reports, blocked, reqs, stories,
     // 설정 점검: 값은 절대 내보내지 않고 '넣었는지'만
     setup: [
       ['관리자 계정 (SAVA_ADMIN_UID)', !!env.SAVA_ADMIN_UID], ['관리 비밀번호 (ADMIN_KEY)', !!env.ADMIN_KEY],

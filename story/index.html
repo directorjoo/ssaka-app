@@ -11,6 +11,7 @@
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css">
+  <link rel="stylesheet" href="../css/steps.css?v=3">
   <style>
     * { box-sizing: border-box; } [hidden] { display: none !important; }
     html, body { margin: 0; background: #FBF7F1; color: var(--ink); font-family: var(--font); }
@@ -43,6 +44,40 @@
     .row .k { background: #FEE500; color: #191919; } .row .l { background: #f0ece6; color: var(--ink); }
     .send { display: block; margin-top: 10px; min-height: 54px; border-radius: 16px; background: var(--ssaka); color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; display: grid; place-items: center; }
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.9); color: #fff; font-size: 14px; font-weight: 700; }
+    /* ✍️ 쓰기 화면 — 공통 단계 상자(steps.css) 틀 */
+    #new h1 { margin: 2px 0 6px; font-size: 28px; font-weight: 900; letter-spacing: -.03em; }
+    #new .lead { margin: 0 0 14px; color: var(--ink-2); font-size: 15.5px; line-height: 1.6; word-break: keep-all; }
+    .kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kinds button { min-height: 78px; padding: 10px 8px; border-radius: 16px; border: 2px solid #E9E2D8; background: #fff; font: inherit; color: var(--ink); cursor: pointer; text-align: center; }
+    .kinds button b { display: block; font-size: 17px; font-weight: 900; }
+    .kinds button span { display: block; margin-top: 3px; font-size: 13.5px; color: var(--ink-2); font-weight: 700; word-break: keep-all; }
+    .kinds button[aria-pressed="true"] { border-color: #B3132B; background: #FFF7F8; box-shadow: 0 0 0 2px rgba(179,19,43,.12); }
+    .kinds button[aria-pressed="true"] b { color: #B3132B; }
+    .fl { display: block; margin: 0 0 6px; font-size: 15px; font-weight: 800; color: #5A4632; }
+    .fl em { font-style: normal; font-weight: 700; color: #A0907E; font-size: 13.5px; }
+    .in, .ta { display: block; width: 100%; padding: 12px 14px; border-radius: 14px; border: 1.5px solid #DDD3C6; background: #fff; font: inherit; font-size: 17px; color: var(--ink); }
+    .in + .fl { margin-top: 12px; }
+    .in:focus, .ta:focus { outline: none; border-color: #B3132B; box-shadow: 0 0 0 3px rgba(179,19,43,.12); }
+    .ta { min-height: 260px; line-height: 1.75; resize: vertical; font-family: "Noto Serif KR", "AppleMyungjo", serif; }
+    .cnt { margin-top: 6px; display: flex; justify-content: space-between; font-size: 13.5px; color: #8A7660; font-weight: 700; }
+    .cnt .ok { color: #2F7A45; }
+    .tips { margin: 0 0 10px; padding: 0; list-style: none; }
+    .tips li { position: relative; padding: 0 0 4px 18px; font-size: 14.5px; line-height: 1.55; color: #6B5845; word-break: keep-all; }
+    .tips li::before { content: '🍒'; position: absolute; left: 0; top: 0; font-size: 12px; }
+    .lines { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+    .lines button { min-height: 40px; padding: 0 13px; border-radius: 999px; border: 1.5px solid #E6DCCD; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: #8E0F22; cursor: pointer; }
+    .agree { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; font-size: 14.5px; line-height: 1.55; color: #5A4632; word-break: keep-all; cursor: pointer; }
+    .agree input { flex: none; width: 22px; height: 22px; margin: 1px 0 0; accent-color: #B3132B; }
+    .go { display: block; width: 100%; min-height: 58px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #7A0C1C; }
+    .go:disabled { opacity: .45; cursor: default; }
+    .gnote { margin: 8px 0 0; font-size: 13.5px; color: var(--ink-2); text-align: center; word-break: keep-all; }
+    .done { text-align: center; padding: 30px 18px; border-radius: 20px; background: #fff; border: 2px solid #B3132B; }
+    .done .big { font-size: 54px; }
+    .done h2 { margin: 6px 0 8px; font-size: 24px; font-weight: 900; }
+    .done p { margin: 0 0 16px; color: var(--ink-2); font-size: 15.5px; line-height: 1.6; word-break: keep-all; }
+    .done a, .done button { display: grid; place-items: center; width: 100%; min-height: 50px; margin-top: 8px; border-radius: 14px; border: 0; font: inherit; font-size: 16px; font-weight: 800; text-decoration: none; cursor: pointer; }
+    .done .p { background: #B3132B; color: #fff; } .done .s { background: #f0ece6; color: var(--ink); }
+    a.back, button.back { border: 0; background: none; font: inherit; cursor: pointer; padding: 0; }
   </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -63,9 +98,55 @@
       <span class="soon">🗓️ 곧 열려요 · 기간과 상은 곧 알려 드릴게요</span>
     </div>
     <button type="button" class="write" id="write">✍️ 내 이야기 올리기</button>
-    <p class="wnote">카카오 로그인이 열리면 바로 올릴 수 있어요</p>
+    <p class="wnote">로그인 없이 바로 보낼 수 있어요 · 살펴본 뒤 싸바스토리에 올려 드려요</p>
     <h3>이야기</h3>
     <div id="cards"></div>
+  </section>
+
+  <section id="new" hidden>
+    <button type="button" class="back" id="newBack">← 이야기 목록</button>
+    <h1>✍️ 내 이야기 올리기</h1>
+    <p class="lead">오래 연락 못 한 사람에게 먼저 건넨 한 마디 — 건넸던 이야기도, 건네고 싶은 이야기도 좋아요.</p>
+    <div id="form">
+      <div class="stp s1"><div class="stp-h"><span class="stp-n">1</span>어떤 이야기인가요?</div>
+        <div class="kinds" id="kinds">
+          <button type="button" data-k="real" aria-pressed="true"><b>🙋 내가 겪은 실화</b><span>먼저 건넸던, 받았던 한 마디</span></button>
+          <button type="button" data-k="fic" aria-pressed="false"><b>✨ 지어낸 이야기</b><span>소설처럼 써도 좋아요</span></button>
+        </div>
+      </div>
+      <div class="stp s2"><div class="stp-h"><span class="stp-n">2</span>제목과 이름</div>
+        <label class="fl" for="fTitle">제목</label>
+        <input class="in" id="fTitle" maxlength="40" placeholder="예: 십 년 만의 싸바?">
+        <label class="fl" for="fBy">글쓴이 <em>· 별명도 좋아요, 비우면 '익명'</em></label>
+        <input class="in" id="fBy" maxlength="20" placeholder="예: 금남로 국밥집">
+      </div>
+      <div class="stp s3"><div class="stp-h"><span class="stp-n">3</span>이야기 쓰기<small>줄을 바꾸면 문단이 나뉘어요</small></div>
+        <ul class="tips">
+          <li>누구에게, 왜 오래 연락을 못 했나요?</li>
+          <li>무슨 말을 썼다 지웠나요? 결국 보낸 한 마디는?</li>
+          <li>답이 왔나요? 그 뒤로 무엇이 달라졌나요?</li>
+        </ul>
+        <textarea class="ta" id="fText" maxlength="8000" placeholder="그날 밤, 휴대폰을 꺼냈다…"></textarea>
+        <div class="cnt"><span id="fCnt">0자</span><span id="fSaved"></span></div>
+      </div>
+      <div class="stp opt"><div class="stp-h"><span class="stp-n">+</span>더 적어 둘까요?<small>안 적어도 돼요</small></div>
+        <label class="fl" for="fLine">💬 건넨 그 한 마디</label>
+        <input class="in" id="fLine" maxlength="60" placeholder="싸바? 잘 지내?">
+        <div class="lines" id="lines"><button type="button">싸바? 잘 지내?</button><button type="button">밥은 먹고 다녀?</button><button type="button">보고 싶다</button><button type="button">미안했어</button></div>
+        <label class="fl" for="fContact" style="margin-top:14px">📮 연락처 <em>· 공모전 결과 알림용, 공개 안 돼요</em></label>
+        <input class="in" id="fContact" maxlength="60" placeholder="전화번호나 이메일">
+      </div>
+      <label class="agree"><input type="checkbox" id="fAgree"><span>보낸 이야기가 싸바스토리와 공모전에 실릴 수 있어요. 다른 사람의 실명·사생활은 빼 주세요.</span></label>
+      <button type="button" class="go" id="fGo" disabled>📮 이야기 보내기</button>
+      <p class="gnote">쓰던 글은 이 폰에 저절로 저장돼요</p>
+    </div>
+    <div class="done" id="done" hidden>
+      <div class="big">🍒</div>
+      <h2>이야기를 받았어요</h2>
+      <p>꼼꼼히 읽어 보고 싸바스토리에 올려 드릴게요.<br>오늘, 그 사람에게도 한 마디 건네 보세요.</p>
+      <a class="p" href="../eodiya/">💬 "싸바? 잘 지내?" 보내기</a>
+      <button type="button" class="s" id="doneBack">이야기 목록 보기</button>
+    </div>
   </section>
 
   <section id="read" hidden>
@@ -79,7 +160,7 @@
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var L = window.SAVA_STORIES || [];
+  var L = (window.SAVA_STORIES || []).slice();
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2000); }
   function cards() {
@@ -89,17 +170,56 @@
     document.querySelectorAll('.card').forEach(function (b) { b.addEventListener('click', function () { location.hash = b.dataset.id; }); });
   }
   function show() {
-    var id = location.hash.replace('#', ''), s = L.filter(function (x) { return x.id === id; })[0];
-    $('list').hidden = !!s; $('read').hidden = !s;
+    var id = location.hash.replace('#', ''), s = L.filter(function (x) { return x.id === id; })[0], w = id === 'write';
+    $('list').hidden = !!s || w; $('read').hidden = !s; $('new').hidden = !w;
+    if (w) { document.title = '내 이야기 올리기 · 싸바스토리'; scrollTo(0, 0); return; }
+    document.title = '싸바스토리 · 싸바';
     if (!s) return;
     document.title = s.title + ' · 싸바스토리';
     $('art').innerHTML = '<h2>' + esc(s.title) + '</h2>' + s.paras.map(function (p) {
-      var line = /^싸바[?!]/.test(p) && p.length < 30;
+      var line = (/^싸바[?!]/.test(p) && p.length < 30) || (s.line && p.replace(/["“”']/g, '').trim() === s.line.replace(/["“”']/g, '').trim());
       return '<p' + (line ? ' class="line"' : '') + '>' + esc(p) + '</p>';
-    }).join('') + (s.tags ? '<div class="tags">' + esc(s.tags) + '</div>' : '') + (s.fiction ? '<div class="fic">이 이야기는 싸바의 마음을 담아 지어낸 이야기입니다.</div>' : '');
+    }).join('') + (s.tags ? '<div class="tags">' + esc(s.tags) + '</div>' : '') + (s.by && s.by !== '싸바' ? '<div class="fic">글 · ' + esc(s.by) + '</div>' : '') + (s.fiction ? '<div class="fic">' + (s.by && s.by !== '싸바' ? '지어낸 이야기입니다.' : '이 이야기는 싸바의 마음을 담아 지어낸 이야기입니다.') + '</div>' : '');
     scrollTo(0, 0);
   }
-  $('write').addEventListener('click', function () { toast('카카오 로그인이 열리면 바로 올릴 수 있어요 🍒'); });
+  $('write').addEventListener('click', function () { location.hash = 'write'; });
+  // ---- 쓰기 ----
+  var K = 'real', DK = 'sava-story-draft';
+  function setKind(k) { K = k; document.querySelectorAll('#kinds button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.k === k ? 'true' : 'false'); }); save(); }
+  document.querySelectorAll('#kinds button').forEach(function (b) { b.addEventListener('click', function () { setKind(b.dataset.k); }); });
+  document.querySelectorAll('#lines button').forEach(function (b) { b.addEventListener('click', function () { $('fLine').value = b.textContent; save(); }); });
+  var F = ['fTitle', 'fBy', 'fText', 'fLine', 'fContact'];
+  function check() {
+    var n = $('fText').value.trim().length;
+    $('fCnt').textContent = n + '자' + (n < 30 ? ' · 30자 넘게 써 주세요' : '');
+    $('fCnt').className = n >= 30 ? 'ok' : '';
+    $('fGo').disabled = !($('fTitle').value.trim() && n >= 30 && $('fAgree').checked);
+  }
+  var tm = 0;
+  function save() {
+    check(); clearTimeout(tm);
+    tm = setTimeout(function () {
+      var o = { k: K }; F.forEach(function (f) { o[f] = $(f).value; });
+      try { localStorage.setItem(DK, JSON.stringify(o)); $('fSaved').textContent = '저장됨 ✓'; } catch (e) {}
+    }, 500);
+  }
+  try { var d = JSON.parse(localStorage.getItem(DK) || 'null'); if (d) { F.forEach(function (f) { if (d[f]) $(f).value = d[f]; }); if (d.k) setKind(d.k); } } catch (e) {}
+  F.forEach(function (f) { $(f).addEventListener('input', save); });
+  $('fAgree').addEventListener('change', check);
+  check();
+  $('newBack').addEventListener('click', function () { location.hash = ''; });
+  $('doneBack').addEventListener('click', function () { $('form').hidden = false; $('done').hidden = true; location.hash = ''; });
+  var ERR = { title: '제목을 적어 주세요', short: '이야기를 30자 넘게 써 주세요', agree: '아래 동의에 체크해 주세요', 'bad-words': '올릴 수 없는 말이 들어 있어요', slow: '잠시 뒤에 다시 보내 주세요', big: '글이 너무 길어요' };
+  $('fGo').addEventListener('click', function () {
+    var b = $('fGo'); b.disabled = true; b.textContent = '보내는 중…';
+    fetch('/api/story', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: K, title: $('fTitle').value, by: $('fBy').value, text: $('fText').value, line: $('fLine').value, contact: $('fContact').value, agree: $('fAgree').checked }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) { try { localStorage.removeItem(DK); } catch (e) {} F.forEach(function (f) { $(f).value = ''; }); $('fAgree').checked = false; $('fSaved').textContent = ''; $('form').hidden = true; $('done').hidden = false; scrollTo(0, 0); return; }
+        toast(ERR[j && j.error] || '보내지 못했어요. 다시 눌러 주세요');
+      }, function () { toast('인터넷 연결을 확인해 주세요'); })
+      .then(function () { b.textContent = '📮 이야기 보내기'; check(); });
+  });
   $('copyL').addEventListener('click', function () { var u = location.href; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function () { toast('링크를 복사했어요'); }, function () { prompt('이 링크를 복사하세요', u); }); });
   $('shareK').addEventListener('click', function () {
     var id = location.hash.replace('#', ''), s = L.filter(function (x) { return x.id === id; })[0]; if (!s) return;
@@ -107,6 +227,11 @@
   });
   window.addEventListener('hashchange', show);
   cards(); show();
+  // 대표가 올린 이야기 불러와 앞에 붙이기
+  fetch('/api/story').then(function (r) { return r.json(); }).then(function (j) {
+    if (!j || !j.items || !j.items.length) return;
+    L = j.items.concat(L); cards(); if (location.hash.length > 1) show();
+  }).catch(function () {});
 })();
 </script>
 <script src="/js/home.js?v=13" defer></script>

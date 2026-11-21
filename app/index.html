@@ -479,6 +479,63 @@
     html.home-apricot #v-home .nc { box-shadow: 0 16px 30px -20px rgba(120,70,20,.55); }
     html.home-apricot .n-panel { box-shadow: 0 16px 30px -20px rgba(120,70,20,.5); }
     html.home-apricot .n-h a { color: #8A5A22; }
+    /* ===== 새 홈 시안 v2 (?v2) ===== */
+    #v-home.v2 { padding: 0 0 40px; background: linear-gradient(180deg, #FFFFFF 0%, #FFF8EF 30%, #FCEEDC 70%, #FAE6CC 100%); min-height: 100vh; }
+    #v-home.v2 .v2-hi { padding: 10px 22px 18px; }
+    #v-home.v2 .v2-hi small { display: block; font-size: 15px; font-weight: 600; color: #8A5A22; }
+    #v-home.v2 .v2-hi b { display: block; font-size: 30px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; color: #1A1A1A; }
+    #v-home.v2 .v2-hi b span { color: #B3132B; }
+    #v-home.v2 .v2c { position: relative; display: block; margin: 0 18px 28px; border-radius: 26px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 18px 34px -22px rgba(90,40,20,.6); -webkit-tap-highlight-color: transparent; }
+    #v-home.v2 .v2c h3 { margin: 0; font-size: 32px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; }
+    #v-home.v2 .v2c p { margin: 4px 0 0; font-size: 17px; line-height: 1.4; font-weight: 500; opacity: .9; word-break: keep-all; }
+    #v-home.v2 .v2c em { display: block; font-style: normal; font-size: 15px; font-weight: 600; opacity: .85; margin-bottom: 2px; }
+    /* 어디야 */
+    #v-home.v2 .v2-eo { background: linear-gradient(180deg, #6E0A22 0%, #5A0819 55%, #42050F 100%); }
+    #v-home.v2 .v2-eo .ph { height: 190px; background-size: cover; background-position: center 40%; }
+    #v-home.v2 .v2-eo .ph::after { content: ""; position: absolute; left: 0; right: 0; top: 110px; height: 80px; background: linear-gradient(180deg, rgba(110,10,34,0) 0%, #6E0A22 100%); }
+    #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -34px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    #v-home.v2 .v2-eo .b3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px 16px; }
+    #v-home.v2 .v2-eo .b3 a { display: grid; place-items: center; gap: 2px; padding: 12px 4px; border-radius: 18px; background: #fff; color: #B3132B; text-decoration: none; text-align: center; }
+    #v-home.v2 .v2-eo .b3 a:active { transform: scale(.96); }
+    #v-home.v2 .v2-eo .b3 b { font-size: 21px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; }
+    #v-home.v2 .v2-eo .b3 small { font-size: 15px; font-weight: 600; color: #6E4A4A; }
+    /* 싸바알림판 */
+    #v-home.v2 .v2-mk { background: linear-gradient(100deg, #124A3B 0%, #17573F 35%, #2A7350 65%, #5C9A55 100%); }
+    #v-home.v2 .v2-mk .tx { padding: 20px 20px 16px; text-shadow: 0 1px 4px rgba(0,0,0,.35); }
+    #v-home.v2 .v2-mk h3 { color: #F4E7C8; }
+    #v-home.v2 .v2-mk .btn { display: inline-flex; align-items: center; margin-top: 14px; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #F5E7C6, #E4CF9F); color: #123F33; font-size: 18px; font-weight: 800; text-decoration: none; text-shadow: none; }
+    #v-home.v2 .v2-mk .dance { position: absolute; right: 14px; top: 16px; width: 76px; height: auto; pointer-events: none; }
+    #v-home.v2 .v2-mk .sp { display: flex; align-items: center; gap: 12px; margin: 0 12px 12px; padding: 10px 14px 10px 10px; border-radius: 18px; background: rgba(255,255,255,.14); color: #fff; text-decoration: none; }
+    #v-home.v2 .v2-mk .sp i { flex: none; width: 46px; height: 46px; border-radius: 12px; background-size: cover; background-position: center; border: 2px solid #fff; }
+    #v-home.v2 .v2-mk .sp span { flex: 1; min-width: 0; }
+    #v-home.v2 .v2-mk .sp b { display: block; font-size: 17px; font-weight: 800; }
+    #v-home.v2 .v2-mk .sp small { display: block; font-size: 15px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #v-home.v2 .v2-mk .sp u, #v-home.v2 .v2-strip u, #v-home.v2 .v2-sv u { text-decoration: none; font-size: 24px; font-weight: 700; }
+    /* 오늘의 싸바 — 흰 띠 */
+    #v-home.v2 .v2-strip { display: flex; align-items: center; gap: 12px; margin: 0 18px 32px; padding: 14px 18px; border-radius: 20px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
+    #v-home.v2 .v2-strip i { font-style: normal; font-size: 30px; line-height: 1; }
+    #v-home.v2 .v2-strip span { flex: 1; min-width: 0; }
+    #v-home.v2 .v2-strip b { display: block; font-size: 19px; font-weight: 800; }
+    #v-home.v2 .v2-strip small { display: block; font-size: 15px; color: #6B6259; font-weight: 500; }
+    #v-home.v2 .v2-strip u { color: #B3132B; }
+    #v-home.v2 .v2-sec { margin-bottom: 18px; }
+    #v-home.v2 .v2-sec .n-h { padding: 0 20px; }
+    /* 싸바비앙 — 라파예트 사진 그대로, 글씨는 그림자로 */
+    #v-home.v2 .v2-sv { min-height: 170px; background: #6E4C1E url(../img/savabien-dome.jpg) center 35%/cover; display: flex; align-items: flex-end; }
+    #v-home.v2 .v2-sv .in { display: flex; align-items: center; gap: 12px; padding: 16px 18px; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 8px rgba(0,0,0,.75); }
+    #v-home.v2 .v2-sv .k { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: #B3132B; font-size: 30px; text-shadow: none; box-shadow: 0 6px 14px rgba(0,0,0,.35); }
+    #v-home.v2 .v2-sv em { display: inline-block; font-style: normal; padding: 3px 10px; border-radius: 999px; background: #fff; color: #B3132B; font-size: 15px; font-weight: 800; text-shadow: none; }
+    #v-home.v2 .v2-sv b { display: block; margin-top: 4px; font-size: 30px; line-height: 1.1; font-weight: 900; letter-spacing: -0.03em; }
+    #v-home.v2 .v2-sv b small { margin-left: 8px; font-size: 15px; font-weight: 700; letter-spacing: .14em; color: #FFE7A3; }
+    #v-home.v2 .v2-sv .d { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; }
+    /* 놀이터 · 싸바가 뭐지? */
+    #v-home.v2 .v2-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 18px; }
+    #v-home.v2 .v2-half { display: flex; flex-direction: column; padding: 18px 16px; border-radius: 22px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
+    #v-home.v2 .v2-half:active, #v-home.v2 .v2-strip:active, #v-home.v2 a.v2c:active { transform: scale(.98); }
+    #v-home.v2 .v2-half i { font-style: normal; font-size: 40px; line-height: 1; height: 44px; margin-bottom: 10px; }
+    #v-home.v2 .v2-half i img { height: 44px; width: auto; display: block; }
+    #v-home.v2 .v2-half b { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+    #v-home.v2 .v2-half small { margin-top: 3px; font-size: 15px; color: #6B6259; line-height: 1.35; word-break: keep-all; }
 </style>
 <script src="/js/launch.js?v=3"></script>
 </head>
@@ -838,7 +895,57 @@
       location.href = url;
     });
   }
+  // ===== 새 홈 시안 v2 (11-21) — sava.kr/app/?v2 로 열 때만. 지금 홈은 그대로 =====
+  // 원칙: 카드 틀 하나로 통일, 큰 색은 체리·초록·금색 셋, 나머지는 흰 카드, 카드 사이 28px, 설명 한 줄
+  function renderHomeV2() {
+    var v = $('v-home'); v.innerHTML = ''; v.classList.add('v2');
+    var now = new Date();
+    var hi = el('div', 'v2-hi');
+    hi.innerHTML = '<small></small><b>오늘도 <span>싸바?</span></b>';
+    hi.querySelector('small').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
+    v.appendChild(hi);
+
+    // 1. 어디야 — 가장 크게 (싸바의 얼굴)
+    var eo = el('section', 'v2c v2-eo');
+    eo.innerHTML = '<div class="ph" style="background-image:url(../img/eodiya-cherry12.jpg)"></div>' +
+      '<div class="tx"><h3>어디야?</h3><p>잘 지내? 한마디에 답장이 와요</p></div>' +
+      '<div class="b3"><a href="../eodiya/#ask"><b>싸바?</b><small>안부 전하기</small></a><a href="../eodiya/#come"><b>여기야!</b><small>위치 보내기</small></a><a href="../eodiya/#play"><b>놀자!</b><small>친구 부르기</small></a></div>';
+    tapGo(eo, '../eodiya/');
+    v.appendChild(eo);
+
+    // 2. 싸바알림판 — 초록, 단추 하나 + 특판은 아래 작은 띠
+    var mk = el('section', 'v2c v2-mk');
+    mk.innerHTML = '<div class="tx"><em>가게홍보 · 모임공지 · 초대장</em><h3>싸바알림판</h3><p>카드 한 장 만들어 SNS에 알리세요</p>' +
+      '<a class="btn" href="#alim">1분에 만들기 ›</a></div>' +
+      '<img class="dance" src="../img/cherry-dance-anim.svg" alt="">' +
+      '<a class="sp" href="../kimchi/"><i style="background-image:url(../img/gatkimchi-sign.jpg)"></i><span><b>언니김치 특판</b><small>특판 코너에서 가격을 확인하세요</small></span><u>›</u></a>';
+    tapGo(mk, '#alim');
+    v.appendChild(mk);
+
+    // 3. 오늘의 싸바 — 얇은 흰 띠 한 줄
+    var td = el('a', 'v2-strip'); td.href = '../today/';
+    td.innerHTML = '<i aria-hidden="true">☀️</i><span><b>오늘의 싸바</b><small>뉴스 · 날씨 · 정부 혜택 · 라디오</small></span><u>›</u>';
+    v.appendChild(td);
+
+    // 4. 지금 보내기 좋은 카드 — 그대로
+    var pnl = el('section', 'v2-sec');
+    pnl.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
+    pnl.appendChild(campaigns());
+    v.appendChild(pnl);
+
+    // 5. 싸바비앙 — 황금 넓은 띠 (입점 시작되면 맨 위로)
+    var sv = el('a', 'v2c v2-sv'); sv.href = '../savabien/'; sv.setAttribute('aria-label', '싸바비앙 명품 콜렉션');
+    sv.innerHTML = '<div class="in"><span class="k" aria-hidden="true">👑</span><span class="t"><em>명품 콜렉션</em><b>싸바비앙<small>SAVABIEN</small></b><small class="d">명인의 손끝에서 태어난 명품</small></span></div>';
+    v.appendChild(sv);
+
+    // 6. 놀이터 · 싸바가 뭐지? — 반 칸씩 흰 카드
+    var duo = el('div', 'v2-duo');
+    duo.innerHTML = '<a class="v2-half" href="../eodiya/#playground"><i aria-hidden="true">🎮</i><b>싸바 놀이터</b><small>게임 ' + GAMES.length + '가지 · 무료</small></a>' +
+      '<a class="v2-half" href="../?story=1"><i aria-hidden="true"><img src="../img/cherry.webp" alt=""></i><b>싸바가 뭐지?</b><small>카드 한 장이면 다 알아요</small></a>';
+    v.appendChild(duo);
+  }
   function renderHome() {
+    if (/[?&]v2\b/.test(location.search)) return renderHomeV2();
     var v = $('v-home'); v.innerHTML = '';
     var now = new Date();
     var hi = el('div', 'n-hello');

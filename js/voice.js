@@ -4,7 +4,8 @@
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   var css = document.createElement('style');
   css.textContent =
-    '.vc-btn{position:static;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#B3132B;color:#fff;font:inherit;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 #7E0C1E;margin-left:auto;margin-right:6px}' +
+    '.vc-btn{position:static;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:#B3132B;color:#fff;font:inherit;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 #7E0C1E;margin-left:auto;margin-right:6px;white-space:nowrap}' +
+    '.vc-tidy{margin-left:0;background:#fff;color:#B3132B;border:2px solid #B3132B;box-shadow:none}' +
     '.vc-ov{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;background:rgba(20,8,10,.72);padding:24px}' +
     '.vc-ov.on{display:flex}' +
     '.vc-box{width:100%;max-width:400px;background:#fff;border-radius:24px;padding:28px 22px 22px;text-align:center;color:#111}' +
@@ -95,10 +96,14 @@
     var ta = document.getElementById('gText'); if (!ta) return false;
     var comp = ta.closest('.composer'); if (!comp) return false;
     var row = comp.querySelector('.chint'); if (!row || row.querySelector('.vc-btn')) return true;
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn';
-    b.textContent = '✨ 다듬기';
+    row.style.flexWrap = 'wrap'; row.style.rowGap = '6px';
+    // 🎤 말하기(폰이 듣기 → 바로 다듬기) + ✨ 다듬기(키보드 🎤로 말했거나 쓴 글) 둘 다 (11-21)
+    var lb = row.querySelector('span'); if (lb) lb.textContent = '✍️ 보낼 말';
+    var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.textContent = '🎤 말하기';
+    m.addEventListener('click', start);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.textContent = '✨ 다듬기';
     b.addEventListener('click', tidy);
-    var clr = row.querySelector('button'); row.insertBefore(b, clr || null);
+    var clr = row.querySelector('button:not(.vc-btn)'); row.insertBefore(m, clr || null); row.insertBefore(b, clr || null);
     return true;
   }
   var tries = 0; (function loop() { if (!mount() && ++tries < 20) setTimeout(loop, 300); })();

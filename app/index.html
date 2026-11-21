@@ -494,6 +494,16 @@
     #v-home.v2 .v2-hi small { display: block; font-size: 15px; font-weight: 600; color: #8A5A22; }
     #v-home.v2 .v2-hi b { display: block; font-size: 30px; line-height: 1.2; font-weight: 800; letter-spacing: -0.03em; color: #1A1A1A; }
     #v-home.v2 .v2-hi b span { color: #B3132B; }
+    /* 날씨 한 줄 (11-21 밤, DESIGN 원칙 6) */
+    #v-home.v2 .v2-wx { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 9px 14px; border-radius: 999px; background: rgba(255,255,255,.75); border: 1px solid #EBDCC4; color: #3A2A14; text-decoration: none; font-size: 16px; font-weight: 600; width: fit-content; max-width: 100%; box-sizing: border-box; }
+    #v-home.v2 .v2-wx .i { font-size: 20px; line-height: 1; }
+    #v-home.v2 .v2-wx .t { font-weight: 800; white-space: nowrap; }
+    #v-home.v2 .v2-wx .m { color: #7A6448; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #v-home.v2 .v2-wx u { text-decoration: none; color: #B3132B; font-size: 20px; font-weight: 700; }
+    /* 구역 제목 쉼표 (원칙 8): 26px 검정 */
+    #v-home.v2 .v2-gap { height: 12px; }
+    #v-home.v2 .n-h { margin: 0 20px 14px; }
+    #v-home.v2 .n-h h2 { font-size: 26px; color: #1A1A1A; }
     #v-home.v2 .v2c { position: relative; display: block; margin: 0 18px 28px; border-radius: 26px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 18px 34px -22px rgba(90,40,20,.6); -webkit-tap-highlight-color: transparent; }
     #v-home.v2 .v2c h3 { margin: 0; font-size: 32px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; }
     #v-home.v2 .v2c p { margin: 4px 0 0; font-size: 17px; line-height: 1.4; font-weight: 500; opacity: .9; word-break: keep-all; }
@@ -557,7 +567,7 @@
     #v-home.v2 .v2-strip small { display: block; font-size: 15px; color: #6B6259; font-weight: 500; }
     #v-home.v2 .v2-strip u { color: #B3132B; }
     #v-home.v2 .v2-sec { margin-bottom: 18px; }
-    #v-home.v2 .v2-sec .n-h { padding: 0 20px; }
+    #v-home.v2 .v2-sec .n-h { padding: 0; }
     /* 싸바비앙 — 라파예트 사진 그대로, 글씨는 그림자로 */
     #v-home.v2 .v2-sv { min-height: 170px; background: #6E4C1E url(../img/savabien-dome.jpg) center 35%/cover; display: flex; align-items: flex-end; }
     #v-home.v2 .v2-sv .in { display: flex; align-items: center; gap: 12px; padding: 16px 18px; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 8px rgba(0,0,0,.75); }
@@ -936,13 +946,39 @@
   // ===== 새 홈 시안 v2 (11-21) — sava.kr/app/?v2 로 열 때만. 지금 홈은 그대로 =====
   // 원칙: 카드 틀 하나로 통일, 큰 색은 체리·초록·금색 셋, 나머지는 흰 카드, 카드 사이 28px, 설명 한 줄
   var HOME_V2 = /[?&]v2\b/.test(location.search); // 처음 열 때 한 번만 확인 (주소가 바뀌어도 시안 유지)
+  // 홈 날씨 한 줄 (Open-Meteo, 키 없이 무료) — 30분 기억해서 홈 열 때마다 부르지 않음
+  function homeWxLine(a) {
+    var c = null; try { c = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
+    if (!c || !c[1]) c = ['광주', 35.1595, 126.8526];
+    function ic(n) { return n === 0 ? ['☀️', '맑음'] : n <= 2 ? ['🌤️', '구름 조금'] : n === 3 ? ['☁️', '흐림'] : n <= 48 ? ['🌫️', '안개'] : n <= 57 ? ['🌦️', '이슬비'] : n <= 67 ? ['🌧️', '비'] : n <= 77 ? ['❄️', '눈'] : n <= 82 ? ['🌦️', '소나기'] : n <= 86 ? ['🌨️', '눈'] : ['⛈️', '천둥번개']; }
+    function put(w) {
+      var k = ic(w.c), r = w.p >= 50 ? '☂️ 비 ' + w.p + '% · ' : '';
+      a.innerHTML = '';
+      a.appendChild(el('span', 'i', k[0]));
+      a.appendChild(el('span', 't', c[0] + ' ' + Math.round(w.t) + '° ' + k[1]));
+      a.appendChild(el('span', 'm', r + '최고 ' + Math.round(w.hi) + '° 최저 ' + Math.round(w.lo) + '°'));
+      a.appendChild(el('u', '', '›'));
+    }
+    var key = 'sava-wx-home', s = null; try { s = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
+    if (s && s.n === c[0] && Date.now() - s.at < 1800000) return put(s);
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=' + c[1] + '&longitude=' + c[2] + '&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1')
+      .then(function (r) { return r.json(); }).then(function (j) {
+        var w = { n: c[0], at: Date.now(), t: j.current.temperature_2m, c: j.current.weather_code, hi: j.daily.temperature_2m_max[0], lo: j.daily.temperature_2m_min[0], p: j.daily.precipitation_probability_max[0] || 0 };
+        try { localStorage.setItem(key, JSON.stringify(w)); } catch (e) {}
+        put(w);
+      }).catch(function () { a.textContent = '☀️ 오늘 날씨 보기 ›'; });
+  }
   function renderHomeV2() {
     var v = $('v-home'); v.innerHTML = ''; v.classList.add('v2');
     var now = new Date();
     var hi = el('div', 'v2-hi');
     hi.innerHTML = '<small></small><b>오늘도 <span>싸바?</span></b>';
     hi.querySelector('small').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
+    // 오늘 필요한 한 줄(DESIGN 원칙 6, 롯데식): 날씨·기온 — 오늘의 싸바 날씨에서 고른 도시(sava-wx) 그대로, 누르면 날씨 자세히
+    var wxl = el('a', 'v2-wx'); wxl.href = '../today/#wx'; wxl.textContent = '☀️ 날씨 불러오는 중…';
+    hi.appendChild(wxl);
     v.appendChild(hi);
+    homeWxLine(wxl);
 
     // 1. 어디야 — 가장 크게 (싸바의 얼굴)
     var eo = el('section', 'v2c v2-eo');
@@ -974,6 +1010,10 @@
     pnl.appendChild(nhead('지금 보내기 좋은 카드', { text: '전체 ›', href: '#alim' }));
     pnl.appendChild(campaigns());
     v.appendChild(pnl);
+
+    // 구역 제목 쉼표 (DESIGN 원칙 8)
+    v.appendChild(el('div', 'v2-gap'));
+    var mh = nhead('구경하고, 놀고'); mh.classList.add('v2-h'); v.appendChild(mh);
 
     // 5. 싸바비앙 — 황금 넓은 띠 (입점 시작되면 맨 위로)
     var sv = el('a', 'v2c v2-sv'); sv.href = '../savabien/'; sv.setAttribute('aria-label', '싸바비앙 명품 콜렉션');

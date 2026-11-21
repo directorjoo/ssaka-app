@@ -39,6 +39,8 @@ export async function onRequest({ request, env }) {
   if (!db) return json({ error: 'no-db' }, 503);
   const ad = await isAdmin(request, env, db);
   if (!ad.ok) return json({ error: ad.setup ? 'setup' : 'forbidden', login: !!ad.login }, 403);
+  // 가벼운 확인용(다른 화면에서 '관리자만 보이는 칸'을 열지 말지): GET /api/admin?me=1 → {ok:true}
+  if (request.method === 'GET' && new URL(request.url).searchParams.get('me') === '1') return json({ ok: true, by: ad.by });
   await db.prepare('CREATE TABLE IF NOT EXISTS admin_reqs (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL, place TEXT, st TEXT NOT NULL DEFAULT \'open\', at INTEGER NOT NULL, done_at INTEGER)').run();
 
   if (request.method === 'POST') {

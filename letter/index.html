@@ -91,6 +91,8 @@
     #stSend { margin-top: 14px; }
     #stSend .acts { margin-top: 0; }
     .rcv #stWho, .rcv #stCity { display: none !important; }
+    /* 11-22 대표님: 어르신·대표님·배우 고르기는 싸바 관리자에게만(식당 대표가 배우 소식 볼 일 없음) — 처음 온 사람은 한 번만 고르고 그 뒤엔 숨김 */
+    .nowho #stWho { display: none !important; }
     .rcv #stSend { border: 1.5px solid #E9E2D8; box-shadow: none; }
   </style>
 </head>
@@ -99,7 +101,7 @@
   <h1>💌 오늘도 싸바?</h1>
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
   <section class="stp s1" id="stWho"><div class="stp-h"><span class="stp-n">1</span>누구에게 보낼 소식?<small>받는 분께 맞는 소식만 골라 담아요</small></div><div class="who" id="who"></div></section>
-  <section class="stp s2" id="stCity"><div class="stp-h"><span class="stp-n">2</span>어느 지역 날씨·소식?<small>날씨와 지역 소식이 이 지역으로 들어가요</small></div><div class="cities" id="cities"></div></section>
+  <section class="stp s2" id="stCity"><div class="stp-h"><span class="stp-n" id="cityN">2</span>어느 지역 날씨·소식?<small>날씨와 지역 소식이 이 지역으로 들어가요</small></div><div class="cities" id="cities"></div></section>
   <div class="sv" id="svTop" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a></div>
   <article class="paper writing" id="paper"><div class="msg">카드를 만드는 중이에요…</div></article>
   <div class="sv" id="svBot" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a><a class="mk" id="svMake" href="/make/">✨ 싸바에서 내 카드 만들어 보세요</a></div>
@@ -120,7 +122,11 @@
   var GROUPS = [['수도권', ['서울', '경기', '인천']], ['강원·충청', ['강원', '대전', '세종', '충북', '충남']], ['호남·제주', ['광주', '전북', '전남', '제주']], ['영남', ['부산', '대구', '울산', '경북', '경남']]];
   var CITIES = [].concat.apply([], GROUPS.map(function (g) { return g[1]; }));
   var OLD = { 여수: '전남', 순천: '전남', 목포: '전남', 전주: '전북' };
-  var qs = new URLSearchParams(location.search), k = qs.get('k'), city = qs.get('city');
+  var qs = new URLSearchParams(location.search), k = qs.get('k'), city = qs.get('city'), stored = null;
+  try { stored = localStorage.getItem('sava-letter-k'); } catch (e) {}
+  // 받는 분 고르기 칸: 관리자만 늘 보임. 링크(?k=)나 예전 고른 값이 있으면 숨기고, 처음 온 사람만 한 번 고르게
+  var isAdm = false, pickOnce = !k && !stored;
+  if (!pickOnce) document.body.classList.add('nowho');
   try { k = k || localStorage.getItem('sava-letter-k'); city = city || localStorage.getItem('sava-letter-city'); } catch (e) {}
   if (!WHO.some(function (w) { return w[0] === k; })) k = 'boss';
   city = OLD[city] || city;
@@ -137,8 +143,10 @@
   }
   function bar() {
     var w = $('who'); w.innerHTML = '';
-    WHO.forEach(function (x) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = x[1] + '<small>' + x[2] + '</small>'; b.setAttribute('aria-pressed', x[0] === k ? 'true' : 'false'); b.addEventListener('click', function () { k = x[0]; go(); }); w.appendChild(b); });
-    var c = $('cities'); c.innerHTML = ''; $('stCity').hidden = k === 'actor'; $('sendN').textContent = k === 'actor' ? '2' : '3';
+    WHO.forEach(function (x) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = x[1] + '<small>' + x[2] + '</small>'; b.setAttribute('aria-pressed', x[0] === k ? 'true' : 'false'); b.addEventListener('click', function () { k = x[0]; if (pickOnce && !isAdm) { pickOnce = false; document.body.classList.add('nowho'); } go(); }); w.appendChild(b); });
+    var c = $('cities'); c.innerHTML = ''; $('stCity').hidden = k === 'actor';
+    var off = document.body.classList.contains('nowho') ? 1 : 0;
+    $('cityN').textContent = 2 - off; $('sendN').textContent = (k === 'actor' ? 2 : 3) - off;
     GROUPS.forEach(function (g) {
       var row = document.createElement('div'); row.className = 'row';
       var lb = document.createElement('span'); lb.textContent = g[0]; row.appendChild(lb);
@@ -191,6 +199,11 @@
     if (window.SsakaShare) SsakaShare(opt); else if (navigator.share) navigator.share({ title: opt.title, text: desc, url: url });
   });
   go();
+  // 관리자면 고르기 칸을 다시 보이게(대표 카카오 로그인 또는 관리 비밀번호)
+  if (!rcv) { var h = {}; try { var ak = sessionStorage.getItem('sava-adm'); if (ak) h['x-admin-key'] = ak; } catch (e) {}
+    fetch('/api/admin?me=1', { credentials: 'same-origin', cache: 'no-store', headers: h }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.ok) { isAdm = true; document.body.classList.remove('nowho'); bar(); }
+    }).catch(function () {}); }
 })();
 </script>
 <script src="/js/home.js?v=13" defer></script>

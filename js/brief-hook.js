@@ -46,12 +46,12 @@
     if (document.getElementById('sv-tk-css')) return;
     var st = document.createElement('style'); st.id = 'sv-tk-css';
     st.textContent =
-      '.sv-tk{position:relative;overflow:hidden;white-space:nowrap;margin:8px 0 2px;font-size:17px;font-weight:800;line-height:1.5;' +
+      '.sv-tk{position:relative;overflow:hidden;white-space:nowrap;margin:8px 0 2px;font-size:20px;font-weight:900;line-height:1.5;color:#1A1A1A;-webkit-font-smoothing:antialiased;' +
       '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}' +
-      '.sv-tk .tr{display:inline-block;padding-left:100%;animation:svTk var(--dur,60s) linear infinite}' +
+      '.sv-tk .tr{display:inline-block;padding-left:100%;animation:svTk var(--dur,60s) linear infinite;will-change:transform;backface-visibility:hidden}' +
       '.sv-tk .tr i{font-style:normal;margin:0 14px;opacity:.75}' +
       '.sv-tk.still .tr{padding-left:0;animation:none}' +
-      '@keyframes svTk{from{transform:translateX(0)}to{transform:translateX(-100%)}}';
+      '@keyframes svTk{from{transform:translate3d(0,0,0)}to{transform:translate3d(-100%,0,0)}}';
     document.head.appendChild(st);
   }
   window.SAVA_MAIN = MAIN;

@@ -887,24 +887,26 @@
   }
 
   // 📣 싸바 홍보(promo/)로 가는 한 줄 — 만들기 탭 카드·블로그 아래 (11-23)
-  // 11-23 08:20 대표님: '만들 시간이 없으시죠?'로 바꾸고 더 큰 홍보창으로 눈에 띄게 (체리 바탕·흰 글씨·흰 단추)
+  // 11-23 08:20 대표님: '만들 시간이 없으시죠?'로 바꾸고 더 큰 홍보창으로 눈에 띄게 → 08:27 너무 빨갛다 → 홈 '황금체리나무' 색(황금 바탕·체리나무·진갈 글씨·황금 갈색 단추)
   function promoLink() {
     var a = el('a', ''); a.href = '../promo/'; a.setAttribute('aria-label', '만들 시간이 없으시죠? 싸바 홍보 대행 보기');
-    a.style.cssText = 'display:block;position:relative;overflow:hidden;margin:24px 0 8px;padding:24px 20px 20px;border-radius:22px;background:linear-gradient(140deg,#C8182F 0%,#B3132B 55%,#8E0E22 100%);color:#fff;text-decoration:none;box-shadow:0 10px 24px rgba(179,19,43,.28);line-height:1.45';
+    a.style.cssText = 'display:block;position:relative;overflow:hidden;margin:24px 0 8px;padding:24px 20px 20px;border-radius:22px;background:radial-gradient(ellipse at 70% 20%,#FFE58A 0%,#F7CF4E 45%,#EDB52E 100%);border:1px solid rgba(154,100,8,.25);color:#1A1A1A;text-decoration:none;box-shadow:0 10px 24px rgba(201,138,18,.28);line-height:1.45';
+    var glow = 'text-shadow:0 0 4px rgba(255,236,170,.95),0 0 12px rgba(255,236,170,.8)';
     a.innerHTML =
-      '<span aria-hidden="true" style="position:absolute;right:-18px;top:-22px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.10)"></span>' +
-      '<span aria-hidden="true" style="position:absolute;right:14px;top:16px;font-size:44px;line-height:1">📣</span>' +
-      '<span style="display:inline-block;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.18);font-size:13px;font-weight:800;letter-spacing:.2px">싸바 홍보 대행</span>' +
-      '<strong style="display:block;margin:12px 0 6px;font-size:25px;font-weight:900;letter-spacing:-.5px;word-break:keep-all;padding-right:56px">만들 시간이 없으시죠?</strong>' +
-      '<span style="display:block;font-size:16px;font-weight:700;opacity:.95;word-break:keep-all">카드·블로그, 싸바가 매달 만들어<br>대신 올려 드려요</span>' +
-      '<span style="display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 16px;font-size:13.5px;font-weight:700">' +
-        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.14)">✓ 매달 새 카드</span>' +
-        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.14)">✓ 블로그 글</span>' +
-        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.14)">✓ 인스타·플레이스</span>' +
+      '<img src="../img/today-tree.png" alt="" aria-hidden="true" style="position:absolute;right:-46px;top:-18px;width:210px;opacity:.85;pointer-events:none">' +
+      '<span aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(247,207,78,.86) 0%,rgba(247,207,78,.62) 50%,rgba(247,207,78,.18) 100%),linear-gradient(0deg,rgba(237,181,46,.55) 0%,transparent 40%)"></span>' +
+      '<span style="position:relative;display:block">' +
+      '<span style="display:inline-block;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.88);border:1px solid rgba(110,70,10,.2);color:#4A3104;font-size:13px;font-weight:800">📣 싸바 홍보 대행</span>' +
+      '<strong style="display:block;margin:12px 0 6px;font-size:25px;font-weight:900;letter-spacing:-.5px;word-break:keep-all;color:#1A1A1A;' + glow + '">만들 시간이 없으시죠?</strong>' +
+      '<span style="display:block;font-size:16px;font-weight:700;color:#4A3104;word-break:keep-all;' + glow + '">카드·블로그, 싸바가 매달 만들어<br>대신 올려 드려요</span>' +
+      '<span style="display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 16px;font-size:13.5px;font-weight:700;color:#4A3104">' +
+        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.88);border:1px solid rgba(110,70,10,.2)">✓ 매달 새 카드</span>' +
+        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.88);border:1px solid rgba(110,70,10,.2)">✓ 블로그 글</span>' +
+        '<span style="padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.88);border:1px solid rgba(110,70,10,.2)">✓ 인스타·플레이스</span>' +
       '</span>' +
-      '<span style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-radius:14px;background:#fff;color:#B3132B;font-size:17px;font-weight:900">' +
+      '<span style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-radius:14px;background:linear-gradient(180deg,#C98A12,#9A6408);color:#fff;font-size:17px;font-weight:900;box-shadow:0 4px 10px rgba(154,100,8,.3)">' +
         '<span>월 49,000원부터 · 상담은 무료</span><b style="font-size:22px">›</b>' +
-      '</span>';
+      '</span></span>';
     return a;
   }
   // ---------- 업종별로 바로 만들기 (싸바알림 화면) ----------

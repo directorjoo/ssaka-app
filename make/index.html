@@ -474,6 +474,19 @@
   .mk-s2 #form > .sec-h, .mk-s2 #form > fieldset, .mk-s2 #exFillBox, .mk-s2 #hLinks,
   .mk-s1 #bar, .mk-s2 #bar { display: none !important; }
   @media (max-width: 859px) { .mk-s1 .preview, .mk-s2 .preview { display: none !important; } }
+  /* 11-23 대표님: 용도를 고르면 바로 쓰기 — 고른 용도는 한 줄로 접고, 디자인은 옆으로 넘기는 작은 띠로 한눈에, 그 아래 바로 쓰는 칸 */
+  .usesum { display: none; align-items: center; gap: 8px; margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: #fff; border: 1.5px solid #E9E2D8; font-size: 15.5px; font-weight: 800; }
+  .usesum span { flex: 1; min-width: 0; line-height: 1.35; word-break: keep-all; }
+  .usesum button { flex: none; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #B3132B; background: #fff; color: #B3132B; font: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; }
+  .mk-s3 .usesum { display: flex; scroll-margin-top: 62px; }
+  .mk-s3 .tp[data-tab="design"], .mk-s3 #d2step, .mk-s3 #d2dest, .mk-s3 .d2box.opt, .mk-s3 .d2box .stp-h small { display: none !important; }
+  .mk-s3 .d2box { padding: 10px 10px 4px; margin-bottom: 10px; }
+  .mk-s3 .d2box .stp-h { margin-bottom: 6px; font-size: 17px; }
+  .mk-s3 .d2box .stp-n { width: 26px; height: 26px; font-size: 14px; }
+  .mk-s3 .gallery { grid-auto-flow: column !important; grid-template-columns: none !important; grid-auto-columns: 86px !important; overflow-x: auto !important; gap: 8px !important; padding: 2px 2px 8px !important; margin-bottom: 4px; }
+  .mk-s3 .gallery .tcard { width: 86px; }
+  .mk-s3 .dcols { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+  .mk-s3 .dcols button { flex: none; }
   /* 고른 용도(인스타 4:5·스토리 9:16·정사각 1:1)대로 미리보기도 그 모양 그대로 */
   .snspv { position: relative; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #fff; border: 2px solid #eee; box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); }
   .snspv.r-feed { aspect-ratio: 4 / 5; width: 100%; } .snspv.r-sq { aspect-ratio: 1 / 1; width: 100%; } .snspv.r-story { aspect-ratio: 9 / 16; height: min(640px, 78vh); } .snspv.r-a4 { aspect-ratio: 210 / 297; width: 100%; }
@@ -607,7 +620,7 @@
     <section class="mk-hero">
       <em>🍒 싸바카드</em>
       <h1>우리 모임 소식도,<br>우리 가게 자랑도</h1>
-      <ol class="mk-flow"><li><b>1</b>용도</li><li><b>2</b>디자인</li><li><b>3</b>쓰고 완성</li></ol>
+      <ol class="mk-flow"><li><b>1</b>용도</li><li><b>2</b>디자인 보며 쓰기</li><li><b>3</b>완성</li></ol>
       <img class="mk-dance" src="../img/cherry-dance-anim.svg" alt="">
     </section>
   </header>
@@ -626,6 +639,7 @@
       <div class="hlinks" id="hLinks" hidden></div>
       </div>
       <a class="mwrite" id="mWrite" href="../survey/">✍️ 카드 말고 <b>블로그 글</b>이 필요하세요? ›</a>
+      <div class="usesum" id="useSum" hidden><span id="useSumT"></span><button type="button" id="useSumB">✏️ 용도 바꾸기</button></div>
       <div id="d2home">
       <div class="tp" data-tab="design2">
       <div class="step" id="d2step">2. 디자인 고르기 <span id="designInfo"></span></div>
@@ -3229,6 +3243,7 @@
     paintedDest = dest;
     try { paintSnsPv(); } catch (e) {}
     try { renderTabs(); } catch (e) {}
+    try { if (stage === 3) paintSum(); } catch (e) {}
   }
   var stage = 3;
   function goStage(n, scrollTo) {
@@ -3237,13 +3252,20 @@
     document.body.classList.toggle('mk-s2', n === 2);
     document.body.classList.toggle('mk-s3', n === 3);
     $('useGo').hidden = n !== 1;
+    $('useSum').hidden = n !== 3;
+    if (n === 3) paintSum();
     if (scrollTo) setTimeout(function () { var el = typeof scrollTo === 'string' ? document.querySelector(scrollTo) : scrollTo; if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
-  // 무엇을 알릴지 고르면 → 그 용도에 맞는 디자인으로
+  function paintSum() {
+    var ds = DEST_BY[dest] || {}, ind = D.industry(industry) || {};
+    $('useSumT').textContent = '✅ ' + [ds.i ? ds.i + ' ' + (ds.b || '') : '', ind.label ? (ind.emoji || '') + ' ' + ind.label : ''].filter(Boolean).join(' · ');
+  }
+  $('useSumB').addEventListener('click', function () { goStage(1, '#d1step'); });
+  // 무엇을 알릴지 고르면 → 바로 쓰기 (11-23 대표님: 디자인은 쓰는 칸 위 작은 띠로 한눈에 보며 바로 쓰기)
   function afterUse() {
-    if (stage < 2) goStage(2);
+    goStage(3);
     setTimeout(fitGal, 0);
-    setTimeout(function () { var el = document.querySelector('.tp[data-tab="design2"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+    setTimeout(function () { var el = $('useSum'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
   // 디자인을 정하면 → 그 카드에 필요한 질문만
   $('d2next').addEventListener('click', function () {
@@ -3292,7 +3314,7 @@
     var dt = v('title');
     if (hadDraft && dt) { $('resumeBtn').hidden = false; $('resumeBtn').textContent = '✏️ 쓰던 카드 이어서 쓰기 — ' + dt; }
     if (!hadDraft) document.querySelectorAll('.inds button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-  } else if (qInd && !editCard && !jump && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { goStage(2); afterUse(); }
+  } else if (qInd && !editCard && !jump && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { afterUse(); }
   else goStage(3);
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();

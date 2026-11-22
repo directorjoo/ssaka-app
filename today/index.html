@@ -924,7 +924,8 @@
     $('wtop').addEventListener('click', function (e) { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); });
   }
   paintBar(); show(cur);
-  if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
+  if (/[?&]go=1/.test(location.search)) setTimeout(function () { var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ block: 'start' }); }, 60); // 홈 브리핑 알약에서 오면 바로 그 탭 내용으로
+  else if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
   var a = bar.querySelector('[aria-pressed="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ inline: 'center', block: 'nearest' });
 })();
 </script>

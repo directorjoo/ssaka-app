@@ -3,7 +3,14 @@
 > 대화방을 닫기 전에 Claude가 이 파일을 최신으로 고쳐서 커밋한다.
 > 새 방에서 "싸바"라고 하면: 이 파일 → 최근 커밋 순서로 확인하고 바로 이어서 작업.
 
-마지막 갱신: 2026-11-23 03:30
+마지막 갱신: 2026-11-23 03:40
+
+## 0. 🔑 내일 할 일: API 키 넣기 (대표님 '내일 하자' — 새 방에서 먼저 꺼내 드리기)
+- 방식: 대표님은 아이폰으로 대화, 맥북 크롬(Claude in Chrome)으로 Claude가 진행. 로그인·비밀번호만 대표님, 키 신청·Cloudflare 입력은 Claude(넣기·다시 배포 직전 한 번 확인)
+- Cloudflare: directorjoo@gmail.com 로그인 됨(11-23 확인). 프로젝트 ssaka-app → 설정 → 변수 및 비밀. 넣은 뒤 배포 다시 해야 적용
+- 지금 있는 키(11-23): ADMIN_KEY, ANTHROPIC_API_KEY, BLOG_AI_KEY, COUPON_PIN, DATA_API_KEY, SAVA_ADMIN_UID=1(텍스트)
+- 없는 키(순서 제안): ① YOUTUBE_API_KEY(구글 클라우드 — 크롬 구글 로그인으로 바로 가능, 유튜브 인기 탭) ② KOBIS_KEY(kobis.or.kr/kobisopenapi — 오픈API 사이트는 계정 따로, 11-23 로그인 계속 에러로 중단. 아이디·비번 찾기나 고객센터 02-6261-6573) ③ NAVER_ID·NAVER_SECRET(네이버 클라우드 NAVER API HUB 검색) ④ KAMIS_KEY·KAMIS_ID(kamis.or.kr Open-API, 승인 대기) ⑤ TOUR_API_KEY·BIZINFO_API_KEY(공공데이터·기업마당) ⑥ PHONE_KEY·KAKAO_ADMIN_KEY
+- ※ 설정에 관리자 칸 사라짐: SAVA_ADMIN_UID=1 → 대표님 폰 로그인 회원번호가 1이 아니면 안 보임. 회원번호 확인 후 맞추기
 
 ## 1. 마지막으로 올린 작업
 - 2026-11-23 03:30 — 대표님: 영화 흥행 순위도(한국·미국·유럽·중국·일본 등) → 🌍 세계 소식·음악 묶음에 '🎬 영화 흥행'(#movie). 나라 칩 kr·us·eu·cn·jp·in(이 폰 기억 sava-movie). 서버 /api/today?k=movie&t=…(today.js MOVIE·movie()): 한국은 영화진흥위원회 KOBIS 공식 Open API 어제 일별 박스오피스 10위(하루·누적 관객, ▲▼·NEW) — ⚠️ Cloudflare 환경 변수 KOBIS_KEY 필요(kobis.or.kr → 오픈API → 키 발급, 무료). 키 없으면 흥행 기사만. 다른 나라는 무료 공식 API가 없어 한국어 흥행 기사 10개(구글 뉴스) + 공식 순위 바로가기(Box Office Mojo 나라별·The Numbers·마오얀·eiga.com). 관리자 설정 점검에 KOBIS 줄 추가 · 버전 2026.11.23-470 / sw sava-v445

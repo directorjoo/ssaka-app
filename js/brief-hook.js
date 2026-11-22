@@ -1,63 +1,82 @@
-/* 싸바 브리핑 큰 제목 — 사장님용 훅 제목이 2초마다 돌아가며 바뀜 (11-22 대표님: 하루 한 번 → 2초에 한 번)
-   홈(app/) 싸바 브리핑 칸 h3, 브리핑 화면(today/) h1 이 같이 씀. 처음 열 땐 늘 메인 카피(목록 첫 줄)부터.
-   움직임 줄이기 폰은 안 돌림, 화면 안 볼 땐 멈춤. 빠르기는 아래 MS.
-   고치려면 아래 목록만 고치면 됨 — '|' 자리에서 줄이 바뀜 (한 줄 10자 안팎). 첫 줄은 기본 제목. */
+/* 싸바 브리핑 — 메인 카피는 고정, 그 아래 한 줄로 문구가 옆으로 흘러감 (11-22 대표님)
+   홈(app/) 싸바 브리핑 칸 h3 아래, 브리핑 화면(today/) h1 아래 같이 씀.
+   모든 사람(일반·자영업·직장인·오디션·건강·여성·청년·어르신·학부모)이 관심 가질 문구 — 목록만 고치면 됨.
+   움직임 줄이기 폰은 흐르지 않고 4초마다 한 문구씩 바뀜. 빠르기는 PX_PER_SEC. */
 (function () {
+  var MAIN = '모르면 손해,<br>아는 사람만 챙겨요!';
   var HOOKS = [
-    '모르면 손해,|아는 사람만 챙겨요!',
-    '사장님, 오늘|놓친 지원금 없나요?',
-    '신청 안 하면|그냥 사라지는 돈',
-    '남들 다 받는 혜택,|사장님만 몰랐다면?',
-    '세금 아끼는 법,|아침에 챙겨 가세요',
-    '바뀐 법 하나가|가게를 바꿔요',
-    '정부 지원,|먼저 알면 먼저 받아요',
-    '검색 1시간,|싸바는 1분',
-    '사장님 대신|싸바가 찾아왔어요',
-    '이번 주 지원사업,|마감 전에 확인!',
-    '배달 수수료,|줄일 방법 있을까?',
-    '직원 뽑을 때|받는 지원금 아세요?',
-    '대출 이자,|낮출 방법 있을까?',
-    '아는 만큼|남는 장사',
-    '장사 잘되는 집의|아침 습관',
-    '홍보비 0원으로|손님 부르기',
-    '오늘 뜬 검색어,|장사에 써 보세요',
-    '바쁜 사장님은|3분만 보세요',
-    '소상공인 소식,|한 장에 다 모았어요',
-    '사장님 통장에|들어올 돈 찾기',
-    '혼자 하는 가게,|혼자 고민 마세요',
-    '전기·가스요금|아끼는 방법',
-    '오늘의 정책 소식,|커피 한 잔에 끝',
-    '경쟁 가게는|벌써 알고 있어요',
-    '힘들 때 기댈 곳,|여기 다 있어요',
-    '카드 수수료,|돌려받을 수 있을까?',
-    '이번 달 놓치면|다음 기회는 언제?',
-    '사장님 건강도|장사 밑천이에요',
-    '오늘 하루 장사,|싸바 브리핑으로 시작',
-    '손해 보기 전에,|싸바 브리핑'
+    '몰라서 못 받은 정부 혜택 없나요?',
+    '사장님, 놓친 지원금 없나요?',
+    '오디션 정보 아세요? 오늘 공고 모았어요',
+    '건강 정보, 꼭 챙겨 보세요',
+    '청년이라면 꼭 챙겨야 할 지원 정책',
+    '여성 창업·재취업 지원, 알고 계세요?',
+    '지금 사람들이 제일 많이 찾는 검색어',
+    '부모님께 꼭 알려 드릴 어르신 혜택',
+    '신청 안 하면 그냥 사라지는 지원금',
+    '세금·대출·배달 수수료 줄이는 법',
+    '아역·모델·보조출연 모집도 한눈에',
+    '무료 건강검진 대상인지 확인해 보세요',
+    '청년 월세·교통비 지원, 확인해 보세요',
+    '출산·육아 지원금, 놓치지 마세요',
+    '오늘 꼭 알아야 할 뉴스, 3분이면 끝',
+    '직원 뽑을 때 받는 지원금 아세요?',
+    '직장인 연말정산, 미리 챙기면 돌려받아요',
+    '우리 아이 교육·돌봄 지원 소식',
+    '바뀐 법, 모르면 나만 손해',
+    '취업 준비, 오늘 뜬 채용 소식부터',
+    '엄마도 나를 챙기는 시간, 여성 건강 소식',
+    '어르신 기초연금·복지 새 소식',
+    '프리랜서·1인 사업자 지원도 있어요',
+    '소상공인 지원사업, 마감 전에 확인!',
+    '주말 나들이, 무료 행사 어디 있을까?',
+    '지금 방송하는 TV·라디오 바로 보기',
+    '홍보비 0원으로 손님 부르기',
+    '검색 1시간, 싸바는 1분',
+    '아는 만큼 챙기는 하루, 싸바 브리핑'
   ];
+  var PX_PER_SEC = 55;
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function today() {
-    var day = Math.floor((Date.now() + 9 * 3600000) / 86400000); // 한국 날짜
-    return HOOKS[((day % HOOKS.length) + HOOKS.length) % HOOKS.length];
+  function css() {
+    if (document.getElementById('sv-tk-css')) return;
+    var st = document.createElement('style'); st.id = 'sv-tk-css';
+    st.textContent =
+      '.sv-tk{position:relative;overflow:hidden;white-space:nowrap;margin:8px 0 2px;font-size:17px;font-weight:800;line-height:1.5;' +
+      '-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}' +
+      '.sv-tk .tr{display:inline-block;padding-left:100%;animation:svTk var(--dur,60s) linear infinite}' +
+      '.sv-tk .tr i{font-style:normal;margin:0 14px;opacity:.75}' +
+      '.sv-tk.still .tr{padding-left:0;animation:none}' +
+      '@keyframes svTk{from{transform:translateX(0)}to{transform:translateX(-100%)}}';
+    document.head.appendChild(st);
   }
-  // 줄바꿈 넣은 HTML (h1/h3 innerHTML 용)
-  window.savaHook = function () { return today().split('|').map(esc).join('<br>'); };
-  window.savaHookText = function () { return today().replace('|', ' '); };
+  window.SAVA_MAIN = MAIN;
   window.SAVA_HOOKS = HOOKS;
-  var MS = 2000;
-  function html(h) { return h.split('|').map(esc).join('<br>'); }
-  // 제목 칸(el)을 MS마다 다음 제목으로 — 살짝 사라졌다 나타남
-  window.savaHookRotate = function (el) {
-    if (!el) return;
-    var i = 0; // 처음 열 땐 늘 메인 카피(첫 줄) — 11-22 대표님
-    el.innerHTML = html(HOOKS[i]);
-    try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
-    el.style.transition = 'opacity .25s ease';
-    var t = setInterval(function () {
-      if (!el.isConnected) { clearInterval(t); return; }
-      if (document.hidden) return;
-      el.style.opacity = '0';
-      setTimeout(function () { i = (i + 1) % HOOKS.length; el.innerHTML = html(HOOKS[i]); el.style.opacity = '1'; }, 250);
-    }, MS);
+  window.savaHook = function () { return MAIN; };
+  // titleEl(제목)은 메인 카피로 고정하고, 바로 아래에 흐르는 줄을 붙임
+  window.savaHookTicker = function (titleEl) {
+    if (!titleEl) return;
+    titleEl.innerHTML = MAIN;
+    css();
+    var box = document.createElement('div'); box.className = 'sv-tk'; box.setAttribute('aria-label', HOOKS.join(' · '));
+    var tr = document.createElement('span'); tr.className = 'tr'; tr.setAttribute('aria-hidden', 'true');
+    box.appendChild(tr);
+    titleEl.insertAdjacentElement('afterend', box);
+    var still = false;
+    try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (still) {
+      box.classList.add('still');
+      var i = 0; tr.textContent = HOOKS[0];
+      var t = setInterval(function () {
+        if (!box.isConnected) { clearInterval(t); return; }
+        if (document.hidden) return;
+        i = (i + 1) % HOOKS.length; tr.textContent = HOOKS[i];
+      }, 4000);
+      return;
+    }
+    tr.innerHTML = HOOKS.map(esc).join('<i>🍒</i>');
+    // 글 길이에 맞춰 늘 같은 빠르기로 (화면에 붙은 뒤 너비를 잼)
+    var n = 0;
+    function fit() { var w = tr.scrollWidth; if (w) tr.style.setProperty('--dur', Math.round(w / PX_PER_SEC) + 's'); else if (++n < 20) setTimeout(fit, 300); }
+    setTimeout(fit, 0);
   };
 })();

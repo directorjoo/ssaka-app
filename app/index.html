@@ -735,7 +735,7 @@
 <script src="../js/store.js?v=3"></script>
 <script src="../js/install.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/brief-hook.js?v=3"></script>
+<script src="../js/brief-hook.js?v=4"></script>
 <script>
 (function () {
   var D = window.SsakaDesigns, S = window.SsakaStore;
@@ -1113,7 +1113,7 @@
     td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 싸바 브리핑</em><h3>모르면 손해,<br>아는 사람만 챙겨요!</h3><p><span class="bt-long">인기 검색어·정부 혜택·뉴스를 검색 안 해도 싸바가 매일 아침 골라 드려요</span><span class="bt-short">검색어·혜택·뉴스 매일 아침</span></p></div>' +
       '<div class="ch"><span>🔥 인기 검색어</span><span>🔔 정부 혜택</span><span>🗞️ 뉴스 요약</span><span>🏪 자영업자 정보</span><span>🎬 오디션</span><span>💊 건강</span><span>📺 TV·라디오</span></div>' +
       '<div class="ft"><a class="lt" href="../letter/">💌 싸바 브리핑 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
-    if (window.savaHookRotate) { try { window.savaHookRotate(td.querySelector('h3')); } catch (e) {} } // 11-22: 사장님용 훅 제목 2초마다 바뀜 (js/brief-hook.js)
+    if (window.savaHookTicker) { try { window.savaHookTicker(td.querySelector('h3')); } catch (e) {} } // 11-22: 메인 카피 고정 + 아래 한 줄 흐르는 문구 (js/brief-hook.js)
     tapGo(td, '../today/');
     v.appendChild(td);
 

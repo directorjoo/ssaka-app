@@ -74,9 +74,40 @@ async function gnTry(url) {
   } catch (e) {}
   gnBadUntil = Date.now() + 20 * 60e3; return null;
 }
+// 11-22 대표님 '검색 기사는 네이버 기사 우선': 네이버 검색 API(뉴스) 키가 있으면 네이버부터 → 없거나 실패하면 구글 → 빙.
+// 키는 Cloudflare 환경 변수 NAVER_ID·NAVER_SECRET(developers.naver.com 애플리케이션 등록 → 검색 API, 하루 25,000번 무료).
+// 결과는 구글 뉴스 RSS 모양으로 바꿔 돌려주므로 읽는 쪽 코드는 그대로.
+let NV = null;
+export function setNaver(env) { NV = env && env.NAVER_ID && env.NAVER_SECRET ? [String(env.NAVER_ID).trim(), String(env.NAVER_SECRET).trim()] : null; }
+const PRESS = { 'yna.co.kr': '연합뉴스', 'yonhapnewstv.co.kr': '연합뉴스TV', 'chosun.com': '조선일보', 'joongang.co.kr': '중앙일보', 'donga.com': '동아일보', 'hani.co.kr': '한겨레', 'khan.co.kr': '경향신문', 'hankookilbo.com': '한국일보', 'kmib.co.kr': '국민일보', 'seoul.co.kr': '서울신문', 'segye.com': '세계일보', 'munhwa.com': '문화일보', 'mk.co.kr': '매일경제', 'hankyung.com': '한국경제', 'sedaily.com': '서울경제', 'mt.co.kr': '머니투데이', 'edaily.co.kr': '이데일리', 'asiae.co.kr': '아시아경제', 'heraldcorp.com': '헤럴드경제', 'fnnews.com': '파이낸셜뉴스', 'newsis.com': '뉴시스', 'news1.kr': '뉴스1', 'kbs.co.kr': 'KBS', 'imbc.com': 'MBC', 'sbs.co.kr': 'SBS', 'ytn.co.kr': 'YTN', 'jtbc.co.kr': 'JTBC', 'mbn.co.kr': 'MBN', 'ichannela.com': '채널A', 'tvchosun.com': 'TV조선', 'nocutnews.co.kr': '노컷뉴스', 'ohmynews.com': '오마이뉴스', 'pressian.com': '프레시안', 'sisain.co.kr': '시사IN', 'etnews.com': '전자신문', 'zdnet.co.kr': 'ZDNet', 'dt.co.kr': '디지털타임스', 'bizwatch.co.kr': '비즈워치', 'newspim.com': '뉴스핌', 'ajunews.com': '아주경제', 'inews24.com': '아이뉴스24', 'dailian.co.kr': '데일리안', 'mediatoday.co.kr': '미디어오늘', 'kookje.co.kr': '국제신문', 'busan.com': '부산일보', 'kwnews.co.kr': '강원일보', 'kado.net': '강원도민일보', 'kwangju.co.kr': '광주일보', 'jnilbo.com': '전남일보', 'namdonews.com': '남도일보', 'mdilbo.com': '무등일보', 'jjan.kr': '전북일보', 'imaeil.com': '매일신문', 'yeongnam.com': '영남일보', 'joongdo.co.kr': '중도일보', 'kyeongin.com': '경인일보', 'starnewskorea.com': '스타뉴스', 'osen.co.kr': 'OSEN', 'xportsnews.com': '엑스포츠뉴스', 'sportsseoul.com': '스포츠서울', 'isplus.com': '일간스포츠', 'mydaily.co.kr': '마이데일리', 'tenasia.co.kr': '텐아시아', 'newsen.com': '뉴스엔', 'sportschosun.com': '스포츠조선', 'korea.kr': '정책브리핑' };
+function pressOf(u) { let h = ''; try { h = new URL(u).hostname.replace(/^(www|m|news|biz|n|sports|entertain|star)\./, ''); } catch (e) { return ''; } for (const k in PRESS) if (h === k || h.endsWith('.' + k)) return PRESS[k]; return h.replace(/\.(co\.kr|com|kr|net|or\.kr)$/, ''); }
+async function naverAsGn(gUrl) {
+  if (!NV) return null;
+  let q = '', days = 0;
+  try { q = new URL(gUrl).searchParams.get('q') || ''; } catch (e) {}
+  const m = q.match(/\bwhen:(\d+)([dh])\b/); if (m) days = m[2] === 'h' ? 1 : Number(m[1]);
+  q = q.replace(/\bwhen:\d+[dh]\b/g, '').replace(/\bsite:\S+/g, '').replace(/"/g, '').replace(/\s+/g, ' ').trim();
+  if (!q) return null; // 검색어 없는 '주요 뉴스'는 구글 그대로
+  const nq = q.split(/\s+OR\s+/).map(x => x.trim()).filter(Boolean).join(' | '); // 네이버는 OR 대신 |
+  try {
+    const r = await fetch('https://openapi.naver.com/v1/search/news.xml?display=40&sort=date&query=' + encodeURIComponent(nq), { headers: { 'X-Naver-Client-Id': NV[0], 'X-Naver-Client-Secret': NV[1] }, cf: { cacheTtl: 900 } });
+    if (!r.ok) return null;
+    const xml = await r.text(), since = days ? Date.now() - (days + 1) * 864e5 : 0;
+    const items = (xml.match(/<item>[\s\S]*?<\/item>/g) || []).map(x => {
+      const t = tag(x, 'title').replace(/<\/?b>/g, '').replace(/&quot;/g, '"').replace(/&apos;|&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+      const ol = tag(x, 'originallink'), nl = tag(x, 'link'), d = tag(x, 'pubDate');
+      const u = /^https?:\/\//.test(ol) ? ol : nl, s = pressOf(u);
+      if (!t || !/^https?:\/\//.test(u) || (since && Date.parse(d) && Date.parse(d) < since)) return '';
+      return '<item><title>' + xesc(t + (s ? ' - ' + s : '')) + '</title><link>' + xesc(u) + '</link><pubDate>' + xesc(d) + '</pubDate><source>' + xesc(s) + '</source></item>';
+    }).filter(Boolean);
+    if (!items.length) return null; // 네이버에 없으면 구글·빙으로
+    return '<rss><channel>' + items.join('') + '</channel></rss>';
+  } catch (e) { return null; }
+}
 // 동시에 여러 검색어가 와도 구글은 먼저 하나만 물어보고(gnProbe), 막혔으면 나머지는 바로 빙으로 — 바깥 요청 50개 한도 지키기
 let gnProbe = null;
 export async function gnText(url) {
+  const nv = await naverAsGn(url); if (nv) return nv; // 네이버 먼저
   if (Date.now() > gnBadUntil) {
     if (gnProbe) { await gnProbe.catch(() => null); if (Date.now() > gnBadUntil) { const t = await gnTry(url); if (t) return t; } }
     else { const p = gnProbe = gnTry(url); let t; try { t = await p; } finally { gnProbe = null; } if (t) return t; }
@@ -400,12 +431,13 @@ async function build(k, city, env) {
   };
 }
 export async function onRequestGet({ request, env, waitUntil }) {
+  setNaver(env);
   const u = new URL(request.url), k = u.searchParams.get('k') || 'boss', city = pickCity(u.searchParams.get('city'));
   if (!RULES[k]) return json({ error: 'bad-k' }, 400);
   // 연결 점검: /api/letter?check=1&city=광주 — 키 값은 보여주지 않고 연결 상태와 받아온 자료만 보여 줌
   if (u.searchParams.get('check')) {
     const c = CITY[city], diag = {}, [f, p] = await Promise.all([festivals(env, c, diag), programs(env, c, diag)]);
-    return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
+    return json({ city, 네이버뉴스: NV ? '키 있음 — 네이버 기사 먼저' : '키 없음(NAVER_ID·NAVER_SECRET) — 구글·빙으로', 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
   const ckey = new Request(u.origin + '/__letter11/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;

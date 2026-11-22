@@ -10,7 +10,7 @@
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
-import { market, indexOf, readOne, SUM_RULE, gnText, clipSum, isAudition } from './letter.js';
+import { market, indexOf, readOne, SUM_RULE, gnText, clipSum, isAudition, setNaver } from './letter.js';
 //   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
 const TP = {
   audition: [['🎬 오디션·배우 모집', ['배우 오디션 when:30d', '배우 모집 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '뮤지컬 오디션 OR 연극 오디션 when:30d', '모델 모집 OR 아역 오디션 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d'], 20,
@@ -169,6 +169,7 @@ async function build(k, env, t) {
 }
 
 export async function onRequestGet({ request, env, waitUntil }) {
+  setNaver(env);
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
   if (!/^(news|google|gov|yt|world|market|stock|tp)$/.test(k)) return json({ error: 'bad-k' }, 400);
   const t = k === 'tp' ? (u.searchParams.get('t') || '') : '';
@@ -202,6 +203,7 @@ async function sumAI(arts, env, key) {
   } catch (e) { return {}; } finally { clearTimeout(tm); }
 }
 export async function onRequestPost({ request, env, waitUntil }) {
+  setNaver(env);
   let b; try { b = await request.json(); } catch (e) { return json({ error: 'bad' }, 400); }
   const list = (Array.isArray(b && b.sum) ? b.sum : []).filter(x => x && /^https:\/\//.test(String(x.u || '')) && String(x.u).length < 1500).slice(0, 6)
     .map(x => ({ t: String(x.t || '').slice(0, 120), u: String(x.u) }));

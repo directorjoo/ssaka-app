@@ -29,6 +29,19 @@ function ymd(d) { return d.toISOString().slice(0, 10); }
 function un(s) { return String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim(); }
 function tag(x, t) { const m = x.match(new RegExp('<' + t + '(?:\\s[^>]*)?>([\\s\\S]*?)</' + t + '>')); return m ? un(m[1]) : ''; }
 async function getText(url) { const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 900 } }); if (!r.ok) throw new Error(url.slice(0, 40) + ' ' + r.status); return r.text(); }
+// 대표님 카드 장사 뉴스 10묶음 (11-22): [아이콘, 구글 뉴스 검색어]
+const BIZ_Q = [
+  ['💰', '소상공인 지원금 OR 소상공인 정책자금 OR 자영업자 지원'],
+  ['🧾', '자영업자 부가세 OR 종합소득세 OR 소상공인 세금'],
+  ['🏦', '소상공인 대출 OR 자영업자 대출 OR 이자 지원 소상공인'],
+  ['📈', '자영업 매출 OR 외식업 트렌드 OR 장사 잘되는'],
+  ['🛵', '배달앱 수수료 OR 배달의민족 자영업 OR 쿠팡이츠 자영업'],
+  ['👥', '최저임금 자영업 OR 4대보험 소상공인 OR 알바 구인 자영업'],
+  ['💸', '전기요금 소상공인 OR 임대료 자영업 OR 식자재 가격'],
+  ['📣', '가게 홍보 OR 스마트플레이스 OR 소상공인 온라인 마케팅'],
+  ['⚖️', '자영업 바뀌는 제도 OR 소상공인 개정 시행 OR 음식점 단속'],
+  ['💗', '자영업자 사연 OR 소상공인 희망 OR 골목상권 상생']
+];
 async function news(q, n) {
   try {
     const xml = await getText('https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=ko&gl=KR&ceid=KR:ko');
@@ -265,9 +278,12 @@ async function build(k, city, env) {
     const [a, b, s] = await Promise.all([N(['독감 유행 when:7d', '감기 유행 when:7d', '주의보 질병관리청 when:7d', '노로바이러스 when:7d'], 5), N(['어르신 무료 접종 when:14d', '노인 무료 건강검진 when:14d', '보건소 무료 when:14d', '노인 혜택 when:14d'], 5), N(['보이스피싱 수법 when:14d', '노인 사기 when:14d', '스미싱 주의 when:14d'], 4)]);
     groups = [['🤧', '유행·질병', a], ['🆓', '무료·혜택', b], ['🚨', '사기 조심', s]];
   } else if (k === 'boss') {
-    const [a, f, p, tr] = await Promise.all([news('자영업 OR 소상공인 OR 카드수수료 OR 배달앱 when:3d', 6), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
+    // 11-22 대표님: 장사 뉴스를 자영업 10묶음으로 나눠 찾고, 묶음마다 돌아가며 골라 여러 주제가 고르게 들어가게 (검색어 고칠 땐 BIZ_Q만)
+    const [bz, f, p, tr] = await Promise.all([Promise.all(BIZ_Q.map(([ic, q]) => news(q + ' when:5d', 4).then(r => r.map(x => Object.assign({ icon: ic }, x))))), festivals(env, c), programs(env, c), getText('https://trends.google.com/trending/rss?geo=KR').then(x => (x.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, 15).map(i => tag(i, 'title'))).catch(() => [])]);
+    const mix = []; for (let i = 0; i < 4; i++) bz.forEach(r => { if (r[i]) mix.push(r[i]); });
+    const a = uniq(mix).slice(0, 12);
     const p2 = p.length ? p.map(x => ({ t: x.t, src: (x.org || '기업마당') + (x.when ? ' · 신청 ' + x.when : ''), url: x.url })) : await news('소상공인 지원사업 신청 마감 when:7d', 5);
-    groups = [['💰', '지원사업', p2.slice(0, 6)], ['🎪', '축제·행사', f.slice(0, 6).map(x => ({ t: x.t, src: x.at + ' · ' + x.addr, url: x.url }))], ['📰', '장사 뉴스', a]];
+    groups = [['💰', '지원사업', p2.slice(0, 4)], ['🎪', '축제·행사', f.slice(0, 4).map(x => ({ t: x.t, src: x.at + ' · ' + x.addr, url: x.url }))], ['📰', '장사 뉴스', a]];
     if (tr.length) extra = '\n[지금 인기 검색어] ' + tr.join(', ');
     links = BOSS_LINKS;
   } else {
@@ -343,7 +359,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter7/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter8/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey);
   // ?more=1 : 아직 요약 안 한 기사(앞 7개 다음)를 13개까지 더 읽고 요약해 캐시에 합침
   if (u.searchParams.get('more')) {

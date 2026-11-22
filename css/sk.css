@@ -803,3 +803,24 @@
 .sk-al-sbx { width: 100%; max-width: 480px; padding: 20px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 22px 22px 0 0; background: #fff; color: #222; font-family: var(--f-body, inherit); --accent: #B3132B; }
 .sk-al-sbx b { font-size: 19px; } .sk-al-sbx p { margin: 6px 0 12px; font-size: 15px; line-height: 1.5; color: #555; }
 .sk-al-sbx input { width: 100%; min-height: 50px; padding: 0 14px; border: 1.5px solid #ddd; border-radius: 12px; font-size: 17px; box-sizing: border-box; }
+
+/* 모임 회비 (11-23, js/dues.js) — 계좌·송금 + 입금 체크. 미납 알림 없음 */
+.sk-dues { margin: 14px 0 6px; padding: 16px; border-radius: 18px; background: color-mix(in srgb, var(--paper) 92%, var(--ink)); color: var(--ink); border: 1.5px solid var(--line-ink, rgba(0,0,0,.12)); font-family: var(--f-body); }
+.sk-du-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.sk-du-head b { font-size: 18px; font-weight: 800; }
+.sk-du-amt { font-size: 19px; font-weight: 800; color: var(--accent-line, var(--accent)); font-variant-numeric: tabular-nums; }
+.sk-du-memo { margin: 6px 0 0; font-size: 15px; color: var(--sub); }
+.sk-du-acct { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--paper, #fff); border: 1px solid var(--line-ink, rgba(0,0,0,.12)); }
+.sk-du-acct span { flex: 1; font-size: 16.5px; font-weight: 700; word-break: keep-all; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.sk-du-acct button { flex: none; min-height: 42px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--accent); color: var(--on-accent, #fff); font: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; }
+.sk-du-pay { display: flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 8px; border-radius: 14px; background: #FEE500; color: #191919; font-size: 16.5px; font-weight: 800; text-decoration: none; }
+.sk-du-mine p { margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; font-size: 15.5px; font-weight: 700; background: rgba(0,0,0,.05); }
+.sk-du-mine p.ok { background: color-mix(in srgb, var(--accent) 14%, var(--paper, #fff)); color: var(--accent-line, var(--accent)); }
+.sk-du-mine small { display: block; margin-top: 6px; font-size: 13.5px; color: var(--sub); }
+.sk-du-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; max-height: 380px; overflow-y: auto; }
+.sk-du-list button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px 10px; border: 1px solid var(--line-ink, rgba(0,0,0,.12)); border-radius: 12px; background: var(--paper, #fff); color: var(--ink); font: inherit; font-size: 16px; font-weight: 700; text-align: left; cursor: pointer; }
+.sk-du-list i { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--line-ink, rgba(0,0,0,.25)); font-style: normal; font-weight: 900; }
+.sk-du-list span { flex: 1; }
+.sk-du-list li.on i { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+.sk-du-list .tell { flex: none; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,.06); font-size: 12.5px; font-weight: 800; }
+.sk-dues .sk-fine { margin: 10px 0 0; font-size: 14px; color: var(--sub); }

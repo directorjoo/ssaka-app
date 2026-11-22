@@ -167,7 +167,7 @@
       ol.style.display = seeAll() ? '' : 'none';
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
-    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); }
+    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림
     var ERRS = { cap: '정원이 다 찼어요. 모임 연 분께 물어보세요', closed: '응답이 마감됐어요. 모임 연 분께 직접 알려 주세요', name: '이름을 적어 주세요', host: '모임 연 분만 할 수 있어요' };
     function errT(e) { toast(ERRS[e && e.message] || '잠시 뒤 다시 눌러 주세요'); }
     function hostOp(o) { return send(Object.assign({ hk: hk }, o)); }

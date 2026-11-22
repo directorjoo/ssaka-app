@@ -183,6 +183,8 @@
     var root = SsakaRender.build(card, design, ctx);
     // 산악회·동문회 공지: 참석 명단 (신청·번호 자동·카톡용 복사)
     if (card.roster && window.SsakaRoster) { try { SsakaRoster.mount(card, root, toast); } catch (e) {} }
+    // 모임 회비 (11-23): 계좌·카카오페이 + 입금 체크(모임 연 분만 봄, 미납 알림 없음)
+    if (card.dues && window.SsakaDues) { try { SsakaDues.mount(card, root, toast); } catch (e) {} }
     // 모임 사진첩 (11-23): 모임 뒤 단톡방 사람들이 사진을 한 곳에
     if (card.album && window.SsakaAlbum) { try { SsakaAlbum.mount(card, root, toast); } catch (e) {} }
     // ---------- 손님 반응 숫자: 열람·버튼 '횟수'만 보냄 (만든 사람 본인 화면은 빼고) ----------

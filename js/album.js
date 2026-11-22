@@ -155,7 +155,7 @@
     });
 
     // 자리: 참석 명단 아래, 없으면 바로가기 단추 아래
-    var anchor = root.querySelector('.sk-roster') || root.querySelector('.sk-actions');
+    var anchor = root.querySelector('.sk-dues') || root.querySelector('.sk-roster') || root.querySelector('.sk-actions');
     if (anchor) anchor.insertAdjacentElement('afterend', box); else (root.querySelector('.sk-wrap') || root).appendChild(box);
     // 참석 명단 없는 사진첩은 만든 폰 열쇠로 주인 잠금
     if (live && hk && !card.roster) post({ op: 'claim' }).then(function (o) { list = o.list || []; owner = !!o.owner; paint(); }).catch(load);

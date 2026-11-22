@@ -3,6 +3,8 @@
 // 저장하는 것: 이름, 전화번호(선택, 주최자만 봄), 기수(선택), 탑승지(선택), 동반 인원, 답(참석·불참·미정), 한마디, 신청 시각. 위치는 저장하지 않음.
 // 내 신청을 고치거나 빼는 열쇠(tok)는 신청한 휴대폰에만 있고, 남에게는 보여 주지 않음.
 // 120일 지난 신청은 자동 청소.
+// 회비 입금 체크(d, 11-23): 0 없음 · 1 본인이 '입금했어요' · 2 모임 연 분이 확인. 누가 냈는지는 주최자와 본인만 봄.
+//   ⚠️ 대표님: 모임에서 안 낸 사람에게 알리는 건 금지 → 미납 알림·미납자 공개 기능은 만들지 않음
 import { currentUser } from '../auth/[[path]].js';
 const KEEP = 120 * 24 * 3600 * 1000;
 const MAX = 400;
@@ -32,8 +34,8 @@ async function isHost(db, request, id, hk) {
 }
 // 답: a = y(참석) · n(불참 — '못 가요'·신청 취소도 여기로 자동 기록) · m(아직 몰라요)
 async function list(db, request, id, tok, hk) {
-  const r = await db.prepare('SELECT tok, n, ph, g, s, p, t, a, w FROM roster WHERE rid = ? ORDER BY t ASC LIMIT ?').bind(id, MAX).all();
-  const all = (r.results || []).map(function (x) { return { n: x.n, ph: x.ph || undefined, g: x.g, s: x.s, p: x.a === 'n' || x.a === 'm' ? 0 : x.p, t: x.t, a: x.a === 'n' || x.a === 'm' ? x.a : 'y', w: x.w || undefined, me: tok && x.tok === tok ? 1 : undefined }; });
+  const r = await db.prepare('SELECT tok, n, ph, g, s, p, t, a, w, d FROM roster WHERE rid = ? ORDER BY t ASC LIMIT ?').bind(id, MAX).all();
+  const all = (r.results || []).map(function (x) { return { n: x.n, ph: x.ph || undefined, g: x.g, s: x.s, p: x.a === 'n' || x.a === 'm' ? 0 : x.p, t: x.t, a: x.a === 'n' || x.a === 'm' ? x.a : 'y', w: x.w || undefined, d: x.d | 0 || undefined, me: tok && x.tok === tok ? 1 : undefined }; });
   const yes = all.filter(x => x.a === 'y');
   const stat = { count: yes.length, people: yes.reduce(function (a, x) { return a + 1 + (x.p || 0); }, 0), no: all.filter(x => x.a === 'n').length, maybe: all.filter(x => x.a === 'm').length };
   const h = await isHost(db, request, id, hk);
@@ -42,7 +44,7 @@ async function list(db, request, id, tok, hk) {
   // 주최자에겐 줄마다 k(고치기·지우기용 열쇠)도 — 카톡 안 하는 분을 대신 적거나 전화로 받은 답을 바꿀 때
   if (h.host) return Object.assign({ pub: h.pub, owner: 1, list: all.map(function (x, i) { return Object.assign({ k: r.results[i].tok }, x); }) }, stat);
   const mine = all.filter(function (x) { return x.me; });
-  if (h.pub === 2) return Object.assign({ pub: 2, list: all.map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, t: x.t, a: x.a, w: x.w, me: x.me }; }) }, stat);
+  if (h.pub === 2) return Object.assign({ pub: 2, list: all.map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, t: x.t, a: x.a, w: x.w, me: x.me, d: x.me ? x.d : undefined }; }) }, stat);
   if (h.pub === 1) return Object.assign({ pub: 1, list: mine }, stat);
   return { pub: 0, priv: 1, list: mine };
 }
@@ -60,6 +62,7 @@ export async function onRequest({ request, env, params }) {
     try { await db.prepare('ALTER TABLE roster_meta ADD COLUMN dl INTEGER').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster ADD COLUMN a TEXT').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster ADD COLUMN w TEXT').run(); } catch (e) {}
+    try { await db.prepare('ALTER TABLE roster ADD COLUMN d INTEGER').run(); } catch (e) {}
     if (Math.random() < 0.05) await db.prepare('DELETE FROM roster WHERE t < ?').bind(Date.now() - KEEP).run();
 
     const id = clean((params.id || [])[0], 16);
@@ -86,6 +89,14 @@ export async function onRequest({ request, env, params }) {
         if (b.set && 'dl' in b) await db.prepare('UPDATE roster_meta SET dl = ? WHERE rid = ?').bind(+b.dl > 0 ? +b.dl : null, id).run();
       }
       return json(await list(db, request, id, clean(b.tok, 24), hk));
+    }
+    // 회비: 모임 연 분이 입금 확인(2)·확인 취소(0)
+    if (b.op === 'hostpaid') {
+      const h = await isHost(db, request, id, hk);
+      if (!h.host) return json({ error: 'host' }, 403);
+      const k = clean(b.k, 24); if (!/^[a-z0-9]{12,24}$/.test(k)) return json({ error: 'bad' }, 400);
+      await db.prepare('UPDATE roster SET d = ? WHERE rid = ? AND tok = ?').bind(b.v ? 2 : 0, id, k).run();
+      return json(await list(db, request, id, '', hk));
     }
     // 주최자 전용: 카톡 안 하는 분·전화로 답한 분을 대신 적기(hostadd), 답 바꾸기(hostset), 지우기(hostdel)
     if (/^host(add|set|del)$/.test(b.op)) {
@@ -115,6 +126,11 @@ export async function onRequest({ request, env, params }) {
       const hd = await isHost(db, request, id, hk);
       if (!hd.host && hd.meta && hd.meta.dl && Date.now() > hd.meta.dl) return json({ error: 'closed' }, 409);
       await db.prepare('UPDATE roster SET a = \'n\', p = 0 WHERE rid = ? AND tok = ?').bind(id, tok).run();
+      return json(await list(db, request, id, tok, hk));
+    }
+    // 회비: 본인이 '입금했어요'(1)·되돌리기(0) — 모임 연 분이 이미 확인(2)했으면 그대로 둠
+    if (b.op === 'paid') {
+      await db.prepare('UPDATE roster SET d = ? WHERE rid = ? AND tok = ? AND COALESCE(d, 0) < 2').bind(b.v ? 1 : 0, id, tok).run();
       return json(await list(db, request, id, tok, hk));
     }
     if (b.op === 'add') {

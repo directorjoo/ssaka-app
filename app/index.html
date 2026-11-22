@@ -620,7 +620,7 @@
     #v-home.v2 .v2-td h3 { font-size: 28px; line-height: 1.25; color: #1A1A1A; }
     #v-home.v2 .v2-td .tx p { color: #284927; opacity: 1; }
     html.bigtxt #v-home.v2 .v2c h3 { font-size: 26px; }
-    #v-home.v2 .v2-td .ch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px 14px 4px; } /* 11-22 대표님: 3줄 → 2줄(4+3), 이모지 위·글씨 아래 작은 타일 */
+    #v-home.v2 .v2-td .ch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px 14px 4px; } /* 11-22 대표님: 3줄 → 2줄(4+4, 대학입시 넣어 8개), 이모지 위·글씨 아래 작은 타일 */
     #v-home.v2 .v2-td .ch span { flex-direction: column; gap: 1px; min-height: 58px !important; padding: 6px 2px !important; border-radius: 16px !important; font-size: 13.5px !important; line-height: 1.2; letter-spacing: -.04em; white-space: normal !important; word-break: keep-all; text-align: center; }
     #v-home.v2 .v2-td .ch span i { font-style: normal; font-size: 19px; line-height: 1; }
     html.bigtxt #v-home.v2 .v2-td .ch { grid-template-columns: repeat(3, 1fr); }
@@ -1115,7 +1115,7 @@
     // 3. 싸바 브리핑 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 싸바 브리핑 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
     td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 싸바 브리핑</em><h3>모르면 손해,<br>아는 사람만 챙겨요!</h3><p><span class="bt-long">인기 검색어·정부 혜택·뉴스를 검색 안 해도 싸바가 매일 아침 골라 드려요</span><span class="bt-short">검색어·혜택·뉴스 매일 아침</span></p></div>' +
-      '<div class="ch"><span><i>🔥</i>인기 검색어</span><span><i>🔔</i>정부 혜택</span><span><i>🗞️</i>뉴스 요약</span><span><i>🏪</i>자영업자 정보</span><span><i>🎬</i>오디션</span><span><i>💊</i>건강</span><span><i>📺</i>TV·라디오</span></div>' +
+      '<div class="ch"><span><i>🔥</i>인기 검색어</span><span><i>🔔</i>정부 혜택</span><span><i>🗞️</i>뉴스 요약</span><span><i>🏪</i>자영업자 정보</span><span><i>🎬</i>오디션</span><span><i>💊</i>건강</span><span><i>🎓</i>대학입시</span><span><i>📺</i>TV·라디오</span></div>' +
       '<div class="ft"><a class="lt" href="../letter/">💌 싸바 브리핑 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
     if (window.savaHookTicker) { try { window.savaHookTicker(td.querySelector('h3')); } catch (e) {} } // 11-22: 메인 카피 고정 + 아래 한 줄 흐르는 문구 (js/brief-hook.js)
     tapGo(td, '../today/');

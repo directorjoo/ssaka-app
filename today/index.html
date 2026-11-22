@@ -201,7 +201,7 @@
     .grp h3 .cnt { margin-left: auto; flex: none; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.18); color: #fff; font-size: 14px; font-weight: 800; text-shadow: none; }
     .grp.tb-am   { --bh: #D9822B; --bx: #FFF1E2; --bl: #F0C595; } /* 주황 — 아침 해 */
     .grp.tb-hot  { --bh: #D04A3A; --bx: #FFEDE9; --bl: #F3BDB3; } /* 코랄 빨강 — 화제 */
-    .grp.tb-biz  { --bh: #8A6A4A; --bx: #F5EFE8; --bl: #D8C6B2; } /* 갈색 — 대표님(영업·상담과 같은 색) */
+    .grp.tb-biz  { --bh: #8A6A4A; --bx: #F5EFE8; --bl: #D8C6B2; } /* 갈색 — 자영업(영업·상담과 같은 색) */
     .grp.tb-sen  { --bh: #3F9A5C; --bx: #EAF6EC; --bl: #B7DDBF; } /* 초록 — 어르신(소식·안심과 같은 색) */
     .grp.tb-trip { --bh: #1E9AA0; --bx: #E5F6F6; --bl: #A9DCDD; } /* 청록 — 나들이 */
     .grp.tb-mkt  { --bh: #2C4A7A; --bx: #E9EEF7; --bl: #B6C4DC; } /* 남색 — 주식·부동산·환율 */
@@ -265,7 +265,7 @@
       { k: 'family', t: '학부모·아이', i: '🎒', c: '#E0A800', n: 1 },
       { k: 'exam', t: '대학입시', i: '🎓', c: '#1E3A8A', n: 1 },
       { k: 'worker', t: '직장인·프리랜서', i: '💼', c: '#5b4636', n: 1 }] },
-    { id: 'biz', h: '🏪 대표님', s: '매출에 도움 되는 것만', c: [
+    { id: 'biz', h: '🏪 자영업', s: '매출에 도움 되는 것만', c: [
       { k: 'biz', t: '혜택 알리미', i: '🔔', c: '#7a3fb0', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
       { k: 'sns', t: 'SNS 만들기', i: '📱', c: '#E1306C', n: 1 },
@@ -625,10 +625,10 @@
     ['🏢 가까운 주민센터', '지도에서 바로 찾기', 'https://map.naver.com/p/search/' + encodeURIComponent('행정복지센터')]
   ];
   // [월, 일, 이름, 누구] — 매년 반복되는 신고·납부 마감 (주말·공휴일이면 다음 평일로 미뤄질 수 있어요)
-  var DUE = [[1, 25, '부가세 확정신고 (2기)', '대표님'], [2, 10, '사업장현황신고 (면세사업자)', '대표님'], [4, 25, '부가세 예정신고·납부', '대표님'],
-    [5, 31, '종합소득세·지방소득세 신고', '대표님·어르신(소득 있는 분)'], [6, 30, '자동차세 (1기)', '차 있는 분'], [7, 25, '부가세 확정신고 (1기)', '대표님'],
-    [7, 31, '재산세 (건물·주택 1기)', '집·건물 있는 분'], [8, 31, '주민세 (사업소분)', '대표님'], [9, 30, '재산세 (토지·주택 2기)', '땅·집 있는 분'],
-    [10, 25, '부가세 예정신고·납부', '대표님'], [12, 15, '종합부동산세', '해당되는 분'], [12, 31, '자동차세 (2기)', '차 있는 분']];
+  var DUE = [[1, 25, '부가세 확정신고 (2기)', '자영업자'], [2, 10, '사업장현황신고 (면세사업자)', '자영업자'], [4, 25, '부가세 예정신고·납부', '자영업자'],
+    [5, 31, '종합소득세·지방소득세 신고', '자영업자·어르신(소득 있는 분)'], [6, 30, '자동차세 (1기)', '차 있는 분'], [7, 25, '부가세 확정신고 (1기)', '자영업자'],
+    [7, 31, '재산세 (건물·주택 1기)', '집·건물 있는 분'], [8, 31, '주민세 (사업소분)', '자영업자'], [9, 30, '재산세 (토지·주택 2기)', '땅·집 있는 분'],
+    [10, 25, '부가세 예정신고·납부', '자영업자'], [12, 15, '종합부동산세', '해당되는 분'], [12, 31, '자동차세 (2기)', '차 있는 분']];
   function minwon() {
     var y = now.getFullYear(), t0 = new Date(y, now.getMonth(), now.getDate());
     var up = DUE.map(function (d) { var dt = new Date(y, d[0] - 1, d[1]); if (dt < t0) dt = new Date(y + 1, d[0] - 1, d[1]); return { dt: dt, n: d[2], who: d[3], left: Math.round((dt - t0) / 864e5) }; })
@@ -657,12 +657,12 @@
   ];
   var bizData = null, bizF = 'all', bizR = ls('sava-region') || '';
   function biz() {
-    pane.innerHTML = '<h2>🔔 대표님 혜택 알리미</h2><div class="src">중소벤처기업부 기업마당 공고 · 마감 가까운 순 · 누르면 공고 원문</div>' +
+    pane.innerHTML = '<h2>🔔 자영업 혜택 알리미</h2><div class="src">중소벤처기업부 기업마당 공고 · 마감 가까운 순 · 누르면 공고 원문</div>' +
       chips('bf', BIZF, bizF, '#7a3fb0') +
       '<label style="display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:15px;font-weight:800">📍 우리 지역 공고도 <select id="br" style="flex:1;min-height:42px;padding:0 10px;border:1.5px solid #e2d4c9;border-radius:12px;font:inherit;font-size:16px;font-weight:800;background:#fff">' + [['', '전국 공고만 보기']].concat(SIDO.map(function (s) { return [s, s + ' + 전국']; })).map(function (a) { return '<option value="' + a[0] + '"' + (a[0] === bizR ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select></label>' +
       '<div id="bl"><div class="msg">지원사업 공고를 모으는 중이에요…</div></div>' +
       '<div class="sec">📰 이번 주 지원금·혜택 뉴스</div><div id="bn"><div class="msg" style="padding:12px">소식을 모으는 중…</div></div>' +
-      '<div class="sec">📌 대표님 공식 창구</div>' + links(BIZL) +
+      '<div class="sec">📌 자영업 공식 창구</div>' + links(BIZL) +
       '<p class="note">신청 자격·기간은 꼭 공고 원문에서 확인해 주세요. "지원금 받게 해 줄 테니 수수료 먼저" 하는 전화·문자는 사기예요. 정부 지원 신청은 모두 무료예요.</p>';
     onChip('bf', function (v) { bizF = v; paintBiz(); });
     $('br').addEventListener('change', function () { bizR = this.value; ls('sava-region', bizR); paintBiz(); });

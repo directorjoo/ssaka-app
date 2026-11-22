@@ -877,6 +877,13 @@
     return g;
   }
 
+  // 📣 싸바 홍보(promo/)로 가는 한 줄 — 만들기 탭 카드·블로그 아래 (11-23)
+  function promoLink() {
+    var a = el('a', ''); a.href = '../promo/';
+    a.style.cssText = 'display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:14px 16px;border-radius:18px;background:linear-gradient(100deg,#FDE7D6,#FFF6EC);border:1.5px solid #F3D3B6;color:#5A2A08;text-decoration:none;font-weight:800;font-size:15.5px;line-height:1.45';
+    a.innerHTML = '<span style="font-size:26px">📣</span><span>만들 시간이 없으세요?<br><small style="font-weight:700;color:#A3410C">싸바가 매달 만들어 대신 올려 드려요 · 월 49,000원부터</small></span><b style="margin-left:auto;font-size:20px">›</b>';
+    return a;
+  }
   // ---------- 업종별로 바로 만들기 (싸바알림 화면) ----------
   // 업종마다 또렷이 구분되는 파스텔 바탕 (이모지가 잘 보이도록 밝게)
   var TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
@@ -950,6 +957,7 @@
     v.appendChild(seg);
     if (alimTab === 'blog') {
       v.appendChild(ncard({ pal: 6, href: '../survey/', label: '블로그 쓰기', photo: '../img/library-blog.jpg', em: '상호와 키워드만 넣으면', title: '블로그 쓰기', desc: '업종 인기 블로그를 참고해 글 여러 편을 써 드려요. 마음에 드는 글을 고르세요.', icon: '✍️', name: '블로그 쓰기', sub: '네이버 · 구글 블로그', btn: '글 쓰러 가기' }));
+      v.appendChild(promoLink());
       return;
     }
     var sb = el('label', 'al-search');
@@ -1006,6 +1014,7 @@
     v.appendChild(el('div', 'divider'));
     v.appendChild(secHead('업종별로 바로 만들기'));
     industries(v);
+    v.appendChild(promoLink());
   }
 
   // ---------- 홈 (2026-11-21 새 판: 12색 표준 카드) ----------

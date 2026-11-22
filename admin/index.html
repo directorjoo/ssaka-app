@@ -95,7 +95,7 @@
 
   <div id="main" hidden>
     <nav class="nav">
-      <a href="#s-claude">💬 Claude</a><a href="#s-req">📝 요청 목록</a><i></i><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><i></i><a href="#s-report">🚨 신고·차단</a><a href="#s-story">📖 싸바스토리</a><i></i><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
+      <a href="#s-claude">💬 Claude</a><a href="#s-req">📝 요청 목록</a><i></i><a href="#s-today">📊 오늘</a><a href="#s-trend">📈 추이</a><a href="#s-top">🏆 인기 카드</a><i></i><a href="#s-report">🚨 신고·차단</a><a href="#s-story">📖 싸바스토리</a><a href="#s-promo">📣 홍보 신청</a><i></i><a href="#s-go">🧭 바로가기</a><a href="#s-setup">⚙️ 설정 점검</a>
     </nav>
 
     <div class="gh">🛠️ 고치기</div>
@@ -157,6 +157,12 @@
       <h2>📖 싸바스토리 원고 <span id="stN"></span></h2>
       <div id="stories"></div>
       <p class="muted">sava.kr/story/ '내 이야기 올리기'로 온 원고예요. "올리기"를 누르면 싸바스토리 목록 맨 앞에 바로 보여요. 연락처는 여기서만 보여요.</p>
+    </section>
+
+    <section id="s-promo">
+      <h2>📣 싸바 홍보 신청 <span id="prN"></span></h2>
+      <div id="promos"></div>
+      <p class="muted">sava.kr/promo/ 신청서로 온 상담 신청이에요. 연락드린 뒤 "연락함"을 누르세요 — 연락함 뒤 90일이 지나면 저절로 지워져요(신청 화면에 3개월 안에 지운다고 알림).</p>
     </section>
 
     <div class="gh">⚙️ 관리</div>
@@ -228,7 +234,7 @@
     if (o.kimchiWeek != null) T.appendChild(tile('🥬 김치 주문', num(o.kimchiWeek), '7일 · 주문 단추 누름 ' + num(o.kimchiOrderTapWeek || 0)));
     T.appendChild(tile('📣 마케팅 동의', num(u.marketing), '오늘도 싸바? 받을 수 있는 회원'));
     $('lkIdea').textContent = o.ideasNew ? '읽을 것 ' + o.ideasNew + '개' : '채택 · 쿠폰';
-    chart(); top(); reports(); reqs(); stories(); setup();
+    chart(); top(); reports(); reqs(); stories(); promos(); setup();
   }
   function chart() {
     var C = $('chart'); C.innerHTML = '';
@@ -340,6 +346,27 @@
       if (x.st === 'new') b('안 올림', '', function () { api({ op: 'storyno', id: x.id }).then(load); });
       if (x.st === 'ok') { var v = el('a', 'sb', '보기 ↗'); v.href = '/story/#u' + x.id; v.target = '_blank'; a.appendChild(v); }
       b('지우기', 'red', function () { if (confirm('이 원고를 지울까요? 되돌릴 수 없어요.')) api({ op: 'storydel', id: x.id }).then(load); });
+      d.appendChild(a); L.appendChild(d);
+    });
+  }
+  function promos() {
+    var L = $('promos'), S = D.promos || []; L.innerHTML = '';
+    var nw = S.filter(function (x) { return x.st === 'new'; }).length;
+    $('prN').textContent = '새 신청 ' + nw + ' · 전체 ' + S.length;
+    if (!S.length) { L.appendChild(el('p', 'muted', '아직 온 신청이 없어요.')); return; }
+    var PL = { auto: '⚡ 자동 발행 49,000원', care: '🤝 함께 대행 99,000원', ask: '🤔 상담부터' };
+    S.forEach(function (x) {
+      var d = el('div', 'req' + (x.st === 'done' ? ' done' : ''));
+      d.appendChild(el('div', 'meta', (x.st === 'new' ? '🟠 새 신청' : '✅ 연락함') + ' · ' + (PL[x.plan] || x.plan) + ' · ' + when(x.at)));
+      d.appendChild(el('p', '', '🏪 ' + x.shop + (x.ind ? ' · ' + x.ind : '') + (x.area ? ' · ' + x.area : '')));
+      d.appendChild(el('p', '', '📞 ' + (x.name ? x.name + ' · ' : '') + x.tel));
+      if (x.msg) { var m = el('p', '', '💬 ' + x.msg); m.style.fontSize = '15px'; m.style.color = '#5a4e44'; d.appendChild(m); }
+      var a = el('div', 'a');
+      function b(txt, cls, fn) { var e = el('button', 'sb ' + (cls || ''), txt); e.type = 'button'; e.addEventListener('click', fn); a.appendChild(e); }
+      if (/^[\d\-\s+]{8,}$/.test(x.tel)) { var c = el('a', 'sb dark', '📞 전화'); c.href = 'tel:' + x.tel.replace(/[^\d+]/g, ''); a.appendChild(c); }
+      if (x.st === 'new') b('✅ 연락함', '', function () { api({ op: 'promodone', id: x.id }).then(load); });
+      else b('되돌리기', '', function () { api({ op: 'promonew', id: x.id }).then(load); });
+      b('지우기', 'red', function () { if (confirm('이 신청을 지울까요?')) api({ op: 'promodel', id: x.id }).then(load); });
       d.appendChild(a); L.appendChild(d);
     });
   }

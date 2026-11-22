@@ -5,10 +5,12 @@
 // POST /api/admin {op:'req', text, where}  → Claude에게 맡길 수정 요청 적어 두기
 // POST /api/admin {op:'reqdone'|'reqopen'|'reqdel', id}
 // POST /api/admin {op:'storyok'|'storyno'|'storynew'|'storydel', id}  → 싸바스토리 원고 올리기·내리기·지우기
+// POST /api/admin {op:'promodone'|'promonew'|'promodel', id}  → 📣 싸바 홍보 신청 연락함·되돌리기·지우기
 // 개인정보: 회원 숫자만 셈. 이름·전화번호·카카오 번호는 이 화면에 내보내지 않음.
 
 import { currentUser } from './auth/[[path]].js';
 import { storyTable } from './story.js';
+import { promoTable } from './promo.js';
 
 function json(o, status) {
   return new Response(JSON.stringify(o), { status: status || 200, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'private, no-store' } });
@@ -76,6 +78,12 @@ export async function onRequest({ request, env }) {
       else { const st = b.op.slice(5); await db.prepare('UPDATE stories SET st = ?, ok_at = CASE WHEN ? = \'ok\' THEN ? ELSE ok_at END WHERE id = ?').bind(st, st, Date.now(), id).run(); }
       return json({ ok: 1 });
     }
+    if (id > 0 && /^promo(done|new|del)$/.test(b.op)) {
+      await promoTable(db);
+      if (b.op === 'promodel') await db.prepare('DELETE FROM promo_req WHERE id = ?').bind(id).run();
+      else await db.prepare('UPDATE promo_req SET st = ?, done_at = ? WHERE id = ?').bind(b.op === 'promodone' ? 'done' : 'new', b.op === 'promodone' ? Date.now() : null, id).run();
+      return json({ ok: 1 });
+    }
     if (id > 0 && b.op === 'reqdel') { await db.prepare('DELETE FROM admin_reqs WHERE id = ?').bind(id).run(); return json({ ok: 1 }); }
     return json({ error: 'bad' }, 400);
   }
@@ -136,9 +144,11 @@ export async function onRequest({ request, env }) {
   const blocked = blRows.map(r => Object.assign({ cid: r.cid, why: r.why, at: r.at }, r.d ? decodeTitle(r.d) : { title: '' }));
   try { await storyTable(db); } catch (e) {}
   const stories = await all(db, 'SELECT id, kind, title, by, text, line, contact, st, at FROM stories ORDER BY (st = \'new\') DESC, at DESC LIMIT 60');
+  try { await promoTable(db); await db.prepare('DELETE FROM promo_req WHERE st = \'done\' AND done_at < ?').bind(now - 90 * 864e5).run(); } catch (e) {}
+  const promos = await all(db, 'SELECT id, plan, shop, ind, area, name, tel, msg, st, at FROM promo_req ORDER BY (st = \'new\') DESC, at DESC LIMIT 100');
   const reqs = await all(db, 'SELECT id, text, place, st, at, done_at FROM admin_reqs ORDER BY (st = \'open\') DESC, at DESC LIMIT 100');
 
-  return json({ ok: 1, by: ad.by, nick: ad.nick || '', at: now, users, cards, views, other, trend, top, reports, blocked, reqs, stories,
+  return json({ ok: 1, by: ad.by, nick: ad.nick || '', at: now, users, cards, views, other, trend, top, reports, blocked, reqs, stories, promos,
     // 설정 점검: 값은 절대 내보내지 않고 '넣었는지'만
     setup: [
       ['관리자 계정 (SAVA_ADMIN_UID)', !!env.SAVA_ADMIN_UID], ['관리 비밀번호 (ADMIN_KEY)', !!env.ADMIN_KEY],

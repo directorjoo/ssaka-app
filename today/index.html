@@ -286,7 +286,8 @@
       { k: 'ledger', t: '대표님 장부', i: '📒', c: '#5b4636', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
       { k: 'sns', t: 'SNS 만들기', i: '📱', c: '#E1306C', n: 1 },
-      { k: 'card', t: '싸바카드', i: '🍒', c: '#B3132B', href: '../make/' }] },
+      { k: 'card', t: '싸바카드', i: '🍒', c: '#B3132B', href: '../make/' },
+      { k: 'promo', t: '싸바 홍보', i: '📣', c: '#C2410C', href: '../promo/', n: 1 }] },
     { id: 'sen', h: '👵 어르신·가족', s: '건강과 살림', c: [
       { k: 'health', t: '건강', i: '💊', c: '#12924a' },
       { k: 'senior', t: '어르신 혜택', i: '🎁', c: '#c2410c' },
@@ -730,10 +731,36 @@
     box.querySelectorAll('.fv').forEach(function (b) { b.onclick = function () { var l = favs(), i = l.indexOf(b.dataset.f); if (i >= 0) l.splice(i, 1); else l.unshift(b.dataset.f); ls('sava-food-fav', JSON.stringify(l.slice(0, 30))); paintFood(); }; });
   }
 
-  // 📒 대표님 장부 (11-23) — 달력에 날마다 매출·지출·메모. 이 폰에만 저장(서버로 안 보냄)
-  var ledM = null, ledSel = '';
+  // 📒 대표님 장부 (11-23) — 달력에 날마다 매출·지출·메모. 폰에 먼저 저장하고,
+  // 카카오로 로그인했으면 내 싸바 계정(/api/ledger)에도 저장 → 폰을 바꿔도 그대로. 날마다 t(고친 시각)로 새 것만 남김
+  var ledM = null, ledSel = '', ledAcc = null, ledBusy = false, ledAgain = false;
   function ledGet() { try { return JSON.parse(ls('sava-ledger') || '{}'); } catch (e) { return {}; } }
   function ledSet(o) { ls('sava-ledger', JSON.stringify(o)); }
+  function ledSync() {
+    if (ledBusy) { ledAgain = true; return; }
+    ledBusy = true;
+    fetch('/api/ledger', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ data: ledGet() }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var was = ledAcc && ledAcc.login;
+        ledAcc = { login: j && j.login ? 1 : 0, nick: (j && j.nick) || '', at: (j && j.at) || 0 };
+        if (j && j.login && j.data) {
+          var o = ledGet(), d = j.data;
+          Object.keys(d).forEach(function (k) { if (!o[k] || (+d[k].t || 0) >= (+o[k].t || 0)) o[k] = d[k]; });
+          ledSet(o);
+        }
+        var ae = document.activeElement; if ($('lsave') && (!was || j.login) && !(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName))) ledger();
+      }, function () { if (!ledAcc) ledAcc = { login: 0, off: 1 }; if ($('lsave')) ledger(); })
+      .then(function () { ledBusy = false; if (ledAgain) { ledAgain = false; ledSync(); } });
+  }
+  function ledAccBox() {
+    if (!ledAcc) return '<div class="src" style="margin:4px 0 10px">☁️ 계정 저장 확인 중…</div>';
+    if (ledAcc.login) {
+      var t = ledAcc.at ? new Date(ledAcc.at) : null;
+      return '<div style="margin:4px 0 10px;padding:10px 12px;border-radius:12px;background:#EEF6EF;color:#245C35;font-size:14.5px;font-weight:700;line-height:1.5">☁️ ' + (ledAcc.nick ? esc(ledAcc.nick) + ' 님 ' : '') + '싸바 계정에 저장돼요 · 폰을 바꿔도 그대로' + (t ? ' <small style="font-weight:600;opacity:.8">(' + t.getHours() + ':' + ('0' + t.getMinutes()).slice(-2) + ' 저장)</small>' : '') + '</div>';
+    }
+    return '<a href="/api/auth/kakao?next=' + encodeURIComponent('/today/?go=1#ledger') + '" style="display:block;margin:4px 0 10px;padding:12px 14px;border-radius:12px;background:#FEE500;color:#191600;font-size:15px;font-weight:800;line-height:1.45;text-decoration:none">💬 카카오로 로그인하면 <u>폰을 바꿔도</u> 장부가 남아요 ›<br><small style="font-weight:600">지금 적은 장부도 옮겨져요 · 안 하면 이 폰에만 저장</small></a>';
+  }
   function ymd8(d) { return d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
   function won(n) { n = Math.round(n || 0); return n.toLocaleString() + '원'; }
   function short(n) { n = n || 0; return n >= 10000 ? (Math.round(n / 1000) / 10) + '만' : n ? n.toLocaleString() : ''; }
@@ -749,7 +776,8 @@
       cells += '<button type="button" class="ld' + (k8 === ledSel ? ' on' : '') + (k8 === ymd8(now) ? ' td' : '') + '" data-d="' + k8 + '"><i style="color:' + (dw === 0 ? '#D7263D' : dw === 6 ? '#1A4FB0' : '#3a2a22') + '">' + dd + '</i>' + (v.s ? '<b>' + short(+v.s) + '</b>' : '') + (v.e ? '<u>-' + short(+v.e) + '</u>' : '') + (v.m ? '<s>📝</s>' : '') + '</button>';
     }
     var sv = L[ledSel] || {}, sd = ledSel;
-    pane.innerHTML = '<h2>📒 대표님 장부</h2><div class="src">날짜를 누르고 매출·지출·메모를 적어 두세요 · <b>이 폰에만 저장</b>돼요 (싸바 서버로 안 보내요)</div>' +
+    if (!ledAcc && !ledBusy) ledSync();
+    pane.innerHTML = '<h2>📒 대표님 장부</h2><div class="src">날짜를 누르고 매출·지출·메모를 적어 두세요</div>' + ledAccBox() +
       '<div class="ldh"><button type="button" id="lp" aria-label="지난달">‹</button><b>' + y + '년 ' + (m + 1) + '월</b><button type="button" id="ln" aria-label="다음 달">›</button></div>' +
       '<div class="lds"><div><small>매출</small><b style="color:#1A6FD1">' + won(sumS) + '</b></div><div><small>지출</small><b style="color:#D7263D">' + won(sumE) + '</b></div><div><small>남은 돈</small><b>' + won(sumS - sumE) + '</b></div></div>' +
       '<div class="ldw"><span style="color:#D7263D">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#1A4FB0">토</span></div><div class="ldg">' + cells + '</div>' +
@@ -757,14 +785,15 @@
       '<div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>💰 매출<input id="ls" type="number" inputmode="numeric" value="' + esc(sv.s || '') + '" placeholder="0"></label><label>💸 지출<input id="le" type="number" inputmode="numeric" value="' + esc(sv.e || '') + '" placeholder="0"></label></div>' +
       '<label>📝 메모 <small>예약·납품·세금 날짜 등</small><textarea id="lm" rows="2" placeholder="예: 김 사장님 단체 예약 12명 / 갓김치 납품">' + esc(sv.m || '') + '</textarea></label>' +
       '<button type="button" class="btn" id="lsave" style="width:100%;margin-top:8px;min-height:50px;border:0;border-radius:14px;background:#5b4636;color:#fff;font:inherit;font-size:17px;font-weight:900">저장하기</button></div>' +
-      '<p class="note">폰을 바꾸거나 인터넷 기록을 지우면 장부도 지워져요. 카드·배달 매출 자동 연결은 준비 중이에요.</p>';
+      '<p class="note">' + (ledAcc && ledAcc.login ? '장부는 대표님 계정에서만 보여요. 싸바를 탈퇴하면 장부도 함께 지워져요.' : '로그인하지 않으면 폰을 바꾸거나 인터넷 기록을 지울 때 장부도 지워져요.') + ' 카드·배달 매출 자동 연결은 준비 중이에요.</p>';
     $('lp').onclick = function () { ledM = new Date(y, m - 1, 1); ledger(); };
     $('ln').onclick = function () { ledM = new Date(y, m + 1, 1); ledger(); };
     pane.querySelectorAll('.ld').forEach(function (b) { b.onclick = function () { ledSel = b.dataset.d; ledger(); var e = pane.querySelector('.lde'); if (e && e.scrollIntoView) e.scrollIntoView({ behavior: 'smooth', block: 'center' }); }; });
     $('lsave').onclick = function () {
       var o = ledGet(), s = +$('ls').value || 0, e = +$('le').value || 0, mm = $('lm').value.trim();
-      if (s || e || mm) o[ledSel] = { s: s || '', e: e || '', m: mm }; else delete o[ledSel];
+      o[ledSel] = { s: s || '', e: e || '', m: mm, t: Date.now() }; // 비운 날도 t를 남겨 다른 폰에서도 지워지게
       ledSet(o); ledger();
+      if (ledAcc && ledAcc.login) ledSync();
     };
   }
 
@@ -997,7 +1026,7 @@
   }
 
   // ★ 지금 보고 있는 탭 하나만 보내기 — 받는 사람은 이 탭부터 보고, 위 동그라미로 싸바 전체를 둘러봄
-  var SENDT = { food: '오늘 배추·돼지고기 같은 식자재 시세, 어제보다 올랐는지 한눈에 보여요', ledger: '달력에 날마다 매출·지출·메모를 적는 장부예요 (내 폰에만 저장)', biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에', audition: '배우·모델·뮤지컬 오디션 공고를 모아 봤어요', women: '여성 일자리·출산·육아·건강 소식이에요', youth: '청년 정책과 채용 소식이에요', family: '교육·돌봄 지원과 학교 소식이에요', exam: '수능·수시·정시 대학입시 소식이에요', worker: '연말정산·세금, 직장인·프리랜서 소식이에요', estate: '청약·분양, 전세·집값 소식이에요' };
+  var SENDT = { food: '오늘 배추·돼지고기 같은 식자재 시세, 어제보다 올랐는지 한눈에 보여요', ledger: '달력에 날마다 매출·지출·메모를 적는 장부예요 (로그인하면 폰을 바꿔도 그대로)', biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에', audition: '배우·모델·뮤지컬 오디션 공고를 모아 봤어요', women: '여성 일자리·출산·육아·건강 소식이에요', youth: '청년 정책과 채용 소식이에요', family: '교육·돌봄 지원과 학교 소식이에요', exam: '수능·수시·정시 대학입시 소식이에요', worker: '연말정산·세금, 직장인·프리랜서 소식이에요', estate: '청약·분양, 전세·집값 소식이에요' };
   function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
   $('send').addEventListener('click', function () {
     var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '싸바 브리핑' };

@@ -134,6 +134,8 @@
       photo.appendChild(fx);
     }
     if (!card.sos) hero.appendChild(photo);
+    // 대표 사진 설명 (11-22)
+    if (card.cap && card.image && !card.sos) hero.appendChild(el('p', 'sk-cap', String(card.cap).slice(0, 80)));
     var titles = el('div', 'sk-titles');
     if (card.kick) titles.appendChild(el('p', 'sk-kick', card.kick));
     var h1 = el('h1', 'sk-title', card.title || '');
@@ -156,6 +158,7 @@
     main.appendChild(hero);
 
     var pics = (card.gallery || []).filter(Boolean).slice(0, 10);
+    var caps = (Array.isArray(card.caps) ? card.caps : []).map(function (x) { return String(x || '').slice(0, 60); });
     // 청첩장: 다른 모바일 청첩장처럼 사진을 크게 길게 (첫 장 넓게 → 두 장씩), 인사말 아래에
     var longGal = /^wedding-/.test(String(card.design || '')), galEl = null;
     if (pics.length) {
@@ -164,9 +167,10 @@
       pics.forEach(function (src, i) {
         var b = el(live ? 'button' : 'div', 'sk-gal-i');
         if (live) { b.type = 'button'; b.setAttribute('aria-label', '사진 ' + (i + 1) + ' 크게 보기'); }
-        var im = el('img'); im.src = src; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async';
+        var im = el('img'); im.src = src; im.alt = caps[i] || ''; im.loading = 'lazy'; im.decoding = 'async';
         b.appendChild(im);
-        if (live) on(b, function () { openViewer(root, pics, i); });
+        if (caps[i]) b.appendChild(el('span', 'sk-gal-cap', caps[i]));
+        if (live) on(b, function () { openViewer(root, pics, i, caps); });
         gal.appendChild(b);
       });
       if (longGal) gal.insertBefore(el('p', 'sk-gal-h', 'GALLERY'), gal.firstChild);
@@ -211,6 +215,24 @@
     }
     if (longGal && galEl) main.appendChild(galEl);
     wrap.appendChild(main);
+    // 글씨 크기 (11-22): card.fs = [제목, 부제목, 본문] 각각 -1 작게 · 0 보통 · 1 크게 · 2 아주 크게
+    if (Array.isArray(card.fs)) {
+      var FK = { '-1': 0.85, '1': 1.18, '2': 1.38 };
+      var fsGo = function (nodes, k) {
+        if (!k) return;
+        nodes.forEach(function (n) {
+          if (!n) return;
+          var tries = 0;
+          (function go() {
+            if (!n.isConnected || !n.offsetParent && tries < 30) { if (tries++ < 30) (typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout)(go); return; }
+            var px = parseFloat(getComputedStyle(n).fontSize); if (px) n.style.fontSize = (px * k).toFixed(1) + 'px';
+          })();
+        });
+      };
+      fsGo([h1], FK[String(card.fs[0] | 0)]);
+      fsGo([titles.querySelector('.sk-sub')], FK[String(card.fs[1] | 0)]);
+      fsGo(Array.prototype.slice.call(main.querySelectorAll('.sk-list > li')), FK[String(card.fs[2] | 0)]);
+    }
 
     if (card.video && /^https:\/\//i.test(String(card.video))) { // 영상 주소는 https만 (javascript: 같은 위험한 주소 막기)
       var v = el(live ? 'a' : 'div', 'sk-video');
@@ -299,16 +321,18 @@
   }
 
   // 사진 크게 보기 (옆으로 넘기기)
-  function openViewer(root, pics, start) {
+  function openViewer(root, pics, start, caps) {
+    caps = caps || [];
     var i = start;
     var v = el('div', 'sk-viewer');
     v.setAttribute('role', 'dialog'); v.setAttribute('aria-modal', 'true'); v.setAttribute('aria-label', '사진 보기');
     var img = el('img'); img.alt = '';
     var count = el('div', 'sk-viewer-n');
+    var capEl = el('div', 'sk-viewer-cap');
     var x = el('button', 'sk-viewer-x', '닫기'); x.type = 'button';
     var prev = el('button', 'sk-viewer-p', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', '이전 사진');
     var next = el('button', 'sk-viewer-q', '›'); next.type = 'button'; next.setAttribute('aria-label', '다음 사진');
-    function show() { img.src = pics[i]; count.textContent = (i + 1) + ' / ' + pics.length; prev.hidden = next.hidden = pics.length < 2; }
+    function show() { img.src = pics[i]; count.textContent = (i + 1) + ' / ' + pics.length; capEl.textContent = caps[i] || ''; capEl.hidden = !caps[i]; prev.hidden = next.hidden = pics.length < 2; }
     function go(d) { i = (i + d + pics.length) % pics.length; show(); }
     function shut() { v.remove(); document.removeEventListener('keydown', key); }
     function key(e) { if (e.key === 'Escape') shut(); if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); }
@@ -320,7 +344,7 @@
     v.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
     v.addEventListener('touchend', function (e) { var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); });
     document.addEventListener('keydown', key);
-    v.appendChild(img); v.appendChild(count); v.appendChild(x); v.appendChild(prev); v.appendChild(next);
+    v.appendChild(img); v.appendChild(capEl); v.appendChild(count); v.appendChild(x); v.appendChild(prev); v.appendChild(next);
     show();
     root.appendChild(v);
     setTimeout(function () { x.focus(); }, 30);

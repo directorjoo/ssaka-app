@@ -123,7 +123,7 @@
         root.appendChild(auto);
       }
       var ti = el('input', 'sb-title'); ti.value = p.title || ''; ti.setAttribute('aria-label', '제목');
-      ti.addEventListener('input', function () { p.title = ti.value; changed(); });
+      ti.addEventListener('input', function () { p.title = ti.value; changed(); dirty.title = 1; });
       root.appendChild(ti);
       p.blocks.forEach(function (b, i) { root.appendChild(wrap(b, i)); });
       var tg = el('div', 'sb-tags', p.tags.join(' ')); tg.contentEditable = 'true';
@@ -229,9 +229,56 @@
       });
       toast('사진을 저장해요. 휴대폰은 사진을 길게 눌러 "사진에 저장"을 고르세요');
     }
+    // ✨ 맞춤법·오탈자 자동 고침: 대표님이 고친 문단은 그 칸을 벗어나면 1.5초 뒤 저절로 고쳐짐 (11-22)
+    var dirty = {}, spT = 0, spBusy = false;
+    function markDirty(node) { var w = node.closest('.sb-blk'); if (!w) return; var i = Array.prototype.indexOf.call(root.querySelectorAll('.sb-blk'), w); if (i >= 0) dirty['b' + i] = 1; }
+    function itemOf(k) {
+      if (k === 'title') return p.title || '';
+      var b = p.blocks[+k.slice(1)]; if (!b || b.t === 'img') return '';
+      return b.lines ? b.lines.join('\n') : (b.text || '');
+    }
+    function putItem(k, v) {
+      if (k === 'title') { p.title = v.replace(/\n/g, ' '); return; }
+      var b = p.blocks[+k.slice(1)]; if (!b || b.t === 'img') return;
+      if (b.lines) b.lines = v.split('\n').map(function (l) { return l.trim(); }).filter(Boolean); else b.text = v;
+    }
+    function spell(keys, manual) {
+      if (spBusy) return Promise.resolve(0);
+      var items = keys.map(function (k) { return { k: k, text: itemOf(k) }; }).filter(function (x) { return x.text.trim().length > 1; });
+      if (!items.length) { if (manual) toast('고칠 글이 없어요'); return Promise.resolve(0); }
+      spBusy = true; if (api.spellBtn) { api.spellBtn.disabled = true; api.spellBtn.textContent = '✨ 고치는 중…'; }
+      return fetch('/api/blog', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ mode: 'spell', items: items, dev: opt.dev || '' }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var n = 0;
+          (j && j.items || []).forEach(function (x) {
+            var sentTx = (items.filter(function (y) { return y.k === x.k; })[0] || {}).text;
+            if (sentTx == null || itemOf(x.k) !== sentTx) return; // 그사이 또 고쳤으면 건드리지 않음
+            putItem(x.k, x.text); n++;
+          });
+          if (n) { changed(true); if (!root.contains(document.activeElement)) paint(); else pendingPaint = true; toast('✨ 맞춤법·오탈자 ' + n + '곳 고쳤어요 (↩ 되돌리기 가능)'); }
+          else if (manual) toast(j && j.error ? (j.error === 'limit' ? '오늘 고치기 횟수를 다 썼어요' : '지금은 못 고쳤어요. 잠시 뒤 다시') : '✨ 틀린 곳이 없어요');
+          return n;
+        })
+        .catch(function () { if (manual) toast('인터넷 확인 후 다시 눌러 주세요'); return 0; })
+        .then(function (n) { spBusy = false; if (api.spellBtn) { api.spellBtn.disabled = false; api.spellBtn.textContent = '✨ 맞춤법 고치기'; } return n; });
+    }
+    var pendingPaint = false;
+    root.addEventListener('focusout', function () {
+      clearTimeout(spT);
+      spT = setTimeout(function () {
+        if (root.contains(document.activeElement)) return; // 아직 쓰는 중
+        if (pendingPaint) { pendingPaint = false; paint(); }
+        var keys = Object.keys(dirty); dirty = {};
+        if (keys.length) spell(keys, false);
+      }, 1500);
+    });
+    function allKeys() { var l = ['title']; p.blocks.forEach(function (b, i) { if (b.t !== 'img') l.push('b' + i); }); return l; }
     var api = {
       el: root,
       undoBtn: null,
+      spellBtn: null,
+      spell: function () { dirty = {}; return spell(allKeys(), true); },
       undo: function () {
         clearTimeout(hT); keep();
         if (H.length < 2) return false;

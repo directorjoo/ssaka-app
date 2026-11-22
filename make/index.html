@@ -11,7 +11,7 @@
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=92">
+  <link rel="stylesheet" href="../css/sk.css?v=93">
   <link rel="stylesheet" href="../css/sk-world.css?v=8">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=3">
@@ -49,6 +49,23 @@
     .mk-flow li { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; background: rgba(255,255,255,.72); font-size: 15px; font-weight: 800; color: #3B3912; }
     .mk-flow b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #B3132B; color: #fff; font-size: 14px; }
     .mk-dance { position: absolute; right: 12px; top: 14px; width: 72px; height: auto; pointer-events: none; }
+    /* 11-22 글씨 크기 · 골라 넣기 · 사진 설명 */
+    .fs-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-radius: 12px; overflow: hidden; border: 1.5px solid #E9E2D8; margin-bottom: 8px; }
+    .fs-tabs button { min-height: 44px; border: 0; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: #5a4a42; cursor: pointer; }
+    .fs-tabs button + button { border-left: 1.5px solid #E9E2D8; }
+    .fs-tabs button[aria-selected="true"] { background: #B3132B; color: #fff; }
+    .fs-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .fs-sizes button { min-height: 58px; border-radius: 12px; border: 1.5px solid #E9E2D8; background: #FFFCF5; font: inherit; font-size: 13px; font-weight: 700; color: #5a4a42; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.1; }
+    .fs-sizes button span { font-weight: 900; color: #222; }
+    .fs-sizes button[aria-pressed="true"] { border-color: #B3132B; background: #FFE8EB; color: #B3132B; }
+    .bchips { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+    .bchips small { width: 100%; font-size: 12.5px; font-weight: 800; color: #8a7f76; }
+    .bchips button { min-height: 36px; padding: 0 11px; border-radius: 999px; border: 1.5px dashed #DDD3C6; background: #fff; font: inherit; font-size: 13.5px; font-weight: 700; color: #5a4a42; cursor: pointer; }
+    .bchips button:active { background: #FFE8EB; }
+    .caplab { margin-top: 12px; }
+    #galCapList .gcap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    #galCapList .gcap img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; flex: none; }
+    #galCapList .gcap input { flex: 1; min-width: 0; }
     /* 11-22 덜 심심하게 (js/mkfun.js): 머리 띠 · 업종 이야기 카드 · 쓰기 응원 띠 */
     .mk-tick { margin: 14px -18px -16px; padding: 9px 0; overflow: hidden; background: rgba(255,255,255,.45); border-top: 1px solid rgba(87,83,25,.12); }
     .mk-tick-in { display: flex; gap: 8px; width: max-content; animation: mkTick 38s linear infinite; }
@@ -633,7 +650,7 @@
 
       <h2 class="sec-h" data-sec="basic"><span>3</span><b></b><small></small></h2>
       <div class="snsfit" id="snsFit" hidden></div>
-      <fieldset data-for="club" data-tab="basic">
+      <fieldset data-for="club" data-tab="basic" data-part="notice">
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
         <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·내용·계좌를 알아서 채워 드려요.</div>
         <textarea id="noticeIn" maxlength="6000" placeholder="👉 여기를 길게 눌러 [붙여넣기]&#10;(공지·초대장 글 전체를 복사해 오세요)"></textarea>
@@ -642,7 +659,7 @@
 
       <fieldset data-tab="basic">
         <legend>카드 앞면 · 제목</legend>
-        <div data-for="club greet">
+        <div data-for="club greet" data-part="kick">
           <label for="kick">맨 위 한마디 (선택)</label>
           <input id="kick" maxlength="20" placeholder="예: 초대합니다">
           <div class="moods" id="kickPick" style="margin-top:6px"><button type="button">초대합니다</button><button type="button">모십니다</button><button type="button">함께해요</button><button type="button">You're Invited</button><button type="button">없음</button></div>
@@ -669,7 +686,7 @@
             <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" maxlength="20">
           </div>
         </div>
-        <div data-for="profile">
+        <div data-for="profile" data-part="org">
           <div class="row">
             <div>
               <label for="org" data-l="org">소속 (선택)</label>
@@ -682,7 +699,7 @@
           </div>
         </div>
         <p class="hint" id="bizNote" hidden>보험 상품 광고는 협회 심의 대상일 수 있어요. 카드에는 소속, 연락처, 상담 분야만 적고 상품 이름·보장 내용·수익률은 쓰지 않는 게 안전해요.</p>
-        <div data-for="profile shop">
+        <div data-for="profile shop" data-part="addr">
           <label for="addr1">주소 (선택 — 주소록에 함께 저장돼요)</label>
           <div class="addr">
             <input id="zip" placeholder="우편번호" readonly>
@@ -710,21 +727,21 @@
         <div class="hint">받는 사람이 누르면 카카오맵·네이버지도·구글지도에서 이 이름으로 찾아줘요.</div>
       </fieldset>
 
-      <fieldset data-for="shop profile" data-tab="basic" data-snsoff>
+      <fieldset data-for="shop profile" data-tab="basic" data-part="links" data-snsoff>
         <legend id="lkLeg">우리 가게 다른 곳 (선택)</legend>
         <div class="hint" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
-        <label for="lkDg">🥕 당근 비즈프로필</label>
-        <input id="lkDg" type="url" inputmode="url" placeholder="https://www.daangn.com/…">
-        <label for="lkNv" id="lkNvLab">🟢 네이버 플레이스·예약</label>
-        <input id="lkNv" type="url" inputmode="url" placeholder="https://naver.me/…">
-        <label for="lkKc">💬 카카오톡 채널</label>
-        <input id="lkKc" type="url" inputmode="url" placeholder="https://pf.kakao.com/…">
-        <label for="lkIg">📷 인스타그램</label>
-        <input id="lkIg" type="url" inputmode="url" placeholder="https://instagram.com/…">
+        <div data-part="lk-dg"><label for="lkDg">🥕 당근 비즈프로필</label>
+        <input id="lkDg" type="url" inputmode="url" placeholder="https://www.daangn.com/…"></div>
+        <div data-part="lk-nv"><label for="lkNv" id="lkNvLab">🟢 네이버 플레이스·예약</label>
+        <input id="lkNv" type="url" inputmode="url" placeholder="https://naver.me/…"></div>
+        <div data-part="lk-kc"><label for="lkKc">💬 카카오톡 채널</label>
+        <input id="lkKc" type="url" inputmode="url" placeholder="https://pf.kakao.com/…"></div>
+        <div data-part="lk-ig"><label for="lkIg">📷 인스타그램</label>
+        <input id="lkIg" type="url" inputmode="url" placeholder="https://instagram.com/…"></div>
       </fieldset>
 
       <h2 class="sec-h" data-sec="photo"><span>4</span><b></b><small></small></h2>
-      <fieldset data-tab="photo">
+      <fieldset data-tab="photo" data-part="photo">
         <legend id="phLeg">📷 대표 사진 · 사진첩</legend>
         <div data-for="profile club shop greet">
           <label class="ptile" for="photoFile" id="ptile">
@@ -750,6 +767,9 @@
             <label class="fixlab"><input type="checkbox" id="autoFix" checked> ✨ 사진 자동 보정 (밝기·색감)</label>
           </div>
           <input id="image" type="hidden">
+          <label for="cap" class="caplab">📝 사진 설명 (선택)</label>
+          <input id="cap" maxlength="60" data-ph="예: 가게 입구 · 새로 바뀐 간판" placeholder="예: 가게 입구 · 새로 바뀐 간판">
+          <div class="hint">사진 바로 아래에 작은 글씨로 나와요.</div>
         </div>
         <div data-for="profile club shop" id="galBox">
           <div class="gal-head"><b id="galTitle">사진 더 올리기</b> <span class="hint" id="galCount">최대 10장</span></div>
@@ -758,7 +778,9 @@
           </div>
           <input id="galFile" type="file" accept="image/*" multiple hidden>
           <input id="galUrls" type="hidden">
+          <input id="galCaps" type="hidden">
           <div class="hint" id="galStatus">여러 장을 한 번에 고를 수 있어요. 받는 사람은 옆으로 넘겨 보고, 누르면 크게 봐요.</div>
+          <div id="galCapBox" hidden><div class="gal-head" style="margin-top:12px"><b>📝 사진마다 설명 (선택)</b></div><div id="galCapList"></div></div>
         </div>
       </fieldset>
 
@@ -783,9 +805,10 @@
           <div class="hint" style="margin:0 0 6px">✉️ 초대의 글을 고르면 아래 칸에 들어가요. 그다음 고쳐 쓰세요.</div>
           <div class="moods" id="invPick" style="margin-bottom:8px"><button type="button" data-k="0">정중하게</button><button type="button" data-k="1">행사·포럼</button><button type="button" data-k="2">친근하게</button></div>
         </div>
+        <div class="bchips" id="bodyChips" hidden></div>
         <textarea id="body" maxlength="8000"></textarea>
-        <button type="button" class="mini" id="tidyBtn" style="width:100%;margin-top:8px;font-weight:800">✨ 붙여 넣은 글 AI로 정리하기</button>
-        <div class="hint">포스터·보도자료·카톡 공지를 위 칸에 그대로 붙여 넣고 누르세요. 겹친 말은 빼고, 일시·장소·프로그램·주최를 나눠 정리해 줘요. 넣기 전에 먼저 보여 드려요.</div>
+        <div data-part="tidy"><button type="button" class="mini" id="tidyBtn" style="width:100%;margin-top:8px;font-weight:800">✨ 붙여 넣은 글 AI로 정리하기</button>
+        <div class="hint">포스터·보도자료·카톡 공지를 위 칸에 그대로 붙여 넣고 누르세요. 겹친 말은 빼고, 일시·장소·프로그램·주최를 나눠 정리해 줘요. 넣기 전에 먼저 보여 드려요.</div></div>
         <div id="tidyBox" hidden style="position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center">
           <div style="background:#fff;width:100%;max-width:560px;max-height:88dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column">
             <div style="padding:16px 18px 8px;font-weight:800;font-size:17px">✨ 이렇게 정리했어요</div>
@@ -797,11 +820,20 @@
             </div>
           </div>
         </div>
-        <div data-for="profile" data-snsoff>
+        <div data-for="profile" data-part="vlink" data-snsoff>
           <label for="video">영상 링크 (선택, 유튜브·인스타)</label>
           <div class="hint">동영상은 유튜브에 "일부 공개"로 올린 뒤 그 링크를 붙여넣으세요.</div>
           <input id="video" type="url" inputmode="url" placeholder="https://youtu.be/…">
         </div>
+      </fieldset>
+
+      <fieldset data-tab="content" id="fsFs" data-snsoff>
+        <legend>🔠 글씨 크기</legend>
+        <div class="hint" style="margin:0 0 8px">바꿀 곳을 고르고 크기를 누르세요. 위 미리보기에 바로 보여요.</div>
+        <div class="fs-tabs" role="tablist" aria-label="글씨 크기 바꿀 곳"><button type="button" role="tab" data-k="0" aria-selected="true">제목</button><button type="button" role="tab" data-k="1" aria-selected="false">부제목</button><button type="button" role="tab" data-k="2" aria-selected="false">본문</button></div>
+        <div class="fs-sizes" role="group" aria-label="글씨 크기"><button type="button" data-v="-1"><span style="font-size:13px">가</span>작게</button><button type="button" data-v="0"><span style="font-size:16px">가</span>보통</button><button type="button" data-v="1"><span style="font-size:20px">가</span>크게</button><button type="button" data-v="2"><span style="font-size:24px">가</span>아주 크게</button></div>
+        <div class="hint" id="fsNow">제목 보통 · 부제목 보통 · 본문 보통</div>
+        <input type="hidden" id="fsz">
       </fieldset>
 
       <fieldset data-for="profile club shop greet" id="copyFs" data-tab="content" data-part="copy" data-snsoff>
@@ -958,7 +990,7 @@
       <button type="button" class="kakao big" id="send2">💬 카톡으로 보내기</button>
       <button type="button" class="ghost big" id="sms2">📱 문자로 보내기 (연락처에서 고르기)</button>
       <button type="button" class="ghost big" id="copy2">🔗 링크 복사 (밴드·인스타 등)</button>
-      <a class="ghost big" id="castGo" href="https://www.filmmakers.co.kr/performerCasting" target="_blank" rel="noopener" hidden>🎬 배우 모집 공고에 프로필 보내러 가기</a>
+      <a class="ghost big" id="castGo" href="/star/#list" hidden>⭐ 싸바스타에서 오디션 지원하기</a>
     </section>
     <section class="stp s2 dn-sec" aria-label="더 만들기">
       <h3 class="stp-h"><span class="stp-n">2</span>같은 내용으로 더 만들기 <small>쓴 내용 그대로, 한 번에 만들어 드려요</small></h3>
@@ -1059,8 +1091,9 @@
 <script src="../js/codec.js"></script>
 <script src="../js/designs.js?v=93"></script>
 <script src="../js/mkfun.js?v=1"></script>
+<script src="../js/mkask.js?v=1"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=84"></script>
+<script src="../js/render.js?v=85"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1098,7 +1131,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -1540,7 +1573,8 @@
   var BASE_L = {};
   document.querySelectorAll('[data-l]').forEach(function (el) { BASE_L[el.dataset.l] = el.textContent; });
   function applyIndustry(ind) {
-    var L = Object.assign({}, TYPES[type].labels, ind.L || {});
+    var ASK = window.MkAsk ? MkAsk.get(ind.id, type) : { hide: [], L: {}, ph: {}, chips: [] };
+    var L = Object.assign({}, TYPES[type].labels, ind.L || {}, ASK.L);
     document.querySelectorAll('[data-l]').forEach(function (el) {
       el.textContent = L[el.dataset.l] || BASE_L[el.dataset.l] || el.textContent;
     });
@@ -1559,7 +1593,7 @@
       hl.hidden = false;
     } else hl.hidden = true;
     // 그 카드 종류에 필요한 칸만 (동문회만 기수, 산악회만 탑승지, 부고엔 참석 신청·시즌·움직임 없음…)
-    var F = ind.form || {}, HIDE = F.hide || [];
+    var F = ind.form || {}, HIDE = (F.hide || []).concat(ASK.hide);
     document.querySelectorAll('[data-part]').forEach(function (el) {
       if (HIDE.indexOf(el.dataset.part) >= 0) el.hidden = true;
       else if (el.dataset.for) el.hidden = el.dataset.for.split(' ').indexOf(type) < 0;
@@ -1573,6 +1607,28 @@
     if (type === 'club') $('gisuOn').checked = !!F.gisu;
     $('placeLeg').textContent = ind.id === 'funeral' ? '빈소' : ind.id === 'wedding' ? '예식장' : '장소';
     if (F.sound !== undefined && typeof soundTouched !== 'undefined' && !soundTouched && $('sound')) $('sound').value = F.sound;
+    // 업종별 예시 글 · 골라 넣기 단추 (js/mkask.js)
+    Object.keys(ASK.ph).forEach(function (f) { if ($(f)) $(f).placeholder = ASK.ph[f]; });
+    var bc = $('bodyChips'); bc.innerHTML = ''; bc.hidden = !ASK.chips.length;
+    if (ASK.chips.length) {
+      var bh = document.createElement('small'); bh.textContent = '👇 눌러서 골라 넣기 (넣은 뒤 이어서 쓰세요)'; bc.appendChild(bh);
+      ASK.chips.forEach(function (c) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = '+ ' + c.replace(/:\s*$/, '');
+        b.addEventListener('click', function () {
+          var t = $('body'), cur = t.value.replace(/\s+$/, '');
+          t.value = (cur ? cur + '\n' : '') + c; t.focus();
+          try { t.setSelectionRange(t.value.length, t.value.length); } catch (e) {}
+          t.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        bc.appendChild(b);
+      });
+    }
+    try { fsPaint(); } catch (e) {}
+    PHOTO_OVR = ASK.photo || []; if ($('photoHelp')) { if (PHOTO_OVR[1]) $('photoHelp').textContent = PHOTO_OVR[1]; showThumb($('image').value); }
+    if (ASK.cap && $('cap')) $('cap').placeholder = ASK.cap;
+    // 움직임: 김 모락모락은 음식·카페에만
+    var stOpt = $('motion').querySelector('option[value="steam"]');
+    if (stOpt) { var food = ind.id === 'restaurant' || ind.id === 'cafe'; stOpt.hidden = !food; stOpt.disabled = !food; if (!food && $('motion').value === 'steam') $('motion').value = ''; }
     applyMedia();
     try { MkFun.show(ind); } catch (e) {}
     update();
@@ -1625,6 +1681,35 @@
 
   function v(id) { return ($(id) && !$(id).closest('[hidden]')) ? $(id).value.trim() : ''; }
   function galList() { return v('galUrls').split('\n').filter(Boolean).slice(0, 10); }
+  // 사진마다 설명 (11-22) — galUrls 와 같은 순서로 한 줄씩
+  function galCaps() { var a = ($('galCaps').value || '').split('\n'); var n = galList().length; var o = []; for (var i = 0; i < n; i++) o.push((a[i] || '').trim()); return o; }
+  function setGalCaps(a) { $('galCaps').value = a.map(function (x) { return String(x || '').replace(/\n/g, ' '); }).join('\n'); }
+  function paintGalCaps() {
+    var box = $('galCapList'); if (!box) return;
+    var list = galList(), caps = galCaps();
+    $('galCapBox').hidden = !list.length || $('galBox').hidden;
+    var keep = document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.i : null;
+    if (keep != null) return; // 쓰는 중엔 다시 그리지 않음
+    box.innerHTML = '';
+    list.forEach(function (u, i) {
+      var r = document.createElement('div'); r.className = 'gcap';
+      var im = document.createElement('img'); im.src = u; im.alt = '사진 ' + (i + 1);
+      var inp = document.createElement('input'); inp.maxLength = 40; inp.dataset.i = i; inp.value = caps[i] || ''; inp.placeholder = (i + 1) + '번 사진 설명'; inp.setAttribute('aria-label', (i + 1) + '번 사진 설명');
+      inp.addEventListener('input', function () { var c = galCaps(); c[i] = inp.value; setGalCaps(c); update(); });
+      r.appendChild(im); r.appendChild(inp); box.appendChild(r);
+    });
+  }
+  // 글씨 크기 (11-22) — fsz = "제목,부제목,본문" (-1 작게 · 0 보통 · 1 크게 · 2 아주 크게)
+  var fsK = 0, FS_NAME = { '-1': '작게', '0': '보통', '1': '크게', '2': '아주 크게' };
+  function fsGet() { var a = ($('fsz').value || '').split(',').map(function (x) { var n = parseInt(x, 10); return n >= -1 && n <= 2 ? n : 0; }); while (a.length < 3) a.push(0); return a.slice(0, 3); }
+  function fsPaint() {
+    var a = fsGet();
+    document.querySelectorAll('.fs-tabs button').forEach(function (b) { b.setAttribute('aria-selected', +b.dataset.k === fsK ? 'true' : 'false'); });
+    document.querySelectorAll('.fs-sizes button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.v === a[fsK] ? 'true' : 'false'); });
+    $('fsNow').textContent = '제목 ' + FS_NAME[a[0]] + ' · 부제목 ' + FS_NAME[a[1]] + ' · 본문 ' + FS_NAME[a[2]];
+  }
+  document.querySelectorAll('.fs-tabs button').forEach(function (b) { b.addEventListener('click', function () { fsK = +b.dataset.k; fsPaint(); }); });
+  document.querySelectorAll('.fs-sizes button').forEach(function (b) { b.addEventListener('click', function () { var a = fsGet(); a[fsK] = +b.dataset.v; $('fsz').value = a.join(','); fsPaint(); update(); }); });
 
   function buildCard() {
     var cfg = TYPES[type];
@@ -1656,8 +1741,10 @@
     var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = g(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
     if (Object.keys(lk).length) card.links = lk;
     if ($('galBox').hidden) {} // 이 업종엔 사진첩 칸이 없음 — 예전에 올린 사진이 남아 있어도 안 넣음
-    else if (galList().length) card.gallery = galList();
+    else if (galList().length) { card.gallery = galList(); var gc = galCaps().slice(0, card.gallery.length); if (gc.some(Boolean)) card.caps = gc; }
     else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
+    if (v('cap') && card.image) card.cap = v('cap');
+    var fsv = fsGet(); if (fsv.some(function (x) { return x; })) card.fs = fsv;
     if (v('season')) card.season = v('season');
     if (v('motion')) card.motion = v('motion');
     if (v('clip') && MEDIA_NO_VIDEO.indexOf(industry) < 0) card.clip = v('clip');
@@ -2232,8 +2319,9 @@
     if ($('adj')) { $('adj').hidden = !url; applyIp(); }
     $('photoRemove').hidden = !url;
     $('ptile').classList.toggle('has', !!url);
-    $('photoLabel').textContent = url ? '사진 바꾸기' : PHOTO_LABEL[type];
+    $('photoLabel').textContent = url ? '사진 바꾸기' : (PHOTO_OVR[0] || PHOTO_LABEL[type]);
   }
+  var PHOTO_OVR = [];
   var PHOTO_LABEL = { profile: '대표 사진 올리기', shop: '간판·매장 사진 올리기', club: '모임 사진 올리기', greet: '사진 올리기', safe: '사진 올리기' };
   var PHOTO_HELP = { profile: '본인 프로필 사진을 고르면 카드 맨 위에 크게 들어가요', shop: '간판이나 매장, 대표 메뉴 사진이 좋아요', club: '모임 단체 사진이나 장소 사진이 좋아요', greet: '함께 찍은 사진이나 겨울 풍경 사진이 좋아요', safe: '' };
   // ✨ 사진 자동 보정: 어둡거나 뿌연 사진을 밝기·대비·색감 맞춰 또렷하게 (과하지 않게)
@@ -2418,13 +2506,14 @@
       var it = document.createElement('div'); it.className = 'gal-it';
       var im = document.createElement('img'); im.src = u; im.alt = '사진 ' + (i + 1);
       var x = document.createElement('button'); x.type = 'button'; x.className = 'gal-x'; x.textContent = '×'; x.setAttribute('aria-label', '사진 ' + (i + 1) + ' 빼기');
-      x.addEventListener('click', function () { var l = galList(); l.splice(i, 1); $('galUrls').value = l.join('\n'); renderGal(); update(); renderGallery(); });
+      x.addEventListener('click', function () { var l = galList(); l.splice(i, 1); $('galUrls').value = l.join('\n'); var cl = galCaps(); cl.splice(i, 1); setGalCaps(cl); renderGal(); update(); renderGallery(); });
       it.appendChild(im); it.appendChild(x); grid.insertBefore(it, add);
     });
     var mx = galMax();
     grid.querySelectorAll('.gal-it').forEach(function (n, i) { n.style.opacity = i < mx ? '' : '.35'; }); // 넘친 사진은 흐리게 (이 용도엔 안 들어감, 지우진 않음)
     add.hidden = list.length >= mx;
     $('galCount').textContent = list.length + ' / ' + mx + '장' + (list.length > mx ? ' · 앞 ' + mx + '장만 들어가요' : '');
+    try { paintGalCaps(); } catch (e) {}
   }
   function uploadOne(file) {
     var keep = null;
@@ -2890,9 +2979,10 @@
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('글을 복사하세요', t); });
     else prompt('글을 복사하세요', t);
   });
+  // 11-22: 바깥 사이트(필름메이커스) 대신 싸바스타로 — 카드 링크도 복사해 둠(다른 곳에 지원할 때 붙여넣기)
   $('castGo').addEventListener('click', function () {
     var c = current(); if (!c) return;
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link(c)).then(function () { toast('내 프로필 카드 링크를 복사했어요. 공고에 지원할 때 붙여넣으세요'); });
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(link(c)).catch(function () {});
   });
   $('expClose').addEventListener('click', function () { $('expModal').hidden = true; });
   $('expModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
@@ -3014,7 +3104,7 @@
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
     set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
     IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
-    set('galUrls', (c.gallery || []).join('\n')); set('season', c.season || ''); set('motion', c.motion || ''); set('clip', c.clip || ''); if (window.__clipUi) __clipUi();
+    set('galUrls', (c.gallery || []).join('\n')); set('galCaps', (c.caps || []).join('\n')); set('cap', c.cap || ''); set('fsz', Array.isArray(c.fs) ? c.fs.join(',') : ''); set('season', c.season || ''); set('motion', c.motion || ''); set('clip', c.clip || ''); if (window.__clipUi) __clipUi();
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));

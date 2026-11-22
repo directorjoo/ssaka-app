@@ -125,8 +125,8 @@
   var qs = new URLSearchParams(location.search), k = qs.get('k'), city = qs.get('city'), stored = null;
   try { stored = localStorage.getItem('sava-letter-k'); } catch (e) {}
   // 받는 분 고르기 칸: 관리자만 늘 보임. 링크(?k=)나 예전 고른 값이 있으면 숨기고, 처음 온 사람만 한 번 고르게
-  var isAdm = false, pickOnce = !k && !stored;
-  if (!pickOnce) document.body.classList.add('nowho');
+  // 11-22 17:12 대표님: 관리자만 보던 고르기 칸을 모두에게 공개 (어르신·대표님·배우 누구나 늘 고를 수 있음)
+  var isAdm = true, pickOnce = false;
   try { k = k || localStorage.getItem('sava-letter-k'); city = city || localStorage.getItem('sava-letter-city'); } catch (e) {}
   if (!WHO.some(function (w) { return w[0] === k; })) k = 'boss';
   city = OLD[city] || city;

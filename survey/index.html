@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B3132B">
   <title>대표님 설문 · 싸바</title>
-  <meta property="og:title" content="📋 싸바 대표님 설문 — 한 번 답하면 블로그 글 10가지">
-  <meta property="og:description" content="짧게 답만 적어 주세요. 싸바가 우리 가게 블로그 글을 10가지로 써 드려요.">
+  <meta property="og:title" content="📋 싸바 블로그 쓰기 — 상호와 강점만 적으면 블로그 글이 술술">
+  <meta property="og:description" content="짧게 답만 적어 주세요. 싸바가 우리 가게 블로그 글을 3편·5편·10편 골라서 써 드려요.">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css">
@@ -15,6 +15,11 @@
     * { box-sizing: border-box; } [hidden] { display: none !important; }
     html, body { margin: 0; background: #FBF7F1; color: var(--ink); font-family: var(--font); -webkit-text-size-adjust: 100%; }
     .w { max-width: 620px; margin: 0 auto; padding: calc(10px + env(safe-area-inset-top)) 16px calc(110px + env(safe-area-inset-bottom)); }
+    .topnav { position: sticky; top: 0; z-index: 30; display: flex; gap: 6px; margin: 0 -16px 8px; padding: calc(6px + env(safe-area-inset-top)) 16px 8px; background: rgba(251,247,241,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid #ece4d8; }
+    .topnav button { min-height: 42px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E9E2D8; background: #fff; font: inherit; font-size: 15px; font-weight: 800; color: var(--ink); cursor: pointer; }
+    .topnav button.h { background: #FFE8EB; border-color: #F6C9D0; color: #B3132B; }
+    .topnav #navTop { margin-left: auto; color: var(--ink-2); }
+    .w { padding-top: 0 !important; }
     a.back { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-decoration: none; font-weight: 700; }
     .hero .k { font-size: 13px; font-weight: 800; color: var(--ssaka); letter-spacing: .05em; }
     .hero h1 { margin: 4px 0 8px; font-size: 27px; font-weight: 900; letter-spacing: -.03em; line-height: 1.25; }
@@ -138,10 +143,10 @@
 </head>
 <body>
 <div class="w">
-  <div class="back" aria-hidden="true" style="visibility:hidden">·</div>
+  <nav class="topnav" aria-label="이동"><button type="button" id="navBack">‹ 이전</button><button type="button" id="navHome" class="h">🍒 싸바 홈</button><button type="button" id="navTop" aria-label="맨 위로">▲ 위로</button></nav>
   <div class="hero">
     <div class="k" id="kTitle">SAVA · 대표님 설문</div>
-    <h1>📋 한 번 답하면<br>블로그 글이 10가지</h1>
+    <h1>📋 한 번 답하면<br>블로그 글이 술술</h1>
     <p>글은 안 쓰셔도 돼요. 아는 대로 짧게 답만 적어 주세요. 모르는 건 비워 두셔도 돼요.<br>답은 이 휴대폰에 바로바로 저장돼요.</p>
   </div>
 
@@ -193,10 +198,11 @@
 
   <div class="gen" id="gen">
     <h3 class="grp-h">📝 답한 내용으로 블로그 글 만들기</h3>
-    <p>답한 내용으로 싸바 AI가 네이버 블로그 글을 써요. 하나씩 눌러도 되고, 10가지를 한 번에 써도 돼요.</p>
+    <p>답한 내용으로 싸바 AI가 네이버 블로그 글을 써요. 아래 글 형을 하나씩 눌러도 되고, 몇 편 쓸지 골라 한 번에 써도 돼요.</p>
     <input id="cardUrl" inputmode="url" placeholder="싸바카드 링크가 있으면 붙여넣기 (글 끝에 붙어요)">
     <div class="types" id="types"></div>
-    <button type="button" class="btn yel" id="allGo">⚡ 10가지 한 번에 쓰기</button>
+    <div class="qkn" role="group" aria-label="몇 편 쓸까요"><button type="button" data-n="3" aria-pressed="true">3편</button><button type="button" data-n="5" aria-pressed="false">5편</button><button type="button" data-n="10" aria-pressed="false">10편</button></div>
+    <button type="button" class="btn yel" id="allGo">⚡ 3편 한 번에 쓰기</button>
     <div class="prog" id="prog" hidden><div class="pt2" id="progT"></div><i><b id="progB"></b></i><div class="pe" id="progE" hidden></div><button type="button" class="btn yel" id="progSee" hidden>📚 쓴 글 보기</button></div>
     <p class="warn" id="genMsg">답이 5개 넘게 있어야 쓸 수 있어요. 하루 25편까지 써요.</p>
   </div>
@@ -302,6 +308,14 @@
     if (navigator.share) navigator.share({ title: '싸바 ' + who() + ' 설문', text: t, url: myLink() }).catch(function () {});
     else copy(t + '\n' + myLink(), '링크를 복사했어요. 카톡에 붙여넣어 보내세요.');
   });
+
+  // 위쪽 이동 단추 (11-22 대표님: 블로그 쓰다 나갈 단추가 안 보임 — 아래 공통 단추는 키보드·글 편집 중에 가려짐)
+  function leaveTo(go) { var m = window.SavaNav.onLeave && window.SavaNav.onLeave(); if (m) { toast(m); setTimeout(go, 450); } else go(); }
+  $('navBack').addEventListener('click', function () {
+    leaveTo(function () { var same = false; try { same = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {} if (same && history.length > 1) history.back(); else location.href = '../app/'; });
+  });
+  $('navHome').addEventListener('click', function () { leaveTo(function () { location.href = '../app/'; }); });
+  $('navTop').addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
   // ---- 업종 ----
   function who() { return (S.BY[st.ind] || {}).h || '대표님'; }
@@ -441,8 +455,8 @@
   }
 
   $('allGo').addEventListener('click', function () {
-    var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; });
-    if (!list.length) { toast('10가지 다 썼어요!'); return; }
+    var list = S.TYPES.map(function (t) { return t.n; }).filter(function (n) { return !posts[n]; }).slice(0, qkN);
+    if (!list.length) { toast('10가지 글 형을 다 썼어요! 다시 쓰려면 글 아래 🔄 다시 쓰기'); return; }
     var p = run(list);
     if (p) p.then(function () { var n = Object.keys(posts).length; if (n) { toast('글 ' + n + '편 · 노란 "쓴 글 보기"를 누르세요'); } });
   });
@@ -457,12 +471,13 @@
   function paintPost(n) {
     var p = posts[n], ty = n > 100 ? { name: QT[n - 101] } : S.types(st.ind)[n - 1], old = $('post' + n);
     var el = document.createElement('div'); el.className = 'post'; el.id = 'post' + n;
-    el.innerHTML = '<div class="ty2"></div><div class="ed"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><div class="row2 r3"><button type="button" class="btn gh c4" disabled>↩ 되돌리기</button><button type="button" class="btn gh c3">🔄 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 블로그 열기</a></div><p class="hint2">글자를 누르면 고칠 수 있어요. 문단을 누르면 위에 뜨는 단추로 소제목·인용구·박스로 바꾸고 글씨 크기도 바꿔요.</p>';
+    el.innerHTML = '<div class="ty2"></div><div class="ed"></div><div class="row2"><button type="button" class="btn gh c1">① 제목 복사</button><button type="button" class="btn red c2">② 본문 복사</button></div><button type="button" class="btn gh c5" style="margin-top:8px">✨ 맞춤법 고치기</button><div class="row2 r3"><button type="button" class="btn gh c4" disabled>↩ 되돌리기</button><button type="button" class="btn gh c3">🔄 다시 쓰기</button><a class="btn gh" href="https://blog.naver.com/GoBlogWrite.naver" target="_blank" rel="noopener">③ 블로그 열기</a></div><p class="hint2">글자를 누르면 고칠 수 있어요. 고친 문단은 칸을 벗어나면 맞춤법·오탈자가 저절로 고쳐져요. 문단을 누르면 위에 뜨는 단추로 소제목·인용구·박스로 바꾸고 글씨 크기도 바꿔요.</p>';
     el.querySelector('.ty2').textContent = n > 100 ? '⚡ 상위글 틀 · ' + ty.name : n + '형 · ' + ty.name;
     var indL = (S.BY[st.ind] || {}).label || '';
     var ed = SavaBlog.editor(p, { toast: toast, link: cardLink, dev: dev(), ind: indL ? indL + ' business' : '',
       onChange: function (np) { posts[n] = np; savePosts(); } });
-    ed.undoBtn = el.querySelector('.c4');
+    ed.undoBtn = el.querySelector('.c4'); ed.spellBtn = el.querySelector('.c5');
+    el.querySelector('.c5').addEventListener('click', function () { ed.spell(); });
     el.querySelector('.ed').appendChild(ed.el);
     el.querySelector('.c1').addEventListener('click', function () { copy(ed.title(), '제목을 복사했어요'); });
     el.querySelector('.c2').addEventListener('click', function () {
@@ -489,8 +504,16 @@
   var qk0 = st.qk || {};
   QF.forEach(function (id) { if (qk0[id]) $(id).value = qk0[id]; $(id).addEventListener('input', function () { st.qk = st.qk || {}; st.qk[id] = $(id).value; save(); }); });
   document.querySelectorAll('.qkn button').forEach(function (b) {
-    b.addEventListener('click', function () { qkN = +b.dataset.n; document.querySelectorAll('.qkn button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); $('qkGo').textContent = '✍️ 상위 블로그 방식으로 ' + qkN + '편 쓰기'; });
+    b.addEventListener('click', function () { setN(+b.dataset.n); });
   });
+  // 3편·5편·10편: 위(빠르게 쓰기)와 아래(설문으로 쓰기) 고르기가 같이 움직이고, 단추 글씨도 같이 바뀜 (11-22 대표님: 3편 골라도 10편이라 나옴)
+  function setN(n) {
+    qkN = [3, 5, 10].indexOf(n) >= 0 ? n : 3; st.qkN = qkN; save();
+    document.querySelectorAll('.qkn button').forEach(function (x) { x.setAttribute('aria-pressed', +x.dataset.n === qkN ? 'true' : 'false'); });
+    $('qkGo').textContent = '✍️ 상위 블로그 방식으로 ' + qkN + '편 쓰기';
+    $('allGo').textContent = '⚡ ' + qkN + '편 한 번에 쓰기';
+  }
+  setN(+st.qkN || 3);
   $('qkGo').addEventListener('click', function () {
     var list = QORDER.slice(0, qkN).map(function (k) { return 100 + k; });
     QORDER.slice(0, qkN).forEach(function (k) { delete posts[100 + k]; var o = $('post' + (100 + k)); if (o) o.remove(); });
@@ -536,6 +559,6 @@
 </script>
 <script src="/js/home.js?v=13" defer data-shift=".bar"></script>
 <script src="../js/cherry.js?v=1"></script>
-<script src="../js/blogedit.js?v=1"></script>
+<script src="../js/blogedit.js?v=2"></script>
 </body>
 </html>

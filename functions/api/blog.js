@@ -63,6 +63,7 @@ const FORMAT = `
 - 정보 박스 "info" 1~2개: 시간·위치·가격·준비물·신청 방법처럼 따로 챙겨 볼 정보. "title"(10자 안쪽)과 "lines". 사실에 있는 정보만 쓰고, 없으면 넣지 않는다.
 - 사진 자리 "img"에는 "hint"(한국어 12자 안팎)와 "prompt"(영어 이미지 생성 지시, 20~30단어, 사진처럼 사실적인 장면, 자연광, 글자·간판·로고 없이, 사람은 뒷모습이나 손 위주)를 함께 쓴다.
 - 소제목 "h"는 짧게(20자 안쪽). 본문 "p"는 2~3문장.
+- [맞춤법] 받은 사실·답에 오타·빠진 글자·맞춤법·띄어쓰기 틀린 곳이 있으면(휴대폰으로 급히 쳐서 생긴 것, 예: 이ㅛ어요→있어요, 필여해요→필요해요, 되요→돼요) 바르게 고쳐서 쓴다. 상호·사람 이름·메뉴 이름 같은 고유명사는 그대로 둔다. 글 전체를 맞춤법에 맞게 쓴다.
 블록 모양 예: {"t":"q","text":"..."} {"t":"sum","lines":["...","..."]} {"t":"info","title":"이용 안내","lines":["...","..."]} {"t":"img","n":2,"hint":"...","prompt":"..."}`;
 
 function surveyText(sv, type) {
@@ -271,6 +272,36 @@ async function tidy(b, request, env, key) {
   return json(res);
 }
 
+
+// ---------- 맞춤법·오탈자 고치기 (mode: 'spell') — 편집기에서 대표님이 고친 문단을 자동으로 ----------
+const SPELL_RULES = `너는 한국어 맞춤법 교정자다. 받은 글 조각마다 오타·빠진 글자·자음모음 깨짐(예: 이ㅛ어요→있어요, 핑요→필요)·맞춤법·띄어쓰기만 고친다.
+뜻·말투·문장 순서·줄바꿈·이모지·숫자·상호와 사람 이름은 바꾸지 않는다. 더 좋게 다듬거나 늘리지 않는다. 틀린 곳이 없으면 그대로 돌려준다.
+답은 JSON 하나만, 코드블록 없이: {"items":[{"k":"받은 k 그대로","text":"고친 글"}]}`;
+async function spell(b, request, env, key) {
+  const items = (Array.isArray(b.items) ? b.items : []).slice(0, 40).map(x => ({ k: clean(x.k, 12), text: String(x.text == null ? '' : x.text).replace(/[\u0000-\u0009\u000b-\u001f<>]/g, ' ').slice(0, 1500) })).filter(x => x.k && x.text.trim());
+  if (!items.length) return json({ items: [] });
+  if (items.reduce((n, x) => n + x.text.length, 0) > 12000) return json({ error: 'big' }, 413);
+  if (env.DB) {
+    const ip = request.headers.get('cf-connecting-ip') || 'x';
+    const e = await overLimit(env.DB, [['spip:' + await sha(ip), 300], ['spdev:' + clean(b.dev, 40), 200]]);
+    if (e) return json({ error: e }, 429);
+  }
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+    body: JSON.stringify({ model: env.SPELL_MODEL || env.BLOG_MODEL || MODEL_DEFAULT, max_tokens: 4000, system: SPELL_RULES, messages: [{ role: 'user', content: JSON.stringify({ items }) }] })
+  });
+  if (!r.ok) return json({ error: 'ai', status: r.status }, 502);
+  const out = await r.json();
+  const raw = (out.content || []).filter(x => x.type === 'text').map(x => x.text).join('').trim();
+  let o; try { o = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)); } catch (e) { return json({ error: 'parse' }, 502); }
+  const sent = {}; items.forEach(x => { sent[x.k] = x.text; });
+  const res = (Array.isArray(o.items) ? o.items : []).map(x => ({ k: clean(x.k, 12), text: String(x.text == null ? '' : x.text).replace(/\*/g, '').slice(0, 1600) }))
+    // 너무 많이 바뀐 답(다시 쓴 것)은 버림 — 맞춤법만 고쳐야 함
+    .filter(x => sent[x.k] != null && x.text.trim() && x.text !== sent[x.k] && Math.abs(x.text.length - sent[x.k].length) <= Math.max(8, sent[x.k].length * 0.25));
+  return json({ items: res });
+}
+
 export async function onRequest({ request, env }) {
   // 연결 점검: GET /api/blog?check=1 → AI 연결 상태만 알려 줌 (키 값은 절대 안 보여 줌)
   if (request.method === 'GET' && new URL(request.url).searchParams.get('check')) {
@@ -296,6 +327,7 @@ export async function onRequest({ request, env }) {
   if (b.mode === 'survey') return survey(b, request, env, key);
   if (b.mode === 'quick') return quick(b, request, env, key);
   if (b.mode === 'tidy') return tidy(b, request, env, key);
+  if (b.mode === 'spell') return spell(b, request, env, key);
   const card = b.card || {};
   if (!clean(card.title, 60)) return json({ error: 'empty' }, 400);
   const nImg = Math.max(1, Math.min(8, b.images | 0 || 3));

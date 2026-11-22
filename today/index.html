@@ -201,18 +201,14 @@
     .grp.tb-biz  { --bh: #8A6A4A; --bx: #F5EFE8; --bl: #D8C6B2; } /* 갈색 — 대표님(영업·상담과 같은 색) */
     .grp.tb-sen  { --bh: #3F9A5C; --bx: #EAF6EC; --bl: #B7DDBF; } /* 초록 — 어르신(소식·안심과 같은 색) */
     .grp.tb-trip { --bh: #1E9AA0; --bx: #E5F6F6; --bl: #A9DCDD; } /* 청록 — 나들이 */
-    .grp.tb-mkt  { --bh: #2C4A7A; --bx: #E9EEF7; --bl: #B6C4DC; } /* 남색 — 주식·환율 */
+    .grp.tb-mkt  { --bh: #2C4A7A; --bx: #E9EEF7; --bl: #B6C4DC; } /* 남색 — 주식·부동산·환율 */
+    .grp.tb-me   { --bh: #8A63B0; --bx: #F3EEF9; --bl: #D2C2E6; } /* 보라 — 나에게 맞는 소식(11-22) */
     html.bigtxt .grp h3 small { display: none; }
     /* 2가지짜리 두 묶음(나들이·주식)은 반씩 나란히 — 화면 덜 길게 */
     .circles { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; }
     .circles .grp { grid-column: 1 / -1; }
-    .circles .grp.tb-trip, .circles .grp.tb-mkt { grid-column: auto; }
-    .grp.tb-trip h3, .grp.tb-mkt h3 { font-size: 17px; padding: 10px 10px; gap: 4px; white-space: nowrap; letter-spacing: -.04em; }
-    .grp.tb-trip h3 .cnt, .grp.tb-mkt h3 .cnt { padding: 2px 7px; font-size: 13px; }
-    .grp.tb-trip h3 small, .grp.tb-mkt h3 small { display: none; }
-    .grp.tb-trip .gr, .grp.tb-mkt .gr { grid-template-columns: 1fr 1fr; }
+    /* 11-22: 주식·부동산·환율 3가지가 되어 나들이·주식도 한 줄 전체 */
     html.bigtxt .circles { grid-template-columns: 1fr; }
-    html.bigtxt .grp.tb-trip .gr, html.bigtxt .grp.tb-mkt .gr { grid-template-columns: repeat(3, 1fr); }
   </style>
 </head>
 <body>
@@ -220,7 +216,7 @@
   <!-- 11-21 밤 DESIGN 원칙 2·7: 머리말 → 혜택 두 줄 제목 → 유리 판(그 자리에서 ▾ 펼침) -->
   <section class="hero">
     <div class="hx"><em>☀️ 싸바 브리핑 · <span id="date"></span></em><h1 id="hook">모르면 손해,<br>아는 사람만 챙겨요!</h1></div>
-    <script src="/js/brief-hook.js?v=4"></script><script>try { window.savaHookTicker(document.getElementById('hook')); } catch (e) {}</script>
+    <script src="/js/brief-hook.js?v=5"></script><script>try { window.savaHookTicker(document.getElementById('hook')); } catch (e) {}</script>
     <div class="glass" id="glass">
       <button type="button" class="gl-h" id="glH" aria-expanded="false" aria-controls="glB"><span class="gl-s"><b id="glW">☀️ 날씨 불러오는 중…</b><small id="glM">최고·최저 · 미세먼지</small></span><i aria-hidden="true">▾</i></button>
       <div class="gl-b" id="glB" hidden></div>
@@ -253,6 +249,13 @@
       { k: 'naver', t: '네이버', i: '🟢', c: '#03C75A' },
       { k: 'world', t: '세계 방송', i: '🌏', c: '#0b4ea2' },
       { k: 'radio', t: '라디오·TV', i: '📻', c: '#6a3a9c', href: '../radio/' }] },
+    { id: 'me', h: '🙋 나에게 맞는 소식', s: '누구에게나 꼭 필요한 것', c: [
+      { k: 'audition', t: '오디션', i: '🎬', c: '#B3132B', n: 1 },
+      { k: 'women', t: '여성', i: '🌸', c: '#d9466a', n: 1 },
+      { k: 'youth', t: '청년·취업', i: '🧑', c: '#2F73C4', n: 1 },
+      { k: 'family', t: '학부모·아이', i: '🎒', c: '#E0A800', n: 1 },
+      { k: 'exam', t: '대학입시', i: '🎓', c: '#1E3A8A', n: 1 },
+      { k: 'worker', t: '직장인·프리랜서', i: '💼', c: '#5b4636', n: 1 }] },
     { id: 'biz', h: '🏪 대표님', s: '매출에 도움 되는 것만', c: [
       { k: 'biz', t: '혜택 알리미', i: '🔔', c: '#7a3fb0', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
@@ -265,8 +268,9 @@
     { id: 'trip', h: '🎪 나들이', s: '한국관광공사 정보', c: [
       { k: 'fest', t: '축제·행사', i: '🎪', c: '#db2777', n: 1 },
       { k: 'near', t: '내 주변', i: '📍', c: '#0369a1', n: 1 }] },
-    { id: 'mkt', h: '📈 주식·환율', s: '따로 모아 봐요', c: [
+    { id: 'mkt', h: '📈 주식·부동산·환율', s: '따로 모아 봐요', c: [
       { k: 'stock', t: '주식', i: '📈', c: '#C62828', n: 1 },
+      { k: 'estate', t: '부동산', i: '🏠', c: '#7a5230', n: 1 },
       { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' }] }
   ];
   var C = [].concat.apply([], G.map(function (g) { return g.c; }));
@@ -297,7 +301,7 @@
   function show(k) {
     cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
     var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
-    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock })[k]();
+    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
 
@@ -806,6 +810,28 @@
   }
 
   // 💱 환율
+  // 🙋 사람별 소식 + 🏠 부동산 (11-22 대표님) — 서버 /api/today?k=tp&t=… 가 묶음별 기사 제목, 여기선 공식 바로가기·안내를 붙임
+  var TPC = {
+    audition: { h: '🎬 오디션', s: '배우·모델·뮤지컬·연극 공고 모음', L: [['⭐ 싸바스타', '연락처 없이 지원 · 프로필 올리기', '../star/'], ['🎞️ 필름메이커스', '배우 모집 공고', 'https://www.filmmakers.co.kr/actorsAudition'], ['🎬 씨네21 영화인 JOB', '오디션·모집', 'https://cine21.com/community/recruit'], ['🎤 더뮤지컬', '뮤지컬·연극 소식', 'https://www.themusical.co.kr/News/List']], note: '출연료를 먼저 내라거나 개인 정보를 많이 묻는 공고는 조심하세요.' },
+    women: { h: '🌸 여성', s: '일자리·창업 · 임신·출산·육아 · 여성 건강', L: [['💼 여성새로일하기센터', '경력 이음 · 재취업 상담', 'https://saeil.mogef.go.kr'], ['🤝 복지로', '출산·육아 지원 찾기', 'https://www.bokjiro.go.kr'], ['👶 아이사랑', '보육·어린이집·부모급여', 'https://www.childcare.go.kr'], ['🏥 국가건강정보포털', '여성 건강 정보', 'https://health.kdca.go.kr']] },
+    youth: { h: '🧑 청년·취업', s: '청년 정책 · 채용 소식', L: [['🧑 온통청년', '청년 정책 한 번에 찾기', 'https://www.youthcenter.go.kr'], ['📋 고용24', '채용 공고 · 국민내일배움카드', 'https://www.work24.go.kr'], ['🏠 마이홈', '청년 주거 지원', 'https://www.myhome.go.kr'], ['🎁 보조금24', '내가 받을 수 있는 혜택', 'https://www.gov.kr/portal/rcvfvrSvc/main']] },
+    family: { h: '🎒 학부모·아이', s: '교육·돌봄 지원 · 학교 소식', L: [['👶 아이사랑', '보육·어린이집·아동수당', 'https://www.childcare.go.kr'], ['🤝 복지로', '교육급여·돌봄 지원 찾기', 'https://www.bokjiro.go.kr'], ['🏫 교육부', '학교·교육 정책', 'https://www.moe.go.kr'], ['📺 EBS', '무료 강의', 'https://www.ebs.co.kr']] },
+    exam: { h: '🎓 대학입시', s: '수능·수시·정시 소식', L: [['🎓 대입정보포털 어디가', '대학·전형·입시 결과 찾기', 'https://www.adiga.kr'], ['📝 한국교육과정평가원', '수능 공지·문제', 'https://www.kice.re.kr'], ['📚 EBSi', '무료 수능 강의', 'https://www.ebsi.co.kr'], ['🏛️ 한국대학교육협의회', '대입 전형 기본사항', 'https://www.kcue.or.kr']], note: '전형 일정·조건은 해마다 바뀌어요. 지원 전에 꼭 대학 입학처 공지를 확인하세요.' },
+    worker: { h: '💼 직장인·프리랜서', s: '연말정산·세금 · 직장인·1인 사업자 소식', L: [['🧾 홈택스', '연말정산 간소화 · 종합소득세', 'https://www.hometax.go.kr'], ['📋 고용24', '실업급여 · 직업훈련', 'https://www.work24.go.kr'], ['🏦 국민연금', '내 연금 조회', 'https://www.nps.or.kr'], ['🎁 보조금24', '내가 받을 수 있는 혜택', 'https://www.gov.kr/portal/rcvfvrSvc/main']] },
+    estate: { h: '🏠 부동산', s: '청약·분양 · 전세·집값 소식', L: [['🏠 청약홈', '아파트 청약 일정·신청', 'https://www.applyhome.co.kr'], ['📊 실거래가 공개', '국토교통부 실거래가', 'https://rt.molit.go.kr'], ['🏘️ LH청약플러스', '공공임대·분양', 'https://apply.lh.or.kr'], ['🏡 마이홈', '주거 지원 찾기', 'https://www.myhome.go.kr']], note: '뉴스 모음일 뿐 사고팔라는 권유가 아니에요. 계약 전엔 등기부등본·전세보증보험을 꼭 확인하세요.' }
+  };
+  function tp(k) {
+    var c = TPC[k];
+    pane.innerHTML = '<h2>' + c.h + '</h2><div class="src">' + esc(c.s) + '</div>' + links(c.L) + '<div id="tpL"><div class="msg">오늘 소식을 모으는 중이에요…</div></div>' +
+      '<p class="note">' + (c.note ? esc(c.note) + ' ' : '') + '기사 제목과 원문 링크는 구글 뉴스에서 모아 와요. 자세한 내용은 원문에서 확인해 주세요.</p>';
+    fetch('/api/today?k=tp&t=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+      if (cur !== k || !$('tpL')) return;
+      var h = '<div class="src" style="margin-top:12px">' + esc(d.at) + ' 기준</div>';
+      (d.secs || []).forEach(function (x) { if (x.list && x.list.length) h += '<div class="sec">' + esc(x.h) + '</div>' + nlist(x.list); });
+      $('tpL').innerHTML = h;
+    }).catch(function () { if (cur === k && $('tpL')) $('tpL').innerHTML = '<div class="msg">소식을 불러오지 못했어요. 위 바로가기에서 확인해 주세요.</div>'; });
+  }
+
   function fx() {
     msg('환율을 불러오는 중이에요…');
     fetch('https://open.er-api.com/v6/latest/USD').then(function (r) { return r.json(); }).then(function (j) {
@@ -840,7 +866,7 @@
   }
 
   // ★ 지금 보고 있는 탭 하나만 보내기 — 받는 사람은 이 탭부터 보고, 위 동그라미로 싸바 전체를 둘러봄
-  var SENDT = { biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에' };
+  var SENDT = { biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에', audition: '배우·모델·뮤지컬 오디션 공고를 모아 봤어요', women: '여성 일자리·출산·육아·건강 소식이에요', youth: '청년 정책과 채용 소식이에요', family: '교육·돌봄 지원과 학교 소식이에요', exam: '수능·수시·정시 대학입시 소식이에요', worker: '연말정산·세금, 직장인·프리랜서 소식이에요', estate: '청약·분양, 전세·집값 소식이에요' };
   function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
   $('send').addEventListener('click', function () {
     var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '싸바 브리핑' };

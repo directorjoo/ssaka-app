@@ -8,7 +8,35 @@
 // 같은 결과를 Cloudflare 캐시에 30~60분 보관해서 방문자가 많아도 바깥 요청·AI 비용이 늘지 않게 합니다.
 //   GET /api/today?k=market : 📈 코스피·코스닥 + 달러·엔·유로·위안 환율 (아침카드와 같은 market(), 30분 캐시)
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
+//   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
+//                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
 import { market, indexOf } from './letter.js';
+const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
+const NOT_ACT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
+const TP = {
+  audition: [['🎬 오디션·배우 모집', ['배우 오디션 when:30d', '배우 모집 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '뮤지컬 오디션 OR 연극 오디션 when:30d', '모델 모집 OR 아역 오디션 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d'], 15,
+    x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && ACT.test(x.t) && !NOT_ACT.test(x.t) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)]],
+  estate: [['🏠 청약·분양', ['아파트 청약 일정 when:7d', '청약 접수 OR 분양 일정 when:7d'], 8], ['📰 부동산 소식', ['부동산 시장 when:3d', '전세 OR 월세 시장 when:3d', '부동산 대책 OR 대출 규제 when:7d'], 10]],
+  women: [['💼 여성 일자리·창업', ['경력단절 여성 지원 when:14d', '여성 창업 지원 OR 여성 재취업 when:14d'], 8], ['👶 임신·출산·육아 지원', ['출산 지원금 OR 육아 지원 when:7d', '임신 출산 혜택 OR 부모급여 when:14d'], 8], ['🌸 여성 건강', ['여성 건강 검진 OR 갱년기 when:14d'], 5]],
+  youth: [['🧑 청년 지원 정책', ['청년 지원 정책 when:7d', '청년 월세 OR 청년 도약 OR 청년 교통비 when:14d'], 10], ['📋 채용·취업 소식', ['공개채용 OR 신입 채용 when:3d', '취업 박람회 OR 채용 설명회 when:7d'], 8]],
+  family: [['🎒 교육·돌봄 지원', ['돌봄 지원 OR 늘봄 when:7d', '학부모 교육 지원 OR 교육급여 when:14d', '아동수당 OR 육아 지원 when:14d'], 10], ['🏫 학교·교육 소식', ['교육부 학교 when:3d'], 6]],
+  exam: [['🎓 대학입시 소식', ['수능 when:7d', '수시 OR 정시 대입 when:7d', '대학입시 전형 OR 입시 일정 when:14d'], 12], ['📚 입시 정책', ['대입 정책 OR 입시 제도 교육부 when:30d'], 6]],
+  worker: [['🧾 연말정산·세금', ['연말정산 when:14d', '직장인 세금 OR 소득공제 when:14d'], 8], ['💼 직장인 소식', ['직장인 근로자 지원 when:7d', '최저임금 OR 근로기준 when:14d'], 6], ['🧑‍💻 프리랜서·1인 사업자', ['프리랜서 지원 OR 1인 사업자 when:14d', '종합소득세 프리랜서 when:30d'], 6]]
+};
+async function topic(t) {
+  const secs = TP[t]; if (!secs) throw new Error('bad-t');
+  const out = await Promise.all(secs.map(async ([h, qs, n, ok]) => {
+    const got = await Promise.all(qs.map(q => rss(GN(q)).then(x => gnews(x, 12)).catch(() => [])));
+    const seen = new Set();
+    let a = [].concat(...got).filter(x => { const key = x.t.replace(/\s+/g, '').slice(0, 26); if (seen.has(key)) return false; seen.add(key); return true; });
+    if (ok) a = a.filter(ok);
+    a.sort((x, y) => (Date.parse(y.at) || 0) - (Date.parse(x.at) || 0));
+    a = a.filter((x, i, arr) => arr.slice(0, i).filter(y => y.src === x.src).length < 4); // 한 언론사 최대 4개
+    return { h, list: a.slice(0, n) };
+  }));
+  if (!out.some(s => s.list.length)) throw new Error('empty');
+  return { k: 'tp', t, at: kst().toISOString().slice(0, 16).replace('T', ' '), secs: out };
+}
 const f2 = v => v.toLocaleString('ko-KR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 const rp = p => p == null || !isFinite(p) ? null : Math.round(p * 100) / 100;
 async function stock() {
@@ -84,7 +112,8 @@ async function translate(env, arr) {
   }
 }
 
-async function build(k, env) {
+async function build(k, env, t) {
+  if (k === 'tp') return topic(t);
   if (k === 'stock') { const s = await stock(); if (!s) throw new Error('no-stock'); return s; }
   if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
   if (k === 'news') {
@@ -141,11 +170,13 @@ async function build(k, env) {
 
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt|world|market|stock)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  if (!/^(news|google|gov|yt|world|market|stock|tp)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  const t = k === 'tp' ? (u.searchParams.get('t') || '') : '';
+  if (k === 'tp' && !TP[t]) return json({ error: 'bad-t' }, 400);
   let ttl = k === 'google' || k === 'market' || k === 'stock' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
-  const ckey = new Request(u.origin + '/__today/' + k + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__today/' + k + (t ? '-' + t : '') + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey); if (hit) return hit;
-  let data; try { data = await build(k, env); } catch (e) { return json({ error: 'source', msg: String(e.message || e).slice(0, 80) }, 502); }
+  let data; try { data = await build(k, env, t); } catch (e) { return json({ error: 'source', msg: String(e.message || e).slice(0, 80) }, 502); }
   if (k === 'world' && data && !data.ko) ttl = 300;
   const res = json(data, 200, 300);
   const store = new Response(res.clone().body, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + ttl } });

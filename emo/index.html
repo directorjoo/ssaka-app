@@ -11,7 +11,7 @@
   <meta property="og:url" content="https://sava.kr/emo/">
   <meta property="og:title" content="🍒 싸바 공짜 이모티콘">
   <meta property="og:description" content="움직이는 귀여운 이모티콘 100개 + 수묵 이모티콘 24개, 전부 공짜!">
-  <meta property="og:image" content="https://sava.kr/emo/g/e001.gif?v=3">
+  <meta property="og:image" content="https://sava.kr/emo/g/e001.gif?v=4">
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
@@ -68,7 +68,7 @@
     <div class="nm" id="nm"></div>
     <button type="button" class="btn k" id="save">📥 사진첩에 저장 (움직이는 그대로)</button>
     <div class="steps" id="steps" hidden>
-      <b>✅ 저장했으면 이제 카톡에서</b><br>대화방 <b>＋</b> → <b>앨범</b> → 맨 앞 그림(<b>GIF</b>) → 전송<br><span>움직이는 이모티콘 그대로 가요!</span>
+      <b>✅ 저장했으면 이제 카톡에서</b><br>대화방 <b>＋</b> → <b>앨범</b> → 맨 앞 그림(<b>GIF</b>) → 전송<br><span>카톡 대화방에선 처음에 멈춘 그림으로 보이고, 누르면 움직여요 (카톡이 정한 방식이라 싸바에서 바꿀 수 없어요)</span>
       <a class="btn kk" href="kakaotalk://launch">💬 카카오톡 열기</a>
     </div>
     <button type="button" class="btn s" id="send">⚡ 카톡으로 바로 보내기 <small>(멈춘 그림으로 가요)</small></button>
@@ -95,13 +95,13 @@
     var list = EMO.filter(function (e) { return cat === '전체' || e.c === cat; });
     list.forEach(function (e) {
       var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', e.n); if (e.id[0] === 'i') b.className = 'ink';
-      var im = document.createElement('img'); im.src = 'g/' + e.id + '.gif?v=3'; im.alt = e.n; im.loading = 'lazy';
+      var im = document.createElement('img'); im.src = 'g/' + e.id + '.gif?v=4'; im.alt = e.n; im.loading = 'lazy';
       b.appendChild(im); b.addEventListener('click', function () { open(e); }); g.appendChild(b);
     });
     if (!list.length) { var s = document.createElement('div'); s.className = 'soon'; s.textContent = '🍒 이 주제 이모티콘은 곧 나와요!'; g.appendChild(s); }
   }
   function open(e) {
-    cur = e; $('big').src = 'g/' + e.id + '.gif?v=3'; $('nm').textContent = e.n;
+    cur = e; $('big').src = 'g/' + e.id + '.gif?v=4'; $('nm').textContent = e.n;
     $('steps').hidden = true;
     $('sheet').hidden = false;
   }
@@ -110,7 +110,7 @@
   // 11-23 대표님: 카톡에 보내면 안 움직임 → 카톡은 공유창으로 받은 그림을 사진(JPEG) 한 장으로 바꿔 보냄(첫 장면만).
   // 그래서 ① 사진첩에 GIF로 저장(아이폰 공유창 '이미지 저장') → ② 카톡 앨범에서 보내기를 기본으로 안내
   function gifFile(cb) {
-    fetch('g/' + cur.id + '.gif?v=3').then(function (r) { return r.blob(); }).then(function (b) {
+    fetch('g/' + cur.id + '.gif?v=4').then(function (r) { return r.blob(); }).then(function (b) {
       cb(new File([b], '싸바-' + cur.n.replace(/[^가-힣a-zA-Z0-9]/g, '') + '.gif', { type: 'image/gif' }));
     }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
   }

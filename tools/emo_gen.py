@@ -692,19 +692,14 @@ def frame(row, t):
     st.alpha_composite(text_layer(txt, col).resize((FIN, FIN), Image.LANCZOS))
     return st
 
+# 11-23 대표님: 카톡·사진첩은 투명 부분을 까맣게 보여 줌 → 밝은 미색 바탕을 깔아 투명 없이 저장
+BG = (255, 248, 238)
 def save_gif(frames, fn):
     out = []
     for f in frames:
-        arr = np.array(f)
-        mask = arr[:, :, 3] < 110
-        rgb = Image.fromarray(arr[:, :, :3])
-        q = rgb.quantize(colors=PAL, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-        qa = np.array(q); qa[mask] = 255
-        pal = q.getpalette()[:255 * 3] + [0, 0, 0]
-        p = Image.fromarray(qa.astype(np.uint8), 'P'); p.putpalette(pal)
-        p.info['transparency'] = 255
-        out.append(p)
-    out[0].save(fn, save_all=True, append_images=out[1:], duration=DUR, loop=0, transparency=255, disposal=2, optimize=True)
+        bg = Image.new('RGBA', f.size, BG + (255,)); bg.alpha_composite(f.convert('RGBA'))
+        out.append(bg.convert('RGB').quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE))
+    out[0].save(fn, save_all=True, append_images=out[1:], duration=DUR, loop=0, disposal=1, optimize=True)
 
 def make(i, row):
     frames = [frame(row, k / NF) for k in range(NF)]

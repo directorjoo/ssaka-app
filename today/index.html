@@ -279,8 +279,7 @@
     { id: 'am', h: '🌅 매일 아침', s: '날씨·뉴스부터', c: [
       { k: 'letter', t: '오늘도 싸바?', i: '💌', c: '#d9466a', href: '../letter/' },
       { k: 'news', t: '뉴스 요약', i: '🗞️', c: '#B3132B' },
-      { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' },
-      { k: 'kwx', t: '전국 날씨', i: '🗺️', c: '#0E6BA8' }] },
+      { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' }] },
     { id: 'glb', h: '🌍 세계 소식·음악', s: '검색 안 해도 최신', c: [
       { k: 'globe', t: '지구촌 뉴스', i: '🌐', c: '#1F6FB2', n: 1 },
       { k: 'music', t: '인기 노래', i: '🎵', c: '#B3132B', n: 1 },
@@ -319,7 +318,7 @@
       { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' }] }
   ];
   var C = [].concat.apply([], G.map(function (g) { return g.c; }));
-  var OLDK = { gov: 'biz' }; // 예전 주소(#gov)도 열리게
+  var OLDK = { gov: 'biz', kwx: 'wx' }; // 11-23 전국 날씨는 날씨 탭 아래로 합침 // 예전 주소(#gov)도 열리게
   // 보낸 링크(?t=insure)로 들어오면 그 탭부터 보여 줌
   var qT = new URLSearchParams(location.search).get('t') || '';
   var fromLink = !!qT && !location.hash;
@@ -358,7 +357,7 @@
     if (k !== 'music' && typeof auStop === 'function') try { auStop(); } catch (e) {}
     cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
     var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
-    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, globe: globe, music: music, movie: movie, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
+    ({ news: news, wx: wx, google: google, yt: yt, world: world, naver: naver, globe: globe, music: music, movie: movie, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
 
@@ -378,7 +377,7 @@
       var h = '';
       if (W) h += '<h4>☀️ ' + esc(wc[0]) + ' 오늘 날씨</h4><div class="gl-g"><div><span>최고</span><b>' + Math.round(W.hi) + '°</b></div><div><span>최저</span><b>' + Math.round(W.lo) + '°</b></div><div><span>비 올 확률</span><b>' + (W.p || 0) + '%</b></div><div><span>미세먼지</span><b>' + dustOf(W.pm) + '</b></div></div><div class="gl-wear">' + wearOf(W.t) + '</div>';
       if (!h) h = '<div class="gl-wear">잠시 뒤 다시 눌러 주세요.</div>';
-      h += '<div class="gl-lk"><button type="button" data-k="wx">날씨 자세히 ›</button><button type="button" data-k="kwx">전국 날씨 ›</button></div>';
+      h += '<div class="gl-lk"><button type="button" data-k="wx">날씨 자세히 · 전국 날씨 ›</button></div>';
       B.innerHTML = h;
     }
     H.addEventListener('click', function () {
@@ -645,10 +644,11 @@
 
   // 🗺️ 전국 날씨 — 주요 도시를 한 화면에 (북쪽부터), 누르면 그 도시 자세한 날씨
   var KCITY = [['서울', 37.5665, 126.978], ['인천', 37.4563, 126.7052], ['수원', 37.2636, 127.0286], ['춘천', 37.8813, 127.7298], ['강릉', 37.7519, 128.8761], ['청주', 36.6424, 127.489], ['대전', 36.3504, 127.3845], ['세종', 36.48, 127.289], ['전주', 35.8242, 127.148], ['안동', 36.5684, 128.7294], ['대구', 35.8714, 128.6014], ['포항', 36.019, 129.3435], ['광주', 35.1595, 126.8526], ['울산', 35.5384, 129.3114], ['목포', 34.8118, 126.3922], ['순천', 34.9506, 127.4872], ['여수', 34.7604, 127.6622], ['창원', 35.2281, 128.6811], ['부산', 35.1796, 129.0756], ['제주', 33.4996, 126.5312]];
+  // 11-23 대표님: 날씨 탭 두 개 필요 없음 → 날씨 탭 맨 아래에 전국 날씨를 붙임(kwb 칸을 wx()가 만들고 여기서 채움)
   function kwx() {
-    pane.innerHTML = '<h2>🗺️ 전국 날씨</h2><div id="kwb"><div class="msg">전국 날씨를 불러오는 중이에요…</div></div>';
+    if (!$('kwb')) return;
     fetch('https://api.open-meteo.com/v1/forecast?latitude=' + KCITY.map(function (c) { return c[1]; }).join(',') + '&longitude=' + KCITY.map(function (c) { return c[2]; }).join(',') + '&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1').then(function (r) { return r.json(); }).then(function (a) {
-      if (cur !== 'kwx') return;
+      if (cur !== 'wx' || !$('kwb')) return;
       if (!Array.isArray(a)) a = [a];
       var box = el('div', 'kw');
       KCITY.forEach(function (c, i) {
@@ -656,12 +656,12 @@
         var ic = wcode(w.current.weather_code), d = w.daily, rp = d.precipitation_probability_max[0];
         var b = el('button'); b.type = 'button'; b.setAttribute('aria-label', c[0] + ' 자세한 날씨');
         b.innerHTML = '<i>' + ic[0] + '</i><span><b>' + c[0] + '</b><small>' + Math.round(d.temperature_2m_max[0]) + '°/' + Math.round(d.temperature_2m_min[0]) + '°</small>' + (rp >= 30 ? '<small class="rn">☂️ ' + rp + '%</small>' : '') + '</span><em>' + Math.round(w.current.temperature_2m) + '°</em>';
-        b.addEventListener('click', function () { wsel = c; try { localStorage.setItem('sava-wx', JSON.stringify(c)); } catch (e) {} show('wx'); });
+        b.addEventListener('click', function () { wsel = c; try { localStorage.setItem('sava-wx', JSON.stringify(c)); } catch (e) {} show('wx'); paneTop(); });
         box.appendChild(b);
       });
       $('kwb').innerHTML = ''; $('kwb').appendChild(box);
       $('kwb').appendChild(el('p', 'note', '지금 기온 · 오늘 최고/최저 · 비 올 확률 30% 이상이면 ☂️ 표시. 도시를 누르면 자세한 날씨와 미세먼지를 볼 수 있어요. (Open-Meteo)'));
-    }).catch(function () { if (cur === 'kwx') $('kwb').innerHTML = '<div class="msg">날씨를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
+    }).catch(function () { if (cur === 'wx' && $('kwb')) $('kwb').innerHTML = '<div class="msg">날씨를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>'; });
   }
   // ☀️ 날씨 (Open-Meteo, 키 없이 무료)
   var CITY = [['광주', 35.1595, 126.8526], ['서울', 37.5665, 126.978], ['여수', 34.7604, 127.6622], ['순천', 34.9506, 127.4872], ['목포', 34.8118, 126.3922], ['전주', 35.8242, 127.148], ['부산', 35.1796, 129.0756], ['대구', 35.8714, 128.6014], ['대전', 36.3504, 127.3845], ['인천', 37.4563, 126.7052], ['제주', 33.4996, 126.5312]];
@@ -674,8 +674,9 @@
   function grade(v, b) { var g = v <= b[0] ? ['좋음', '#1d6fd1'] : v <= b[1] ? ['보통', '#12924a'] : v <= b[2] ? ['나쁨', '#E8710A'] : ['매우 나쁨', '#c62828']; return '<span class="dust" style="background:' + g[1] + '">' + g[0] + '</span>'; }
   function wear(t) { return t <= 0 ? '🧥 패딩·목도리·장갑 꼭 챙기세요' : t <= 5 ? '🧥 두꺼운 외투에 목도리까지' : t <= 11 ? '🧶 코트나 점퍼, 따뜻하게' : t <= 16 ? '🧥 가벼운 외투 하나' : t <= 22 ? '👕 긴팔 하나면 충분해요' : t <= 27 ? '👕 반팔·얇은 옷' : '🩳 시원하게, 물 자주 드세요'; }
   function wx() {
-    var h = '<h2>☀️ 오늘의 날씨</h2><div class="cities" id="cities"></div><div id="wxb"><div class="msg">날씨를 불러오는 중이에요…</div></div>';
-    pane.innerHTML = h;
+    var h = '<h2>☀️ 오늘의 날씨</h2><div class="cities" id="cities"></div><div id="wxb"><div class="msg">날씨를 불러오는 중이에요…</div></div>' +
+      '<h2 style="margin-top:26px">🗺️ 전국 날씨</h2><div id="kwb"><div class="msg">전국 날씨를 불러오는 중이에요…</div></div>';
+    pane.innerHTML = h; kwx();
     var cb = $('cities');
     var me = el('button', '', '📍 내 위치'); me.type = 'button'; me.setAttribute('aria-pressed', wsel[0] === '내 위치' ? 'true' : 'false');
     me.addEventListener('click', function () {

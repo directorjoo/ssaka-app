@@ -552,6 +552,11 @@
     #v-home.v2 .v2-eo.face .b3 a { background: rgba(255,255,255,.92); }
     #v-home.v2 .v2-eo .tx { position: relative; padding: 2px 20px 14px; margin-top: -52px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
     #v-home.v2 .v2-eo h3, #v-home.v2 .v2-mk h3 { font-size: 28px; line-height: 1.25; }
+    /* 11-23 대표님: 이모티콘 작은 탭 — 어디야 칸 단추 셋 아래 */
+    .eo-emow { padding: 0 14px 14px; }
+    .eo-emo { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 4px 14px; border-radius: 999px; background: rgba(255,255,255,.92); color: #B3132B; font-size: 16px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
+    .eo-emo img { width: 30px; height: 30px; border-radius: 8px; }
+    .eo-emo small { font-size: 14px; font-weight: 600; color: #7a4a4f; }
     #v-home.v2 .v2-eo .b3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px 16px; }
     #v-home.v2 .v2-eo .b3 a { display: grid; place-items: center; gap: 2px; padding: 12px 4px; border-radius: 18px; background: #fff; color: #B3132B; text-decoration: none; text-align: center; }
     #v-home.v2 .v2-eo .b3 a:active { transform: scale(.96); }
@@ -1112,7 +1117,8 @@
     var eo = el('section', 'v2c v2-eo');
     eo.innerHTML = '<div class="ph" style="background-image:url(../img/eodiya-cherry12.jpg)"></div>' +
       '<div class="tx"><em>🍒 어디야?</em><h3>보고 싶은 사람,<br>한마디로 부르세요</h3></div>' +
-      '<div class="b3"><a href="../eodiya/#ask"><b>싸바?</b><small>안부 전하기</small></a><a href="../eodiya/#come"><b>여기야!</b><small>위치 보내기</small></a><a href="../eodiya/#play"><b>놀자!</b><small>친구 부르기</small></a></div>';
+      '<div class="b3"><a href="../eodiya/#ask"><b>싸바?</b><small>안부 전하기</small></a><a href="../eodiya/#come"><b>여기야!</b><small>위치 보내기</small></a><a href="../eodiya/#play"><b>놀자!</b><small>친구 부르기</small></a></div>' +
+      '<div class="eo-emow"><a class="eo-emo" href="../emo/"><img src="../emo/g/e001.gif?v=4" alt="" width="30" height="30">😆 공짜 이모티콘 <small>움직이는 124개</small> ›</a></div>';
     tapGo(eo, '../eodiya/');
     v.appendChild(eo);
     eoFaces(eo.querySelector('.ph'));
@@ -1255,7 +1261,7 @@
     eo.classList.add('eo-c');
     var b3 = el('div', 'eo3');
     b3.innerHTML = '<a href="../eodiya/#ask">싸바?<small>안부 전하기</small></a><a href="../eodiya/#come">여기야!<small>위치 보내기</small></a><a href="../eodiya/#play">놀자!<small>친구 부르기</small></a>';
-    eo.appendChild(b3); tapGo(eo, '../eodiya/');
+    eo.appendChild(b3); var emw = el('div', 'eo-emow'); emw.innerHTML = '<a class="eo-emo" href="../emo/"><img src="../emo/g/e001.gif?v=4" alt="" width="30" height="30">😆 공짜 이모티콘 <small>움직이는 124개</small> ›</a>'; eo.appendChild(emw); tapGo(eo, '../eodiya/');
     zt.appendChild(eo);
 
     // 3. 싸바알림판 + 언니김치 특판 — 예전 초록 알림판 그대로 되돌림 (11-21 대표님)

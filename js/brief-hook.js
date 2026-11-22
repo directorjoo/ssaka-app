@@ -40,7 +40,7 @@
     '검색 1시간, 싸바는 1분',
     '아는 만큼 챙기는 하루, 싸바 브리핑'
   ];
-  var PX_PER_SEC = 55;
+  var PX_PER_SEC = 100; // 11-22 대표님: 55는 느려서 답답 → 100
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function css() {
     if (document.getElementById('sv-tk-css')) return;

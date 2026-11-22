@@ -17,6 +17,14 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../img/favicon.png?v=4">
+  <!-- 11-23 싸바스타 별도 앱: 같은 sava.kr 주소(/star/)를 쓰되 홈 화면엔 ⭐ 싸바스타 아이콘으로 따로 설치. 로그인·서버는 싸바와 같이 씀 -->
+  <link rel="manifest" href="/star/manifest.webmanifest?v=1">
+  <link rel="apple-touch-icon" href="/img/star-apple-touch.png?v=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="싸바스타">
+  <meta name="application-name" content="싸바스타">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" href="../css/brand.css">
   <link rel="stylesheet" href="../css/steps.css?v=6">
   <!-- 싸바스타 (11-21): 배우 프로필 접수 + 오디션 올리기·지원·심사·발표. 서버는 functions/api/star/[[path]].js -->
@@ -174,6 +182,8 @@
     .addrole { display: block; width: 100%; min-height: 48px; border-radius: 14px; border: 2px dashed #D9C9BB; background: #fff; color: #8E0F22; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
     .amsg { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #FFFCF5; border: 1px solid #EFE6D6; font-size: 15px; line-height: 1.5; white-space: pre-line; }
     .stp label.f:first-of-type { margin-top: 0; }
+    #starInst:empty { display: none; } #starInst .si-chip { margin: 0 0 14px; border-color: #F2C2CA; background: #FFFCF8; }
+    body.is-app .top a.sava { display: none; } body.is-app .w { padding-top: calc(16px + env(safe-area-inset-top)); }
     body.has-bar .w { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
   </style>
 </head>
@@ -181,6 +191,7 @@
 <main class="w">
   <div class="top"><h1>⭐ 싸바<b>스타</b></h1><a class="sava" href="/app/" aria-label="싸바 둘러보기">🍒 싸바</a></div>
   <p class="sub">번호 없는 오디션 — 배우도, 캐스팅 담당도 연락처를 드러내지 않아요.</p>
+  <div id="starInst"></div>
   <nav class="tabs">
     <a href="#list" data-t="list"><i>🎬</i>오디션<br>공고</a>
     <a href="#profile" data-t="profile"><i>🙋</i>내<br>프로필</a>
@@ -643,6 +654,16 @@
   window.addEventListener('hashchange', route);
   route();
 })();
+</script>
+<script src="/js/install.js?v=4" data-name="싸바스타" data-mark="⭐" data-icon="/img/star-icon-192.png?v=1" data-url="sava.kr/star"></script>
+<script>
+  // 11-23 별도 앱: 홈 화면 앱으로 열리면 body.is-app(싸바 단추 숨김), 아니면 맨 위에 '⭐ 싸바스타 앱 설치' 띠
+  (function () {
+    var I = window.SsakaInstall; if (!I) return;
+    if (I.standalone()) { document.body.classList.add('is-app'); return; }
+    var c = I.chip(document.getElementById('starInst'), '⭐ 싸바스타 앱으로 쓰기');
+    if (c) c.querySelector('span').textContent = '홈 화면에 아이콘 하나 · 앱스토어 없이 3초';
+  })();
 </script>
 <script src="/js/share.js?v=3" defer></script>
 <script src="/js/home.js?v=15" defer data-bar="0"></script>

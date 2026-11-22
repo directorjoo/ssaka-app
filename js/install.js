@@ -7,7 +7,10 @@
   // 예전 주소(ssaka-app.pages.dev)로 들어오면 정식 주소 sava.kr 로 옮김 (카톡 공유는 sava.kr 에서만 됨)
   if (location.hostname === 'ssaka-app.pages.dev') { location.replace('https://sava.kr' + location.pathname + location.search + location.hash); return; }
   var SELF = (document.currentScript && document.currentScript.src) || '';
-  var ICON = SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png?v=4') : '/img/icon-192.png?v=4';
+  var DS = (document.currentScript && document.currentScript.dataset) || {};
+  // 11-23 싸바스타 별도 앱: <script src="/js/install.js" data-name="싸바스타" data-icon="…" data-mark="⭐" data-url="sava.kr/star"> — 안 주면 싸바 그대로
+  var NAME = DS.name || '싸바', MARK = DS.mark || '🍒', HOST = DS.url || 'sava.kr';
+  var ICON = DS.icon || (SELF ? SELF.replace(/js\/install\.js.*$/, 'img/icon-192.png?v=4') : '/img/icon-192.png?v=4');
   var ua = navigator.userAgent;
   var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var inKakao = /KAKAOTALK/i.test(ua);
@@ -56,11 +59,11 @@
 
   function open() {
     addCss();
-    var w = el('div', 'si-wrap'); w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', '싸바 설치하기');
+    var w = el('div', 'si-wrap'); w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', NAME + ' 설치하기');
     var b = el('div', 'si-box');
     var done = standalone();
-    b.appendChild(el('div', 'si-head', '<img src="' + ICON + '" alt=""><div><b>' + (done ? '이미 설치돼 있어요 🍒' : '싸바 설치하기') + '</b><span>' +
-      (done ? '홈 화면의 🍒 아이콘으로 열면 돼요' : '앱스토어 없이 홈 화면에 쏙 · 3초면 끝') + '</span></div>'));
+    b.appendChild(el('div', 'si-head', '<img src="' + ICON + '" alt=""><div><b>' + (done ? '이미 설치돼 있어요 ' + MARK : NAME + ' 설치하기') + '</b><span>' +
+      (done ? '홈 화면의 ' + MARK + ' ' + NAME + ' 아이콘으로 열면 돼요' : '앱스토어 없이 홈 화면에 쏙 · 3초면 끝') + '</span></div>'));
     if (done) {
       // 안내만
     } else if (inApp) {
@@ -82,7 +85,7 @@
       b.appendChild(el('ol', 'si-how',
         '<li>주소창 옆에 있는 <b>공유 버튼</b>을 누르세요. 네모 위로 화살표가 솟은 모양(□↑)이에요. 주소창은 화면 맨 아래나 맨 위에 있어요. 안 보이면 점 세 개(•••)를 먼저 누르세요.</li>' +
         '<li>아래에서 목록이 올라오면 손가락으로 <b>위로 쭉 밀어 올리세요.</b> 그러면 <b>\'홈 화면에 추가\'</b>가 보여요. 그걸 누르세요.</li>' +
-        '<li>오른쪽 위 <b>\'추가\'</b>를 누르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'));
+        '<li>오른쪽 위 <b>\'추가\'</b>를 누르면 끝! 휴대폰 바탕화면에 ' + MARK + ' ' + NAME + ' 아이콘이 생겨요.</li>'));
       b.appendChild(el('p', 'si-note', '※ 이 글은 설명이에요. 여기를 누르지 마시고, 휴대폰 화면에서 직접 찾아 눌러 주세요.'));
     } else {
       // 안드로이드: 크롬이 설치 창을 준비했으면 버튼 한 번, 아니면 메뉴 3칸 안내
@@ -94,10 +97,10 @@
       });
       var guide = el('div', '', '');
       guide.appendChild(el('ol', 'si-how', samsung
-        ? '<li>화면 <b>오른쪽 맨 아래 줄 세 개(☰)</b>를 누르세요.</li><li>메뉴에서 <b>\'현재 페이지 추가\'</b>를 누르세요.</li><li><b>\'홈 화면\'</b>을 고르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'
-        : '<li>크롬 화면 <b>오른쪽 맨 위 점 세 개(⋮)</b>를 누르세요.</li><li>메뉴에서 <b>\'홈 화면에 추가\'</b> 또는 <b>\'앱 설치\'</b>를 누르세요.</li><li><b>\'설치\'</b>(또는 \'추가\')를 누르면 끝! 휴대폰 바탕화면에 🍒 싸바 아이콘이 생겨요.</li>'));
+        ? '<li>화면 <b>오른쪽 맨 아래 줄 세 개(☰)</b>를 누르세요.</li><li>메뉴에서 <b>\'현재 페이지 추가\'</b>를 누르세요.</li><li><b>\'홈 화면\'</b>을 고르면 끝! 휴대폰 바탕화면에 ' + MARK + ' ' + NAME + ' 아이콘이 생겨요.</li>'
+        : '<li>크롬 화면 <b>오른쪽 맨 위 점 세 개(⋮)</b>를 누르세요.</li><li>메뉴에서 <b>\'홈 화면에 추가\'</b> 또는 <b>\'앱 설치\'</b>를 누르세요.</li><li><b>\'설치\'</b>(또는 \'추가\')를 누르면 끝! 휴대폰 바탕화면에 ' + MARK + ' ' + NAME + ' 아이콘이 생겨요.</li>'));
       guide.appendChild(el('p', 'si-note', '※ 이 글은 설명이에요. 여기를 누르지 마시고, 휴대폰 화면에서 직접 찾아 눌러 주세요.'));
-      guide.appendChild(el('p', 'si-tip', samsung ? '크롬 앱에서 sava.kr 을 열면 단추 한 번으로 설치돼요.' : '메뉴에 안 보이면 크롬 앱으로 sava.kr 을 열어 주세요.'));
+      guide.appendChild(el('p', 'si-tip', samsung ? '크롬 앱에서 ' + HOST + ' 을 열면 단추 한 번으로 설치돼요.' : '메뉴에 안 보이면 크롬 앱으로 ' + HOST + ' 을 열어 주세요.'));
       function paint() { go.hidden = !deferred; guide.hidden = !!deferred; }
       paint(); window.addEventListener('beforeinstallprompt', function () { setTimeout(paint, 0); });
       b.appendChild(go); b.appendChild(guide);
@@ -118,7 +121,7 @@
     if (quiet()) return null;
     if (standalone() || !parent) return null;
     addCss();
-    var c = el('button', 'si-chip', '<img src="' + ICON + '" alt=""><div><b>' + (text || '싸바 홈 화면에 추가') + '</b><span>다음엔 아이콘 한 번에 열려요</span></div><em>설치 ›</em>');
+    var c = el('button', 'si-chip', '<img src="' + ICON + '" alt=""><div><b>' + (text || NAME + ' 홈 화면에 추가') + '</b><span>다음엔 아이콘 한 번에 열려요</span></div><em>설치 ›</em>');
     c.type = 'button';
     c.addEventListener('click', open);
     parent.appendChild(c);

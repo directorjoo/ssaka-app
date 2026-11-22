@@ -1,0 +1,25 @@
+{
+  "id": "/star/",
+  "name": "싸바스타 — 번호 없는 오디션",
+  "short_name": "싸바스타",
+  "description": "배우 프로필 한 번, 지원은 단추 하나. 연락처 없이 지원하고 결과는 꼭 받는 오디션.",
+  "start_url": "/star/?app=1",
+  "scope": "/star/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8EF",
+  "theme_color": "#B3132B",
+  "lang": "ko",
+  "categories": ["entertainment", "business"],
+  "icons": [
+    { "src": "/img/star-icon-192.png?v=1", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/star-icon-512.png?v=1", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/star-icon-maskable-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "오디션 공고", "url": "/star/#list", "icons": [{ "src": "/img/star-icon-192.png?v=1", "sizes": "192x192" }] },
+    { "name": "내 프로필", "url": "/star/#profile", "icons": [{ "src": "/img/star-icon-192.png?v=1", "sizes": "192x192" }] },
+    { "name": "오디션 올리기", "url": "/star/#post", "icons": [{ "src": "/img/star-icon-192.png?v=1", "sizes": "192x192" }] },
+    { "name": "내 지원·내 공고", "url": "/star/#mine", "icons": [{ "src": "/img/star-icon-192.png?v=1", "sizes": "192x192" }] }
+  ]
+}

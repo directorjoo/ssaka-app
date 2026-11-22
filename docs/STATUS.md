@@ -3,7 +3,7 @@
 > 대화방을 닫기 전에 Claude가 이 파일을 최신으로 고쳐서 커밋한다.
 > 새 방에서 "싸바"라고 하면: 이 파일 → 최근 커밋 순서로 확인하고 바로 이어서 작업.
 
-마지막 갱신: 2026-11-23 08:32 (홍보창 체리나무 2배·희미하게 — 490)
+마지막 갱신: 2026-11-23 08:55 (싸바스타 별도 앱 — 491)
 
 ## ⭐ 방향 결정 메모 (11-23 06:20 대표님과 총정리 — 다음 방은 이것부터 보기)
 - 결론: 지금처럼 기능 40개+ 한 앱으로는 수익 어려움. 돈 될 씨앗 2개에 집중 — ① 모임 공지·참석 명단(→ "모임 총무 비서") ② 자영업 홍보 대행(promo/ 49,000·99,000원). 싸바스타(배우)는 대표님 전문이라 키움
@@ -28,6 +28,10 @@
 - ※ 설정에 관리자 칸 사라짐: SAVA_ADMIN_UID=1 → 대표님 폰 로그인 회원번호가 1이 아니면 안 보임. 회원번호 확인 후 맞추기
 
 ## 1. 마지막으로 올린 작업
+- 2026-11-23 08:55 — ⭐ 대표님: 싸바스타 별도 앱, 싸바 도메인 같이 쓰는 걸로 → 주소는 그대로 sava.kr/star/, 홈 화면엔 ⭐ 싸바스타 아이콘으로 따로 설치(싸바 🍒 앱과 별개). 로그인(카카오)·서버(functions/api/star)·D1·R2는 싸바와 같이 씀 (491)
+  ① star/manifest.webmanifest 새로: id·scope /star/, start_url /star/?app=1, 이름 '싸바스타', 바로가기 4개(공고·내 프로필·올리기·내 지원) ② 아이콘 새로 img/star-icon-192·512·maskable-512, star-apple-touch(180) — 체리 그라데이션+흰·금 별+작은 체리, 다시 그릴 땐 python3 tools/star_icon.py img ③ star/index.html 머리에 manifest·apple-touch-icon·앱 이름 meta, 탭 위에 '⭐ 싸바스타 앱으로 쓰기' 설치 띠(설치된 앱으로 열면 안 보이고 오른쪽 위 🍒 싸바 단추도 숨김 body.is-app) ④ js/install.js에 data-name·data-mark·data-icon·data-url 받게 함(안 주면 싸바 그대로) — 다른 앱도 이 방식으로 따로 설치 가능 · sw sava-v465(SHELL에 /star/) · 버전 2026.11.23-491
+  ※ 폰 확인: 아이폰 사파리 sava.kr/star → 공유 → 홈 화면에 추가 → ⭐ 싸바스타 아이콘·이름 / 안드로이드 크롬 설치 단추 / ⚠️ 아이폰 홈 화면 앱 안에서 카카오 로그인이 유지되는지(아이폰은 홈 화면 앱 저장 공간이 사파리와 따로라 처음 한 번 다시 로그인해야 할 수 있음)
+  ※ 다음 후보: star.sava.kr 같은 하위 주소(Cloudflare DNS·커스텀 도메인 대표님 손 필요 — 로그인 쿠키 도메인도 손봐야 함), 싸바스타 전용 아래 탭·첫 화면 정리
 - 2026-11-23 08:32 — 대표님: 홍보창 체리나무 2배로 키우고 희미하게 바탕에 → img 420px(right -110px, top -50px), opacity .32 + saturate(.8). app/index.html promoLink() · 버전 2026.11.23-490 / sw sava-v464
 - 2026-11-23 08:30 — 대표님: 홍보창(487) 너무 빨갛다 → 홈 '황금체리나무' 색으로: 황금 바탕(radial #FFE58A→#F7CF4E→#EDB52E)·오른쪽 체리나무(img/today-tree.png 210px)·황금 막·제목 #1A1A1A/설명 #4A3104 황금빛 번짐·흰 칩·황금 갈색 단추(#C98A12→#9A6408). app/index.html promoLink() · 헤드리스 확인 · 버전 2026.11.23-489 / sw sava-v463
 - 2026-11-23 08:28 — 대표님: 홍보 상담 신청이 관리자 화면과 이메일에 동시에 → functions/api/promo.js mailPromo(): D1 저장 뒤 Resend API로 directorjoo@gmail.com에 메일(제목 '📣 홍보 상담 신청 — 가게(지역)', 표·📞 바로 전화·관리자 화면 링크), waitUntil로 응답 안 늦춤, 실패해도 신청은 저장. ⚠️ 켜려면 Cloudflare 환경 변수 RESEND_API_KEY(resend.com 무료, directorjoo@gmail.com으로 가입 — 기본 보내는 주소 onboarding@resend.dev는 가입 메일로만 감). 선택: PROMO_MAIL_TO·PROMO_MAIL_FROM(sava.kr 도메인 인증 시). 관리자 설정 점검에 줄 추가 · 가짜 D1·fetch로 메일 보냄/키 없으면 건너뜀 확인 · 버전 2026.11.23-488

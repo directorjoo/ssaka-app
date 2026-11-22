@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
   <title>싸바 공짜 이모티콘 🍒</title>
-  <meta name="description" content="움직이는 귀여운 이모티콘 100개를 공짜로! 눌러서 카톡방에 바로 보내요.">
+  <meta name="description" content="움직이는 귀여운 이모티콘 100개 + 먹으로 그린 수묵 이모티콘 24개, 전부 공짜!">
   <meta name="theme-color" content="#B3142B">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sava.kr/emo/">
   <meta property="og:title" content="🍒 싸바 공짜 이모티콘">
-  <meta property="og:description" content="움직이는 귀여운 이모티콘 100개, 눌러서 카톡방에 바로 보내요. 전부 공짜!">
-  <meta property="og:image" content="https://sava.kr/emo/g/e001.gif?v=2">
+  <meta property="og:description" content="움직이는 귀여운 이모티콘 100개 + 수묵 이모티콘 24개, 전부 공짜!">
+  <meta property="og:image" content="https://sava.kr/emo/g/e001.gif?v=3">
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
@@ -43,6 +43,11 @@
     .btn.k { background: #FEE500; color: #3a1d1d; }
     .btn.s { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1.5px #ddd; }
     .btn.x { background: none; color: var(--ink-2); font-size: 15px; font-weight: 700; min-height: 44px; line-height: 44px; }
+    .steps { margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: #fff8d6; font-size: 15px; line-height: 1.65; word-break: keep-all; }
+    .steps span { color: var(--ink-2); font-size: 13.5px; }
+    .btn.kk { background: #3a1d1d; color: #FEE500; min-height: 50px; line-height: 50px; font-size: 16px; }
+    .btn small { font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+    .grid button.ink { background: #f6efe0; }
     .how { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: #f7f7f9; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); word-break: keep-all; }
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 70; padding: 11px 16px; border-radius: 14px; background: rgba(20,20,20,.88); color: #fff; font-size: 14px; font-weight: 700; max-width: 90%; text-align: center; }
   </style>
@@ -51,18 +56,22 @@
 <div class="w">
   <div class="top"><a href="../app/"><img src="../img/cherry.webp" alt="">싸바</a></div>
   <h1><em>공짜</em> 싸바 이모티콘 🍒</h1>
-  <p class="sub">곰·고양이·토끼·만두·체리… 움직이는 이모티콘 100개, 전부 공짜예요. 누르면 카톡방에 바로 보낼 수 있어요.</p>
+  <p class="sub">체리·곰·토끼·고양이·병아리·강아지·개구리가 손 흔들고, 인사하고, 건배하는 움직이는 이모티콘 100개 + 먹으로 그린 <b>🖌️ 수묵</b> 24개. 전부 공짜예요.</p>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
-  <div class="how"><b>보내는 법</b> 이모티콘을 누르고 <b>카톡으로 보내기</b> → 카카오톡 → 보낼 방 선택. 안 되면 <b>사진첩에 저장</b>한 뒤 카톡에서 사진으로 보내세요. 움직이는 그대로 가요!</div>
+  <div class="how"><b>움직이는 그대로 보내는 법</b><br>① 이모티콘 누르기 → <b>사진첩에 저장</b> (아이폰은 공유창에서 <b>이미지 저장</b>)<br>② 카톡 대화방 <b>＋</b> → <b>앨범</b> → 방금 저장한 그림(GIF 표시) 보내기<br>※ 공유창에서 카톡으로 바로 보내면 카톡이 사진 한 장으로 바꿔서 멈춘 그림이 가요.</div>
 </div>
 
 <div class="sheet" id="sheet" hidden>
   <div class="in">
     <img id="big" alt="">
     <div class="nm" id="nm"></div>
-    <button type="button" class="btn k" id="send">💬 카톡으로 보내기</button>
-    <a class="btn s" id="save" download>⬇️ 사진첩에 저장</a>
+    <button type="button" class="btn k" id="save">📥 사진첩에 저장 (움직이는 그대로)</button>
+    <div class="steps" id="steps" hidden>
+      <b>✅ 저장했으면 이제 카톡에서</b><br>대화방 <b>＋</b> → <b>앨범</b> → 맨 앞 그림(<b>GIF</b>) → 전송<br><span>움직이는 이모티콘 그대로 가요!</span>
+      <a class="btn kk" href="kakaotalk://launch">💬 카카오톡 열기</a>
+    </div>
+    <button type="button" class="btn s" id="send">⚡ 카톡으로 바로 보내기 <small>(멈춘 그림으로 가요)</small></button>
     <button type="button" class="btn x" id="close">닫기</button>
   </div>
 </div>
@@ -74,10 +83,10 @@
   var $ = function (id) { return document.getElementById(id); };
   function toast(t) { var d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 2400); }
   // 이모티콘 목록 (주제별) — 그림 파일: g/e001.gif …
-  var CATS = ['전체', '💛 인사', '😊 대답', '😂 감정', '🙏 고마움', '🏃 약속', '🍻 먹고 마시기', '🎉 축하', '👴 가족', '💪 응원', '🗣️ 사투리', '☔ 날씨·일상'];
-  // 11-23 대표님: 촌스러운 것 모두 버리고 새로 100개 (곰·고양이·토끼·병아리·돼지·개구리·펭귄·강아지·만두·복숭아·구름·두부·유령·별·하트·주먹밥·달걀·체리)
+  var CATS = ['전체', '🖌️ 수묵', '💛 인사', '😊 대답', '😂 감정', '🙏 고마움', '🏃 약속', '🍻 먹고 마시기', '🎉 축하', '👴 가족', '💪 응원', '🗣️ 사투리', '☔ 날씨·일상'];
+  // 11-23 대표님 v3: '성의 없이 그려짐' → 몸·팔다리 있는 아기 캐릭터 7가지가 문구마다 다른 동작 100개 + 🖌️ 수묵판 24개(i001~i024)
   // 그림은 tools/emo_gen.py로 만듦 — 목록·글씨 고칠 땐 거기 L 표를 고치고 다시 실행(끝에 찍히는 목록을 아래 EMO에 붙여 넣기)
-  var EMO = [{"id": "e001", "n": "싸바 싸바!", "c": "💛 인사"}, {"id": "e002", "n": "싸바?", "c": "💛 인사"}, {"id": "e003", "n": "안녕~", "c": "💛 인사"}, {"id": "e004", "n": "좋은 아침!", "c": "💛 인사"}, {"id": "e005", "n": "굿나잇", "c": "💛 인사"}, {"id": "e006", "n": "뭐 해?", "c": "💛 인사"}, {"id": "e007", "n": "반가워!", "c": "💛 인사"}, {"id": "e008", "n": "좋은 하루", "c": "💛 인사"}, {"id": "e009", "n": "통화 돼?", "c": "💛 인사"}, {"id": "e010", "n": "잘 지내지?", "c": "💛 인사"}, {"id": "e011", "n": "짠! 나야", "c": "💛 인사"}, {"id": "e012", "n": "개굴~ 안녕", "c": "💛 인사"}, {"id": "e013", "n": "응응!", "c": "😊 대답"}, {"id": "e014", "n": "오케이", "c": "😊 대답"}, {"id": "e015", "n": "알겠어~", "c": "😊 대답"}, {"id": "e016", "n": "헐!", "c": "😊 대답"}, {"id": "e017", "n": "엥?", "c": "😊 대답"}, {"id": "e018", "n": "아니~", "c": "😊 대답"}, {"id": "e019", "n": "좋아요", "c": "😊 대답"}, {"id": "e020", "n": "그래그래", "c": "😊 대답"}, {"id": "e021", "n": "대박!", "c": "😊 대답"}, {"id": "e022", "n": "콜!", "c": "😊 대답"}, {"id": "e023", "n": "당연하지", "c": "😊 대답"}, {"id": "e024", "n": "진짜?!", "c": "😊 대답"}, {"id": "e025", "n": "사랑해", "c": "😂 감정"}, {"id": "e026", "n": "ㅋㅋㅋㅋ", "c": "😂 감정"}, {"id": "e027", "n": "흑흑…", "c": "😂 감정"}, {"id": "e028", "n": "부글부글", "c": "😂 감정"}, {"id": "e029", "n": "설레~", "c": "😂 감정"}, {"id": "e030", "n": "우울해", "c": "😂 감정"}, {"id": "e031", "n": "멋지지?", "c": "😂 감정"}, {"id": "e032", "n": "당황…", "c": "😂 감정"}, {"id": "e033", "n": "서운해", "c": "😂 감정"}, {"id": "e034", "n": "메롱~", "c": "😂 감정"}, {"id": "e035", "n": "좋아해", "c": "😂 감정"}, {"id": "e036", "n": "어질어질", "c": "😂 감정"}, {"id": "e037", "n": "심심해", "c": "😂 감정"}, {"id": "e038", "n": "보고 싶어", "c": "😂 감정"}, {"id": "e039", "n": "고마워!", "c": "🙏 고마움"}, {"id": "e040", "n": "미안해…", "c": "🙏 고마움"}, {"id": "e041", "n": "감사합니다", "c": "🙏 고마움"}, {"id": "e042", "n": "잘못했어", "c": "🙏 고마움"}, {"id": "e043", "n": "덕분이야", "c": "🙏 고마움"}, {"id": "e044", "n": "선물이야", "c": "🙏 고마움"}, {"id": "e045", "n": "죄송해요", "c": "🙏 고마움"}, {"id": "e046", "n": "감동이야", "c": "🙏 고마움"}, {"id": "e047", "n": "가는 중!", "c": "🏃 약속"}, {"id": "e048", "n": "늦어서 미안", "c": "🏃 약속"}, {"id": "e049", "n": "어디야?", "c": "🏃 약속"}, {"id": "e050", "n": "도착!", "c": "🏃 약속"}, {"id": "e051", "n": "거의 다 왔어", "c": "🏃 약속"}, {"id": "e052", "n": "언제 봐?", "c": "🏃 약속"}, {"id": "e053", "n": "이따 봐!", "c": "🏃 약속"}, {"id": "e054", "n": "조금만 기다려", "c": "🏃 약속"}, {"id": "e055", "n": "여기로 와!", "c": "🏃 약속"}, {"id": "e056", "n": "나왔어~", "c": "🏃 약속"}, {"id": "e057", "n": "한잔 콜?", "c": "🍻 먹고 마시기"}, {"id": "e058", "n": "커피 한잔", "c": "🍻 먹고 마시기"}, {"id": "e059", "n": "밥 먹자!", "c": "🍻 먹고 마시기"}, {"id": "e060", "n": "배고파~", "c": "🍻 먹고 마시기"}, {"id": "e061", "n": "냠냠", "c": "🍻 먹고 마시기"}, {"id": "e062", "n": "건배!", "c": "🍻 먹고 마시기"}, {"id": "e063", "n": "맛있다!", "c": "🍻 먹고 마시기"}, {"id": "e064", "n": "배불러", "c": "🍻 먹고 마시기"}, {"id": "e065", "n": "취했다~", "c": "🍻 먹고 마시기"}, {"id": "e066", "n": "카페 갈래?", "c": "🍻 먹고 마시기"}, {"id": "e067", "n": "생일 축하해", "c": "🎉 축하"}, {"id": "e068", "n": "축하해!", "c": "🎉 축하"}, {"id": "e069", "n": "최고야!", "c": "🎉 축하"}, {"id": "e070", "n": "결혼 축하해", "c": "🎉 축하"}, {"id": "e071", "n": "합격 축하!", "c": "🎉 축하"}, {"id": "e072", "n": "부자 되세요", "c": "🎉 축하"}, {"id": "e073", "n": "새해 복!", "c": "🎉 축하"}, {"id": "e074", "n": "축하드려요", "c": "🎉 축하"}, {"id": "e075", "n": "수고했어", "c": "🎉 축하"}, {"id": "e076", "n": "짝짝짝!", "c": "🎉 축하"}, {"id": "e077", "n": "엄마 사랑해", "c": "👴 가족"}, {"id": "e078", "n": "아빠 최고", "c": "👴 가족"}, {"id": "e079", "n": "밥은 먹었니?", "c": "👴 가족"}, {"id": "e080", "n": "건강하세요", "c": "👴 가족"}, {"id": "e081", "n": "보고 싶어요", "c": "👴 가족"}, {"id": "e082", "n": "용돈 주세요~", "c": "👴 가족"}, {"id": "e083", "n": "전화 드릴게요", "c": "👴 가족"}, {"id": "e084", "n": "우리 가족 사랑", "c": "👴 가족"}, {"id": "e085", "n": "힘내!", "c": "💪 응원"}, {"id": "e086", "n": "할 수 있어", "c": "💪 응원"}, {"id": "e087", "n": "파이팅!", "c": "💪 응원"}, {"id": "e088", "n": "아자아자!", "c": "💪 응원"}, {"id": "e089", "n": "잘했어!", "c": "💪 응원"}, {"id": "e090", "n": "넌 최고야", "c": "💪 응원"}, {"id": "e091", "n": "응원해!", "c": "💪 응원"}, {"id": "e092", "n": "다 잘될 거야", "c": "💪 응원"}, {"id": "e093", "n": "겁나 좋아잉", "c": "🗣️ 사투리"}, {"id": "e094", "n": "오메 오메!", "c": "🗣️ 사투리"}, {"id": "e095", "n": "뭐 하요?", "c": "🗣️ 사투리"}, {"id": "e096", "n": "그라제~", "c": "🗣️ 사투리"}, {"id": "e097", "n": "비 온다", "c": "☔ 날씨·일상"}, {"id": "e098", "n": "추워~", "c": "☔ 날씨·일상"}, {"id": "e099", "n": "졸려…", "c": "☔ 날씨·일상"}, {"id": "e100", "n": "퇴근하고 싶다", "c": "☔ 날씨·일상"}];
+  var EMO = [{"id": "e001", "n": "싸바 싸바!", "c": "💛 인사"}, {"id": "e002", "n": "싸바?", "c": "💛 인사"}, {"id": "e003", "n": "안녕~", "c": "💛 인사"}, {"id": "e004", "n": "좋은 아침!", "c": "💛 인사"}, {"id": "e005", "n": "굿나잇", "c": "💛 인사"}, {"id": "e006", "n": "뭐 해?", "c": "💛 인사"}, {"id": "e007", "n": "반가워!", "c": "💛 인사"}, {"id": "e008", "n": "좋은 하루", "c": "💛 인사"}, {"id": "e009", "n": "통화 돼?", "c": "💛 인사"}, {"id": "e010", "n": "잘 지내지?", "c": "💛 인사"}, {"id": "e011", "n": "짠! 나야", "c": "💛 인사"}, {"id": "e012", "n": "개굴~ 안녕", "c": "💛 인사"}, {"id": "e013", "n": "응응!", "c": "😊 대답"}, {"id": "e014", "n": "오케이", "c": "😊 대답"}, {"id": "e015", "n": "알겠어~", "c": "😊 대답"}, {"id": "e016", "n": "헐!", "c": "😊 대답"}, {"id": "e017", "n": "엥?", "c": "😊 대답"}, {"id": "e018", "n": "아니~", "c": "😊 대답"}, {"id": "e019", "n": "좋아요", "c": "😊 대답"}, {"id": "e020", "n": "그래그래", "c": "😊 대답"}, {"id": "e021", "n": "대박!", "c": "😊 대답"}, {"id": "e022", "n": "콜!", "c": "😊 대답"}, {"id": "e023", "n": "당연하지", "c": "😊 대답"}, {"id": "e024", "n": "진짜?!", "c": "😊 대답"}, {"id": "e025", "n": "사랑해", "c": "😂 감정"}, {"id": "e026", "n": "ㅋㅋㅋㅋ", "c": "😂 감정"}, {"id": "e027", "n": "흑흑…", "c": "😂 감정"}, {"id": "e028", "n": "부글부글", "c": "😂 감정"}, {"id": "e029", "n": "설레~", "c": "😂 감정"}, {"id": "e030", "n": "우울해", "c": "😂 감정"}, {"id": "e031", "n": "멋지지?", "c": "😂 감정"}, {"id": "e032", "n": "당황…", "c": "😂 감정"}, {"id": "e033", "n": "서운해", "c": "😂 감정"}, {"id": "e034", "n": "메롱~", "c": "😂 감정"}, {"id": "e035", "n": "좋아해", "c": "😂 감정"}, {"id": "e036", "n": "어질어질", "c": "😂 감정"}, {"id": "e037", "n": "심심해", "c": "😂 감정"}, {"id": "e038", "n": "보고 싶어", "c": "😂 감정"}, {"id": "e039", "n": "고마워!", "c": "🙏 고마움"}, {"id": "e040", "n": "미안해…", "c": "🙏 고마움"}, {"id": "e041", "n": "감사합니다", "c": "🙏 고마움"}, {"id": "e042", "n": "잘못했어", "c": "🙏 고마움"}, {"id": "e043", "n": "덕분이야", "c": "🙏 고마움"}, {"id": "e044", "n": "선물이야", "c": "🙏 고마움"}, {"id": "e045", "n": "죄송해요", "c": "🙏 고마움"}, {"id": "e046", "n": "감동이야", "c": "🙏 고마움"}, {"id": "e047", "n": "가는 중!", "c": "🏃 약속"}, {"id": "e048", "n": "늦어서 미안", "c": "🏃 약속"}, {"id": "e049", "n": "어디야?", "c": "🏃 약속"}, {"id": "e050", "n": "도착!", "c": "🏃 약속"}, {"id": "e051", "n": "거의 다 왔어", "c": "🏃 약속"}, {"id": "e052", "n": "언제 봐?", "c": "🏃 약속"}, {"id": "e053", "n": "이따 봐!", "c": "🏃 약속"}, {"id": "e054", "n": "조금만 기다려", "c": "🏃 약속"}, {"id": "e055", "n": "여기로 와!", "c": "🏃 약속"}, {"id": "e056", "n": "나왔어~", "c": "🏃 약속"}, {"id": "e057", "n": "한잔 콜?", "c": "🍻 먹고 마시기"}, {"id": "e058", "n": "커피 한잔", "c": "🍻 먹고 마시기"}, {"id": "e059", "n": "밥 먹자!", "c": "🍻 먹고 마시기"}, {"id": "e060", "n": "배고파~", "c": "🍻 먹고 마시기"}, {"id": "e061", "n": "냠냠", "c": "🍻 먹고 마시기"}, {"id": "e062", "n": "건배!", "c": "🍻 먹고 마시기"}, {"id": "e063", "n": "맛있다!", "c": "🍻 먹고 마시기"}, {"id": "e064", "n": "배불러", "c": "🍻 먹고 마시기"}, {"id": "e065", "n": "취했다~", "c": "🍻 먹고 마시기"}, {"id": "e066", "n": "카페 갈래?", "c": "🍻 먹고 마시기"}, {"id": "e067", "n": "생일 축하해", "c": "🎉 축하"}, {"id": "e068", "n": "축하해!", "c": "🎉 축하"}, {"id": "e069", "n": "최고야!", "c": "🎉 축하"}, {"id": "e070", "n": "결혼 축하해", "c": "🎉 축하"}, {"id": "e071", "n": "합격 축하!", "c": "🎉 축하"}, {"id": "e072", "n": "부자 되세요", "c": "🎉 축하"}, {"id": "e073", "n": "새해 복!", "c": "🎉 축하"}, {"id": "e074", "n": "축하드려요", "c": "🎉 축하"}, {"id": "e075", "n": "수고했어", "c": "🎉 축하"}, {"id": "e076", "n": "짝짝짝!", "c": "🎉 축하"}, {"id": "e077", "n": "엄마 사랑해", "c": "👴 가족"}, {"id": "e078", "n": "아빠 최고", "c": "👴 가족"}, {"id": "e079", "n": "밥은 먹었니?", "c": "👴 가족"}, {"id": "e080", "n": "건강하세요", "c": "👴 가족"}, {"id": "e081", "n": "보고 싶어요", "c": "👴 가족"}, {"id": "e082", "n": "용돈 주세요~", "c": "👴 가족"}, {"id": "e083", "n": "전화 드릴게요", "c": "👴 가족"}, {"id": "e084", "n": "우리 가족 사랑", "c": "👴 가족"}, {"id": "e085", "n": "힘내!", "c": "💪 응원"}, {"id": "e086", "n": "할 수 있어", "c": "💪 응원"}, {"id": "e087", "n": "파이팅!", "c": "💪 응원"}, {"id": "e088", "n": "아자아자!", "c": "💪 응원"}, {"id": "e089", "n": "잘했어!", "c": "💪 응원"}, {"id": "e090", "n": "넌 최고야", "c": "💪 응원"}, {"id": "e091", "n": "응원해!", "c": "💪 응원"}, {"id": "e092", "n": "다 잘될 거야", "c": "💪 응원"}, {"id": "e093", "n": "겁나 좋아잉", "c": "🗣️ 사투리"}, {"id": "e094", "n": "오메 오메!", "c": "🗣️ 사투리"}, {"id": "e095", "n": "뭐 하요?", "c": "🗣️ 사투리"}, {"id": "e096", "n": "그라제~", "c": "🗣️ 사투리"}, {"id": "e097", "n": "비 온다", "c": "☔ 날씨·일상"}, {"id": "e098", "n": "추워~", "c": "☔ 날씨·일상"}, {"id": "e099", "n": "졸려…", "c": "☔ 날씨·일상"}, {"id": "e100", "n": "퇴근하고 싶다", "c": "☔ 날씨·일상"}, {"id": "i001", "n": "싸바 싸바!", "c": "🖌️ 수묵"}, {"id": "i002", "n": "안녕~", "c": "🖌️ 수묵"}, {"id": "i003", "n": "좋은 아침!", "c": "🖌️ 수묵"}, {"id": "i004", "n": "응응!", "c": "🖌️ 수묵"}, {"id": "i005", "n": "오케이", "c": "🖌️ 수묵"}, {"id": "i006", "n": "대박!", "c": "🖌️ 수묵"}, {"id": "i007", "n": "사랑해", "c": "🖌️ 수묵"}, {"id": "i008", "n": "ㅋㅋㅋㅋ", "c": "🖌️ 수묵"}, {"id": "i009", "n": "흑흑…", "c": "🖌️ 수묵"}, {"id": "i010", "n": "고마워!", "c": "🖌️ 수묵"}, {"id": "i011", "n": "감사합니다", "c": "🖌️ 수묵"}, {"id": "i012", "n": "가는 중!", "c": "🖌️ 수묵"}, {"id": "i013", "n": "한잔 콜?", "c": "🖌️ 수묵"}, {"id": "i014", "n": "커피 한잔", "c": "🖌️ 수묵"}, {"id": "i015", "n": "건배!", "c": "🖌️ 수묵"}, {"id": "i016", "n": "생일 축하해", "c": "🖌️ 수묵"}, {"id": "i017", "n": "최고야!", "c": "🖌️ 수묵"}, {"id": "i018", "n": "새해 복!", "c": "🖌️ 수묵"}, {"id": "i019", "n": "건강하세요", "c": "🖌️ 수묵"}, {"id": "i020", "n": "힘내!", "c": "🖌️ 수묵"}, {"id": "i021", "n": "파이팅!", "c": "🖌️ 수묵"}, {"id": "i022", "n": "넌 최고야", "c": "🖌️ 수묵"}, {"id": "i023", "n": "비 온다", "c": "🖌️ 수묵"}, {"id": "i024", "n": "졸려…", "c": "🖌️ 수묵"}];
   var cat = '전체', cur = null;
   function paint() {
     var tb = $('tabs'); tb.innerHTML = '';
@@ -85,27 +94,44 @@
     var g = $('grid'); g.innerHTML = '';
     var list = EMO.filter(function (e) { return cat === '전체' || e.c === cat; });
     list.forEach(function (e) {
-      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', e.n);
-      var im = document.createElement('img'); im.src = 'g/' + e.id + '.gif?v=2'; im.alt = e.n; im.loading = 'lazy';
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', e.n); if (e.id[0] === 'i') b.className = 'ink';
+      var im = document.createElement('img'); im.src = 'g/' + e.id + '.gif?v=3'; im.alt = e.n; im.loading = 'lazy';
       b.appendChild(im); b.addEventListener('click', function () { open(e); }); g.appendChild(b);
     });
     if (!list.length) { var s = document.createElement('div'); s.className = 'soon'; s.textContent = '🍒 이 주제 이모티콘은 곧 나와요!'; g.appendChild(s); }
   }
   function open(e) {
-    cur = e; $('big').src = 'g/' + e.id + '.gif?v=2'; $('nm').textContent = e.n;
-    $('save').href = 'g/' + e.id + '.gif?v=2'; $('save').setAttribute('download', '싸바-' + e.n.replace(/[^가-힣a-zA-Z0-9]/g, '') + '.gif');
+    cur = e; $('big').src = 'g/' + e.id + '.gif?v=3'; $('nm').textContent = e.n;
+    $('steps').hidden = true;
     $('sheet').hidden = false;
   }
   $('close').addEventListener('click', function () { $('sheet').hidden = true; });
   $('sheet').addEventListener('click', function (ev) { if (ev.target === this) this.hidden = true; });
-  // 카톡으로 보내기: 폰 공유창에 움직이는 그림 파일을 그대로 넘김 → 카카오톡 선택
+  // 11-23 대표님: 카톡에 보내면 안 움직임 → 카톡은 공유창으로 받은 그림을 사진(JPEG) 한 장으로 바꿔 보냄(첫 장면만).
+  // 그래서 ① 사진첩에 GIF로 저장(아이폰 공유창 '이미지 저장') → ② 카톡 앨범에서 보내기를 기본으로 안내
+  function gifFile(cb) {
+    fetch('g/' + cur.id + '.gif?v=3').then(function (r) { return r.blob(); }).then(function (b) {
+      cb(new File([b], '싸바-' + cur.n.replace(/[^가-힣a-zA-Z0-9]/g, '') + '.gif', { type: 'image/gif' }));
+    }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+  }
+  $('save').addEventListener('click', function () {
+    if (!cur) return;
+    gifFile(function (f) {
+      var done = function () { $('steps').hidden = false; };
+      if (navigator.canShare && navigator.canShare({ files: [f] })) {
+        toast('공유창에서 "이미지 저장"을 눌러 주세요');
+        return navigator.share({ files: [f] }).then(done).catch(function () {});
+      }
+      var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+      toast('저장했어요 — 안 보이면 그림을 꾹 눌러 "사진 앱에 저장"'); done();
+    });
+  });
   $('send').addEventListener('click', function () {
     if (!cur) return;
-    fetch('g/' + cur.id + '.gif?v=2').then(function (r) { return r.blob(); }).then(function (b) {
-      var f = new File([b], '싸바-' + cur.id + '.gif', { type: 'image/gif' });
+    gifFile(function (f) {
       if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f] }).catch(function () {});
-      toast('이 브라우저는 바로 보내기가 안 돼요. "사진첩에 저장" 후 카톡에서 보내 주세요');
-    }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+      toast('이 브라우저는 바로 보내기가 안 돼요. "사진첩에 저장" 후 카톡 앨범에서 보내 주세요');
+    });
   });
   paint();
 })();

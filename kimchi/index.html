@@ -36,7 +36,7 @@
     label{font-size:20px;line-height:1.6;font-weight:800;word-break:keep-all}.qty{display:flex;align-items:center;gap:14px;margin:10px 0 16px}.qty button{width:42px;height:42px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:33px}
     .total{font-size:35px;font-weight:900;color:#9b2424}.foot{text-align:center;color:#786e66;font-size:18px;line-height:1.8;padding:22px 8px;word-break:keep-all}
     .kakao-bottom{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:1000;padding:8px 9px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eadbd2;box-shadow:0 -4px 18px #00000012;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto}.kakao-bottom .btn{min-width:0;min-height:42px;font-size:12px;line-height:1.2;padding:7px 2px;border-radius:11px;white-space:nowrap;letter-spacing:-.5px}.kakao-bottom .home{background:#7f1d1d;color:#fff}.kakao-bottom .where{background:#fff0e7;color:#8b3c21}.kakao-bottom .play{background:#fce8ec;color:#8b2437}.kakao-bottom .alim{background:#f4eee5;color:#59432d}body{padding-bottom:90px}.cherry-tap{display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 0 4px}.cherry-tap img{width:48px;height:48px;object-fit:contain;animation:cherryTap 1.4s ease-in-out infinite}.cherry-tap .barrel{font-size:34px;display:inline-block;transform-origin:center;animation:barrelBump 1.4s ease-in-out infinite}@keyframes cherryTap{0%,100%{transform:translateY(0) rotate(-5deg)}45%{transform:translateY(-7px) rotate(8deg)}60%{transform:translateY(0) rotate(-8deg)}}@keyframes barrelBump{0%,35%,100%{transform:rotate(0)}48%{transform:rotate(-9deg) translateX(-2px)}58%{transform:rotate(8deg) translateX(2px)}}
-    .greeting-wide{display:block;width:100%;height:auto;border-radius:14px;margin:4px 0 14px;box-shadow:0 5px 16px #3b21151c}.kimchi-shot{margin:8px 0 0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 5px 16px #3b21151c}.kimchi-shot img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.kimchi-shot figcaption{padding:11px 16px 13px;font-size:18px;line-height:1.5;font-weight:800;color:#7f1d1d;text-align:center;word-break:keep-all}
+    .greeting-wide{display:block;width:100%;height:auto;aspect-ratio:720/670;background:#f3e3d8;border-radius:14px;margin:4px 0 14px;box-shadow:0 5px 16px #3b21151c}.kimchi-shot{margin:8px 0 0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 5px 16px #3b21151c}.kimchi-shot img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#f3e3d8}.kimchi-shot figcaption{padding:11px 16px 13px;font-size:18px;line-height:1.5;font-weight:800;color:#7f1d1d;text-align:center;word-break:keep-all}
     .acct-copy{display:block;width:100%;margin-top:10px;min-height:48px;border:0;border-radius:12px;background:#b3132b;color:#fff;font:inherit;font-size:18px;font-weight:900;cursor:pointer}.acct-copy.done{background:#2f7a62}
     .replay{position:fixed;right:10px;top:calc(54px + env(safe-area-inset-top));z-index:50;width:44px;height:44px;border-radius:50%;border:1px solid rgba(110,68,21,.18);background:rgba(255,255,255,.92);color:#B3132B;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px rgba(110,68,21,.16)}.replay svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   </style>
@@ -53,7 +53,7 @@
   <main class="wrap">
     <section class="section video-section">
       <div class="video">
-        <iframe src="https://www.youtube-nocookie.com/embed/vkYVQEIOc5I?autoplay=1&mute=1&playsinline=1&loop=1&playlist=vkYVQEIOc5I&rel=0&controls=1&modestbranding=1" title="여수 언니 갓김치 영상" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe id="kvid" data-src="https://www.youtube-nocookie.com/embed/vkYVQEIOc5I?autoplay=1&mute=1&playsinline=1&loop=1&playlist=vkYVQEIOc5I&rel=0&controls=1&modestbranding=1" title="여수 언니 갓김치 영상" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </section>
     <section class="section">
@@ -61,14 +61,14 @@
         <a class="sava-about-btn" href="/?story=1" aria-label="싸바가 뭐지? 소개 페이지">싸바?</a>
         <h2><span class="gl">여수 언니의 손맛, 올해도</span><span class="gl">어김없이 찾아왔습니다 🌿</span></h2>
       </div>
-      <img class="greeting-wide" src="/img/gatkimchi-gloss.jpg?v=1" alt="두 손으로 잡고 있는 여수 언니 갓김치" width="900" height="837" loading="eager">
+      <img class="greeting-wide" src="/img/gatkimchi-gloss.jpg?v=2" alt="두 손으로 잡고 있는 여수 언니 갓김치" width="720" height="670" loading="eager" fetchpriority="high" decoding="async">
       <p>사랑하는 친구, 지인 여러분!</p>
       <p>어느덧 한 해의 끝자락에 다가왔네요. 모두 평안하고 건강하게 잘 지내고 계시죠? 😊</p>
       <p>매년 이맘때면 잊지 않고 여수 언니 김치를 찾아주시고 맛있게 드셔주시는 여러분께 진심으로 감사드립니다. 보내주시는 따뜻한 응원과 사랑 덕분에 올해도 기쁜 마음으로 김장 소식을 전합니다.</p>
       <p>소중한 친구와 지인 여러분께 먼저 전해드리고 싶어 <strong>딱 50박스 한정</strong>으로 준비했습니다!</p>
       <p><strong>압구정 순천만 주인 지연숙 드림</strong></p>
     </section>
-    <figure class="kimchi-shot"><img src="/img/gatkimchi-sesame.jpg?v=1" alt="깨를 뿌린 여수 돌산 갓김치" width="880" height="850" loading="lazy"><figcaption>양념 듬뿍, 고소한 깨 송송 🌿</figcaption></figure>
+    <figure class="kimchi-shot"><img src="/img/gatkimchi-sesame.jpg?v=2" alt="깨를 뿌린 여수 돌산 갓김치" width="720" height="695" loading="lazy"><figcaption>양념 듬뿍, 고소한 깨 송송 🌿</figcaption></figure>
     <section class="section">
       <h2>🥬 여수 돌산 갓김치</h2>
       <ul class="features">
@@ -78,7 +78,7 @@
       </ul>
       <p class="price-note">※ 원재료·생산일·배송 일정은 판매자 확인 정보에 맞춰 최종 표기합니다.</p>
     </section>
-    <figure class="kimchi-shot"><img src="/img/gatkimchi-roll.jpg?v=2" alt="한 줄기씩 돌돌 말아 상에 낸 갓김치" width="768" height="720" loading="lazy"><figcaption>이렇게 한 줄기씩 돌돌 말아 대접해도 좋아요</figcaption></figure>
+    <figure class="kimchi-shot"><img src="/img/gatkimchi-roll.jpg?v=3" alt="한 줄기씩 돌돌 말아 상에 낸 갓김치" width="720" height="684" loading="lazy"><figcaption>이렇게 한 줄기씩 돌돌 말아 대접해도 좋아요</figcaption></figure>
     <section class="section order">
       <h2>🛒 주문하기</h2>
       <p><strong>5kg 한 박스 60,000원 · 배송비 포함</strong></p>
@@ -189,6 +189,19 @@ fit();window.addEventListener('resize',fit);if(document.fonts&&document.fonts.re
   }
   document.getElementById('orderKakao').addEventListener('click',function(){stat('order');});
   document.getElementById('orderKakao').addEventListener('click',goSavaOrder);})();
+</script>
+<script>
+/* 사진: 약한 신호에서 받다 끊기면 한 번 더 받기(최대 2번) · 영상은 첫 사진이 뜬 뒤(또는 3초 뒤) 불러와 사진이 먼저 오게 */
+(function(){
+  document.querySelectorAll('main img').forEach(function(im){
+    var n=0;function retry(){if(n>=2)return;n++;var u=im.getAttribute('src').replace(/([?&])r=\d+/,'').replace(/[?&]$/,'');setTimeout(function(){im.src=u+(u.indexOf('?')<0?'?':'&')+'r='+n;},800*n);}
+    im.addEventListener('error',retry);
+    if(im.complete&&im.naturalWidth===0&&im.getAttribute('loading')!=='lazy')retry();
+  });
+  var v=document.getElementById('kvid'),g=document.querySelector('.greeting-wide'),done=0;
+  function go(){if(done||!v)return;done=1;v.src=v.getAttribute('data-src');}
+  if(!g||(g.complete&&g.naturalWidth))go();else{g.addEventListener('load',go);g.addEventListener('error',go);setTimeout(go,3000);}
+})();
 </script>
 <script src="/js/sound.js"></script>
 <script>

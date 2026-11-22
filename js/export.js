@@ -873,6 +873,15 @@
   function safeY(W, H) { var g = geo(W, H); return g.tall ? { top: Math.round(H * 0.1), bot: Math.round(H * 0.86) } : { top: 0, bot: H }; }
 
   var LAYS = {};
+  // 🌳 체리나무 그림(카드 화면과 같은 단풍 체리나무) — 체리나무 디자인 SNS 그림 그릴 때 한 번 불러 둠
+  var TREE = null, TREE_SRC = '/img/today-tree-autumn.png';
+  function treeArt(ctx, cx, cy, s) { // 카드 화면처럼 아주 연하게(투명도 .2), 느낌만
+    if (!TREE) return;
+    ctx.save(); ctx.globalAlpha = 0.2;
+    try { ctx.filter = 'saturate(.7) brightness(1.1)'; } catch (e) {}
+    var r = TREE.width / TREE.height, w = r >= 1 ? s : s * r, h = r >= 1 ? s / r : s;
+    ctx.drawImage(TREE, cx - w / 2, cy - h / 2, w, h); ctx.restore();
+  }
   // 0. 투데이 카드 (11-22) — 표준 12색 그라데이션 바탕, 큰 사진이 아래로 바탕에 번짐, 두 줄 큰 제목, 유리 판 목록
   LAYS.today = function (ctx, W, H, D, P) {
     var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H), stops = P.g || [P.bg, P.bg];
@@ -889,6 +898,7 @@
       var pw = W * 0.5; pic(ctx, D.main, 0, 0, pw, H, D, { fill: dark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.05)', fam: fam });
       fadeOver(pw * 0.55, 0, pw, 0); ctx.fillRect(pw * 0.55, 0, pw * 0.45 + 2, H);
       var tx = pw + 20 * u, tw = W - tx - 64 * u, y = 64 * u;
+      if (D.tree) treeArt(ctx, pw + (W - pw) * 0.65, H * 0.38, (W - pw) * 1.6);
       y = tBlock(ctx, D.head, { x: tx, y: y, w: tw, size: 28 * u, min: 20 * u, fam: FONT, weight: 700, color: sub, lines: 1 }) + 12 * u;
       y = tBlock(ctx, D.title, { x: tx, y: y, w: tw, size: 72 * u, min: 40 * u, fam: fam, weight: 900, color: ink, lines: 2, lh: 1.14, shadow: shadow }) + 12 * u;
       if (D.sub) y = tBlock(ctx, D.sub, { x: tx, y: y, w: tw, size: 28 * u, min: 20 * u, fam: FONT, weight: 600, color: sub, lines: 1 }) + 22 * u;
@@ -903,6 +913,7 @@
     var x = 64 * u, w = W - 128 * u, T = { x: x, w: w, size: (g.tall ? 104 : 88) * u, min: 48 * u, fam: fam, weight: 900, color: ink, lines: 2, lh: 1.14, shadow: shadow };
     var th = tBlock(ctx, D.title, Object.assign({ dry: 1, y: 0 }, T)), hh = 44 * u, shh = D.sub ? 50 * u : 0;
     var yy = Math.max(sf.top + 40 * u, phH - th - hh - shh * 0.4 - 10 * u);
+    if (D.tree) treeArt(ctx, W * 0.65, yy + hh + th * 0.5, W * 1.6); // 제목 뒤 가운데~오른쪽에 크게
     yy = tBlock(ctx, D.head, { x: x, y: yy, w: w, size: 32 * u, min: 22 * u, fam: FONT, weight: 700, color: sub, lines: 1 }) + 12 * u;
     yy = tBlock(ctx, D.title, Object.assign({ y: yy }, T)) + 14 * u;
     if (D.sub) yy = tBlock(ctx, D.sub, { x: x, y: yy, w: w, size: 32 * u, min: 22 * u, fam: FONT, weight: 600, color: sub, lines: 1 }) + 28 * u;
@@ -915,7 +926,7 @@
     }
   };
   // 1. 순천만 노을 — 하늘·해·물결·갈대, 아치 사진, 가운데 명조
-  LAYS.tree = function (ctx, W, H, D, P) { return LAYS.today(ctx, W, H, D, P); }; // 🌳 체리나무 — SNS 그림은 투데이와 같은 모양(나무는 카드 화면에만)
+  LAYS.tree = function (ctx, W, H, D, P) { D.tree = 1; return LAYS.today(ctx, W, H, D, P); }; // 🌳 체리나무 — 투데이 모양 + 제목 뒤 연한 체리나무(11-23 대표님: 인스타에도)
   LAYS.sunset = function (ctx, W, H, D, P) {
     var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H);
     ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
@@ -1332,6 +1343,7 @@
     srcs = srcs.filter(function (s, i) { return srcs.indexOf(s) === i; }).slice(0, 4);
     var fam = famStack(design).split(',')[0], ready = [(document.fonts && document.fonts.ready) ? document.fonts.ready.catch(function () {}) : null, loadSerif()];
     if (document.fonts && fam) ready.push(Promise.race([Promise.all([document.fonts.load('900 80px ' + fam, card.title || '가'), document.fonts.load('400 80px ' + fam, '가')]).catch(function () {}), new Promise(function (r) { setTimeout(r, 2500); })]));
+    if (design.style === 'tree' && !TREE) ready.push(loadImg(TREE_SRC).then(function (im) { if (usable(im)) TREE = im; }));
     return Promise.all(ready).then(function () {
       return Promise.all(srcs.map(function (s) { return loadImg(s, pics[s]); }));
     }).then(function (imgs) {

@@ -212,6 +212,12 @@
     .circles .grp { grid-column: 1 / -1; }
     /* 11-22: 주식·부동산·환율 3가지가 되어 나들이·주식도 한 줄 전체 */
     html.bigtxt .circles { grid-template-columns: 1fr; }
+    /* 11-22 21:20 홈 알약에서 온 화면(?go=1): 내용 먼저, 고르기는 아래 */
+    body.go .hero { display: none; }
+    .gotop { display: flex; align-items: center; gap: 8px; margin: 8px 14px 8px; }
+    .gotop a, .gotop button { flex: none; padding: 8px 14px; border-radius: 999px; border: 1px solid #E9E2D8; background: #fff; color: #4A3104; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; }
+    .gotop b { flex: 1; text-align: center; font-size: 18px; font-weight: 900; }
+    .gohd { margin: 22px 14px 10px; font-size: 20px; font-weight: 900; letter-spacing: -.03em; }
   </style>
 </head>
 <body>
@@ -923,9 +929,21 @@
     $('welcome').hidden = false;
     $('wtop').addEventListener('click', function (e) { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); });
   }
+  // 11-22 21:20 대표님: 홈 알약에서 오면(?go=1) 맨 위에 그 탭 내용 → 그 아래 다른 영역 고르기(누른 탭의 묶음이 맨 앞). 큰 머리는 숨기고 얇은 머리 한 줄
+  var GO = /[?&]go=1/.test(location.search);
+  if (GO) {
+    document.body.classList.add('go');
+    var w0 = document.querySelector('.w'), hero = document.querySelector('.hero');
+    var top = el('div', 'gotop'); top.innerHTML = '<a href="../app/" aria-label="싸바 홈">‹ 홈</a><b>☀️ 싸바 브리핑</b><button type="button" id="goAll">전체 보기</button>';
+    w0.insertBefore(top, hero);
+    w0.insertBefore(pane, hero); w0.insertBefore(document.querySelector('.sendbar'), hero);
+    var gh = el('h2', 'gohd', '📂 다른 소식도 골라 보세요'); w0.insertBefore(gh, hero); w0.insertBefore(bar, hero);
+    var mine = bar.querySelector('.cb[data-k="' + cur + '"]'); if (mine) { var gb = mine.closest('.grp'); if (gb) bar.insertBefore(gb, bar.firstChild); }
+    $('goAll').addEventListener('click', function () { location.href = location.pathname + location.hash; });
+    scrollTo(0, 0);
+  }
   paintBar(); show(cur);
-  if (/[?&]go=1/.test(location.search)) setTimeout(function () { var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ block: 'start' }); }, 60); // 홈 브리핑 알약에서 오면 바로 그 탭 내용으로
-  else if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
+  if (GO) {} else if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
   var a = bar.querySelector('[aria-pressed="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ inline: 'center', block: 'nearest' });
 })();
 </script>

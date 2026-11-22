@@ -11,6 +11,7 @@
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
 //   GET /api/today?k=music&t=kpop|pop|eu|cn|jp|af|la|au : 🎵 나라별 인기 노래(애플 뮤직 순위 + 30초 미리듣기)
+//   GET /api/today?k=movie&t=kr|us|eu|cn|jp|in : 🎬 영화 흥행(한국은 KOBIS 공식 순위 — KOBIS_KEY 필요, 나라마다 흥행 기사)
 //   GET /api/today?k=globe : 🌐 오늘 지구촌 뉴스 10개(구글 뉴스 세계 한국어판)
 import { market, indexOf, readOne, SUM_RULE, gnText, clipSum, isAudition, setNaver } from './letter.js';
 //   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
@@ -147,7 +148,38 @@ async function music(t) {
   return { k: 'music', t, h: m[0], at: kst().toISOString().slice(0, 16).replace('T', ' '), list: list.slice(0, 24) };
 }
 
+// 🎬 영화 흥행 순위 (11-23 대표님: 한국·미국·유럽·중국·일본 등)
+//   한국: 영화진흥위원회 KOBIS 공식 Open API 일별 박스오피스(환경 변수 KOBIS_KEY — kobis.or.kr 오픈API 무료 발급). 키가 없으면 흥행 기사로 대신
+//   다른 나라: 공식 무료 API가 없어 한국어 흥행 기사(구글 뉴스 제목+링크) + 공식 순위 사이트 바로가기
+const MOVIE = {
+  kr: ['🇰🇷 한국', ['박스오피스 관객 when:3d', '극장가 흥행 1위 when:3d']],
+  us: ['🇺🇸 미국', ['북미 박스오피스 when:7d', '북미 흥행 1위 when:7d']],
+  eu: ['🇪🇺 유럽', ['영국 박스오피스 OR 프랑스 박스오피스 when:14d', '유럽 흥행 영화 when:14d']],
+  cn: ['🇨🇳 중국', ['중국 박스오피스 when:7d', '중국 흥행 영화 when:14d']],
+  jp: ['🇯🇵 일본', ['일본 박스오피스 when:7d', '일본 흥행 영화 OR 일본 극장가 when:14d']],
+  in: ['🇮🇳 인도', ['인도 박스오피스 OR 발리우드 흥행 when:30d']]
+};
+async function movie(t, env) {
+  const m = MOVIE[t]; if (!m) throw new Error('bad-t');
+  let rank = null;
+  if (t === 'kr' && env.KOBIS_KEY) {
+    try {
+      const d = new Date(Date.now() + 9 * 3600e3 - 864e5), ymd = d.toISOString().slice(0, 10).replace(/-/g, '');
+      const r = await fetch('https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=' + encodeURIComponent(String(env.KOBIS_KEY).trim()) + '&targetDt=' + ymd);
+      const j = await r.json(), L = (((j || {}).boxOfficeResult || {}).dailyBoxOfficeList) || [];
+      if (L.length) rank = { day: ymd.slice(4, 6) * 1 + '월 ' + ymd.slice(6) * 1 + '일', list: L.slice(0, 10).map(x => ({ r: +x.rank, t: String(x.movieNm || '').slice(0, 60), a: +x.audiCnt || 0, acc: +x.audiAcc || 0, open: String(x.openDt || ''), up: +x.rankInten || 0, nw: x.rankOldAndNew === 'NEW' })) };
+    } catch (e) {}
+  }
+  const got = await Promise.all(m[1].map(q => rss(GN(q)).then(x => gnews(x, 10)).catch(() => [])));
+  const seen = new Set();
+  const news = [].concat(...got).filter(x => { const key = x.t.replace(/\s+/g, '').slice(0, 26); if (seen.has(key)) return false; seen.add(key); return true; })
+    .sort((x, y) => (Date.parse(y.at) || 0) - (Date.parse(x.at) || 0)).slice(0, 10);
+  if (!rank && !news.length) throw new Error('movie');
+  return { k: 'movie', t, h: m[0], at: kst().toISOString().slice(0, 16).replace('T', ' '), rank, news, needKey: t === 'kr' && !env.KOBIS_KEY };
+}
+
 async function build(k, env, t) {
+  if (k === 'movie') return movie(t, env);
   if (k === 'tp') return topic(t);
   if (k === 'music') return music(t);
   if (k === 'globe') {
@@ -233,9 +265,10 @@ async function kamis(env) {
 export async function onRequestGet({ request, env, waitUntil }) {
   setNaver(env);
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt|world|market|stock|tp|music|globe)$/.test(k)) return json({ error: 'bad-k' }, 400);
-  const t = k === 'tp' || k === 'music' ? (u.searchParams.get('t') || '') : '';
+  if (!/^(news|google|gov|yt|world|market|stock|tp|music|globe|movie)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  const t = k === 'tp' || k === 'music' || k === 'movie' ? (u.searchParams.get('t') || '') : '';
   if (k === 'music' && !MUSIC[t]) return json({ error: 'bad-t' }, 400);
+  if (k === 'movie' && !MOVIE[t]) return json({ error: 'bad-t' }, 400);
   if (k === 'kamis' && !(env.KAMIS_KEY && env.KAMIS_ID)) return json({ k, need: 'key' });
   if (k === 'tp' && !TP[t]) return json({ error: 'bad-t' }, 400);
   let ttl = k === 'google' || k === 'market' || k === 'stock' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));

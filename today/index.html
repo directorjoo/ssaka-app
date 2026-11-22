@@ -282,7 +282,8 @@
       { k: 'kwx', t: '전국 날씨', i: '🗺️', c: '#0E6BA8' }] },
     { id: 'glb', h: '🌍 세계 소식·음악', s: '검색 안 해도 최신', c: [
       { k: 'globe', t: '지구촌 뉴스', i: '🌐', c: '#1F6FB2', n: 1 },
-      { k: 'music', t: '인기 노래', i: '🎵', c: '#B3132B', n: 1 }] },
+      { k: 'music', t: '인기 노래', i: '🎵', c: '#B3132B', n: 1 },
+      { k: 'movie', t: '영화 흥행', i: '🎬', c: '#5b2a86', n: 1 }] },
     { id: 'hot', h: '🔥 지금 화제·방송', s: '많이 보는 것', c: [
       { k: 'google', t: '구글 검색어', i: '🔥', c: '#E8710A' },
       { k: 'yt', t: '유튜브 인기', i: '▶️', c: '#e62117' },
@@ -345,7 +346,7 @@
     if (k !== 'music' && typeof auStop === 'function') try { auStop(); } catch (e) {}
     cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
     var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
-    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, globe: globe, music: music, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
+    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, globe: globe, music: music, movie: movie, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
 
@@ -581,6 +582,41 @@
           li.querySelector('.pl').addEventListener('click', function () { if (this.classList.contains('on')) auStop(); else play(i); });
         });
       }).catch(function () { if (cur === 'music') $('muL').innerHTML = '<div class="msg">순위를 불러오지 못했어요. 잠시 뒤 다른 나라를 눌러 보세요.</div>'; });
+    }
+  }
+
+  // 🎬 영화 흥행 순위 — 나라 칩. 한국은 영화진흥위원회 공식 일별 순위, 다른 나라는 흥행 기사 + 공식 순위 사이트
+  var MV = [['kr', '🇰🇷 한국'], ['us', '🇺🇸 미국'], ['eu', '🇪🇺 유럽'], ['cn', '🇨🇳 중국'], ['jp', '🇯🇵 일본'], ['in', '🇮🇳 인도']];
+  var MVL = {
+    kr: [['KOBIS 박스오피스', '영화진흥위원회 공식', 'https://www.kobis.or.kr/kobis/business/stat/boxs/findDailyBoxOfficeList.do']],
+    us: [['Box Office Mojo', '북미 주말 순위', 'https://www.boxofficemojo.com/weekend/'], ['The Numbers', '북미 일별·주말', 'https://www.the-numbers.com/box-office-chart/weekend']],
+    eu: [['영국 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=GB'], ['프랑스 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=FR'], ['독일 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=DE']],
+    cn: [['마오얀 실시간', '중국 흥행 공식급', 'https://piaofang.maoyan.com/'], ['중국 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=CN']],
+    jp: [['일본 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=JP'], ['eiga.com 랭킹', '일본 영화 사이트', 'https://eiga.com/ranking/']],
+    in: [['인도 주말 순위', 'Box Office Mojo', 'https://www.boxofficemojo.com/intl/?area=IN']]
+  };
+  function man(n) { return n >= 10000 ? (Math.round(n / 1000) / 10) + '만' : n.toLocaleString('ko-KR'); }
+  function movie() {
+    var sel = ls('sava-movie') || 'kr'; if (!MVL[sel]) sel = 'kr';
+    pane.innerHTML = '<h2>🎬 영화 흥행 순위</h2><div class="src">나라별 지금 극장에서 가장 잘되는 영화</div>' + chips('mvC', MV, sel, '#5b2a86') + '<div id="mvL"><div class="msg">불러오는 중이에요…</div></div>';
+    onChip('mvC', function (v) { ls('sava-movie', v); load(v); });
+    load(sel);
+    function load(t) {
+      $('mvL').innerHTML = '<div class="msg">불러오는 중이에요…</div>';
+      api('movie&t=' + t).then(function (d) {
+        if (cur !== 'movie') return;
+        var h = '';
+        if (d.rank && d.rank.list.length) {
+          h += '<div class="sec">🏆 ' + esc(d.rank.day) + ' 관객 순위 (영화진흥위원회)</div><ul class="ml">' + d.rank.list.map(function (x) {
+            var mv = x.nw ? '<span style="color:#B3132B;font-weight:900">NEW</span>' : x.up > 0 ? '<span style="color:#B3132B">▲' + x.up + '</span>' : x.up < 0 ? '<span style="color:#1F6FB2">▼' + (-x.up) + '</span>' : '<span style="color:#999">-</span>';
+            return '<li style="grid-template-columns:26px 1fr auto"><em>' + x.r + '</em><div><b>' + esc(x.t) + '</b><small>하루 ' + man(x.a) + '명 · 누적 ' + man(x.acc) + '명' + (x.open ? ' · ' + esc(x.open) + ' 개봉' : '') + '</small></div><small style="font-size:14px">' + mv + '</small></li>';
+          }).join('') + '</ul>';
+        }
+        if (d.news && d.news.length) h += '<div class="sec">📰 ' + esc(d.h) + ' 흥행 소식</div>' + nlist(d.news);
+        h += '<div class="sec">📊 공식 순위 보기</div>' + links(MVL[t]);
+        h += '<p class="note">' + (t === 'kr' ? (d.needKey ? '한국 관객 순위표는 영화진흥위원회 공식 자료를 연결하면 바로 나와요(준비 중). 지금은 흥행 기사로 보여 드려요.' : '한국 순위는 영화진흥위원회 공식 자료(어제 하루 관객)예요.') : '이 나라는 무료 공식 순위 자료가 없어 한국어 흥행 기사로 모아 드려요. 정확한 순위표는 아래 공식 사이트에서 보세요.') + ' ' + esc(d.at) + ' 기준.</p>';
+        $('mvL').innerHTML = h;
+      }).catch(function () { if (cur === 'movie') $('mvL').innerHTML = '<div class="msg">불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.</div>' + links(MVL[t]); });
     }
   }
 

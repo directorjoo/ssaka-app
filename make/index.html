@@ -2200,6 +2200,8 @@
       toast('아직 비어 있어요: ' + miss.map(function (f) { return names[f]; }).join(', '));
       return;
     }
+    // 다시 고치는 중이면(미리보기·완성 화면에서 [고치기]): 디자인 비교 없이 고친 그대로 미리보기 (11-23 대표님)
+    if (fixing) { openFinalPv(); return; }
     // 다른 곳에도 올리는 중이면: 디자인은 방금 골랐으니 비교 없이 바로 마지막 확인으로
     if (madeDests.length && madeDests.indexOf(dest) < 0) { openFinalPv(); return; }
     openCompare();
@@ -2233,8 +2235,14 @@
     }
     $('pvModal').hidden = false;
   }
-  $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고칠 곳을 고친 뒤 다시 [✅ 완성]을 누르세요'); });
-  $('pvOk').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; openDone(); });
+  // 고치기 모드: 고친 뒤 [👀 고친 것 미리보기]를 누르면 바로 마지막 미리보기가 다시 뜸
+  var fixing = false;
+  function setFixing(on) {
+    fixing = on;
+    $('finish').textContent = on ? '👀 고친 것 미리보기' : '✅ 완성';
+  }
+  $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; setFixing(true); var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고친 뒤 아래 [👀 고친 것 미리보기]를 누르세요'); });
+  $('pvOk').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; setFixing(false); openDone(); });
   $('cmpModal').addEventListener('click', function (e) { if (e.target === this) closeCompare(); });
   // ---------- ✏️ 수정하기: 미리보기 카드에서 바로 고치는 모드 ----------
   function editMode(on) {
@@ -2248,11 +2256,13 @@
     var on = !this.classList.contains('on');
     if (on) { document.querySelector('.preview').scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('카드에서 고칠 글자를 누르세요'); }
     editMode(on);
+    // 다시 고치는 중에 [✓ 수정 끝]을 누르면 고친 그대로 미리보기
+    if (!on && fixing) setTimeout(function () { $('finish').click(); }, 150);
   });
   $('goPreview').addEventListener('click', function () {
     document.querySelector('.preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('keepEdit').addEventListener('click', function () { $('doneModal').hidden = true; });
+  $('keepEdit').addEventListener('click', function () { $('doneModal').hidden = true; setFixing(true); toast('고친 뒤 아래 [👀 고친 것 미리보기]를 누르세요'); });
   $('doneModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
   $('send2').addEventListener('click', function () { $('send').click(); });
   $('copy2').addEventListener('click', function () { $('copy').click(); });

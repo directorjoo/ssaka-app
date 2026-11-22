@@ -236,7 +236,9 @@
         .then(function (r) { return r.json(); }).then(function (j) { if (j.list) take(j); else throw new Error(j.error); });
     }
     // 총무님 문자는 비공개(🔒)일 때만 — 공개면 단톡방 공지에 바로 보이니 개인 문자로 넘기지 않음
-    function boss() { return pub === 0 && card.contact && card.contact.phone; }
+    // 11-23 대표님: 문자로만 넘어가지 말고 카톡으로 총무님께 보낼 수 있게 → 카톡(기본)·문자 고르기 창
+    function boss() { return pub === 0; }
+    function bossName() { var c = card.contact || {}; return c.name ? c.name + '님' : '총무님'; }
     function doneMsg(t) { toast(pub > 0 ? t + ' — 단톡방 싸바 공지에 바로 반영됐어요' : t); }
     copy.addEventListener('click', function () {
       var Y = yes(), N = list.filter(function (x) { return x.a === 'n'; });
@@ -253,7 +255,34 @@
         send({ op: 'del' }).then(function () { doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(errT);
       } else openSheet('n');
     });
-    function tellBoss(nm, what) { var b = boss(); if (b && live) setTimeout(function () { location.href = smsHref(b, '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + what + '\n싸바!'); }, 600); }
+    function tellBoss(nm, what) {
+      if (!boss() || !live) return;
+      var c = card.contact || {}, msg = '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + what + '\n싸바!';
+      var sh = el('div', 'sk-sheet'), bx = el('div', 'sk-sheet-box'), hd = el('div', 'sk-sheet-head'), xx = el('button', 'sk-x', '닫기'); xx.type = 'button';
+      sh.setAttribute('role', 'dialog'); sh.setAttribute('aria-modal', 'true'); sh.setAttribute('aria-label', bossName() + '께 알리기');
+      hd.appendChild(el('strong', '', '📨 ' + bossName() + '께 알릴까요?')); hd.appendChild(xx); bx.appendChild(hd);
+      var pv = el('p', 'sk-fine', msg); pv.style.whiteSpace = 'pre-line'; pv.style.fontSize = '15px'; bx.appendChild(pv);
+      var row = el('div', 'sk-ro-btns'); row.style.flexDirection = 'column';
+      var kb = el('button', 'sk-ro-join', '💬 카톡으로 보내기 (' + bossName() + ' 고르기)'); kb.type = 'button'; row.appendChild(kb);
+      var sb = null; if (c.phone) { sb = el('button', 'sk-ro-no', '✉️ 문자로 보내기 (' + bossName() + '께)'); sb.type = 'button'; row.appendChild(sb); }
+      bx.appendChild(row);
+      var skip = el('button', 'sk-ro-copy', '안 보낼게요 (명단에는 이미 기록됐어요)'); skip.type = 'button'; bx.appendChild(skip);
+      function shut() { sh.remove(); }
+      xx.addEventListener('click', shut); skip.addEventListener('click', shut); sh.addEventListener('click', function (ev) { if (ev.target === sh) shut(); });
+      kb.addEventListener('click', function () {
+        shut();
+        var url = location.href.replace(/([?&])rk=[^&#]*&?/, '$1').replace(/[?&]$/, '');
+        var fallback = function () {
+          if (navigator.share) navigator.share({ text: msg + '\n' + url }).catch(function () {});
+          else if (navigator.clipboard) navigator.clipboard.writeText(msg).then(function () { toast('복사했어요. 카톡에서 ' + bossName() + '께 붙여넣으세요'); });
+        };
+        if (window.SsakaKakao) window.SsakaKakao().then(function (K) {
+          K.Share.sendDefault({ objectType: 'text', text: msg.slice(0, 190), link: { mobileWebUrl: url, webUrl: url }, buttonTitle: '공지 보기' });
+        }).catch(fallback); else fallback();
+      });
+      if (sb) sb.addEventListener('click', function () { shut(); location.href = smsHref(c.phone, msg); });
+      sh.appendChild(bx); setTimeout(function () { root.appendChild(sh); }, 400);
+    }
     // 답장 쓰기(참석·불참 시트)에서 부르는 것: 못 가요·아직 몰라요도 명단·통계에 자동 기록
     function answer(a, n, w) {
       if (!n) return Promise.reject(new Error('name'));
@@ -309,7 +338,7 @@
       var b0 = boss(), smsOn = null;
       if (b0) {
         var sw = el('label', 'sk-ro-sms'); smsOn = document.createElement('input'); smsOn.type = 'checkbox'; smsOn.checked = true;
-        sw.appendChild(smsOn); sw.appendChild(document.createTextNode(' ' + (card.contact.name ? card.contact.name + '님' : '총무님') + '께 문자로도 알리기'));
+        sw.appendChild(smsOn); sw.appendChild(document.createTextNode(' ' + bossName() + '께도 알리기 (카톡·문자 골라요)'));
         form.appendChild(sw);
       } else if (pub > 0) form.appendChild(el('p', 'sk-fine', '✅ 저장하면 단톡방 싸바 공지에 바로 보여요 — 총무님께 따로 안 보내도 돼요'));
       bx.appendChild(form);

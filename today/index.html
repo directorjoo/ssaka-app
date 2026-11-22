@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
   <meta name="theme-color" content="#B3132B">
-  <title>오늘 꼭 볼 정보 · 뉴스 · 날씨 · 혜택 알리미 · SNS 만들기 · 보험 점검 · 축제</title>
-  <meta property="og:title" content="☀️ 오늘 꼭 볼 정보 — 뉴스 요약 · 날씨 · 인기 검색어 · 건강 · 정부 혜택">
+  <title>싸바 브리핑 · 뉴스 · 날씨 · 혜택 알리미 · SNS 만들기 · 보험 점검 · 축제</title>
+  <meta property="og:title" content="☀️ 싸바 브리핑 — 뉴스 요약 · 날씨 · 인기 검색어 · 건강 · 정부 혜택">
   <meta property="og:description" content="매일 보는 생활 채널을 싸바 안에서 한 번에. 대표님용 아침 뉴스 3줄, 우리 동네 날씨·미세먼지, 오늘의 인기 검색어, 어르신 건강, 정부 혜택.">
   <meta property="og:url" content="https://sava.kr/today/">
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
@@ -189,7 +189,7 @@
     .stk span, .pane .src span { font-size: 15px; font-weight: 800; }
     .up { color: #C62828; } .dn { color: #1D5FD1; }
     .sth { margin: 16px 0 8px; font-size: 17px; font-weight: 900; }
-    /* 11-22 오늘 꼭 볼 정보 묶음 상자 — 업종 9색 상자와 같은 틀(머리 띠 진한 색+흰 글씨+그림자, 같은 색 연한 바탕, 2px 테두리, 상자 사이 14px). 고르기 화면이라 '한 화면 2~3색' 예외 */
+    /* 11-22 싸바 브리핑 묶음 상자 — 업종 9색 상자와 같은 틀(머리 띠 진한 색+흰 글씨+그림자, 같은 색 연한 바탕, 2px 테두리, 상자 사이 14px). 고르기 화면이라 '한 화면 2~3색' 예외 */
     .circles { padding: 8px 14px 6px; }
     .grp { margin: 0 0 14px; padding: 0 6px 10px; border-radius: 20px; overflow: hidden; background: var(--bx); border: 2px solid var(--bl); box-shadow: 0 8px 18px -14px rgba(60,30,20,.5); }
     .grp:last-child { margin-bottom: 0; }
@@ -219,7 +219,7 @@
 <div class="w">
   <!-- 11-21 밤 DESIGN 원칙 2·7: 머리말 → 혜택 두 줄 제목 → 유리 판(그 자리에서 ▾ 펼침) -->
   <section class="hero">
-    <div class="hx"><em>☀️ 오늘 꼭 볼 정보 · <span id="date"></span></em><h1>검색 안 해도,<br>오늘 소식이 다 와요</h1></div>
+    <div class="hx"><em>☀️ 싸바 브리핑 · <span id="date"></span></em><h1>모르면 손해,<br>아는 사람만 챙겨요!</h1></div>
     <div class="glass" id="glass">
       <button type="button" class="gl-h" id="glH" aria-expanded="false" aria-controls="glB"><span class="gl-s"><b id="glW">☀️ 날씨 불러오는 중…</b><small id="glM">최고·최저 · 미세먼지</small></span><i aria-hidden="true">▾</i></button>
       <div class="gl-b" id="glB" hidden></div>
@@ -842,7 +842,7 @@
   var SENDT = { biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에' };
   function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
   $('send').addEventListener('click', function () {
-    var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '오늘 꼭 볼 정보' };
+    var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '싸바 브리핑' };
     var info = { title: xx.i + ' ' + xx.t + ' · 싸바', description: SENDT[cur] || '매일 보는 생활 정보를 싸바 안에서 한 번에', url: link(), imageUrl: 'https://sava.kr/img/today-share.jpg?v=1', imageWidth: 800, imageHeight: 400, buttonTitle: '이 화면 열기', noButtons: true };
     if (window.SsakaShare) window.SsakaShare(info);
     else if (navigator.share) navigator.share({ title: info.title, text: info.description, url: info.url }).catch(function () {});

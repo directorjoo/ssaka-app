@@ -63,6 +63,15 @@
     });
     fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
       if (j && j.user) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; acct.href = '/join/'; }
+      // 11-23: 로그인이 풀리거나 다른 계정이면 관리자 칸이 통째로 사라져 헷갈림 → 이 폰에서 한 번이라도 관리자였으면 '다시 로그인' 줄을 남김
+      var seen = false; try { if (j && j.admin) localStorage.setItem('sava-admin-seen', '1'); seen = localStorage.getItem('sava-admin-seen') === '1'; } catch (e) {}
+      if (j && !j.admin && seen) {
+        admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
+        var re = el('a', 'sv-row', j.user ? '🔐 관리자 계정으로 다시 로그인' : '🔐 관리자 로그인 (카카오)'); re.href = '/api/auth/kakao?next=' + encodeURIComponent(location.pathname + location.search);
+        re.appendChild(el('span', '', j.user ? '지금은 회원번호 ' + j.user.id + ' — 관리자 아님' : '로그인이 풀렸어요')); admin.appendChild(re);
+        var ak = el('a', 'sv-row', '🔑 싸바 관리자 화면'); ak.href = '/admin/'; ak.appendChild(el('span', '', '관리 비밀번호로도 들어가요')); admin.appendChild(ak);
+      }
+      if (j && !j.admin && !seen) { var gk = el('a', 'sv-row', '🔐 관리자 확인'); gk.href = '/admin/'; gk.appendChild(el('span', '', '대표 전용')); box.appendChild(gk); }
       if (j && j.admin) {
         admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
         [['🔑 싸바 관리자 화면', '/admin/', '경영·디자인·Claude 요청'], ['💡 의견 관리', '/idea/admin/', '채택·쿠폰'], ['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {

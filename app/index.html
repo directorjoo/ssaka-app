@@ -1491,6 +1491,14 @@
         var ad = el('a', ''); ad.href = '/admin/'; ad.appendChild(document.createTextNode('🔑 싸바 관리자 화면')); ad.appendChild(el('span', '', '대표 전용'));
         if (j.admin) { acct.insertAdjacentElement('afterend', od); acct.insertAdjacentElement('afterend', ad); }
       }
+      // 11-23: 이 폰에서 관리자였는데 지금 아니면(로그인 풀림·다른 계정) '다시 로그인' 줄을 남김
+      var seen = false; try { if (j && j.admin) localStorage.setItem('sava-admin-seen', '1'); seen = localStorage.getItem('sava-admin-seen') === '1'; } catch (e) {}
+      if (j && !j.admin && seen) {
+        var re = el('a', ''); re.href = '/api/auth/kakao?next=' + encodeURIComponent('/app/');
+        re.appendChild(document.createTextNode(j.user ? '🔐 관리자 계정으로 다시 로그인' : '🔐 관리자 로그인')); re.appendChild(el('span', '', j.user ? '지금 회원번호 ' + j.user.id + ' · 관리자 아님' : '로그인이 풀렸어요'));
+        var ak = el('a', ''); ak.href = '/admin/'; ak.appendChild(document.createTextNode('🔑 싸바 관리자 화면')); ak.appendChild(el('span', '', '비밀번호로도 들어가요'));
+        acct.insertAdjacentElement('afterend', ak); acct.insertAdjacentElement('afterend', re);
+      } else if (j && !j.admin) { var gk = el('a', ''); gk.href = '/admin/'; gk.appendChild(document.createTextNode('🔐 관리자 확인')); gk.appendChild(el('span', '', '대표 전용')); m.appendChild(gk); }
     }).catch(function () {});
     [['💡 의견 보내기 · 채택되면 7,000원 쿠폰', '../idea/', '순천만'], ['만들기 화면', '../make/', '새 카드'], ['카드 예시 보기', '../demo/?card=actor', '샘플'], ['싸바 이야기', '../?story=1', '싸바 소개'], ['개인정보처리방침', '../privacy/', ''], ['이용약관', '../terms/', '']].forEach(function (x) {
       var a = el('a', ''); a.href = x[1]; a.appendChild(document.createTextNode(x[0])); a.appendChild(el('span', '', x[2])); m.appendChild(a);
@@ -1593,6 +1601,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
-<script src="/js/home.js?v=13" defer data-bar="0"></script>
+<script src="/js/home.js?v=14" defer data-bar="0"></script>
 </body>
 </html>

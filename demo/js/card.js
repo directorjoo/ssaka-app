@@ -785,6 +785,17 @@
         var msg = '[' + (card.title || '모임') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n' + who + ' — ' + o[1].replace(/^\S+\s/, '') + (note ? '\n💬 ' + note : '') + '\n싸바!';
         // 참석이고 카드에 참석 명단이 있으면 명단에 바로 올리기 (번호 자동)
         if (o[0] === 'yes' && card.roster) { shut(); var jb = root.querySelector('.sk-ro-join'); if (jb) { jb.scrollIntoView({ block: 'center' }); jb.click(); return; } }
+        // 못 가요·아직 몰라요도 참석 명단·통계에 자동 기록 (11-23). 공개 명단이면 단톡방 공지에 바로 보이니
+        // 총무 개인 문자로 넘기지 않고 끝 — 🔒 비공개 명단일 때만 아래 '어디로 보낼까요?'로 이어짐
+        if (o[0] !== 'yes' && card.roster && window.SsakaRoster && SsakaRoster.answer && window.self === window.top) {
+          var rec = SsakaRoster.answer(o[0] === 'no' ? 'n' : 'm', who, note || o[1].replace(/^\S+\s/, ''));
+          if (SsakaRoster.pub && SsakaRoster.pub() > 0) {
+            rec.then(function () { shut(); toast((o[0] === 'no' ? '불참' : '아직 몰라요') + '로 알렸어요 — 단톡방 싸바 공지에 바로 반영됐어요'); var rb = root.querySelector('.sk-roster'); if (rb) rb.scrollIntoView({ block: 'center' }); })
+              .catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+            return;
+          }
+          rec.catch(function () {});
+        }
         // 어디로 보낼지 고르기: 카톡(기본) 또는 문자
         box.innerHTML = '';
         var h2 = document.createElement('div'); h2.className = 'sk-sheet-head';
@@ -816,7 +827,8 @@
       row.appendChild(b);
     });
     box.appendChild(row);
-    var fine = document.createElement('p'); fine.className = 'sk-fine'; fine.textContent = '고른 뒤 카톡(모임방이나 ' + (c.name ? c.name + '님' : '총무') + ')이나 문자로 보낼 수 있어요.';
+    var fine = document.createElement('p'); fine.className = 'sk-fine';
+    fine.textContent = card.roster && window.SsakaRoster && SsakaRoster.pub && SsakaRoster.pub() > 0 ? '고르면 단톡방 싸바 공지의 참석 명단에 바로 반영돼요 (총무님께 따로 안 보내도 돼요).' : '고른 뒤 카톡(모임방이나 ' + (c.name ? c.name + '님' : '총무') + ')이나 문자로 보낼 수 있어요.' + (card.roster ? ' 참석·불참은 명단에도 자동으로 기록돼요.' : '');
     box.appendChild(fine);
     function shut() { sheet.remove(); document.removeEventListener('keydown', esc); }
     function esc(e) { if (e.key === 'Escape') shut(); }

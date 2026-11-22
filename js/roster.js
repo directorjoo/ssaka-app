@@ -25,17 +25,21 @@
   }
   function people(list) { return list.reduce(function (a, x) { return a + 1 + (x.p || 0); }, 0); }
 
+  // 공개 방식 (11-23 대표님: 모임은 단톡방 기준 — 고치면 단톡방 싸바 공지에 바로 보이게, 총무 개인 문자로 안 넘어가게)
+  //   2 🌐 모두 공개: 누구나 참석자 이름·인원·통계 (전화번호는 주최자만)  1 🔢 인원만 공개  0 🔒 나만 보기(비공개 — 총무 문자 알림 그대로)
+  // 서버(roster_meta.pub)가 기준. 카드의 R.pub(만들 때 고른 것)은 처음 주인 정할 때만 씀
+  var MODES = [[2, '🌐 모두 공개', '단톡방 누구나 참석자·인원을 봐요'], [1, '🔢 인원만 공개', '숫자만 보이고 이름은 나만'], [0, '🔒 나만 보기', '참석자는 모임 연 분만 봐요']];
   function mount(card, root, toast) {
     var R = card.roster; if (!R || !/^[a-z0-9]{8,16}$/.test(R.id || '')) return;
     toast = toast || function (m) { try { alert(m); } catch (e) {} };
-    // 비공개 명단: 주최자 열쇠(rk)는 링크 끝 &rk=… 이나 이 휴대폰에 저장된 것
-    var hk = '', priv = !!R.priv, isOwner = false, srvCount = 0, srvPeople = 0;
+    var hk = '', isOwner = false, pub = R.pub != null ? R.pub | 0 : (R.priv ? 0 : 2), st = { count: 0, people: 0, no: 0, maybe: 0 };
     try { var qk = new URLSearchParams(location.search).get('rk'); if (qk && /^[a-z0-9]{16,32}$/.test(qk)) localStorage.setItem('sava-roster-key-' + R.id, qk); hk = localStorage.getItem('sava-roster-key-' + R.id) || ''; } catch (e) {}
     var tok = tokOf(R.id), stops = (R.st || []).filter(Boolean).slice(0, 8), list = [], live = window.self === window.top;
     // 카톡방에서 이미 받은 명단(총무가 붙여넣은 것)을 앞에 두고, 싸바로 신청한 사람을 뒤에 이어 붙임
-    var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1 }; });
+    var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1, a: 'y' }; });
+    function seeAll() { return isOwner || pub === 2; }
     function merge(srv) {
-      if (!isOwner) return srv.filter(function (x) { return x.me; }); // 남의 이름은 주최자만 (받은 사람은 내 신청만)
+      if (!seeAll()) return srv.filter(function (x) { return x.me; }); // 남의 이름은 주최자만 (공개가 아니면 내 것만)
       var used = {}, outL = pre.map(function (x) {
         for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; return srv[k]; }
         return x;
@@ -43,54 +47,94 @@
       srv.forEach(function (x, k) { if (!used[k]) outL.push(x); });
       return outL;
     }
+    function yes() { return list.filter(function (x) { return x.a !== 'n' && x.a !== 'm'; }); }
     var box = el('section', 'sk-roster'); box.setAttribute('aria-label', '참석 신청');
     var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 신청'), cnt = el('span', 'sk-ro-cnt', '');
     head.appendChild(ttl); head.appendChild(cnt); box.appendChild(head);
+    var stat = el('div', 'sk-ro-stat'); box.appendChild(stat);
+    var mode = el('div', 'sk-ro-mode'); mode.setAttribute('role', 'group'); mode.setAttribute('aria-label', '참석자 공개 방식'); box.appendChild(mode);
     var myLine = el('p', 'sk-ro-mine'); myLine.hidden = true; box.appendChild(myLine);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
     var ol = el('ol', 'sk-ro-list'); box.appendChild(ol);
+    var nos = el('div', 'sk-ro-nos'); box.appendChild(nos);
     var btns = el('div', 'sk-ro-btns');
     var join = el('button', 'sk-ro-join', '🙋 참석할게요'); join.type = 'button'; btns.appendChild(join);
     var nogo = el('button', 'sk-ro-no', '🙅 못 가요'); nogo.type = 'button'; btns.appendChild(nogo);
     box.appendChild(btns);
     var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button'; box.appendChild(copy);
     var fine = el('p', 'sk-fine', ''); box.appendChild(fine);
+    MODES.forEach(function (m) {
+      var b = el('button', '', m[1]); b.type = 'button'; b.dataset.p = m[0];
+      b.addEventListener('click', function () {
+        if (!live) { toast('미리보기에선 바꿀 수 없어요'); return; }
+        fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok, pub: m[0], set: 1 }) })
+          .then(function (r) { return r.json(); }).then(function (j) { if (j.list) { take(j); toast(m[1] + '로 바꿨어요 — ' + m[2]); } else throw 0; })
+          .catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+      });
+      mode.appendChild(b);
+    });
 
     function draw() {
-      var mine = list.filter(function (x) { return x.me; })[0];
+      var mine = list.filter(function (x) { return x.me; })[0], Y = yes(), N = list.filter(function (x) { return x.a === 'n'; }), M = list.filter(function (x) { return x.a === 'm'; });
+      var nP = people(Y), cN = Y.length, cNo = N.length, cM = M.length;
+      if (!seeAll()) { cN = st.count; nP = st.people; cNo = st.no; cM = st.maybe; }
       box.classList.toggle('host', isOwner);
+      box.classList.toggle('pub', pub > 0);
+      var showStat = isOwner || pub > 0;
       if (isOwner) {
-        var all = list, nN = all.length, nP = people(all);
-        ttl.textContent = '🔒 참석 명단 · 나만 보여요';
-        cnt.textContent = nN ? nN + '명 신청 · 총 ' + nP + '명' : '아직 신청한 사람이 없어요';
-        fine.textContent = '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. 전화번호를 누르면 바로 걸려요.';
+        ttl.textContent = pub === 2 ? '🌐 참석 명단 · 단톡방 모두 보여요' : pub === 1 ? '🔢 참석 명단 · 인원만 공개' : '🔒 참석 명단 · 나만 보여요';
+        fine.textContent = (pub === 0 ? '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. ' : '고치거나 취소하면 단톡방 싸바 공지에 바로 반영돼요. ') + '전화번호는 모임 연 분만 보고, 누르면 바로 걸려요.';
+      } else if (pub === 2) {
+        ttl.textContent = '🙋 참석 신청 · 단톡방 모두 보여요';
+        fine.textContent = '신청·고치기·취소는 이 공지에 바로 반영돼요 (총무님께 따로 안 보내도 돼요). 전화번호는 모임 연 분만 봐요.';
+      } else if (pub === 1) {
+        ttl.textContent = '🙋 참석 여부를 알려 주세요';
+        fine.textContent = '인원은 모두 보이고, 참석자 이름은 모임 연 분만 봐요. 고치면 바로 반영돼요.';
       } else {
         ttl.textContent = '🙋 참석 여부를 알려 주세요';
-        cnt.textContent = '';
-        fine.textContent = '참석자 명단은 모임을 연 분만 볼 수 있어요.';
+        fine.textContent = '참석자 명단은 모임 연 분만 볼 수 있어요. 못 가요·취소도 명단에 자동으로 기록돼요.';
       }
+      cnt.textContent = showStat && !cN && !cNo && !cM ? '아직 신청한 사람이 없어요' : '';
+      stat.innerHTML = '';
+      stat.style.display = showStat && (cN || cNo || cM) ? '' : 'none';
+      if (showStat) {
+        stat.appendChild(el('span', 'y', '🙋 참석 ' + cN + '명' + (nP > cN ? ' · 총 ' + nP + '명' : '')));
+        stat.appendChild(el('span', 'n', '🙅 불참 ' + cNo));
+        if (cM) stat.appendChild(el('span', 'm', '🤔 미정 ' + cM));
+      }
+      mode.style.display = isOwner ? '' : 'none';
+      mode.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', +b.dataset.p === pub); b.setAttribute('aria-pressed', +b.dataset.p === pub ? 'true' : 'false'); });
       myLine.hidden = !mine || isOwner;
-      if (mine) myLine.textContent = '✅ 참석 신청했어요: ' + line(mine, 0).replace(/^\d+\./, '');
-      join.textContent = mine ? '✏️ 내 신청 고치기' : '🙋 참석할게요';
-      nogo.textContent = mine ? '🙅 신청 취소' : '🙅 못 가요';
+      if (mine) myLine.textContent = mine.a === 'n' ? '🙅 불참으로 알렸어요' + (mine.w ? ' · ' + mine.w : '') : mine.a === 'm' ? '🤔 아직 몰라요로 알렸어요' : '✅ 참석 신청했어요: ' + line(mine, 0).replace(/^\d+\./, '');
+      var going = mine && mine.a !== 'n' && mine.a !== 'm';
+      join.textContent = going ? '✏️ 내 신청 고치기' : '🙋 참석할게요';
+      nogo.textContent = going ? '🙅 신청 취소' : mine && mine.a === 'n' ? '✏️ 한마디 고치기' : '🙅 못 가요';
       byStop.innerHTML = '';
-      if (isOwner && stops.length && list.length) stops.forEach(function (s) {
-        var n = people(list.filter(function (x) { return x.s && shortStop(x.s) === shortStop(s); }));
+      if (seeAll() && stops.length && Y.length) stops.forEach(function (s) {
+        var n = people(Y.filter(function (x) { return x.s && shortStop(x.s) === shortStop(s); }));
         byStop.appendChild(el('span', '', shortStop(s) + ' ' + n + '명'));
       });
       ol.innerHTML = '';
-      ol.hidden = !isOwner;
-      if (isOwner) list.forEach(function (x, i) {
+      if (seeAll()) Y.forEach(function (x, i) {
         var li = el('li', x.me ? 'me' : '', line(x, i));
-        if (x.ph) { var a = el('a', 'sk-ro-ph', x.ph); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); li.appendChild(document.createTextNode(' ')); li.appendChild(a); }
+        if (x.w) li.appendChild(el('small', 'sk-ro-w', ' 💬 ' + x.w));
+        if (isOwner && x.ph) { var a = el('a', 'sk-ro-ph', x.ph); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); li.appendChild(document.createTextNode(' ')); li.appendChild(a); }
         ol.appendChild(li);
       });
-      copy.style.display = isOwner && list.length ? '' : 'none';
+      nos.innerHTML = '';
+      if (seeAll()) [[N, '🙅 불참'], [M, '🤔 미정']].forEach(function (g) {
+        if (!g[0].length) return;
+        var p = el('p', '', ''); p.appendChild(el('b', '', g[1] + ' ' + g[0].length + ' · '));
+        p.appendChild(document.createTextNode(g[0].map(function (x) { return x.n + (x.g ? x.g : '') + (x.w ? '(' + x.w + ')' : ''); }).join(', ')));
+        if (isOwner) g[0].forEach(function (x) { if (x.ph) { var a = el('a', 'sk-ro-ph', ' ' + x.n + ' ☎'); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); p.appendChild(a); } });
+        nos.appendChild(p);
+      });
+      copy.style.display = seeAll() && Y.length ? '' : 'none';
       btns.style.display = isOwner ? 'none' : '';
-      ol.style.display = isOwner ? '' : 'none';
+      ol.style.display = seeAll() ? '' : 'none';
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
-    function take(j) { isOwner = !!j.owner; srvCount = j.count || 0; srvPeople = j.people || 0; list = merge(j.list || []); draw(); }
+    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0 }; list = merge(j.list || []); draw(); }
     function load() {
       return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
         .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
@@ -100,48 +144,58 @@
       return fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ tok: tok, hk: hk || undefined }, o)) })
         .then(function (r) { return r.json(); }).then(function (j) { if (j.list) take(j); else throw new Error(j.error); });
     }
+    // 총무님 문자는 비공개(🔒)일 때만 — 공개면 단톡방 공지에 바로 보이니 개인 문자로 넘기지 않음
+    function boss() { return pub === 0 && card.contact && card.contact.phone; }
+    function doneMsg(t) { toast(pub > 0 ? t + ' — 단톡방 싸바 공지에 바로 반영됐어요' : t); }
     copy.addEventListener('click', function () {
-      var t = [card.title || '참석 명단', '—참석자명단'].concat(list.map(line)).join('\n') + '\n(싸바에서 자동 정리 · 총 ' + people(list) + '명)';
+      var Y = yes(), N = list.filter(function (x) { return x.a === 'n'; });
+      var t = [card.title || '참석 명단', '—참석자명단'].concat(Y.map(line)).join('\n') + (N.length ? '\n—불참 ' + N.length + ': ' + N.map(function (x) { return x.n; }).join(', ') : '') + '\n(싸바에서 자동 정리 · 참석 총 ' + people(Y) + '명)';
       var done = function () { toast('명단을 복사했어요. 카톡방에 붙여넣으세요'); };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(done, function () { prompt('복사하세요', t); });
       else prompt('복사하세요', t);
     });
-    join.addEventListener('click', function () { openSheet(); });
+    join.addEventListener('click', function () { openSheet('y'); });
     nogo.addEventListener('click', function () {
-      var mine = list.filter(function (x) { return x.me; })[0], boss = card.contact && card.contact.phone;
-      var tell = function (nm) { if (boss && live) setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + '이번에는 참석이 어려워요 🙏\n싸바!'); }, 500); };
-      if (mine) {
-        if (!confirm('참석 신청을 취소할까요?')) return;
-        send({ op: 'del' }).then(function () { toast('신청을 취소했어요'); tell(mine.n); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
-      } else {
-        var nm = ''; try { nm = localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
-        toast(boss ? '못 간다고 문자로 알려 드릴게요' : '알려 주셔서 고마워요'); tell(nm);
-      }
+      var mine = list.filter(function (x) { return x.me; })[0];
+      if (mine && mine.a !== 'n' && mine.a !== 'm') {
+        if (!confirm('참석 신청을 취소할까요? (불참으로 기록돼요)')) return;
+        send({ op: 'del' }).then(function () { doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+      } else openSheet('n');
     });
-    // 카드 주인 화면: 명단을 '나만 보기'로 잠그고 다시 불러오기 (예전에 만든 공개 명단도)
+    function tellBoss(nm, what) { var b = boss(); if (b && live) setTimeout(function () { location.href = smsHref(b, '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + what + '\n싸바!'); }, 600); }
+    // 답장 쓰기(참석·불참 시트)에서 부르는 것: 못 가요·아직 몰라요도 명단·통계에 자동 기록
+    function answer(a, n, w) {
+      if (!n) return Promise.reject(new Error('name'));
+      var mine = list.filter(function (x) { return x.me; })[0] || {};
+      return send({ op: 'add', a: a, n: n, w: w || '', g: mine.g || '' }).then(function () { return pub; });
+    }
+    // 카드 주인 화면: 명단 주인 정하기 (열쇠가 없으면 만들어 둠) — 공개 방식은 그대로
     global.SsakaRoster.own = function () {
       if (!live) return;
       try { if (!hk) { hk = rnd(24); localStorage.setItem('sava-roster-key-' + R.id, hk); } } catch (e) {}
       fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok }) }).then(load, load);
     };
+    global.SsakaRoster.answer = answer;
+    global.SsakaRoster.pub = function () { return pub; };
 
-    function openSheet() {
-      var mine = list.filter(function (x) { return x.me; })[0] || {};
-      var sheet = el('div', 'sk-sheet'); sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '참석 신청');
+    function openSheet(kind) {
+      var mine = list.filter(function (x) { return x.me; })[0] || {}, isNo = kind === 'n';
+      var sheet = el('div', 'sk-sheet'); sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', isNo ? '불참 알리기' : '참석 신청');
       var bx = el('div', 'sk-sheet-box'), hd = el('div', 'sk-sheet-head'), x = el('button', 'sk-x', '닫기'); x.type = 'button';
-      hd.appendChild(el('strong', '', '🙋 참석 신청')); hd.appendChild(x); bx.appendChild(hd);
+      hd.appendChild(el('strong', '', isNo ? '🙅 이번엔 못 가요' : '🙋 참석 신청')); hd.appendChild(x); bx.appendChild(hd);
       var form = el('div', 'sk-rform');
       function field(label, inp) { var l = el('label', 'sk-f'); l.appendChild(el('span', 'sk-f-l', label)); l.appendChild(inp); form.appendChild(l); return inp; }
       var nm = document.createElement('input'); nm.maxLength = 12; nm.autocomplete = 'name'; nm.placeholder = '홍길동';
       try { nm.value = mine.n || localStorage.getItem('ssaka-my-name') || ''; } catch (e) {}
       field('이름', nm);
-      var ph = document.createElement('input'); ph.type = 'tel'; ph.inputMode = 'tel'; ph.maxLength = 20; ph.autocomplete = 'tel'; ph.placeholder = '010-0000-0000';
-      try { ph.value = mine.ph || localStorage.getItem('sava-my-phone') || ''; } catch (e) {}
-      field('전화번호 (모임 연 분만 봐요)', ph);
-      var gs = null;
+      var ph = null, gs = null, stSel = null, plus = mine.p || 0, wv = null;
+      if (!isNo) {
+        ph = document.createElement('input'); ph.type = 'tel'; ph.inputMode = 'tel'; ph.maxLength = 20; ph.autocomplete = 'tel'; ph.placeholder = '010-0000-0000';
+        try { ph.value = mine.ph || localStorage.getItem('sava-my-phone') || ''; } catch (e) {}
+        field('전화번호 (모임 연 분만 봐요, 선택)', ph);
+      }
       if (R.g) { gs = document.createElement('input'); gs.maxLength = 6; gs.inputMode = 'numeric'; gs.placeholder = '예: 28'; try { gs.value = mine.g || localStorage.getItem('sava-my-gisu') || ''; } catch (e) {} field('기수 (선택)', gs); }
-      var stSel = null;
-      if (stops.length) {
+      if (!isNo && stops.length) {
         stSel = document.createElement('select');
         stops.forEach(function (s) { var o = el('option', '', s); o.value = s; stSel.appendChild(o); });
         var o2 = el('option', '', '직접 가요 · 현장 합류'); o2.value = ''; stSel.appendChild(o2);
@@ -149,34 +203,40 @@
         stSel.style.cssText = 'width:100%;min-height:48px;font:inherit;font-size:16px;border-radius:12px;padding:0 10px;border:1.5px solid var(--line-ink);background:var(--paper);color:var(--ink)';
         field('어디서 타세요?', stSel);
       }
-      var plus = mine.p || 0, out = el('output', '', '+' + plus), step = el('div', 'sk-step sm');
-      var mi = el('button', '', '−'), pl = el('button', '', '+'); mi.type = pl.type = 'button';
-      mi.addEventListener('click', function () { plus = Math.max(0, plus - 1); out.textContent = '+' + plus; });
-      pl.addEventListener('click', function () { plus = Math.min(9, plus + 1); out.textContent = '+' + plus; });
-      step.appendChild(mi); step.appendChild(out); step.appendChild(pl);
-      var sl = el('div', 'sk-f'); sl.appendChild(el('span', 'sk-f-l', '함께 오는 가족·동반 (나 빼고)')); sl.appendChild(step); form.appendChild(sl);
-      // 총무님께 문자로도 알리기 (내 휴대폰 문자앱이 열리고, 보내기만 누르면 됨)
-      var boss = card.contact && card.contact.phone, smsOn = null;
-      if (boss) {
+      if (!isNo) {
+        var out = el('output', '', '+' + plus), step = el('div', 'sk-step sm');
+        var mi = el('button', '', '−'), pl = el('button', '', '+'); mi.type = pl.type = 'button';
+        mi.addEventListener('click', function () { plus = Math.max(0, plus - 1); out.textContent = '+' + plus; });
+        pl.addEventListener('click', function () { plus = Math.min(9, plus + 1); out.textContent = '+' + plus; });
+        step.appendChild(mi); step.appendChild(out); step.appendChild(pl);
+        var sl = el('div', 'sk-f'); sl.appendChild(el('span', 'sk-f-l', '함께 오는 가족·동반 (나 빼고)')); sl.appendChild(step); form.appendChild(sl);
+      }
+      wv = document.createElement('input'); wv.maxLength = 40; wv.placeholder = isNo ? '예: 집안 행사가 있어요 / 다음엔 꼭 갈게요' : '예: 30분 늦어요';
+      wv.value = mine.w || '';
+      field('한마디 (선택' + (pub === 2 ? ' · 단톡방에 보여요' : '') + ')', wv);
+      // 총무님께 문자로도 알리기 — 🔒 비공개 공지일 때만 (공개면 공지에 바로 보이니 필요 없음)
+      var b0 = boss(), smsOn = null;
+      if (b0) {
         var sw = el('label', 'sk-ro-sms'); smsOn = document.createElement('input'); smsOn.type = 'checkbox'; smsOn.checked = true;
         sw.appendChild(smsOn); sw.appendChild(document.createTextNode(' ' + (card.contact.name ? card.contact.name + '님' : '총무님') + '께 문자로도 알리기'));
         form.appendChild(sw);
-      }
+      } else if (pub > 0) form.appendChild(el('p', 'sk-fine', '✅ 저장하면 단톡방 싸바 공지에 바로 보여요 — 총무님께 따로 안 보내도 돼요'));
       bx.appendChild(form);
-      var ok = el('button', 'sk-ro-join', mine.n ? '✅ 고친 내용으로 저장' : '✅ 참석할게요'); ok.type = 'button'; ok.style.marginTop = '16px'; bx.appendChild(ok);
-      if (mine.n) { var del = el('button', 'sk-ro-copy', '이번엔 못 가요 (신청 취소)'); del.type = 'button'; bx.appendChild(del);
-        del.addEventListener('click', function () { send({ op: 'del' }).then(function () { shut(); toast('신청을 취소했어요'); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); }); }); }
+      var going = mine.n && mine.a !== 'n' && mine.a !== 'm';
+      var ok = el('button', isNo ? 'sk-ro-no' : 'sk-ro-join', isNo ? '🙅 불참으로 알리기' : going ? '✅ 고친 내용으로 저장' : '✅ 참석할게요'); ok.type = 'button'; ok.style.marginTop = '16px'; ok.style.width = '100%'; bx.appendChild(ok);
+      if (going && !isNo) { var del = el('button', 'sk-ro-copy', '이번엔 못 가요 (신청 취소)'); del.type = 'button'; bx.appendChild(del);
+        del.addEventListener('click', function () { send({ op: 'del' }).then(function () { shut(); doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); }); }); }
       ok.addEventListener('click', function () {
         var n = nm.value.trim(); if (!n) { toast('이름을 적어주세요'); nm.focus(); return; }
-        var g = gs ? gs.value.trim().replace(/기$/, '') : '', s = stSel ? stSel.value : '';
-        var phv = ph.value.trim();
+        var g = gs ? gs.value.trim().replace(/기$/, '') : '', s = stSel ? stSel.value : '', w = wv.value.trim();
+        var phv = ph ? ph.value.trim() : '';
         try { localStorage.setItem('ssaka-my-name', n); if (phv) localStorage.setItem('sava-my-phone', phv); if (g) localStorage.setItem('sava-my-gisu', g); if (s) localStorage.setItem('sava-my-stop', s); } catch (e) {}
         ok.disabled = true;
-        send({ op: 'add', n: n, ph: phv, g: g, s: s, p: plus }).then(function () {
-          shut(); toast(mine.n ? '고쳤어요' : '참석 신청했어요! 싸바 🙌');
-          if (smsOn && smsOn.checked && live) {
-            var me = list.map(function (x, i) { return x.me ? line(x, i) : null; }).filter(Boolean)[0] || n;
-            setTimeout(function () { location.href = smsHref(boss, '[' + (card.title || '참석') + ']\n' + me + ' ' + (mine.n ? '신청 내용 고쳤어요' : '참석합니다') + '' + '\n싸바!'); }, 600);
+        send({ op: 'add', a: isNo ? 'n' : 'y', n: n, ph: phv, g: g, s: s, p: isNo ? 0 : plus, w: w }).then(function () {
+          shut(); doneMsg(isNo ? '불참으로 알렸어요' : going ? '고쳤어요' : '참석 신청했어요! 싸바 🙌');
+          if (smsOn && smsOn.checked) {
+            var me = isNo ? n : (yes().map(function (x, i) { return x.me ? line(x, i) : null; }).filter(Boolean)[0] || n);
+            tellBoss(me, (isNo ? '이번에는 참석이 어려워요 🙏' : going ? '신청 내용 고쳤어요' : '참석합니다') + (w ? '\n💬 ' + w : ''));
           }
         })
           .catch(function () { ok.disabled = false; toast('잠시 뒤 다시 눌러 주세요'); });
@@ -190,7 +250,8 @@
 
     var anchor = root.querySelector('.sk-actions') || root.querySelector('.sk-wrap') || root;
     if (anchor === root || anchor.classList.contains('sk-wrap')) anchor.appendChild(box); else anchor.insertAdjacentElement('afterend', box);
-    if (priv && hk && live) fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok }) }).then(load, load); else load();
+    // 주인 폰이면(열쇠 있음) 주인 확인 — 처음이면 카드에서 고른 공개 방식으로 정함
+    if (hk && live) fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok, pub: R.pub != null ? R.pub | 0 : undefined }) }).then(function (r) { return r.json(); }).then(function (j) { if (j.list) take(j); else load(); }, load); else load();
     // 다른 사람이 신청한 것도 보이게, 화면을 다시 볼 때마다 새로 불러옴
     document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
   }

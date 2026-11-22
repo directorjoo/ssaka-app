@@ -51,25 +51,35 @@ async function bingAsGn(gUrl) {
   let q = '', days = 0;
   try { q = new URL(gUrl).searchParams.get('q') || ''; } catch (e) {}
   const m = q.match(/\bwhen:(\d+)([dh])\b/); if (m) days = m[2] === 'h' ? 1 : Number(m[1]);
-  q = q.replace(/\bwhen:\d+[dh]\b/g, '').replace(/\s+/g, ' ').trim() || '주요 뉴스';
+  q = q.replace(/\bwhen:\d+[dh]\b/g, '').replace(/\s+/g, ' ').trim(); const top = !q; if (top) q = '주요 뉴스';
   const r = await fetch('https://www.bing.com/news/search?q=' + encodeURIComponent(q) + '&format=rss&setlang=ko-KR&cc=KR&mkt=ko-KR&qft=sortbydate%3d%221%22', { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 900 } });
   if (!r.ok) throw new Error('bing ' + r.status);
   const xml = await r.text(), since = days ? Date.now() - (days + 1) * 864e5 : 0;
+  // 빙은 OR 검색이 느슨해 엉뚱한 기사가 섞임 → 'A B OR C D'에서 묶음마다 첫 낱말(주제어) 중 하나는 제목에 있어야 통과
+  const keys = top ? [] : q.replace(/\bsite:\S+/g, '').split(/\s+OR\s+/).map(x => x.trim().split(/\s+/)[0]).filter(w => w && w.length >= 2);
+  const ent = s => s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
   const out = (xml.match(/<item>[\s\S]*?<\/item>/g) || []).map(x => {
-    const t = tag(x, 'title'), s = tag(x, 'News:Source').replace(/\s+on MSN$/i, ''), d = tag(x, 'pubDate');
+    const t = ent(tag(x, 'title')), s = ent(tag(x, 'News:Source')).replace(/\s+on MSN$/i, ''), d = tag(x, 'pubDate');
+    if (keys.length && !keys.some(w => t.replace(/\s+/g, '').includes(w))) return '';
     let u = tag(x, 'link'); const um = u.match(/[?&]url=([^&]+)/); if (um) { try { u = decodeURIComponent(um[1]); } catch (e) {} }
     if (!t || !/^https?:\/\//.test(u) || (since && Date.parse(d) && Date.parse(d) < since)) return '';
     return '<item><title>' + xesc(t + (s ? ' - ' + s : '')) + '</title><link>' + xesc(u) + '</link><pubDate>' + xesc(d) + '</pubDate><source>' + xesc(s) + '</source></item>';
   }).join('');
   return '<rss><channel>' + out + '</channel></rss>';
 }
+async function gnTry(url) {
+  try {
+    const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)', 'accept': 'application/rss+xml, application/xml, text/xml' }, cf: { cacheTtl: 900 } });
+    if (r.ok) { const t = await r.text(); if (/<rss|<channel/i.test(t)) return t; }
+  } catch (e) {}
+  gnBadUntil = Date.now() + 20 * 60e3; return null;
+}
+// 동시에 여러 검색어가 와도 구글은 먼저 하나만 물어보고(gnProbe), 막혔으면 나머지는 바로 빙으로 — 바깥 요청 50개 한도 지키기
+let gnProbe = null;
 export async function gnText(url) {
   if (Date.now() > gnBadUntil) {
-    try {
-      const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)', 'accept': 'application/rss+xml, application/xml, text/xml' }, cf: { cacheTtl: 900 } });
-      if (r.ok) { const t = await r.text(); if (/<rss|<channel/i.test(t)) return t; }
-    } catch (e) {}
-    gnBadUntil = Date.now() + 20 * 60e3;
+    if (gnProbe) { await gnProbe.catch(() => null); if (Date.now() > gnBadUntil) { const t = await gnTry(url); if (t) return t; } }
+    else { const p = gnProbe = gnTry(url); let t; try { t = await p; } finally { gnProbe = null; } if (t) return t; }
   }
   return bingAsGn(url);
 }
@@ -390,7 +400,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter9/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter10/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey);
   // ?more=1 : 아직 요약 안 한 기사(앞 7개 다음)를 13개까지 더 읽고 요약해 캐시에 합침
   if (u.searchParams.get('more')) {

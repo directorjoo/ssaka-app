@@ -3,7 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+  <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}.sched-rows{display:flex;flex-direction:column;gap:8px;margin:10px 0 8px}
+.sched-row{display:grid;grid-template-columns:8.6em 1fr 40px;gap:6px;align-items:center}
+.sched-row input{min-height:46px;font-size:16px}
+.sched-row.day{grid-template-columns:1fr 40px}
+.sched-row.day input{font-weight:800;background:#FFF4F5;border-color:#E9B8C0}
+.sched-row .x{min-height:46px;border:0;border-radius:12px;background:#F3EEEE;font-size:18px;color:#7a5560;cursor:pointer}
+.sched-add{display:flex;gap:8px;flex-wrap:wrap}.sched-add .mini{flex:1;min-height:44px;font-weight:800}
+</style>
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>싸바 만들기</title>
   <meta name="theme-color" content="#FFFFFF">
@@ -11,7 +18,7 @@
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=95">
+  <link rel="stylesheet" href="../css/sk.css?v=96">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=3">
@@ -910,6 +917,17 @@
         </div>
       </fieldset>
 
+      <fieldset data-for="club" data-tab="content" data-part="sched" data-snsoff>
+        <legend>📅 모임 일정표 <small style="font-weight:600;opacity:.7">(선택)</small></legend>
+        <div class="hint" style="margin-top:0">시간마다 할 일을 적으면 카드에 시간표로 예쁘게 나와요. 예) 08:50 제주공항 집결 → 10:00 성산일출봉</div>
+        <div id="schedRows" class="sched-rows"></div>
+        <div class="sched-add">
+          <button type="button" class="mini" id="schedAdd">＋ 일정 더하기</button>
+          <button type="button" class="mini" id="schedDay">📆 다음 날 일정</button>
+        </div>
+        <input type="hidden" id="schedOn" value="">
+      </fieldset>
+
       <fieldset data-for="club" data-tab="content" data-part="roster" data-snsoff>
         <legend id="rosterLeg">🙋 참석 명단 받기</legend>
         <label class="switch"><input type="checkbox" id="rosterOn" checked> <span>카드에서 참석 신청 받고, 번호 매긴 명단 자동으로 만들기</span></label>
@@ -1139,7 +1157,7 @@
 <script src="../js/mkfun.js?v=1"></script>
 <script src="../js/mkask.js?v=1"></script>
 <script src="../js/notice.js?v=4"></script>
-<script src="../js/render.js?v=85"></script>
+<script src="../js/render.js?v=86"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1728,6 +1746,37 @@
   }
 
   function v(id) { return ($(id) && !$(id).closest('[hidden]')) ? $(id).value.trim() : ''; }
+  // ── 모임 일정표: 줄마다 [시간][할 일][×], 날짜 줄은 [1일차][×]
+  function schedRow(o) {
+    var box = $('schedRows'); if (!box || box.children.length >= 24) return null;
+    var r = document.createElement('div'); r.className = 'sched-row' + (o && o.d != null ? ' day' : '');
+    if (o && o.d != null) {
+      r.innerHTML = '<input type="text" class="sd" maxlength="20" aria-label="날짜 이름"><button type="button" class="x" aria-label="이 줄 지우기">×</button>';
+      r.querySelector('.sd').value = o.d || '';
+    } else {
+      r.innerHTML = '<input type="time" class="st" aria-label="시간"><input type="text" class="sw" maxlength="60" placeholder="할 일 (예: 공항 집결)" aria-label="할 일"><button type="button" class="x" aria-label="이 줄 지우기">×</button>';
+      r.querySelector('.st').value = (o && o.t) || ''; r.querySelector('.sw').value = (o && o.w) || '';
+    }
+    box.appendChild(r); return r;
+  }
+  function schedGet() {
+    var out = [];
+    document.querySelectorAll('#schedRows .sched-row').forEach(function (r) {
+      var d = r.querySelector('.sd');
+      if (d) { if (d.value.trim()) out.push({ d: d.value.trim().slice(0, 20) }); return; }
+      var t = r.querySelector('.st').value, w = r.querySelector('.sw').value.trim().slice(0, 60);
+      if (w) out.push(t ? { t: t, w: w } : { w: w });
+    });
+    // 일정 없는 날짜 줄(뒤에 할 일이 없는 것)은 버림
+    out = out.filter(function (x, i) { if (!x.d) return true; var nx = out[i + 1]; return nx && !nx.d; });
+    return out.some(function (x) { return x.w; }) ? out : [];
+  }
+  function schedSet(list) {
+    var box = $('schedRows'); if (!box) return; box.innerHTML = '';
+    (list || []).forEach(function (o) { schedRow(o); });
+    if (!box.children.length) { schedRow(); schedRow(); }
+  }
+
   function galList() { return v('galUrls').split('\n').filter(Boolean).slice(0, 10); }
   // 사진마다 설명 (11-22) — galUrls 와 같은 순서로 한 줄씩
   function galCaps() { var a = ($('galCaps').value || '').split('\n'); var n = galList().length; var o = []; for (var i = 0; i < n; i++) o.push((a[i] || '').trim()); return o; }
@@ -1827,6 +1876,8 @@
       try { if (!localStorage.getItem(kk) && !isEmpty) { var ka = 'abcdefghjkmnpqrstuvwxyz23456789', kb = crypto.getRandomValues(new Uint8Array(20)), ks = ''; for (var ki = 0; ki < 20; ki++) ks += ka[kb[ki] % ka.length]; localStorage.setItem(kk, ks); } } catch (e) {}
       if (v('pre') && window.SsakaNotice) card.roster.pre = SsakaNotice.preParse(v('pre')).map(function (x) { return { n: x.n, g: x.g || undefined, s: x.s || undefined, p: x.p || undefined, fam: x.fam || undefined }; });
     }
+    // 모임 일정표 (11-23): card.sched = [{d:'1일차'} | {t:'08:50', w:'제주공항 집결'}]
+    if (type === 'club' && (FORM.hide || []).indexOf('sched') < 0) { var sch = schedGet(); if (sch.length) card.sched = sch; }
     if ($('sound').value) card.sound = $('sound').value;
     if (cfg.sos) {
       card.sos = true;
@@ -2723,6 +2774,14 @@
   });
   $('resvOn').addEventListener('change', function () { $('resvBox').hidden = !this.checked; update(); });
   $('rosterOn').addEventListener('change', function () { $('rosterBox').hidden = !this.checked; update(); });
+  schedSet([]);
+  $('schedAdd').addEventListener('click', function () { var r = schedRow(); if (r) r.querySelector('input').focus(); });
+  $('schedDay').addEventListener('click', function () {
+    var box = $('schedRows'), n = box.querySelectorAll('.sched-row.day').length;
+    if (!n && box.querySelector('.sw') && box.querySelector('.sw').value.trim()) { var first = schedRow({ d: '1일차' }); if (first) box.insertBefore(first, box.firstChild); n = 1; }
+    var r = schedRow({ d: (n + 1) + '일차' }); schedRow(); if (r) r.querySelector('input').focus(); update();
+  });
+  $('schedRows').addEventListener('click', function (e) { var x = e.target.closest('.x'); if (!x) return; x.parentNode.remove(); if (!$('schedRows').children.length) schedRow(); update(); });
   $('noticeGo').addEventListener('click', function () {
     var t = $('noticeIn').value.trim();
     if (!t) {
@@ -3184,6 +3243,7 @@
       set('menu', (c.reserve.menu || []).map(function (m) { return m.n + (m.p ? ' ' + m.p : ''); }).join('\n'));
       set('account', c.reserve.account); set('resvMin', String(c.reserve.min || 4)); set('resvRate', String(c.reserve.rate || 0.2));
     } else { $('resvOn').checked = false; $('resvBox').hidden = true; }
+    schedSet(Array.isArray(c.sched) ? c.sched : []);
     // 참석 명단 (11-23): 고칠 때 탑승지·기수·참석자 공개 방식 그대로 (같은 제목이면 같은 명단이라 신청자도 그대로)
     if (c.roster) {
       $('rosterOn').checked = true; $('rosterBox').hidden = false;

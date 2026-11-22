@@ -213,6 +213,23 @@
       });
       main.appendChild(ul);
     }
+    // 모임 일정표 (11-23): card.sched = [{d:'1일차'} | {t:'08:50', w:'제주공항 집결'}]
+    var sch = (Array.isArray(card.sched) ? card.sched : []).slice(0, 24);
+    if (sch.some(function (x) { return x && x.w; })) {
+      var sb = el('section', 'sk-sched'); sb.setAttribute('aria-label', '모임 일정');
+      sb.appendChild(el('h3', 'sk-sched-h', '📅 일정'));
+      var ol = el('ol', 'sk-sched-l');
+      sch.forEach(function (x) {
+        if (!x) return;
+        if (x.d) { ol.appendChild(el('li', 'sk-sched-d', String(x.d).slice(0, 20))); return; }
+        if (!x.w) return;
+        var li = el('li', 'sk-sched-i');
+        li.appendChild(el('span', 'sk-sched-t', /^\d{1,2}:\d{2}$/.test(x.t || '') ? x.t : ''));
+        li.appendChild(el('span', 'sk-sched-w', String(x.w).slice(0, 60)));
+        ol.appendChild(li);
+      });
+      sb.appendChild(ol); main.appendChild(sb);
+    }
     if (longGal && galEl) main.appendChild(galEl);
     wrap.appendChild(main);
     // 글씨 크기 (11-22): card.fs = [제목, 부제목, 본문] 각각 -1 작게 · 0 보통 · 1 크게 · 2 아주 크게

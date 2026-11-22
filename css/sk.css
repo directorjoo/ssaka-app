@@ -764,3 +764,13 @@
 .sk-ro-list li.ed { cursor: pointer; } .sk-ro-list li.ed::before { content: '✏️ '; font-size: 12px; opacity: .5; }
 .sk-ro-ed { margin-left: 4px; padding: 2px 8px; border: 1px solid var(--line-ink, rgba(0,0,0,.15)); border-radius: 99px; background: transparent; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
 .sk-ro-tools { display: grid; gap: 0; }
+
+/* 모임 일정표 (11-23) — 세로 줄 + 점, 시간은 굵게 */
+.sk .sk-sched { margin: 18px 0 4px; text-align: left; }
+.sk .sk-sched-h { margin: 0 0 10px; font-size: 1.05em; font-weight: 800; letter-spacing: -.01em; }
+.sk .sk-sched-l { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--accent-line, currentColor); }
+.sk .sk-sched-i { position: relative; display: grid; grid-template-columns: 4em 1fr; gap: 10px; align-items: baseline; padding: 7px 0 7px 8px; font-size: max(15px, .95em); line-height: 1.45; word-break: keep-all; }
+.sk .sk-sched-i::before { content: ""; position: absolute; left: -21px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent, #B3132B); box-shadow: 0 0 0 3px var(--paper, #fff); }
+.sk .sk-sched-t { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sk .sk-sched-d { display: inline-block; margin: 10px 0 4px -26px; padding: 3px 12px; border-radius: 999px; background: var(--accent, #B3132B); color: var(--on-accent, #fff); font-weight: 800; font-size: .9em; }
+.sk .sk-sched-d:first-child { margin-top: 0; }

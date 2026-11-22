@@ -41,5 +41,7 @@ export async function onRequest({ request, env }) {
   if (isBad(o)) return json({ error: 'bad-words' }, 400);
   if (await tooMany(db, await ipKey(request, 'story'), 5, 3600)) return json({ error: 'slow' }, 429);
   await db.prepare('INSERT INTO stories (kind, title, by, text, line, contact, at) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(o.kind, o.title, o.by, o.text, o.line, o.contact, Date.now()).run();
+  // 개인정보: 연락처는 공모전 알림용 — 180일 지나면 지움(처리방침 1번 표)
+  try { await db.prepare("UPDATE stories SET contact = NULL WHERE contact IS NOT NULL AND contact <> '' AND at < ?").bind(Date.now() - 180 * 864e5).run(); } catch (e) {}
   return json({ ok: 1 });
 }

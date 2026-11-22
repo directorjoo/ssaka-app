@@ -154,7 +154,7 @@ export async function onRequest({ request, env }) {
       ['관리자 계정 (SAVA_ADMIN_UID)', !!env.SAVA_ADMIN_UID], ['관리 비밀번호 (ADMIN_KEY)', !!env.ADMIN_KEY],
       ['AI 글쓰기 키 (ANTHROPIC_API_KEY)', !!(env.ANTHROPIC_API_KEY || env.BLOG_AI_KEY)], ['전화번호 암호 키 (PHONE_KEY)', !!env.PHONE_KEY],
       ['기업마당 (BIZINFO_API_KEY)', !!env.BIZINFO_API_KEY], ['한국관광공사 (TOUR_API_KEY)', !!env.TOUR_API_KEY],
-      ['공공데이터 (DATA_API_KEY)', !!env.DATA_API_KEY], ['유튜브 (YOUTUBE_API_KEY)', !!env.YOUTUBE_API_KEY], ['식자재 시세 KAMIS (KAMIS_KEY·KAMIS_ID)', !!(env.KAMIS_KEY && env.KAMIS_ID)], ['영화 흥행 KOBIS (KOBIS_KEY)', !!env.KOBIS_KEY],
+      ['공공데이터 (DATA_API_KEY)', !!env.DATA_API_KEY], ['유튜브 (YOUTUBE_API_KEY)', !!env.YOUTUBE_API_KEY], ['식자재 시세 KAMIS (KAMIS_KEY·KAMIS_ID)', !!(env.KAMIS_KEY && env.KAMIS_ID)], ['영화 흥행 KOBIS (KOBIS_KEY)', !!env.KOBIS_KEY], ['네이버 뉴스 검색 (NAVER_ID·NAVER_SECRET)', !!(env.NAVER_ID && env.NAVER_SECRET)],
       ['영상 저장소 (R2 VIDEO)', !!env.VIDEO], ['카카오 탈퇴 연결끊기 (KAKAO_ADMIN_KEY)', !!env.KAKAO_ADMIN_KEY]
     ] });
 }

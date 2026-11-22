@@ -201,6 +201,21 @@
     .grp h3 .cnt { margin-left: auto; flex: none; padding: 2px 10px; border-radius: 999px; background: rgba(0,0,0,.18); color: #fff; font-size: 14px; font-weight: 800; text-shadow: none; }
     .grp.tb-am   { --bh: #D9822B; --bx: #FFF1E2; --bl: #F0C595; } /* 주황 — 아침 해 */
     .grp.tb-hot  { --bh: #D04A3A; --bx: #FFEDE9; --bl: #F3BDB3; } /* 코랄 빨강 — 화제 */
+    /* 11-23 식자재 시세 · 대표님 장부 */
+    .fdl li.fd { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #f3ebe5; }
+    .fdl li.fd b { display: block; font-size: 16.5px; } .fdl li.fd small { display: block; margin-top: 2px; font-size: 14px; color: #6b5a50; }
+    .fdl .fv { flex: none; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #F6F1EC; font-size: 19px; cursor: pointer; }
+    .ldh { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 6px 0 10px; font-size: 19px; }
+    .ldh button { width: 42px; height: 42px; border: 1.5px solid #e2d4c9; border-radius: 50%; background: #fff; font-size: 22px; cursor: pointer; }
+    .lds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+    .lds div { padding: 10px 6px; border-radius: 12px; background: #F8F4F0; text-align: center; } .lds small { display: block; font-size: 13.5px; color: #8a7f78; font-weight: 800; } .lds b { font-size: 15.5px; }
+    .ldw, .ldg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; } .ldw span { text-align: center; font-size: 14px; font-weight: 900; padding: 4px 0; }
+    .ld { display: flex; flex-direction: column; align-items: center; min-height: 58px; padding: 4px 1px; border: 1px solid #f0e6dd; border-radius: 10px; background: #fff; font: inherit; cursor: pointer; overflow: hidden; }
+    .ld i { font-style: normal; font-size: 14.5px; font-weight: 800; } .ld b { font-size: 11.5px; color: #1A6FD1; font-weight: 900; } .ld u { text-decoration: none; font-size: 11.5px; color: #D7263D; font-weight: 800; } .ld s { text-decoration: none; font-size: 11px; }
+    .ld.td { border-color: #5b4636; } .ld.on { background: #5b4636; } .ld.on i, .ld.on b, .ld.on u { color: #fff !important; }
+    .lde { margin-top: 12px; padding: 14px; border-radius: 16px; background: #fff; border: 1.5px solid #e2d4c9; }
+    .lde label { display: block; margin-top: 8px; font-size: 15.5px; font-weight: 800; } .lde label small { font-weight: 600; color: #8a7f78; }
+    .lde input, .lde textarea { display: block; width: 100%; margin-top: 4px; padding: 10px 12px; border: 1.5px solid #333; border-radius: 12px; font: inherit; font-size: 17px; }
     .grp.tb-biz  { --bh: #8A6A4A; --bx: #F5EFE8; --bl: #D8C6B2; } /* 갈색 — 자영업(영업·상담과 같은 색) */
     .grp.tb-sen  { --bh: #3F9A5C; --bx: #EAF6EC; --bl: #B7DDBF; } /* 초록 — 어르신(소식·안심과 같은 색) */
     .grp.tb-trip { --bh: #1E9AA0; --bx: #E5F6F6; --bl: #A9DCDD; } /* 청록 — 나들이 */
@@ -267,6 +282,8 @@
       { k: 'worker', t: '직장인·프리랜서', i: '💼', c: '#5b4636', n: 1 }] },
     { id: 'biz', h: '🏪 자영업', s: '매출에 도움 되는 것만', c: [
       { k: 'biz', t: '혜택 알리미', i: '🔔', c: '#7a3fb0', n: 1 },
+      { k: 'food', t: '식자재 시세', i: '🥬', c: '#2e7d32', n: 1 },
+      { k: 'ledger', t: '대표님 장부', i: '📒', c: '#5b4636', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
       { k: 'sns', t: 'SNS 만들기', i: '📱', c: '#E1306C', n: 1 },
       { k: 'card', t: '싸바카드', i: '🍒', c: '#B3132B', href: '../make/' }] },
@@ -310,7 +327,7 @@
   function show(k) {
     cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
     var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
-    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
+    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
 
@@ -678,8 +695,77 @@
     $('bl').innerHTML = '<div class="src">' + esc(d.at) + ' 기준 · ' + rows.length + '건' + (bizR ? ' (전국 ' + nat + ' · ' + esc(bizR) + ' ' + (rows.length - nat) + ')' : '') + '</div>' +
       (rows.length ? '<ul class="nl">' + rows.slice(0, 40).map(function (x) {
         var dd = dday(x.end);
-        return '<li><a href="' + esc(x.url || 'https://www.bizinfo.go.kr') + '" target="_blank" rel="noopener"><span style="flex:1"><b>' + esc(x.t) + '</b><small>' + (x.reg ? '<span class="tagr">' + esc(x.reg) + '</span>' : '<span class="tagr" style="background:#F3ECE6;color:#5a4a42">전국</span>') + esc(x.field) + ' · ' + esc(x.org) + (x.end ? ' · ' + md(x.end) + '까지' : '') + '</small></span><span class="dd ' + dd[1] + '">' + dd[0] + '</span></a></li>';
+        return '<li><a href="' + esc(x.url || 'https://www.bizinfo.go.kr') + '" target="_blank" rel="noopener"><span style="flex:1">' + (x.nw ? '<span class="tagr" style="background:#FFF1E0;color:#C2410C">NEW</span>' : '') + (x.amt ? '<span class="tagr" style="background:#E8F4EC;color:#17573F">💰 최대 ' + esc(x.amt) + '</span>' : '') + '<b>' + esc(x.t) + '</b><small>' + (x.reg ? '<span class="tagr">' + esc(x.reg) + '</span>' : '<span class="tagr" style="background:#F3ECE6;color:#5a4a42">전국</span>') + esc(x.field) + ' · ' + esc(x.org) + (x.end ? ' · ' + md(x.end) + '까지' : '') + '</small></span><span class="dd ' + dd[1] + '">' + dd[0] + '</span></a></li>';
       }).join('') + '</ul>' : '<div class="msg">이 분야는 지금 진행 중인 공고가 없어요. ‘전체’를 눌러 보세요.</div>');
+  }
+
+  // 🥬 오늘의 식자재 시세 (11-23, KAMIS) — 관심 식자재 ⭐를 맨 위에 어제·한 달 전과 비교
+  var foodData = null, foodCls = ls('sava-food-cls') || '소매', foodCat = '', foodQ = '';
+  function favs() { try { return JSON.parse(ls('sava-food-fav') || '[]'); } catch (e) { return []; } }
+  function food() {
+    pane.innerHTML = '<h2>🥬 오늘의 식자재 시세</h2><div class="src">한국농수산식품유통공사(KAMIS) 전국 평균 · ⭐를 누르면 내 관심 식자재로 맨 위에</div><div id="fdb"><div class="msg">시세를 불러오는 중…</div></div>';
+    (foodData ? Promise.resolve(foodData) : api('kamis')).then(function (d) { foodData = d; if (cur === 'food') paintFood(); })
+      .catch(function () { if (cur === 'food') $('fdb').innerHTML = '<div class="msg">시세를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.<br><a class="btn l" style="margin-top:10px" href="https://www.kamis.or.kr" target="_blank" rel="noopener">KAMIS에서 직접 보기</a></div>'; });
+  }
+  function chg(v, lab) { if (v == null) return '<span style="color:#9a8f88">' + esc(lab) + ' -</span>'; return '<span style="color:' + (v > 0 ? '#D7263D' : v < 0 ? '#1A4FB0' : '#6b5a50') + ';font-weight:900">' + esc(lab) + ' ' + (v > 0 ? '+' : '') + v + '%</span>'; }
+  function paintFood() {
+    var d = foodData, box = $('fdb'); if (!d || !box) return;
+    if (d.need) { box.innerHTML = '<div class="msg">식자재 시세 연결을 준비 중이에요. 곧 열려요!<br><a class="btn l" style="margin-top:10px" href="https://www.kamis.or.kr" target="_blank" rel="noopener">지금은 KAMIS에서 보기</a></div>'; return; }
+    var all = (d.rows || []).filter(function (x) { return x.cls.indexOf(foodCls) >= 0; });
+    var cats = []; all.forEach(function (x) { if (x.cat && cats.indexOf(x.cat) < 0) cats.push(x.cat); });
+    var fv = favs(), key = function (x) { return x.cls + '|' + x.n + '|' + x.kind; };
+    var mine = all.filter(function (x) { return fv.indexOf(key(x)) >= 0; });
+    var rows = all.filter(function (x) { return (!foodCat || x.cat === foodCat) && (!foodQ || (x.n + x.kind).indexOf(foodQ) >= 0); });
+    var row = function (x) { var on = fv.indexOf(key(x)) >= 0; return '<li class="fd"><button type="button" class="fv" data-f="' + esc(key(x)) + '" aria-label="관심 식자재">' + (on ? '⭐' : '☆') + '</button><span style="flex:1"><b>' + esc(x.n) + (x.kind && x.kind !== x.n ? ' <small style="display:inline;color:#8a7f78">' + esc(x.kind.replace(x.n, '').replace(/^[\s/]+/, '')) + '</small>' : '') + '</b><small>' + esc(x.unit) + ' · ' + chg(x.c1, '어제보다') + ' · ' + chg(x.c2, '한 달 전보다') + '</small></span><em style="font-style:normal;font-size:17px;font-weight:900;white-space:nowrap">' + x.p.toLocaleString() + '원</em></li>'; };
+    box.innerHTML = chips('fc', [['소매', '🛒 소매(장 볼 때)'], ['도매', '🚚 도매(대량)']], foodCls, '#2e7d32') +
+      (mine.length ? '<div class="sec">⭐ 내 관심 식자재</div><ul class="nl fdl">' + mine.map(row).join('') + '</ul>' : '<div class="hcard" style="background:#F1F8EE"><p style="font-size:16px;font-weight:700">☆를 누르면 우리 가게에서 자주 사는 식자재가 맨 위에 모여요. 매일 열면 어제보다 올랐는지 바로 보여요.</p></div>') +
+      '<div class="sec">📋 오늘의 시세 <small style="font-weight:700;color:#8a7f78">' + esc((all[0] || {}).day || d.at) + ' 기준 · ' + rows.length + '개</small></div>' +
+      '<input id="fq" type="search" placeholder="🔍 식자재 찾기 (예: 배추, 돼지고기)" value="' + esc(foodQ) + '" style="width:100%;min-height:46px;margin:0 0 8px;padding:0 12px;border:1.5px solid #e2d4c9;border-radius:12px;font:inherit;font-size:16px">' +
+      chips('fk', [['', '전체']].concat(cats.map(function (c) { return [c, c]; })), foodCat, '#2e7d32') +
+      (rows.length ? '<ul class="nl fdl">' + rows.slice(0, 150).map(row).join('') + '</ul>' : '<div class="msg">찾는 식자재가 없어요.</div>') +
+      '<p class="note">KAMIS 전국 평균 가격이라 우리 동네 가게·시장 가격과 다를 수 있어요. 빨간색은 오름, 파란색은 내림.</p>';
+    onChip('fc', function (v) { foodCls = v; ls('sava-food-cls', v); foodCat = ''; paintFood(); });
+    onChip('fk', function (v) { foodCat = v; paintFood(); });
+    $('fq').addEventListener('change', function () { foodQ = this.value.trim(); paintFood(); });
+    box.querySelectorAll('.fv').forEach(function (b) { b.onclick = function () { var l = favs(), i = l.indexOf(b.dataset.f); if (i >= 0) l.splice(i, 1); else l.unshift(b.dataset.f); ls('sava-food-fav', JSON.stringify(l.slice(0, 30))); paintFood(); }; });
+  }
+
+  // 📒 대표님 장부 (11-23) — 달력에 날마다 매출·지출·메모. 이 폰에만 저장(서버로 안 보냄)
+  var ledM = null, ledSel = '';
+  function ledGet() { try { return JSON.parse(ls('sava-ledger') || '{}'); } catch (e) { return {}; } }
+  function ledSet(o) { ls('sava-ledger', JSON.stringify(o)); }
+  function ymd8(d) { return d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+  function won(n) { n = Math.round(n || 0); return n.toLocaleString() + '원'; }
+  function short(n) { n = n || 0; return n >= 10000 ? (Math.round(n / 1000) / 10) + '만' : n ? n.toLocaleString() : ''; }
+  function ledger() {
+    if (!ledM) ledM = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (!ledSel) ledSel = ymd8(now);
+    var L = ledGet(), y = ledM.getFullYear(), m = ledM.getMonth(), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+    var sumS = 0, sumE = 0, cells = '';
+    for (var i = 0; i < first; i++) cells += '<span></span>';
+    for (var dd = 1; dd <= days; dd++) {
+      var k8 = ymd8(new Date(y, m, dd)), v = L[k8] || {}, dw = (first + dd - 1) % 7;
+      sumS += +v.s || 0; sumE += +v.e || 0;
+      cells += '<button type="button" class="ld' + (k8 === ledSel ? ' on' : '') + (k8 === ymd8(now) ? ' td' : '') + '" data-d="' + k8 + '"><i style="color:' + (dw === 0 ? '#D7263D' : dw === 6 ? '#1A4FB0' : '#3a2a22') + '">' + dd + '</i>' + (v.s ? '<b>' + short(+v.s) + '</b>' : '') + (v.e ? '<u>-' + short(+v.e) + '</u>' : '') + (v.m ? '<s>📝</s>' : '') + '</button>';
+    }
+    var sv = L[ledSel] || {}, sd = ledSel;
+    pane.innerHTML = '<h2>📒 대표님 장부</h2><div class="src">날짜를 누르고 매출·지출·메모를 적어 두세요 · <b>이 폰에만 저장</b>돼요 (싸바 서버로 안 보내요)</div>' +
+      '<div class="ldh"><button type="button" id="lp" aria-label="지난달">‹</button><b>' + y + '년 ' + (m + 1) + '월</b><button type="button" id="ln" aria-label="다음 달">›</button></div>' +
+      '<div class="lds"><div><small>매출</small><b style="color:#1A6FD1">' + won(sumS) + '</b></div><div><small>지출</small><b style="color:#D7263D">' + won(sumE) + '</b></div><div><small>남은 돈</small><b>' + won(sumS - sumE) + '</b></div></div>' +
+      '<div class="ldw"><span style="color:#D7263D">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span style="color:#1A4FB0">토</span></div><div class="ldg">' + cells + '</div>' +
+      '<div class="lde"><div class="sec" style="margin-top:0">✏️ ' + (+sd.slice(4, 6)) + '월 ' + (+sd.slice(6)) + '일</div>' +
+      '<div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>💰 매출<input id="ls" type="number" inputmode="numeric" value="' + esc(sv.s || '') + '" placeholder="0"></label><label>💸 지출<input id="le" type="number" inputmode="numeric" value="' + esc(sv.e || '') + '" placeholder="0"></label></div>' +
+      '<label>📝 메모 <small>예약·납품·세금 날짜 등</small><textarea id="lm" rows="2" placeholder="예: 김 사장님 단체 예약 12명 / 갓김치 납품">' + esc(sv.m || '') + '</textarea></label>' +
+      '<button type="button" class="btn" id="lsave" style="width:100%;margin-top:8px;min-height:50px;border:0;border-radius:14px;background:#5b4636;color:#fff;font:inherit;font-size:17px;font-weight:900">저장하기</button></div>' +
+      '<p class="note">폰을 바꾸거나 인터넷 기록을 지우면 장부도 지워져요. 카드·배달 매출 자동 연결은 준비 중이에요.</p>';
+    $('lp').onclick = function () { ledM = new Date(y, m - 1, 1); ledger(); };
+    $('ln').onclick = function () { ledM = new Date(y, m + 1, 1); ledger(); };
+    pane.querySelectorAll('.ld').forEach(function (b) { b.onclick = function () { ledSel = b.dataset.d; ledger(); var e = pane.querySelector('.lde'); if (e && e.scrollIntoView) e.scrollIntoView({ behavior: 'smooth', block: 'center' }); }; });
+    $('lsave').onclick = function () {
+      var o = ledGet(), s = +$('ls').value || 0, e = +$('le').value || 0, mm = $('lm').value.trim();
+      if (s || e || mm) o[ledSel] = { s: s || '', e: e || '', m: mm }; else delete o[ledSel];
+      ledSet(o); ledger();
+    };
   }
 
   // 🎁 어르신 혜택 — 복지·연금·일자리 공식 창구 + 이번 주 소식
@@ -911,7 +997,7 @@
   }
 
   // ★ 지금 보고 있는 탭 하나만 보내기 — 받는 사람은 이 탭부터 보고, 위 동그라미로 싸바 전체를 둘러봄
-  var SENDT = { biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에', audition: '배우·모델·뮤지컬 오디션 공고를 모아 봤어요', women: '여성 일자리·출산·육아·건강 소식이에요', youth: '청년 정책과 채용 소식이에요', family: '교육·돌봄 지원과 학교 소식이에요', exam: '수능·수시·정시 대학입시 소식이에요', worker: '연말정산·세금, 직장인·프리랜서 소식이에요', estate: '청약·분양, 전세·집값 소식이에요' };
+  var SENDT = { food: '오늘 배추·돼지고기 같은 식자재 시세, 어제보다 올랐는지 한눈에 보여요', ledger: '달력에 날마다 매출·지출·메모를 적는 장부예요 (내 폰에만 저장)', biz: '지금 신청할 수 있는 정부 지원사업, 마감 가까운 순으로 정리돼 있어요', sns: '구글 메일부터 인스타·카톡 채널까지 차례대로 따라 하면 돼요', insure: '보험 파는 곳 아닌 공식 기관 조회로 쓸데없는 보험료 새는지 5분이면 점검돼요', senior: '어르신이 받을 수 있는 혜택 공식 창구 모음이에요', fest: '지금 열리는 전국 축제·행사예요', near: '내 주변 가볼 곳·맛집이에요', health: '날마다 바뀌는 건강 한마디예요', stock: '코스피·코스닥, 많이 보는 종목, 해외 지수를 한 화면에', audition: '배우·모델·뮤지컬 오디션 공고를 모아 봤어요', women: '여성 일자리·출산·육아·건강 소식이에요', youth: '청년 정책과 채용 소식이에요', family: '교육·돌봄 지원과 학교 소식이에요', exam: '수능·수시·정시 대학입시 소식이에요', worker: '연말정산·세금, 직장인·프리랜서 소식이에요', estate: '청약·분양, 전세·집값 소식이에요' };
   function link() { return 'https://sava.kr/today/?t=' + encodeURIComponent(cur); }
   $('send').addEventListener('click', function () {
     var xx = C.filter(function (x) { return x.k === cur; })[0] || { i: '☀️', t: '싸바 브리핑' };

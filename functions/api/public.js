@@ -48,7 +48,12 @@ async function biz(env) {
     if (!field || field === '기타') { const f = FIELD.find(f => f[1].test(nm)); field = f ? f[0] : '기타'; }
     if (field === '내수') field = '판로';
     const reg = region(nm.slice(0, 16)) || region(org.replace(/중소벤처기업부|소상공인시장진흥공단|중소기업|창업진흥원|기술보증|신용보증|정보통신산업진흥원|한국/g, ''));
-    return { t: nm.slice(0, 100), org: un(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 24), when: when.slice(0, 30), end, field, reg, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
+    // 11-23: 최대 지원금(본문·제목에서 '최대 ○○만원/억원'), 새 공고(등록 3일 안)
+    const txt = nm + ' ' + un(x.bsnsSumryCn || x.description || '');
+    const am = txt.match(/최대\s*(?:연\s*)?([0-9][0-9,.]*\s*(?:억\s*[0-9,]*\s*만?|천만|백만|만)\s*원)/) || txt.match(/(?:한도|지원금|지원 금액|지원액)\s*[:：]?\s*(?:최대\s*)?([0-9][0-9,.]*\s*(?:억|천만|백만|만)\s*원)/);
+    const cd = String(x.creatPnttm || x.pubDate || '').replace(/[^0-9]/g, '').slice(0, 8);
+    const nw = /^\d{8}$/.test(cd) && (Date.parse(cd.slice(0, 4) + '-' + cd.slice(4, 6) + '-' + cd.slice(6, 8)) > Date.now() - 3 * 864e5);
+    return { amt: am ? am[1].replace(/\s+/g, '') : '', nw: nw ? 1 : 0, t: nm.slice(0, 100), org: un(x.jrsdInsttNm || x.excInsttNm || '').slice(0, 24), when: when.slice(0, 30), end, field, reg, url: x.pblancUrl ? (String(x.pblancUrl).startsWith('http') ? x.pblancUrl : 'https://www.bizinfo.go.kr' + x.pblancUrl) : '' };
   }).filter(x => x.t && (!/^\d{8}$/.test(x.end) || x.end >= today));
   const dk = x => /^\d{8}$/.test(x.end) ? x.end : '9';
   rows.sort((a, b) => (dk(a) > dk(b) ? 1 : dk(a) < dk(b) ? -1 : 0));

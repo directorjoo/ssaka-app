@@ -114,6 +114,7 @@ async function translate(env, arr) {
 
 async function build(k, env, t) {
   if (k === 'tp') return topic(t);
+  if (k === 'kamis') return kamis(env);
   if (k === 'stock') { const s = await stock(); if (!s) throw new Error('no-stock'); return s; }
   if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
   if (k === 'news') {
@@ -168,11 +169,29 @@ async function build(k, env, t) {
   return null;
 }
 
+// 🥬 오늘의 식자재 시세 (11-23) — 한국농수산식품유통공사 KAMIS 「일별 부류별 도·소매 가격」(dailySalesList)
+//   환경 변수 KAMIS_KEY(인증키)·KAMIS_ID(신청 아이디) — kamis.or.kr → 정보공개 → Open-API 신청(무료)
+async function kamis(env) {
+  const u = 'https://www.kamis.or.kr/service/price/xml.do?action=dailySalesList&p_cert_key=' + encodeURIComponent(String(env.KAMIS_KEY).trim()) + '&p_cert_id=' + encodeURIComponent(String(env.KAMIS_ID).trim()) + '&p_returntype=json';
+  const r = await fetch(u, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaToday/1.0; +https://sava.kr)' }, cf: { cacheTtl: 3600 } });
+  const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { throw new Error('kamis-format'); }
+  const arr = Array.isArray(j.price) ? j.price : [];
+  const num = v => { const n = Number(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return isFinite(n) && n > 0 ? n : 0; };
+  const pct = (a, b) => a && b ? Math.round((a - b) / b * 1000) / 10 : null;
+  const rows = arr.map(x => {
+    const now = num(x.dpr1), d1 = num(x.dpr2), m1 = num(x.dpr3);
+    return { cls: String(x.product_cls_name || (x.product_cls_code === '02' ? '도매' : '소매')), cat: String(x.category_name || ''), n: String(x.item_name || x.productName || ''), kind: String(x.productName || ''), unit: String(x.unit || ''),
+      p: now, l1: String(x.day2 || '어제'), c1: pct(now, d1), l2: String(x.day3 || '한 달 전'), c2: pct(now, m1), day: String(x.lastest_day || x.day1 || '') };
+  }).filter(x => x.n && x.p);
+  return { k: 'kamis', at: kst().toISOString().slice(0, 16).replace('T', ' '), rows: rows.slice(0, 400) };
+}
+
 export async function onRequestGet({ request, env, waitUntil }) {
   setNaver(env);
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
   if (!/^(news|google|gov|yt|world|market|stock|tp)$/.test(k)) return json({ error: 'bad-k' }, 400);
   const t = k === 'tp' ? (u.searchParams.get('t') || '') : '';
+  if (k === 'kamis' && !(env.KAMIS_KEY && env.KAMIS_ID)) return json({ k, need: 'key' });
   if (k === 'tp' && !TP[t]) return json({ error: 'bad-t' }, 400);
   let ttl = k === 'google' || k === 'market' || k === 'stock' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));
   const ckey = new Request(u.origin + '/__today/' + k + (t ? '-' + t : '') + '/' + slot), cache = caches.default;

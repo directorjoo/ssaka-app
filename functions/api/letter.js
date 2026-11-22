@@ -42,9 +42,40 @@ const BIZ_Q = [
   ['⚖️', '자영업 바뀌는 제도 OR 소상공인 개정 시행 OR 음식점 단속'],
   ['💗', '자영업자 사연 OR 소상공인 희망 OR 골목상권 상생']
 ];
+// 11-22 대표님 '검색이 안돼': 구글 뉴스가 Cloudflare 요청을 막으면(오류·로봇 확인 화면) 빙(Bing) 뉴스 RSS로 대신 찾음.
+// 빙 결과를 구글 뉴스 RSS 모양(제목 - 언론사, <source>, 진짜 신문사 주소)으로 바꿔 돌려주므로 읽는 쪽 코드는 그대로.
+// 구글이 한 번 막히면 20분 동안은 바로 빙으로(바깥 요청 수 아끼기).
+let gnBadUntil = 0;
+const xesc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+async function bingAsGn(gUrl) {
+  let q = '', days = 0;
+  try { q = new URL(gUrl).searchParams.get('q') || ''; } catch (e) {}
+  const m = q.match(/\bwhen:(\d+)([dh])\b/); if (m) days = m[2] === 'h' ? 1 : Number(m[1]);
+  q = q.replace(/\bwhen:\d+[dh]\b/g, '').replace(/\s+/g, ' ').trim() || '주요 뉴스';
+  const r = await fetch('https://www.bing.com/news/search?q=' + encodeURIComponent(q) + '&format=rss&setlang=ko-KR&cc=KR&mkt=ko-KR&qft=sortbydate%3d%221%22', { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)' }, cf: { cacheTtl: 900 } });
+  if (!r.ok) throw new Error('bing ' + r.status);
+  const xml = await r.text(), since = days ? Date.now() - (days + 1) * 864e5 : 0;
+  const out = (xml.match(/<item>[\s\S]*?<\/item>/g) || []).map(x => {
+    const t = tag(x, 'title'), s = tag(x, 'News:Source').replace(/\s+on MSN$/i, ''), d = tag(x, 'pubDate');
+    let u = tag(x, 'link'); const um = u.match(/[?&]url=([^&]+)/); if (um) { try { u = decodeURIComponent(um[1]); } catch (e) {} }
+    if (!t || !/^https?:\/\//.test(u) || (since && Date.parse(d) && Date.parse(d) < since)) return '';
+    return '<item><title>' + xesc(t + (s ? ' - ' + s : '')) + '</title><link>' + xesc(u) + '</link><pubDate>' + xesc(d) + '</pubDate><source>' + xesc(s) + '</source></item>';
+  }).join('');
+  return '<rss><channel>' + out + '</channel></rss>';
+}
+export async function gnText(url) {
+  if (Date.now() > gnBadUntil) {
+    try {
+      const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaLetter/1.0; +https://sava.kr)', 'accept': 'application/rss+xml, application/xml, text/xml' }, cf: { cacheTtl: 900 } });
+      if (r.ok) { const t = await r.text(); if (/<rss|<channel/i.test(t)) return t; }
+    } catch (e) {}
+    gnBadUntil = Date.now() + 20 * 60e3;
+  }
+  return bingAsGn(url);
+}
 async function news(q, n) {
   try {
-    const xml = await getText('https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=ko&gl=KR&ceid=KR:ko');
+    const xml = await gnText('https://news.google.com/rss/search?q=' + encodeURIComponent(q) + '&hl=ko&gl=KR&ceid=KR:ko');
     return (xml.match(/<item>[\s\S]*?<\/item>/g) || []).slice(0, n).map(x => { let t = tag(x, 'title'); const s = tag(x, 'source'); if (s && t.endsWith(' - ' + s)) t = t.slice(0, -(s.length + 3)); return { t: t.slice(0, 110), src: s.slice(0, 20), url: tag(x, 'link'), d: Date.parse(tag(x, 'pubDate')) || 0 }; }).filter(x => x.t && /^https?:/.test(x.url));
   } catch (e) { return []; }
 }
@@ -359,7 +390,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter8/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter9/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey);
   // ?more=1 : 아직 요약 안 한 기사(앞 7개 다음)를 13개까지 더 읽고 요약해 캐시에 합침
   if (u.searchParams.get('more')) {

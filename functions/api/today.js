@@ -10,7 +10,7 @@
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
-import { market, indexOf, readOne, SUM_RULE } from './letter.js';
+import { market, indexOf, readOne, SUM_RULE, gnText } from './letter.js';
 //   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
 const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
 const NOT_ACT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
@@ -66,6 +66,7 @@ function un(s) {
 function tag(x, t) { const m = x.match(new RegExp('<' + t + '(?:\\s[^>]*)?>([\\s\\S]*?)</' + t + '>')); return m ? un(m[1]) : ''; }
 function items(xml) { return (xml.match(/<item>[\s\S]*?<\/item>/g) || []); }
 async function rss(url) {
+  if (/^https:\/\/news\.google\.com\/rss/.test(url)) return gnText(url); // 11-22 구글 뉴스가 막히면 빙 뉴스로 대신
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaToday/1.0; +https://sava.kr)', 'accept': 'application/rss+xml, application/xml, text/xml' }, cf: { cacheTtl: 900 } });
   if (!r.ok) throw new Error('rss ' + r.status);
   return r.text();

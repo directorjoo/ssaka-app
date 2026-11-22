@@ -75,7 +75,7 @@ async function gnTry(url) {
   gnBadUntil = Date.now() + 20 * 60e3; return null;
 }
 // 11-22 대표님 '검색 기사는 네이버 기사 우선': 네이버 검색 API(뉴스) 키가 있으면 네이버부터 → 없거나 실패하면 구글 → 빙.
-// 키는 Cloudflare 환경 변수 NAVER_ID·NAVER_SECRET(developers.naver.com 애플리케이션 등록 → 검색 API, 하루 25,000번 무료).
+// 키는 Cloudflare 환경 변수 NAVER_ID(Client ID)·NAVER_SECRET(Client Secret) — 새 키는 네이버 클라우드 플랫폼 NAVER API HUB(검색 API, 지금 한시적 무료), 예전 개발자센터 키도 2027-06-30까지 됨.
 // 결과는 구글 뉴스 RSS 모양으로 바꿔 돌려주므로 읽는 쪽 코드는 그대로.
 let NV = null;
 export function setNaver(env) { NV = env && env.NAVER_ID && env.NAVER_SECRET ? [String(env.NAVER_ID).trim(), String(env.NAVER_SECRET).trim()] : null; }
@@ -90,13 +90,20 @@ async function naverAsGn(gUrl) {
   if (!q) return null; // 검색어 없는 '주요 뉴스'는 구글 그대로
   const nq = q.split(/\s+OR\s+/).map(x => x.trim()).filter(Boolean).join(' | '); // 네이버는 OR 대신 |
   try {
-    const r = await fetch('https://openapi.naver.com/v1/search/news.xml?display=40&sort=date&query=' + encodeURIComponent(nq), { headers: { 'X-Naver-Client-Id': NV[0], 'X-Naver-Client-Secret': NV[1] }, cf: { cacheTtl: 900 } });
-    if (!r.ok) return null;
-    const xml = await r.text(), since = days ? Date.now() - (days + 1) * 864e5 : 0;
-    const items = (xml.match(/<item>[\s\S]*?<\/item>/g) || []).map(x => {
-      const t = tag(x, 'title').replace(/<\/?b>/g, '').replace(/&quot;/g, '"').replace(/&apos;|&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
-      const ol = tag(x, 'originallink'), nl = tag(x, 'link'), d = tag(x, 'pubDate');
-      const u = /^https?:\/\//.test(ol) ? ol : nl, s = pressOf(u);
+    // 2026-07-31부터 새 키는 네이버 클라우드 NAVER API HUB에서만 발급 → HUB(JSON) 먼저, 안 되면 예전 개발자센터 키(XML)
+    const qs = 'display=40&sort=date&query=' + encodeURIComponent(nq);
+    let raw = [];
+    const h = await fetch('https://naverapihub.apigw.ntruss.com/search/v1/news?' + qs, { headers: { 'X-NCP-APIGW-API-KEY-ID': NV[0], 'X-NCP-APIGW-API-KEY': NV[1] }, cf: { cacheTtl: 900 } }).catch(() => null);
+    if (h && h.ok) { const j = await h.json().catch(() => null); raw = ((j && (j.items || (j.result && j.result.items))) || []).map(x => ({ t: x.title || '', ol: x.originallink || '', nl: x.link || '', d: x.pubDate || '' })); }
+    else {
+      const r = await fetch('https://openapi.naver.com/v1/search/news.xml?' + qs, { headers: { 'X-Naver-Client-Id': NV[0], 'X-Naver-Client-Secret': NV[1] }, cf: { cacheTtl: 900 } }).catch(() => null);
+      if (!r || !r.ok) return null;
+      raw = ((await r.text()).match(/<item>[\s\S]*?<\/item>/g) || []).map(x => ({ t: tag(x, 'title'), ol: tag(x, 'originallink'), nl: tag(x, 'link'), d: tag(x, 'pubDate') }));
+    }
+    const since = days ? Date.now() - (days + 1) * 864e5 : 0;
+    const items = raw.map(x => {
+      const t = String(x.t).replace(/<\/?b>/g, '').replace(/&quot;/g, '"').replace(/&apos;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim();
+      const u = /^https?:\/\//.test(x.ol) ? x.ol : x.nl, s = pressOf(u), d = x.d;
       if (!t || !/^https?:\/\//.test(u) || (since && Date.parse(d) && Date.parse(d) < since)) return '';
       return '<item><title>' + xesc(t + (s ? ' - ' + s : '')) + '</title><link>' + xesc(u) + '</link><pubDate>' + xesc(d) + '</pubDate><source>' + xesc(s) + '</source></item>';
     }).filter(Boolean);

@@ -10,6 +10,8 @@
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
+//   GET /api/today?k=music&t=kpop|pop|eu|cn|jp|af|la|au : 🎵 나라별 인기 노래(애플 뮤직 순위 + 30초 미리듣기)
+//   GET /api/today?k=globe : 🌐 오늘 지구촌 뉴스 10개(구글 뉴스 세계 한국어판)
 import { market, indexOf, readOne, SUM_RULE, gnText, clipSum, isAudition, setNaver } from './letter.js';
 //   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
 const TP = {
@@ -112,8 +114,50 @@ async function translate(env, arr) {
   }
 }
 
+// 🎵 요즘 가장 잘나가는 노래 (11-23 대표님: K-POP·팝송·유럽·중국·일본·아프리카·남미·호주, 들을 수 있으면 더 좋게)
+//   애플 뮤직 나라별 '가장 많이 들은 노래' 순위(공식 RSS) + 아이튠즈 30초 미리듣기(공식 lookup). 노래 파일은 애플 서버 것을 그대로 틂(싸바가 저장 안 함)
+const MUSIC = {
+  kpop: ['🇰🇷 K-POP', [['kr', '']]], pop: ['🇺🇸 팝송', [['us', '']]], eu: ['🇪🇺 유럽', [['gb', '🇬🇧'], ['fr', '🇫🇷'], ['de', '🇩🇪'], ['es', '🇪🇸']]],
+  cn: ['🇨🇳 중국', [['cn', ''], ['tw', '🇹🇼']]], jp: ['🇯🇵 일본', [['jp', '']]], af: ['🌍 아프리카', [['ng', '🇳🇬'], ['za', '🇿🇦'], ['ke', '🇰🇪']]],
+  la: ['🌎 남미', [['br', '🇧🇷'], ['mx', '🇲🇽'], ['ar', '🇦🇷'], ['co', '🇨🇴']]], au: ['🇦🇺 호주', [['au', '']]]
+};
+async function music(t) {
+  const m = MUSIC[t]; if (!m) throw new Error('bad-t');
+  const H = { headers: { 'user-agent': 'Mozilla/5.0 (compatible; SavaToday/1.0; +https://sava.kr)' } };
+  const per = m[1].length === 1 ? 20 : Math.ceil(24 / m[1].length);
+  const got = await Promise.all(m[1].map(async ([cc, flag]) => {
+    try {
+      const r = await fetch('https://rss.marketingtools.apple.com/api/v2/' + cc + '/music/most-played/' + Math.max(per, 10) + '/songs.json', H);
+      if (!r.ok) return [];
+      const j = await r.json(), arr = ((j.feed || {}).results || []).slice(0, per);
+      const pv = {};
+      if (arr.length) {
+        try {
+          const l = await fetch('https://itunes.apple.com/lookup?country=' + cc + '&id=' + arr.map(x => x.id).join(','), H);
+          if (l.ok) ((await l.json()).results || []).forEach(x => { if (x.trackId && /^https:\/\//.test(x.previewUrl || '')) pv[x.trackId] = x.previewUrl; });
+        } catch (e) {}
+      }
+      return arr.map(x => ({ t: String(x.name || '').slice(0, 80), a: String(x.artistName || '').slice(0, 60), img: String(x.artworkUrl100 || '').replace(/^http:/, 'https:'), url: String(x.url || ''), pv: pv[x.id] || '', cc: flag }));
+    } catch (e) { return []; }
+  }));
+  // 여러 나라면 1위끼리, 2위끼리… 번갈아 섞음
+  const list = [], seen = new Set();
+  for (let i = 0; i < per; i++) got.forEach(g => { const x = g[i]; if (!x || !x.t) return; const key = (x.t + x.a).toLowerCase(); if (seen.has(key)) return; seen.add(key); list.push(x); });
+  if (!list.length) throw new Error('music');
+  return { k: 'music', t, h: m[0], at: kst().toISOString().slice(0, 16).replace('T', ' '), list: list.slice(0, 24) };
+}
+
 async function build(k, env, t) {
   if (k === 'tp') return topic(t);
+  if (k === 'music') return music(t);
+  if (k === 'globe') {
+    // 🌐 오늘 지구촌 뉴스 10개 (11-23 대표님) — 구글 뉴스 '세계' 한국어 판, 안 되면 국제 뉴스 검색
+    let list = await rss('https://news.google.com/rss/headlines/section/topic/WORLD?hl=ko&gl=KR&ceid=KR:ko').then(x => gnews(x, 14)).catch(() => []);
+    if (list.length < 6) list = list.concat(await rss(GN('국제 OR 외신 when:1d')).then(x => gnews(x, 14)).catch(() => []));
+    const seen = new Set(); list = list.filter(x => { const key = x.t.replace(/\s+/g, '').slice(0, 26); if (seen.has(key)) return false; seen.add(key); return true; }).slice(0, 10);
+    if (!list.length) throw new Error('globe');
+    return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), list };
+  }
   if (k === 'kamis') return kamis(env);
   if (k === 'stock') { const s = await stock(); if (!s) throw new Error('no-stock'); return s; }
   if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
@@ -189,8 +233,9 @@ async function kamis(env) {
 export async function onRequestGet({ request, env, waitUntil }) {
   setNaver(env);
   const u = new URL(request.url), k = u.searchParams.get('k') || '';
-  if (!/^(news|google|gov|yt|world|market|stock|tp)$/.test(k)) return json({ error: 'bad-k' }, 400);
-  const t = k === 'tp' ? (u.searchParams.get('t') || '') : '';
+  if (!/^(news|google|gov|yt|world|market|stock|tp|music|globe)$/.test(k)) return json({ error: 'bad-k' }, 400);
+  const t = k === 'tp' || k === 'music' ? (u.searchParams.get('t') || '') : '';
+  if (k === 'music' && !MUSIC[t]) return json({ error: 'bad-t' }, 400);
   if (k === 'kamis' && !(env.KAMIS_KEY && env.KAMIS_ID)) return json({ k, need: 'key' });
   if (k === 'tp' && !TP[t]) return json({ error: 'bad-t' }, 400);
   let ttl = k === 'google' || k === 'market' || k === 'stock' ? 1800 : 3600; const slot = Math.floor(Date.now() / (ttl * 1000));

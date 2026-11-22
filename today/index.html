@@ -220,6 +220,19 @@
     .grp.tb-sen  { --bh: #3F9A5C; --bx: #EAF6EC; --bl: #B7DDBF; } /* 초록 — 어르신(소식·안심과 같은 색) */
     .grp.tb-trip { --bh: #1E9AA0; --bx: #E5F6F6; --bl: #A9DCDD; } /* 청록 — 나들이 */
     .grp.tb-mkt  { --bh: #2C4A7A; --bx: #E9EEF7; --bl: #B6C4DC; } /* 남색 — 주식·부동산·환율 */
+    .grp.tb-glb  { --bh: #1F6FB2; --bx: #EAF3FB; --bl: #B9D4EC; } /* 파랑 — 세계 소식·음악(11-23) */
+    /* 🎵 인기 노래 */
+    .ml { list-style: none; margin: 0; padding: 0; }
+    .ml li { display: grid; grid-template-columns: 26px 52px 1fr 48px; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0e6df; }
+    .ml em { font-style: normal; font-weight: 900; font-size: 16px; color: #1F6FB2; text-align: center; }
+    .ml img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: #eee; }
+    .ml b { display: block; font-size: 16px; font-weight: 900; line-height: 1.3; word-break: keep-all; }
+    .ml small { display: block; font-size: 15px; font-weight: 600; color: #7a6d64; }
+    .ml a.ap { font-size: 13px; font-weight: 800; color: #1F6FB2; text-decoration: none; }
+    .ml .pl { width: 48px; height: 48px; border-radius: 50%; border: 0; background: #1F6FB2; color: #fff; font-size: 18px; cursor: pointer; box-shadow: 0 4px 10px -4px rgba(31,111,178,.7); }
+    .ml .pl.on { background: #B3132B; }
+    .ml .pl:disabled { background: #d4d4d8; box-shadow: none; }
+    .ml li.on { background: #FFF6F0; }
     .grp.tb-me   { --bh: #8A63B0; --bx: #F3EEF9; --bl: #D2C2E6; } /* 보라 — 나에게 맞는 소식(11-22) */
     html.bigtxt .grp h3 small { display: none; }
     /* 2가지짜리 두 묶음(나들이·주식)은 반씩 나란히 — 화면 덜 길게 */
@@ -267,6 +280,9 @@
       { k: 'news', t: '뉴스 요약', i: '🗞️', c: '#B3132B' },
       { k: 'wx', t: '날씨', i: '☀️', c: '#1A4FB0' },
       { k: 'kwx', t: '전국 날씨', i: '🗺️', c: '#0E6BA8' }] },
+    { id: 'glb', h: '🌍 세계 소식·음악', s: '검색 안 해도 최신', c: [
+      { k: 'globe', t: '지구촌 뉴스', i: '🌐', c: '#1F6FB2', n: 1 },
+      { k: 'music', t: '인기 노래', i: '🎵', c: '#B3132B', n: 1 }] },
     { id: 'hot', h: '🔥 지금 화제·방송', s: '많이 보는 것', c: [
       { k: 'google', t: '구글 검색어', i: '🔥', c: '#E8710A' },
       { k: 'yt', t: '유튜브 인기', i: '▶️', c: '#e62117' },
@@ -326,9 +342,10 @@
   var pane = $('pane');
   function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
   function show(k) {
+    if (k !== 'music' && typeof auStop === 'function') try { auStop(); } catch (e) {}
     cur = k; if (!fromLink) { try { localStorage.setItem('sava-today', k); } catch (e) {} } history.replaceState(null, '', location.pathname + '#' + k); paintBar();
     var xx = C.filter(function (x) { return x.k === k; })[0]; $('send').textContent = '★ ' + (xx ? xx.i + ' ' + xx.t : '이 화면') + ' 카톡으로 보내기';
-    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
+    ({ news: news, wx: wx, kwx: kwx, google: google, yt: yt, world: world, naver: naver, globe: globe, music: music, health: health, minwon: minwon, biz: biz, food: food, ledger: ledger, senior: senior, sns: sns, insure: insure, fest: fest, near: near, fx: fx, stock: stock, audition: tp, women: tp, youth: tp, family: tp, exam: tp, worker: tp, estate: tp })[k](k);
   }
   function api(k) { return fetch('/api/today?k=' + k).then(function (r) { if (!r.ok) throw 0; return r.json(); }); }
 
@@ -516,6 +533,55 @@
       var by = {}; (d.list || []).forEach(function (n) { (by[n.src] = by[n.src] || []).push(n); });
       $('wnl').innerHTML = Object.keys(by).map(function (s) { return '<div class="sec">' + esc(s) + '</div>' + nlist(by[s], false, true); }).join('') + '<div class="src" style="margin-top:8px">' + esc(d.at) + ' 기준 · ' + (d.ko ? '제목은 AI가 한국어로 옮겼어요 · 누르면 한국어 번역 기사' : '지금 번역이 밀려 원어 제목으로 보여요 · 몇 분 뒤 다시 열면 한국어로 나와요') + '</div>';
     }).catch(function () { if (cur === 'world') $('wnl').innerHTML = ''; });
+  }
+
+  // 🌐 오늘 지구촌 뉴스 10개 (11-23 대표님: 일일이 검색 안 해도 싸바에 오면 최신 정보)
+  function globe() {
+    msg('오늘 지구촌 뉴스를 모으는 중이에요…');
+    api('globe').then(function (d) {
+      if (cur !== 'globe') return;
+      pane.innerHTML = '<h2>🌐 오늘 지구촌 뉴스</h2><div class="src">' + esc(d.at) + ' 기준 · 세계에서 일어난 일 10가지 · 제목을 누르면 원문</div>' + nlist(d.list || [], true) +
+        '<div class="grid2" style="margin-top:12px"><button type="button" class="lk" id="gToW" style="font:inherit;text-align:left;cursor:pointer"><b>🌏 세계 방송</b><span>BBC·NHK·알자지라 제목 · 생방송</span></button><button type="button" class="lk" id="gToM" style="font:inherit;text-align:left;cursor:pointer"><b>🎵 인기 노래</b><span>세계 차트 · 바로 듣기</span></button></div>' +
+        '<p class="note">제목과 원문 링크는 구글 뉴스(세계) 한국어판에서 모아 와요. 1시간마다 새로 바뀌어요.</p>';
+      $('gToW').onclick = function () { show('world'); }; $('gToM').onclick = function () { show('music'); };
+    }).catch(function () { if (cur === 'globe') msg('지구촌 뉴스를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
+  }
+
+  // 🎵 요즘 가장 잘나가는 노래 — 나라별 애플 뮤직 순위, ▶ 누르면 30초 미리듣기 (끝나면 다음 곡)
+  var MU = [['kpop', '🇰🇷 K-POP'], ['pop', '🇺🇸 팝송'], ['eu', '🇪🇺 유럽'], ['jp', '🇯🇵 일본'], ['cn', '🇨🇳 중국'], ['af', '🌍 아프리카'], ['la', '🌎 남미'], ['au', '🇦🇺 호주']];
+  var au = null;
+  function auStop() { if (au) { au.pause(); au.src = ''; } pane.querySelectorAll('.ml li.on').forEach(function (li) { li.classList.remove('on'); var b = li.querySelector('.pl'); if (b) { b.classList.remove('on'); b.textContent = '▶'; } }); }
+  function music() {
+    var sel = ls('sava-music') || 'kpop'; if (!MU.some(function (m) { return m[0] === sel; })) sel = 'kpop';
+    pane.innerHTML = '<h2>🎵 요즘 가장 잘나가는 노래</h2><div class="src">나라별로 지금 가장 많이 듣는 노래 · ▶ 누르면 30초 미리듣기</div>' + chips('muC', MU, sel, '#B3132B') + '<div id="muL"><div class="msg">순위를 불러오는 중이에요…</div></div>' +
+      '<p class="note">순위는 애플 뮤직 나라별 ‘가장 많이 들은 노래’예요. ▶는 애플이 공식으로 주는 30초 미리듣기이고, 끝나면 다음 곡이 이어져요. 전체 곡은 ‘애플 뮤직’이나 ‘유튜브’ 단추로 들으세요.</p>';
+    onChip('muC', function (v) { ls('sava-music', v); auStop(); load(v); });
+    load(sel);
+    function load(t) {
+      $('muL').innerHTML = '<div class="msg">순위를 불러오는 중이에요…</div>';
+      api('music&t=' + t).then(function (d) {
+        if (cur !== 'music') return;
+        var L = d.list || [];
+        $('muL').innerHTML = '<div class="src">' + esc(d.at) + ' 기준 · ' + esc(d.h) + ' TOP ' + L.length + '</div><ul class="ml">' + L.map(function (x, i) {
+          var yt = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(x.a + ' ' + x.t);
+          return '<li data-i="' + i + '"><em>' + (i + 1) + '</em>' + (x.img ? '<img src="' + esc(x.img) + '" alt="" loading="lazy">' : '<span></span>') +
+            '<div><b>' + (x.cc ? x.cc + ' ' : '') + esc(x.t) + '</b><small>' + esc(x.a) + '</small>' +
+            (x.url ? '<a class="ap" href="' + esc(x.url) + '" target="_blank" rel="noopener">애플 뮤직</a> · ' : '') + '<a class="ap" href="' + esc(yt) + '" target="_blank" rel="noopener">유튜브</a></div>' +
+            '<button type="button" class="pl" aria-label="' + esc(x.t) + ' 미리듣기"' + (x.pv ? '' : ' disabled') + '>▶</button></li>';
+        }).join('') + '</ul>';
+        var lis = $('muL').querySelectorAll('li');
+        function play(i) {
+          auStop(); var x = L[i], li = lis[i]; if (!x || !li) return;
+          if (!x.pv) { play(i + 1); return; }
+          if (!au) au = new Audio();
+          au.src = x.pv; au.onended = function () { play(i + 1); };
+          au.play().then(function () { li.classList.add('on'); var b = li.querySelector('.pl'); b.classList.add('on'); b.textContent = '■'; }).catch(function () { var b = li.querySelector('.pl'); b.textContent = '↻'; });
+        }
+        lis.forEach(function (li, i) {
+          li.querySelector('.pl').addEventListener('click', function () { if (this.classList.contains('on')) auStop(); else play(i); });
+        });
+      }).catch(function () { if (cur === 'music') $('muL').innerHTML = '<div class="msg">순위를 불러오지 못했어요. 잠시 뒤 다른 나라를 눌러 보세요.</div>'; });
+    }
   }
 
   // 🟢 네이버

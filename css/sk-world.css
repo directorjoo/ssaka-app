@@ -530,3 +530,45 @@
 .sk[data-style="today"] .sk-act .sk-meta { opacity: .85; }
 .sk[data-style="today"] .sk-share, .sk[data-style="today"] .sk-sms, .sk[data-style="today"] .sk-video, .sk[data-style="today"] .sk-mapbtn { border-radius: 999px; }
 .sk-thumb[data-style="today"] .sk-title { font-size: 30px; }
+
+/* ---- 체리나무: 투데이 카드 규칙 복사 ---- */
+.sk[data-style="tree"] { background: var(--grad, var(--bg)); }
+.sk[data-style="tree"] .sk-wrap { padding-top: 0; }
+.sk[data-style="tree"] .sk-hero { margin: 0 -20px; }
+.sk[data-style="tree"] .sk-photo { aspect-ratio: 4 / 5; background: var(--bg);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%); }
+.sk[data-style="tree"] .sk-photo.sk-nophoto { aspect-ratio: 16 / 9; display: grid; place-items: center; -webkit-mask-image: none; mask-image: none; background: transparent; }
+.sk[data-style="tree"] .sk-nophoto .sk-mono { font-size: 72px; font-weight: 900; color: color-mix(in srgb, var(--on-bg) 30%, transparent); }
+.sk[data-style="tree"] .sk-titles { position: relative; z-index: 1; margin-top: -84px; padding: 0 22px; }
+.sk[data-style="tree"] .sk-photo.sk-nophoto + .sk-titles { margin-top: -20px; }
+.sk[data-style="tree"] .sk-kick { text-shadow: var(--tsh, none); display: inline-block; margin: 0 0 10px; padding: 0; font-family: var(--f-body); font-size: 16px; font-weight: 700; letter-spacing: -.01em; color: var(--sub-bg); }
+.sk[data-style="tree"] .sk-kick::before, .sk[data-style="tree"] .sk-kick::after { content: none; }
+.sk[data-style="tree"] .sk-title { font-size: clamp(32px, 9.4vw, 42px); font-weight: 900; line-height: 1.18; letter-spacing: -.035em; color: var(--on-bg);
+  text-shadow: var(--tsh, 0 2px 10px color-mix(in srgb, var(--bg) 75%, transparent)); }
+.sk[data-style="tree"] .sk-sub { margin-top: 10px; font-size: 16px; font-weight: 600; color: var(--sub-bg); text-shadow: var(--tsh, 0 1px 6px color-mix(in srgb, var(--bg) 70%, transparent)); }
+.sk[data-style="tree"] .sk-gal { margin-top: 20px; }
+.sk[data-style="tree"] .sk-gal-i { width: 120px; aspect-ratio: 1 / 1; border-radius: 16px; }
+.sk[data-style="tree"] .sk-list { margin-top: 22px; padding: 6px 18px; border-radius: 20px;
+  background: color-mix(in srgb, var(--on-bg) 9%, transparent); border: 1px solid color-mix(in srgb, var(--on-bg) 20%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); color: var(--on-bg); }
+.sk[data-style="tree"] .sk-list li { padding: 12px 0; font-size: 16px; line-height: 1.6; }
+.sk[data-style="tree"] .sk-list li + li { border-top: 1px solid color-mix(in srgb, var(--on-bg) 14%, transparent); }
+.sk[data-style="tree"] .sk-list li:first-child { font-size: 17.5px; font-weight: 800; }
+.sk[data-style="tree"] .sk-actions { gap: 8px; margin-top: 18px; }
+.sk[data-style="tree"] .sk-act { min-height: 60px; padding: 10px 16px; border-radius: 999px; background: var(--band, var(--accent)); color: var(--on-bg);
+  border: 1px solid color-mix(in srgb, var(--on-bg) 18%, transparent); }
+.sk[data-style="tree"] .sk-act:first-child { background: var(--paper); color: var(--accent); border-color: transparent; box-shadow: 0 10px 22px -14px rgba(0,0,0,.6); }
+.sk[data-style="tree"] .sk-act .sk-meta { opacity: .85; }
+.sk[data-style="tree"] .sk-share, .sk[data-style="tree"] .sk-sms, .sk[data-style="tree"] .sk-video, .sk[data-style="tree"] .sk-mapbtn { border-radius: 999px; }
+.sk-thumb[data-style="tree"] .sk-title { font-size: 30px; }
+
+/* 🌳 체리나무 (11-22 21:40) — 투데이 카드 모양 그대로 + 제목 뒤 오른쪽에 단풍 체리나무가 살랑 (홈 싸바 브리핑 '황금체리나무') */
+.sk[data-style="tree"] .sk-titles { isolation: isolate; min-height: 150px; padding-right: 30%; }
+.sk[data-style="tree"] .sk-titles::before { content: ""; position: absolute; z-index: -1; right: -50px; top: -96px; width: 260px; height: 260px; pointer-events: none;
+  background: url(../img/today-tree-autumn.png) center / contain no-repeat; opacity: .55; filter: saturate(.85); transform-origin: 50% 100%; animation: skTreeSway 6s ease-in-out infinite; }
+.sk[data-style="tree"] .sk-photo.sk-nophoto { aspect-ratio: 16 / 7; }
+.sk[data-style="tree"] .sk-photo.sk-nophoto .sk-mono { display: none; }
+.sk-thumb[data-style="tree"] .sk-titles::before { animation: none; }
+@keyframes skTreeSway { 0%, 100% { transform: rotate(-.8deg); } 50% { transform: rotate(.8deg); } }
+@media (prefers-reduced-motion: reduce) { .sk[data-style="tree"] .sk-titles::before { animation: none; } }
+

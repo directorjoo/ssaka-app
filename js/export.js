@@ -915,6 +915,7 @@
     }
   };
   // 1. 순천만 노을 — 하늘·해·물결·갈대, 아치 사진, 가운데 명조
+  LAYS.tree = function (ctx, W, H, D, P) { return LAYS.today(ctx, W, H, D, P); }; // 🌳 체리나무 — SNS 그림은 투데이와 같은 모양(나무는 카드 화면에만)
   LAYS.sunset = function (ctx, W, H, D, P) {
     var g = geo(W, H), u = g.u, fam = D.fam, sf = safeY(W, H);
     ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);

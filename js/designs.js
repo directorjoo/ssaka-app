@@ -169,6 +169,11 @@
     { bg: '#B4AB47', paper: '#ffffff', ink: '#1c2a14', accent: '#3E6B33', g: ['#B4AB47', '#74A569', '#69985E'], band: ['#6B9C5E', '#6E975D'], on: '#FFFFFF', sub: '#F4FBE8' },             // 9 햇살 초록
     { bg: '#E73924', paper: '#ffffff', ink: '#2a1008', accent: '#9D2515', g: ['#E73924', '#E03121', '#9D2515', '#5C1408'], band: ['#5C1408', '#7A1C0E'], on: '#FFFFFF', sub: '#FFE3DD' },  // 11 세일 레드
     { bg: '#CA4138', paper: '#ffffff', ink: '#2a1210', accent: '#B83A36', g: ['#CA4138', '#C03F3C', '#B83A36'], band: ['#B83A36', '#D0463C'], on: '#FFFFFF', sub: '#FFE6E2' }]);           // 12 크리에이터 레드
+  // 🌳 체리나무 (11-22 21:40 대표님): 홈 싸바 브리핑의 '황금체리나무' 바탕을 카드 디자인으로 — 투데이 카드 모양 + 제목 뒤 단풍 체리나무(img/today-tree-autumn.png)
+  // 색: 1번 황금(홈 그대로) + 표준 12색 전부 (투데이와 같은 값)
+  W('tree', '체리나무', 'modern', 'sanskr', [
+    { bg: '#FFE58A', paper: '#ffffff', ink: '#1A1A1A', accent: '#9A6408', g: ['#FFE58A', '#F7CF4E', '#EDB52E'], band: ['#C98A12', '#9A6408'], on: '#1A1A1A', sub: '#4A3104' }  // 황금
+  ].concat(STYLES.today.palettes));
   // 투데이 카드는 업종 사진에 어울리는 색부터 보여 줌 (위 목록 순서 번호, 0부터) — 없으면 업종마다 돌려서
   var TODAY_FIRST = { restaurant: 0, product: 10, cafe: 1, beauty: 6, fitness: 9, flower: 8, stay: 2,
     toefl: 4, bigacademy: 2, academy: 3, entrance: 5, tutor: 1, arts: 9,
@@ -374,9 +379,10 @@
   // 12가지는 화면 구조부터 다르고(색만 바꾼 반복 없음), 디자인마다 색 3벌을 따로 고를 수 있어요.
   // 같은 12가지가 SNS 이미지(인스타·카톡 채널·네이버·당근·블로그·유튜브…)에도 똑같은 모양으로 나옵니다 (js/export.js).
   // 예전 1~12번 · -w1~36 · 순천만 시안 번호는 쓰지 않아요. 예전 링크는 그 업종의 1번 디자인으로 보여 줍니다.
-  var TWELVE = ['today', 'sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
+  var TWELVE = ['today', 'tree', 'sunset', 'insta', 'minimal', 'hanji', 'pastel', 'gold', 'mdark', 'glass', 'retro', 'neon', 'paris', 'nordic'];
   var CALM = ['minimal', 'hanji', 'nordic', 'gold', 'today']; // 부고: 가게 차양(paris)·네온 같은 들뜬 모양은 빼고 차분한 것만
   var COLOR_NAMES = {
+    tree: ['황금', '와인 장미', '살구 크림', '바다 남색', '레몬 안개', '하늘 풀밭', '빛 민트', '라벤더 안개', '회색 캐러멜', '코랄 노을', '햇살 초록', '세일 레드', '크리에이터 레드'],
     today: ['와인 장미', '살구 크림', '바다 남색', '레몬 안개', '하늘 풀밭', '빛 민트', '라벤더 안개', '회색 캐러멜', '코랄 노을', '햇살 초록', '세일 레드', '크리에이터 레드'],
     sunset: ['남색 노을', '보랏빛 저녁', '아침 금빛'], insta: ['체리 레드', '초록', '검정·금색'],
     minimal: ['흰색', '베이지', '숲 초록'], hanji: ['한지·주홍', '한지·남색', '먹·주홍'],
@@ -407,6 +413,7 @@
       var pals = fk === 'glass' ? GLASS_PICK.map(function (k) { return st.palettes[k]; }) : st.palettes;
       var first = ind.id === 'restaurant' ? 0 : (n + fi) % 3; // 업종마다 처음 보이는 색을 돌려서 같은 디자인도 업종별로 다르게
       var firstId = null;
+      if (fk === 'tree') first = 0; // 체리나무는 모든 업종 황금부터
       if (fk === 'today') first = TODAY_FIRST[ind.id] != null ? TODAY_FIRST[ind.id] : (n + fi) % pals.length;
       for (var pi = 0; pi < pals.length; pi++) {
         if (ind.calm && fk === 'today' && !pals[pi].calm) continue; // 부고엔 차분한 색만 (살구 크림·바다 남색·라벤더 안개·회색 캐러멜)

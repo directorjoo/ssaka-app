@@ -299,7 +299,7 @@
       { k: 'worker', t: '직장인·프리랜서', i: '💼', c: '#5b4636', n: 1 }] },
     { id: 'biz', h: '🏪 자영업', s: '매출에 도움 되는 것만', c: [
       { k: 'biz', t: '혜택 알리미', i: '🔔', c: '#7a3fb0', n: 1 },
-      { k: 'food', t: '식자재 시세', i: '🥬', c: '#2e7d32', n: 1 },
+      // 🥬 식자재 시세(food)는 11-23 대표님: 빼기 — 탭만 숨김, 코드(food())는 남겨 둠
       { k: 'ledger', t: '대표님 장부', i: '📒', c: '#5b4636', n: 1 },
       { k: 'minwon', t: '세금·민원', i: '🏛️', c: '#3d5a80' },
       { k: 'sns', t: 'SNS 만들기', i: '📱', c: '#E1306C', n: 1 },
@@ -318,7 +318,7 @@
       { k: 'fx', t: '환율', i: '💱', c: '#0e7c86' }] }
   ];
   var C = [].concat.apply([], G.map(function (g) { return g.c; }));
-  var OLDK = { gov: 'biz', kwx: 'wx' }; // 11-23 전국 날씨는 날씨 탭 아래로 합침 // 예전 주소(#gov)도 열리게
+  var OLDK = { gov: 'biz', kwx: 'wx', food: 'biz' }; // 11-23 전국 날씨는 날씨 탭 아래로 합침 // 예전 주소(#gov)도 열리게
   // 보낸 링크(?t=insure)로 들어오면 그 탭부터 보여 줌
   var qT = new URLSearchParams(location.search).get('t') || '';
   var fromLink = !!qT && !location.hash;

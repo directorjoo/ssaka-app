@@ -239,7 +239,7 @@ async function indexOf(code, yh, kind) {
   } catch (e) {}
   return null;
 }
-export { indexOf };
+export { indexOf, readOne, SUM_RULE }; // readOne·SUM_RULE: 싸바 브리핑 기사 4줄 요약(today.js)도 같이 씀
 export async function market() {
   const [ks, kq, fx] = await Promise.all([indexOf('KOSPI', '^KS11'), indexOf('KOSDAQ', '^KQ11'), tfetch('https://open.er-api.com/v6/latest/USD', {}, 5000).then(r => r.json()).catch(() => null)]);
   const idx = [], ex = [];

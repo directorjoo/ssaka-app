@@ -10,17 +10,18 @@
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
-import { market, indexOf } from './letter.js';
+import { market, indexOf, readOne, SUM_RULE } from './letter.js';
+//   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
 const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
 const NOT_ACT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
 const TP = {
-  audition: [['🎬 오디션·배우 모집', ['배우 오디션 when:30d', '배우 모집 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '뮤지컬 오디션 OR 연극 오디션 when:30d', '모델 모집 OR 아역 오디션 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d'], 15,
+  audition: [['🎬 오디션·배우 모집', ['배우 오디션 when:30d', '배우 모집 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '뮤지컬 오디션 OR 연극 오디션 when:30d', '모델 모집 OR 아역 오디션 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d'], 20,
     x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && ACT.test(x.t) && !NOT_ACT.test(x.t) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)]],
-  estate: [['🏠 청약·분양', ['아파트 청약 일정 when:7d', '청약 접수 OR 분양 일정 when:7d'], 8], ['📰 부동산 소식', ['부동산 시장 when:3d', '전세 OR 월세 시장 when:3d', '부동산 대책 OR 대출 규제 when:7d'], 10]],
-  women: [['💼 여성 일자리·창업', ['경력단절 여성 지원 when:14d', '여성 창업 지원 OR 여성 재취업 when:14d'], 8], ['👶 임신·출산·육아 지원', ['출산 지원금 OR 육아 지원 when:7d', '임신 출산 혜택 OR 부모급여 when:14d'], 8], ['🌸 여성 건강', ['여성 건강 검진 OR 갱년기 when:14d'], 5]],
-  youth: [['🧑 청년 지원 정책', ['청년 지원 정책 when:7d', '청년 월세 OR 청년 도약 OR 청년 교통비 when:14d'], 10], ['📋 채용·취업 소식', ['공개채용 OR 신입 채용 when:3d', '취업 박람회 OR 채용 설명회 when:7d'], 8]],
-  family: [['🎒 교육·돌봄 지원', ['돌봄 지원 OR 늘봄 when:7d', '학부모 교육 지원 OR 교육급여 when:14d', '아동수당 OR 육아 지원 when:14d'], 10], ['🏫 학교·교육 소식', ['교육부 학교 when:3d'], 6]],
-  exam: [['🎓 대학입시 소식', ['수능 when:7d', '수시 OR 정시 대입 when:7d', '대학입시 전형 OR 입시 일정 when:14d'], 12], ['📚 입시 정책', ['대입 정책 OR 입시 제도 교육부 when:30d'], 6]],
+  estate: [['🏠 청약·분양', ['아파트 청약 일정 when:7d', '청약 접수 OR 분양 일정 when:7d'], 8], ['📰 부동산 소식', ['부동산 시장 when:3d', '전세 OR 월세 시장 when:3d', '부동산 대책 OR 대출 규제 when:7d'], 12]],
+  women: [['💼 여성 일자리·창업', ['경력단절 여성 지원 when:14d', '여성 창업 지원 OR 여성 재취업 when:14d'], 8], ['👶 임신·출산·육아 지원', ['출산 지원금 OR 육아 지원 when:7d', '임신 출산 혜택 OR 부모급여 when:14d'], 8], ['🌸 여성 건강', ['여성 건강 검진 OR 갱년기 when:14d'], 4]],
+  youth: [['🧑 청년 지원 정책', ['청년 지원 정책 when:7d', '청년 월세 OR 청년 도약 OR 청년 교통비 when:14d'], 12], ['📋 채용·취업 소식', ['공개채용 OR 신입 채용 when:3d', '취업 박람회 OR 채용 설명회 when:7d'], 8]],
+  family: [['🎒 교육·돌봄 지원', ['돌봄 지원 OR 늘봄 when:7d', '학부모 교육 지원 OR 교육급여 when:14d', '아동수당 OR 육아 지원 when:14d'], 14], ['🏫 학교·교육 소식', ['교육부 학교 when:3d'], 6]],
+  exam: [['🎓 대학입시 소식', ['수능 when:7d', '수시 OR 정시 대입 when:7d', '대학입시 전형 OR 입시 일정 when:14d'], 14], ['📚 입시 정책', ['대입 정책 OR 입시 제도 교육부 when:30d'], 6]],
   worker: [['🧾 연말정산·세금', ['연말정산 when:14d', '직장인 세금 OR 소득공제 when:14d'], 8], ['💼 직장인 소식', ['직장인 근로자 지원 when:7d', '최저임금 OR 근로기준 when:14d'], 6], ['🧑‍💻 프리랜서·1인 사업자', ['프리랜서 지원 OR 1인 사업자 when:14d', '종합소득세 프리랜서 when:30d'], 6]]
 };
 async function topic(t) {
@@ -118,8 +119,8 @@ async function build(k, env, t) {
   if (k === 'market') { const m = await market(); if (!m) throw new Error('no-market'); return m; }
   if (k === 'news') {
     const [top, biz] = await Promise.all([
-      rss('https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko').then(x => gnews(x, 12)),
-      rss(GN('자영업 OR 소상공인 when:2d')).then(x => gnews(x, 8)).catch(() => [])
+      rss('https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko').then(x => gnews(x, 14)), // 11-22 대표님: 탭마다 기사 20개 정도
+      rss(GN('자영업 OR 소상공인 when:2d')).then(x => gnews(x, 6)).catch(() => [])
     ]);
     const sum = await summarize(env, top, biz).catch(() => null);
     return { k, at: kst().toISOString().slice(0, 16).replace('T', ' '), sum, top, biz };
@@ -182,4 +183,46 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const store = new Response(res.clone().body, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=' + ttl } });
   if (waitUntil) waitUntil(cache.put(ckey, store)); else await cache.put(ckey, store);
   return res;
+}
+
+// ---------- 📝 기사 4줄 요약 (브리핑 모든 탭 공통) ----------
+async function sumAI(arts, env, key) {
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 45000);
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', signal: ac.signal,
+      headers: Object.assign({ 'content-type': 'application/json', 'x-api-key': key, 'authorization': 'Bearer ' + key, 'anthropic-version': '2023-06-01' }, env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': env.ANTHROPIC_WORKSPACE_ID } : {}),
+      body: JSON.stringify({ model: env.TODAY_MODEL || MODEL_DEFAULT, max_tokens: 3000, system: SUM_RULE + '\n받는 사람: 싸바 브리핑을 보는 누구나(어르신·대표님·직장인·학생·학부모). 외국어 기사도 한국어로 요약한다.', messages: [{ role: 'user', content: arts.map(a => '[' + a.n + '] 제목: ' + a.t + '\n본문: ' + a.text).join('\n\n') }] })
+    });
+    if (!r.ok) return {};
+    const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '', out = {};
+    let cur = null;
+    txt.split('\n').forEach(line => { const m = line.match(/^\s*\[(\d+)\]\s*(.*)$/); if (m) { cur = m[1]; out[cur] = m[2]; } else if (cur && line.trim()) out[cur] += ' ' + line.trim(); });
+    Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; });
+    return out;
+  } catch (e) { return {}; } finally { clearTimeout(tm); }
+}
+export async function onRequestPost({ request, env, waitUntil }) {
+  let b; try { b = await request.json(); } catch (e) { return json({ error: 'bad' }, 400); }
+  const list = (Array.isArray(b && b.sum) ? b.sum : []).filter(x => x && /^https:\/\//.test(String(x.u || '')) && String(x.u).length < 1500).slice(0, 6)
+    .map(x => ({ t: String(x.t || '').slice(0, 120), u: String(x.u) }));
+  if (!list.length) return json({ sums: {} });
+  const origin = new URL(request.url).origin, cache = caches.default, day = kst().toISOString().slice(0, 10);
+  const ck = u => new Request(origin + '/__tsum/' + day + '/' + encodeURIComponent(u));
+  const sums = {}, todo = [];
+  await Promise.all(list.map(async x => { const h = await cache.match(ck(x.u)); if (h) { const v = await h.text(); if (v) sums[x.u] = v; } else todo.push(x); }));
+  const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;
+  if (todo.length && key) {
+    const reads = await Promise.all(todo.map(x => readOne({ url: x.u }).catch(() => null)));
+    const arts = [];
+    reads.forEach((rd, i) => { if (rd && rd.text) arts.push({ n: i + 1, t: todo[i].t, text: rd.text }); });
+    const m = arts.length ? await sumAI(arts, env, key) : {};
+    const puts = todo.map((x, i) => {
+      const v = (m[i + 1] || '').slice(0, 700); if (v) sums[x.u] = v;
+      // 못 읽은 기사도 빈 값으로 하루 기억 — 같은 기사를 계속 다시 읽지 않게
+      return cache.put(ck(x.u), new Response(v, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=' + (v ? 86400 : 21600) } }));
+    });
+    if (waitUntil) waitUntil(Promise.all(puts)); else await Promise.all(puts);
+  }
+  return json({ sums });
 }

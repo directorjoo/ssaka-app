@@ -110,6 +110,9 @@
     .nl a { display: flex; gap: 10px; padding: 11px 2px; color: var(--ink); text-decoration: none; font-size: 16.5px; line-height: 1.45; word-break: keep-all; }
     .nl a em { flex: none; min-width: 26px; font-style: normal; font-weight: 900; color: #B3132B; }
     .nl a small { display: block; margin-top: 2px; color: var(--ink-2); font-size: 15px; }
+    .nl a > span:first-of-type { flex: 1; min-width: 0; }
+    .nl .ss { display: block; margin-top: 7px; padding: 9px 11px; border-radius: 12px; background: #FFFCF5; border: 1px solid #F0E6D6; color: #33291F; font-size: 15.5px; font-weight: 500; line-height: 1.6; white-space: pre-line; }
+    .nl .ss.wt { padding: 6px 11px; color: #9A8B78; font-size: 14px; background: none; border-style: dashed; }
     .rk a em { font-size: 18px; }
     .rk .tr { flex: none; margin-left: auto; align-self: center; padding: 3px 8px; border-radius: 999px; background: #FFF0E6; color: #a14a12; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
     .msg { padding: 30px 6px; text-align: center; color: var(--ink-2); font-size: 16px; line-height: 1.6; }
@@ -352,9 +355,44 @@
   function ko(url) {
     try { var u = new URL(url); if (/translate\.goog$/.test(u.hostname)) return url; u.hostname = u.hostname.replace(/-/g, '--').replace(/\./g, '-') + '.translate.goog'; u.searchParams.set('_x_tr_sl', 'auto'); u.searchParams.set('_x_tr_tl', 'ko'); u.searchParams.set('_x_tr_hl', 'ko'); return u.toString(); } catch (e) { return url; }
   }
+  // 📝 기사 4줄 요약 (11-22 대표님: 브리핑에 나오는 모든 기사 제목 아래 4줄, 화면 길어져도 OK)
+  //   기사 목록이 화면에 그려지면 저절로 6개씩 서버(POST /api/today)에 물어 채움. 같은 기사는 이 폰에 하루 기억.
+  function suAttr(u, t) { return /^https:\/\//.test(u || '') ? ' data-su="' + esc(u) + '" data-st="' + esc(t || '') + '"' : ''; }
+  function suBox(u) { return /^https:\/\//.test(u || '') ? '<span class="ss wt">✍️ 4줄 요약 만드는 중…</span>' : ''; }
+  function lines4(t) { return String(t).replace(/([.!?](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
+  var SUDAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10), suQ = [], suRun = 0;
+  function suGet(u) { try { var o = JSON.parse(localStorage.getItem('sava-sum') || '{}'); return o.d === SUDAY ? o.m[u] : undefined; } catch (e) { return undefined; } }
+  function suSet(m) { try { var o = JSON.parse(localStorage.getItem('sava-sum') || '{}'); if (o.d !== SUDAY) o = { d: SUDAY, m: {} }; Object.keys(m).forEach(function (k) { o.m[k] = m[k]; }); localStorage.setItem('sava-sum', JSON.stringify(o)); } catch (e) {} }
+  function suPaint(li, v) {
+    var b = li.querySelector('.ss'); if (!b) return;
+    if (v) { b.classList.remove('wt'); b.textContent = lines4(v); } else b.remove();
+  }
+  function suNext() {
+    while (suRun < 2 && suQ.length) {
+      var part = suQ.splice(0, 6); suRun++;
+      (function (part) {
+        fetch('/api/today', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sum: part.map(function (li) { return { t: li.dataset.st, u: li.dataset.su }; }) }) })
+          .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+          .then(function (j) { var m = j.sums || {}, save = {}; part.forEach(function (li) { var v = m[li.dataset.su] || ''; save[li.dataset.su] = v; suPaint(li, v); }); suSet(save); })
+          .catch(function () { part.forEach(function (li) { suPaint(li, ''); }); })
+          .then(function () { suRun--; suNext(); });
+      })(part);
+    }
+  }
+  function suScan() {
+    pane.querySelectorAll('li[data-su]:not([data-q])').forEach(function (li) {
+      li.dataset.q = '1'; var v = suGet(li.dataset.su);
+      if (v !== undefined) suPaint(li, v); else suQ.push(li);
+    });
+    suQ = suQ.filter(function (li) { return li.isConnected; }); // 다른 탭으로 옮기면 안 보이는 것은 건너뜀
+    suNext();
+  }
+  var suT = 0;
+  new MutationObserver(function () { clearTimeout(suT); suT = setTimeout(suScan, 60); }).observe($('pane'), { childList: true, subtree: true });
+
   function nlist(arr, rank, tr) {
     return '<ul class="nl' + (rank ? ' rk' : '') + '">' + arr.map(function (n, i) {
-      return '<li><a href="' + esc(tr ? ko(n.url) : n.url) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span>' + esc(n.t) + (n.src ? '<small>' + esc(n.src) + '</small>' : '') + '</span></a></li>';
+      return '<li' + suAttr(n.url, n.t) + '><a href="' + esc(tr ? ko(n.url) : n.url) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span>' + esc(n.t) + (n.src ? '<small>' + esc(n.src) + '</small>' : '') + suBox(n.url) + '</span></a></li>';
     }).join('') + '</ul>';
   }
 
@@ -380,7 +418,8 @@
       var h = '<h2>🔥 구글 인기 검색어</h2><div class="src">' + esc(d.at) + ' 기준 · 한국에서 지금 많이 찾는 말</div><ul class="nl rk">';
       h += (d.list || []).map(function (x, i) {
         var u = x.news && x.news.url ? x.news.url : 'https://www.google.com/search?q=' + encodeURIComponent(x.t);
-        return '<li><a href="' + esc(u) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span><b>' + esc(x.t) + '</b>' + (x.news ? '<small>' + esc(x.news.t) + ' · ' + esc(x.news.src) + '</small>' : '') + '</span>' + (x.traffic ? '<span class="tr">검색 ' + esc(x.traffic) + '</span>' : '') + '</a></li>';
+        var nu = x.news && x.news.url ? x.news.url : '';
+        return '<li' + suAttr(nu, x.news ? x.news.t : '') + '><a href="' + esc(u) + '" target="_blank" rel="noopener"><em>' + (i + 1) + '</em><span><b>' + esc(x.t) + '</b>' + (x.news ? '<small>' + esc(x.news.t) + ' · ' + esc(x.news.src) + '</small>' : '') + suBox(nu) + '</span>' + (x.traffic ? '<span class="tr">검색 ' + esc(x.traffic) + '</span>' : '') + '</a></li>';
       }).join('') + '</ul><p class="note">구글 트렌드의 ‘지금 뜨는 검색어’예요. 누르면 관련 기사로 가요.</p>';
       pane.innerHTML = h;
     }).catch(function () { if (cur === 'google') msg('검색어를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });

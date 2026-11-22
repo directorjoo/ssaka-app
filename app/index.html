@@ -619,9 +619,9 @@
     #v-home.v2 .v2-td em { color: #284927; opacity: 1; }
     #v-home.v2 .v2-td h3 { font-size: 28px; line-height: 1.25; color: #1A1A1A; }
     #v-home.v2 .v2-td .tx p { color: #284927; opacity: 1; }
-    html.bigtxt #v-home.v2 .v2-td .ch { grid-template-columns: repeat(2, 1fr); }
     html.bigtxt #v-home.v2 .v2c h3 { font-size: 26px; }
-    #v-home.v2 .v2-td .ch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 16px 4px; }
+    #v-home.v2 .v2-td .ch { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px 16px 4px; } /* 11-22: 7개 — 글자 길이대로 줄바꿈 */
+    #v-home.v2 .v2-td .ch span { flex: 0 0 auto; padding: 4px 14px !important; }
     #v-home.v2 .v2-td .ch span { display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 4px 6px; border-radius: 999px; background: rgba(255,255,255,.62); border: 1px solid rgba(70,100,40,.18); color: #24401A; font-size: 15px; font-weight: 700; white-space: nowrap; }
     #v-home.v2 .v2-td .ft { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 12px 16px 16px; }
     #v-home.v2 .v2-td .lt { color: #1B331A; font-size: 17px; font-weight: 800; text-decoration: none; }
@@ -735,6 +735,7 @@
 <script src="../js/store.js?v=3"></script>
 <script src="../js/install.js?v=3"></script>
 <script src="../js/share.js"></script>
+<script src="../js/brief-hook.js?v=1"></script>
 <script>
 (function () {
   var D = window.SsakaDesigns, S = window.SsakaStore;
@@ -1109,9 +1110,10 @@
 
     // 3. 싸바 브리핑 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 싸바 브리핑 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
-    td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 싸바 브리핑</em><h3>모르면 손해,<br>아는 사람만 챙겨요!</h3><p><span class="bt-long">지원금·정부 혜택·날씨·뉴스를 검색 안 해도 싸바가 매일 아침 골라 드려요</span><span class="bt-short">지원금·혜택·날씨·뉴스 매일 아침</span></p></div>' +
-      '<div class="ch"><span>☀️ 날씨</span><span>🗞️ 뉴스 요약</span><span>🔥 인기 검색어</span><span>💊 건강</span><span>🔔 정부 혜택</span><span>📻 라디오·TV</span></div>' +
+    td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 싸바 브리핑</em><h3>모르면 손해,<br>아는 사람만 챙겨요!</h3><p><span class="bt-long">인기 검색어·정부 혜택·뉴스를 검색 안 해도 싸바가 매일 아침 골라 드려요</span><span class="bt-short">검색어·혜택·뉴스 매일 아침</span></p></div>' +
+      '<div class="ch"><span>🔥 인기 검색어</span><span>🔔 정부 혜택</span><span>🗞️ 뉴스 요약</span><span>🏪 자영업자 정보</span><span>🎬 오디션</span><span>💊 건강</span><span>📺 TV·라디오</span></div>' +
       '<div class="ft"><a class="lt" href="../letter/">💌 오늘도 싸바? 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
+    if (window.savaHook) { try { td.querySelector('h3').innerHTML = window.savaHook(); } catch (e) {} } // 11-22: 사장님용 훅 제목 매일 바뀜 (js/brief-hook.js)
     tapGo(td, '../today/');
     v.appendChild(td);
 

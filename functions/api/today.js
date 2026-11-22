@@ -10,13 +10,11 @@
 //   GET /api/today?k=stock  : 📈 주식 탭 — 코스피·코스닥 + 미국(다우·나스닥·S&P500)·일본(니케이) + 큰 종목 6개 + 달러 (30분 캐시)
 //   GET /api/today?k=tp&t=… : 🙋 사람별 소식(11-22 대표님) — audition 오디션 · estate 부동산 · women 여성 · youth 청년·취업 · family 학부모·아이 · exam 대학입시 · worker 직장인·프리랜서
 //                              구글 뉴스 제목+링크만(본문 복사 없음), 1시간 캐시. 묶음(sec)마다 검색어 여러 개를 합쳐 최신순
-import { market, indexOf, readOne, SUM_RULE, gnText } from './letter.js';
+import { market, indexOf, readOne, SUM_RULE, gnText, clipSum, isAudition } from './letter.js';
 //   POST /api/today {sum:[{t,u}...]} : 📝 기사 4줄 요약(11-22 대표님: 브리핑의 모든 기사 제목 아래 4줄) — 한 번에 6개까지, 기사마다 하루 캐시(같은 기사는 다시 안 읽음)
-const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
-const NOT_ACT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
 const TP = {
   audition: [['🎬 오디션·배우 모집', ['배우 오디션 when:30d', '배우 모집 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '뮤지컬 오디션 OR 연극 오디션 when:30d', '모델 모집 OR 아역 오디션 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d'], 20,
-    x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && ACT.test(x.t) && !NOT_ACT.test(x.t) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)]],
+    x => isAudition(x.t)]],
   estate: [['🏠 청약·분양', ['아파트 청약 일정 when:7d', '청약 접수 OR 분양 일정 when:7d'], 8], ['📰 부동산 소식', ['부동산 시장 when:3d', '전세 OR 월세 시장 when:3d', '부동산 대책 OR 대출 규제 when:7d'], 12]],
   women: [['💼 여성 일자리·창업', ['경력단절 여성 지원 when:14d', '여성 창업 지원 OR 여성 재취업 when:14d'], 8], ['👶 임신·출산·육아 지원', ['출산 지원금 OR 육아 지원 when:7d', '임신 출산 혜택 OR 부모급여 when:14d'], 8], ['🌸 여성 건강', ['여성 건강 검진 OR 갱년기 when:14d'], 4]],
   youth: [['🧑 청년 지원 정책', ['청년 지원 정책 when:7d', '청년 월세 OR 청년 도약 OR 청년 교통비 when:14d'], 12], ['📋 채용·취업 소식', ['공개채용 OR 신입 채용 when:3d', '취업 박람회 OR 채용 설명회 when:7d'], 8]],
@@ -199,7 +197,7 @@ async function sumAI(arts, env, key) {
     const j = await r.json(), txt = ((j.content || []).find(x => x.type === 'text') || {}).text || '', out = {};
     let cur = null;
     txt.split('\n').forEach(line => { const m = line.match(/^\s*\[(\d+)\]\s*(.*)$/); if (m) { cur = m[1]; out[cur] = m[2]; } else if (cur && line.trim()) out[cur] += ' ' + line.trim(); });
-    Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; });
+    Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; else out[n] = clipSum(out[n]); });
     return out;
   } catch (e) { return {}; } finally { clearTimeout(tm); }
 }
@@ -209,7 +207,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     .map(x => ({ t: String(x.t || '').slice(0, 120), u: String(x.u) }));
   if (!list.length) return json({ sums: {} });
   const origin = new URL(request.url).origin, cache = caches.default, day = kst().toISOString().slice(0, 10);
-  const ck = u => new Request(origin + '/__tsum/' + day + '/' + encodeURIComponent(u));
+  const ck = u => new Request(origin + '/__tsum2/' + day + '/' + encodeURIComponent(u));
   const sums = {}, todo = [];
   await Promise.all(list.map(async x => { const h = await cache.match(ck(x.u)); if (h) { const v = await h.text(); if (v) sums[x.u] = v; } else todo.push(x); }));
   const key = env.BLOG_AI_KEY || env.ANTHROPIC_API_KEY;

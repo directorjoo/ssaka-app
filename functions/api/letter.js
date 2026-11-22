@@ -260,7 +260,17 @@ async function readOne(x) {
     return { url: u, text };
   } catch (e) { return null; }
 }
-const SUM_RULE = '너는 바쁜 사람에게 기사를 대신 읽어 주는 비서다. 아래 [번호] 기사 본문을 읽고 기사마다 꼭 4문장으로 요약한다(한 문장이 한 줄 — 받는 화면에서 4줄로 보임, 길어져도 괜찮으니 4문장을 채운다). 받는 사람이 이 요약만 보고 원문을 열지 말지 정할 수 있게: 무엇이 바뀌었는지·누가 해당되는지·언제까지·어떻게 신청하는지·얼마인지를 본문에 있는 대로 먼저. 본문에 없는 숫자·날짜·사실은 절대 지어내지 않는다. 본문이 기사 내용이 아니거나(광고·로그인 안내 등) 너무 짧아 알 수 없으면 그 번호는 "-"만 쓴다. 존댓말, 쉬운 말, 짧은 문장. 별표(*)·마크다운 금지.\n답 형식(다른 말 없이): 기사마다 한 줄에 "[번호] 요약".';
+const SUM_RULE = '너는 바쁜 사람에게 기사를 대신 읽어 주는 비서다. 아래 [번호] 기사 본문을 읽고 기사마다 4~5줄로 요약한다. 한 줄은 짧은 한 마디(25자 안팎, 절대 35자를 넘기지 않음)이고 줄마다 마침표(.)로 끝낸다 — 긴 문장은 쪼개고, 꾸밈말·배경 설명은 뺀다. 폰 화면에서 딱 4~5줄로 보여야 한다. 받는 사람이 이 요약만 보고 원문을 열지 말지 정할 수 있게: 무엇이 바뀌었는지·누가 해당되는지·언제까지·어떻게 신청하는지·얼마인지를 본문에 있는 대로 먼저. 본문에 없는 숫자·날짜·사실은 절대 지어내지 않는다. 본문이 기사 내용이 아니거나(광고·로그인 안내 등) 너무 짧아 알 수 없으면 그 번호는 "-"만 쓴다. 존댓말, 쉬운 말. 별표(*)·마크다운 금지.\n답 형식(다른 말 없이): 기사마다 한 줄에 "[번호] 요약"(요약 안의 줄은 마침표로만 구분).';
+// 11-22 대표님: 요약은 4~5줄만 — AI가 길게 써도 여기서 한 줄 40자·5줄로 자름(브리핑·오늘도 싸바? 공통)
+function clipSum(s) {
+  const ls = String(s || '').replace(/\*/g, '').split(/(?<=[.!?。](?:[)"'”’])?)\s+/).map(x => x.trim()).filter(Boolean);
+  return ls.slice(0, 5).map(x => x.length > 40 ? x.slice(0, 38).replace(/\s+\S*$/, '') + '…' : x).join(' ');
+}
+// 11-22 대표님: 배우 오디션 소식엔 '진짜 배우 모집·오디션 공고'만 — 영화 기사에 '오디션'이란 말만 있어도 나오던 것 막음.
+// 제목에 '배우·연기자·아역·모델… + 모집/오디션' 또는 '오디션 공고·모집·개최·접수' 같은 모집 말이 있어야 통과, 캐스팅 확정·예능 오디션 프로그램·영화 '오디션' 같은 기사는 뺌
+const AUD_YES = /(배우|연기자|연기|아역|모델|신인|단역|조연|주연|보조\s*출연|엑스트라|성우|출연자|뮤지컬|연극|극단|웹드라마|단편영화|숏폼)[^.,…]{0,10}(오디션|모집|공모|선발)|(오디션|캐스팅)\s*(공고|모집|개최|진행|접수|참가자|안내|일정|지원)|공개\s*오디션|배우\s*(공개\s*)?모집|캐스팅\s*콜/;
+const AUD_NO = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시|오디션\s*프로그램|서바이벌|예능|개봉|시청률|흥행|관객|박스오피스|리뷰|후기|첫\s*방송|캐스팅\s*(확정|된)|확정|합류|낙점|물망|발탁|인터뷰|닮|비주얼|합격|출신|근황|화제|수상|시상/;
+function isAudition(t) { t = String(t || ''); return AUD_YES.test(t) && !AUD_NO.test(t); }
 async function summarize(arts, k, env, key) {
   const who = { senior: '받는 사람: 60~80대 어르신', boss: '받는 사람: 동네 가게 대표님(자영업자)', actor: '받는 사람: 오디션을 찾는 배우' }[k];
   const r = await tfetch('https://api.anthropic.com/v1/messages', {
@@ -275,7 +285,7 @@ async function summarize(arts, k, env, key) {
     const m = line.match(/^\s*\[(\d+)\]\s*(.*)$/);
     if (m) { cur = m[1]; out[cur] = m[2]; } else if (cur && line.trim()) out[cur] += ' ' + line.trim();
   });
-  Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; });
+  Object.keys(out).forEach(n => { out[n] = out[n].replace(/\*/g, '').trim(); if (out[n].length < 15 || /^-+$/.test(out[n])) delete out[n]; else out[n] = clipSum(out[n]); });
   return out;
 }
 // ---------- 📈 오늘의 시세 ----------
@@ -293,7 +303,7 @@ async function indexOf(code, yh, kind) {
   } catch (e) {}
   return null;
 }
-export { indexOf, readOne, SUM_RULE }; // readOne·SUM_RULE: 싸바 브리핑 기사 4줄 요약(today.js)도 같이 씀
+export { indexOf, readOne, SUM_RULE, clipSum, isAudition }; // readOne·SUM_RULE: 싸바 브리핑 기사 4줄 요약(today.js)도 같이 씀
 export async function market() {
   const [ks, kq, fx] = await Promise.all([indexOf('KOSPI', '^KS11'), indexOf('KOSDAQ', '^KQ11'), tfetch('https://open.er-api.com/v6/latest/USD', {}, 5000).then(r => r.json()).catch(() => null)]);
   const idx = [], ex = [];
@@ -331,9 +341,7 @@ async function build(k, city, env) {
     const qs = ['배우 오디션 when:30d', '배우 모집 when:30d', '공개 오디션 배우 OR 연기자 when:30d', '연기자 오디션 OR 연기자 모집 when:30d', '캐스팅 공고 OR 배우 공모 when:30d', '뮤지컬 오디션 OR 뮤지컬 배우 모집 when:30d', '연극 오디션 OR 연극 배우 모집 when:30d', '웹드라마 OR 단편영화 배우 모집 when:30d', '모델 모집 OR 아역 오디션 when:30d', '배우 오디션 개최 when:30d', '신인 배우 발굴 오디션 when:30d', '숏폼 드라마 배우 모집 when:30d', 'site:themusical.co.kr 오디션 when:60d', 'site:cine21.com 오디션 when:60d'];
     const got = await Promise.all(qs.map(q => news(q, 12)));
     // 11-22 대표님: '오디션'만 보면 술·창업자 오디션까지 들어옴 → 제목에 배우·연기 쪽 말이 있어야 하고, 창업·가수 등 다른 오디션은 뺌
-    const ACT = /배우|연기|아역|뮤지컬|연극|드라마|영화|단편|웹드|숏폼|캐스팅|모델|보조출연|엑스트라|단역|조연|주연|극단|뮤비|뮤직비디오|광고|성우/;
-    const NOT = /창업|스타트업|사업가|기업가|투자|주류|전통주|막걸리|와인|맥주|소주|셰프|요리|트로트|가수|아이돌|보컬|댄서|래퍼|밴드|유튜버|인플루언서|공무원|장학|입시/;
-    const all = uniq([].concat(...got)).filter(x => /오디션|모집|캐스팅|공모|선발/.test(x.t) && ACT.test(x.t) && !NOT.test(x.t) && !/vietnam/i.test(x.src) && !/발탁|인터뷰|닮|비주얼|합격|출신|근황|화제/.test(x.t)).sort((x, y) => y.d - x.d).filter((x, i, a) => a.slice(0, i).filter(y => y.src === x.src).length < 4).slice(0, 20); // 한 곳(출처)에서 최대 4개 — 필름메이커스만 가득 차지 않게
+    const all = uniq([].concat(...got)).filter(x => isAudition(x.t) && !/vietnam/i.test(x.src)).sort((x, y) => y.d - x.d).filter((x, i, a) => a.slice(0, i).filter(y => y.src === x.src).length < 4).slice(0, 20); // 한 곳(출처)에서 최대 4개 — 필름메이커스만 가득 차지 않게
     const ic = t => /뮤지컬/.test(t) ? '🎤' : /연극/.test(t) ? '🎭' : /드라마/.test(t) ? '📺' : /광고|모델|뮤직비디오|뮤비/.test(t) ? '📢' : '🎬';
     groups = [['🎬', '오디션·모집', all.map(x => Object.assign({ icon: ic(x.t) }, x))]];
     links = ACTOR_LINKS;
@@ -400,7 +408,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ city, 관광공사: diag.tour, 기업마당: diag.bizinfo, 행사: f, 지원사업: p.slice(0, 5) });
   }
   const slot = ymd(kst()) + '-' + Math.floor(kst().getUTCHours() / 3);
-  const ckey = new Request(u.origin + '/__letter10/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
+  const ckey = new Request(u.origin + '/__letter11/' + k + '/' + encodeURIComponent(city) + '/' + slot), cache = caches.default;
   const hit = await cache.match(ckey);
   // ?more=1 : 아직 요약 안 한 기사(앞 7개 다음)를 13개까지 더 읽고 요약해 캐시에 합침
   if (u.searchParams.get('more')) {

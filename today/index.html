@@ -359,10 +359,10 @@
   //   기사 목록이 화면에 그려지면 저절로 6개씩 서버(POST /api/today)에 물어 채움. 같은 기사는 이 폰에 하루 기억.
   function suAttr(u, t) { return /^https:\/\//.test(u || '') ? ' data-su="' + esc(u) + '" data-st="' + esc(t || '') + '"' : ''; }
   function suBox(u) { return /^https:\/\//.test(u || '') ? '<span class="ss wt">✍️ 4줄 요약 만드는 중…</span>' : ''; }
-  function lines4(t) { return String(t).replace(/([.!?](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
+  function lines4(t) { return String(t).replace(/([.!?…](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
   var SUDAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10), suQ = [], suRun = 0;
-  function suGet(u) { try { var o = JSON.parse(localStorage.getItem('sava-sum') || '{}'); return o.d === SUDAY ? o.m[u] : undefined; } catch (e) { return undefined; } }
-  function suSet(m) { try { var o = JSON.parse(localStorage.getItem('sava-sum') || '{}'); if (o.d !== SUDAY) o = { d: SUDAY, m: {} }; Object.keys(m).forEach(function (k) { o.m[k] = m[k]; }); localStorage.setItem('sava-sum', JSON.stringify(o)); } catch (e) {} }
+  function suGet(u) { try { var o = JSON.parse(localStorage.getItem('sava-sum2') || '{}'); return o.d === SUDAY ? o.m[u] : undefined; } catch (e) { return undefined; } }
+  function suSet(m) { try { var o = JSON.parse(localStorage.getItem('sava-sum2') || '{}'); if (o.d !== SUDAY) o = { d: SUDAY, m: {} }; Object.keys(m).forEach(function (k) { o.m[k] = m[k]; }); localStorage.setItem('sava-sum2', JSON.stringify(o)); } catch (e) {} }
   function suPaint(li, v) {
     var b = li.querySelector('.ss'); if (!b) return;
     if (v) { b.classList.remove('wt'); b.textContent = lines4(v); } else b.remove();

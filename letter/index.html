@@ -156,7 +156,7 @@
   }
   var moreDone = false;
   // 요약을 한 문장씩 줄로 (4줄)
-  function lines4(t) { return String(t).replace(/([.!?](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
+  function lines4(t) { return String(t).replace(/([.!?…](?:[)"'”’])?)\s+(?=\S)/g, '$1\n'); }
   function go() {
     if (!rcv) try { localStorage.setItem('sava-letter-k', k); localStorage.setItem('sava-letter-city', city); } catch (e) {}
     history.replaceState(null, '', '?k=' + k + (k === 'actor' ? '' : '&city=' + encodeURIComponent(city)) + (rcv ? '&r=1' : ''));

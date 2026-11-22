@@ -16,6 +16,9 @@
 // POST /api/star/photo                   사진 올리기(image/jpeg, 2MB까지) → {key, url}
 // GET  /api/star/photo/<key>.jpg         사진
 // POST /api/star/remove                  {type: audition|profile, id}  관리자만
+// POST /api/star/audition/<id>/verify    {on}  관리자: ✓ 싸바 확인 공고 표시
+// (11-23 대표님: 모집요강·지원 다시) 공고 d에 rl(배역 여러 개 {n 배역, t 비중, s 성별, a 나이, d 설명}), qual 지원 자격, plus 우대,
+//   payt 출연료 방식, dir 감독, syn 줄거리, need 제출할 것, adate·aplace 오디션 일시·장소, urgent 급구. 지원에 x {role, msg, video}
 import { currentUser } from '../auth/[[path]].js';
 
 function json(o, status) {
@@ -35,14 +38,25 @@ function cleanProfile(d) {
     name: S(d.name, 20), sex: S(d.sex, 6), born: S(d.born, 4).replace(/\D/g, ''), height: S(d.height, 3).replace(/\D/g, ''), weight: S(d.weight, 3).replace(/\D/g, ''),
     area: S(d.area, 20), fields: (Array.isArray(d.fields) ? d.fields : []).map(x => S(x, 10)).filter(Boolean).slice(0, 8),
     skill: S(d.skill, 120), career: S(d.career, 2000), intro: S(d.intro, 600), agency: S(d.agency, 40),
-    video: /^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be|vimeo\.com|tv\.naver\.com|naver\.me)\//.test(String(d.video || '')) ? S(d.video, 300) : '',
+    video: okVideo(d.video) ? S(d.video, 300) : '',
     photos: (Array.isArray(d.photos) ? d.photos : []).filter(k => KEY.test(k)).slice(0, 6)
   };
 }
+const ROLE_T = ['주연', '조연', '단역', '앙상블', '보조출연', '기타'];
+const NEED = ['프로필 사진', '연기 영상', '자유 연기', '지정 대본', '노래', '춤', '사투리', '포트폴리오'];
+const okVideo = v => /^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be|vimeo\.com|tv\.naver\.com|naver\.me)\//.test(String(v || ''));
+function cleanRoles(rl) {
+  return (Array.isArray(rl) ? rl : []).map(r => ({ n: S(r && r.n, 30), t: ROLE_T.includes(r && r.t) ? r.t : '', s: ['무관', '여', '남'].includes(r && r.s) ? r.s : '', a: S(r && r.a, 20), d: S(r && r.d, 200) }))
+    .filter(r => r.n || r.d).slice(0, 10);
+}
 function cleanAudition(d) {
   d = d || {};
+  const rl = cleanRoles(d.rl);
+  const rolesTxt = rl.length ? rl.map(r => [r.t, r.n].filter(Boolean).join(' ') + (r.s || r.a ? ' (' + [r.a, r.s && r.s !== '무관' ? r.s + '성' : ''].filter(Boolean).join(' ') + ')' : '') + (r.d ? ' — ' + r.d : '')).join('\n') : '';
   return {
-    title: S(d.title, 60), kind: S(d.kind, 10), org: S(d.org, 40), roles: S(d.roles, 600), who: S(d.who, 120),
+    rl, qual: S(d.qual, 300), plus: S(d.plus, 300), payt: S(d.payt, 10), dir: S(d.dir, 40), syn: S(d.syn, 1000),
+    need: (Array.isArray(d.need) ? d.need : []).filter(x => NEED.includes(x)).slice(0, 8), adate: S(d.adate, 60), aplace: S(d.aplace, 60), urgent: !!d.urgent,
+    title: S(d.title, 60), kind: S(d.kind, 10), org: S(d.org, 40), roles: rolesTxt || S(d.roles, 600), who: S(d.who, 120),
     when: S(d.when, 60), where: S(d.where, 60), pay: S(d.pay, 60), deadline: /^\d{4}-\d{2}-\d{2}$/.test(d.deadline || '') ? d.deadline : '',
     steps: S(d.steps, 300), detail: S(d.detail, 3000),
     contact: S(d.contact, 80) // 최종 합격자에게만 보임
@@ -51,7 +65,7 @@ function cleanAudition(d) {
 function pubAudition(r, withContact) {
   let d = {}; try { d = JSON.parse(r.d); } catch (e) {}
   if (!withContact) delete d.contact;
-  return Object.assign(d, { id: r.id, st: r.st, at: r.at, n: r.n || 0 });
+  return Object.assign(d, { id: r.id, st: r.st, at: r.at, n: r.n || 0, v: r.v || 0, vf: !!r.vf });
 }
 function pubProfile(r) {
   let d = {}; try { d = JSON.parse(r.d); } catch (e) {}
@@ -59,10 +73,17 @@ function pubProfile(r) {
   return Object.assign(d, { uid: r.uid, pub: !!r.pub, at: r.at });
 }
 
+let altered = false;
 async function ensure(db) {
   await db.prepare('CREATE TABLE IF NOT EXISTS star_profiles (uid INTEGER PRIMARY KEY, d TEXT NOT NULL, pub INTEGER DEFAULT 0, at INTEGER NOT NULL)').run();
   await db.prepare('CREATE TABLE IF NOT EXISTS star_auditions (id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER NOT NULL, d TEXT NOT NULL, deadline TEXT, st TEXT NOT NULL DEFAULT \'open\', at INTEGER NOT NULL)').run();
   await db.prepare('CREATE TABLE IF NOT EXISTS star_apps (aid INTEGER NOT NULL, uid INTEGER NOT NULL, st TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (aid, uid))').run();
+  if (altered) return;
+  // 11-23: 조회수(v)·싸바 확인(vf)·지원 내용(x) — 이미 있으면 오류 나므로 하나씩 조용히
+  for (const q of ['ALTER TABLE star_auditions ADD COLUMN v INTEGER DEFAULT 0', 'ALTER TABLE star_auditions ADD COLUMN vf INTEGER DEFAULT 0', 'ALTER TABLE star_apps ADD COLUMN x TEXT']) {
+    try { await db.prepare(q).run(); } catch (e) {}
+  }
+  altered = true;
 }
 
 export async function onRequest({ request, env, params }) {
@@ -89,16 +110,17 @@ export async function onRequest({ request, env, params }) {
   try {
     // ── 공고 목록
     if (path === 'auditions' && method === 'GET') {
-      const rs = await db.prepare("SELECT a.id, a.d, a.st, a.at, (SELECT COUNT(*) FROM star_apps p WHERE p.aid = a.id) AS n FROM star_auditions a ORDER BY CASE a.st WHEN 'open' THEN 0 WHEN 'announced' THEN 1 ELSE 2 END, a.at DESC LIMIT 100").all();
+      const rs = await db.prepare("SELECT a.id, a.d, a.st, a.at, a.v, a.vf, (SELECT COUNT(*) FROM star_apps p WHERE p.aid = a.id) AS n FROM star_auditions a ORDER BY CASE a.st WHEN 'open' THEN 0 WHEN 'announced' THEN 1 ELSE 2 END, a.at DESC LIMIT 100").all();
       return json({ list: (rs.results || []).map(r => pubAudition(r, false)), login: !!uid });
     }
     // ── 공고 하나
     m = /^audition\/(\d+)$/.exec(path);
     if (m && method === 'GET') {
       const id = +m[1];
-      const r = await db.prepare('SELECT id, uid, d, st, at FROM star_auditions WHERE id = ?').bind(id).first();
+      const r = await db.prepare('SELECT id, uid, d, st, at, v, vf, (SELECT COUNT(*) FROM star_apps p WHERE p.aid = star_auditions.id) AS n FROM star_auditions WHERE id = ?').bind(id).first();
       if (!r) return json({ error: 'none' }, 404);
       const owner = uid && r.uid === uid;
+      if (!owner) { try { await db.prepare('UPDATE star_auditions SET v = COALESCE(v, 0) + 1 WHERE id = ?').bind(id).run(); r.v = (r.v || 0) + 1; } catch (e) {} }
       const mineApp = uid ? await db.prepare('SELECT st FROM star_apps WHERE aid = ? AND uid = ?').bind(id, uid).first() : null;
       const passed = mineApp && mineApp.st === '최종 합격' && r.st === 'announced';
       const out = { a: pubAudition(r, owner || passed), owner: !!owner, login: !!uid, admin, my: mineApp ? shown(mineApp.st, r.st) : '' };
@@ -108,8 +130,8 @@ export async function onRequest({ request, env, params }) {
         out.winners = (w.results || []).map(x => { try { return JSON.parse(x.d).name || '싸바 배우'; } catch (e) { return '싸바 배우'; } });
       }
       if (owner) {
-        const ap = await db.prepare('SELECT p.uid, p.st, p.at, s.d, s.pub FROM star_apps p LEFT JOIN star_profiles s ON s.uid = p.uid WHERE p.aid = ? ORDER BY p.at').bind(id).all();
-        out.apps = (ap.results || []).map(x => Object.assign(pubProfile({ uid: x.uid, d: x.d || '{}', pub: x.pub, at: x.at }), { st: x.st }));
+        const ap = await db.prepare('SELECT p.uid, p.st, p.at, p.x, s.d, s.pub FROM star_apps p LEFT JOIN star_profiles s ON s.uid = p.uid WHERE p.aid = ? ORDER BY p.at').bind(id).all();
+        out.apps = (ap.results || []).map(x => { let ax = {}; try { ax = JSON.parse(x.x || '{}'); } catch (e) {} return Object.assign(pubProfile({ uid: x.uid, d: x.d || '{}', pub: x.pub, at: x.at }), { st: x.st, ax }); });
       }
       return json(out);
     }
@@ -117,7 +139,7 @@ export async function onRequest({ request, env, params }) {
     if (path === 'audition' && method === 'POST') {
       const n = need(); if (n) return n;
       const b = await body(), d = cleanAudition(b.d);
-      if (!d.title || !d.roles) return json({ error: 'few' }, 400);
+      if (!d.title || (!d.roles && !d.rl.length)) return json({ error: 'few' }, 400);
       const now = Date.now();
       if (b.id) {
         const r = await db.prepare('SELECT uid FROM star_auditions WHERE id = ?').bind(+b.id).first();
@@ -139,6 +161,13 @@ export async function onRequest({ request, env, params }) {
       await db.prepare('UPDATE star_auditions SET st = ? WHERE id = ?').bind(st, +m[1]).run();
       return json({ ok: 1 });
     }
+    m = /^audition\/(\d+)\/verify$/.exec(path);
+    if (m && method === 'POST') {
+      if (!admin) return json({ error: 'admin' }, 403);
+      const b = await body();
+      await db.prepare('UPDATE star_auditions SET vf = ? WHERE id = ?').bind(b.on ? 1 : 0, +m[1]).run();
+      return json({ ok: 1 });
+    }
     // ── 지원
     if (path === 'apply' && method === 'POST') {
       const n = need(); if (n) return n;
@@ -149,7 +178,8 @@ export async function onRequest({ request, env, params }) {
       if (!a) return json({ error: 'none' }, 404);
       if (a.st !== 'open') return json({ error: 'closed' }, 409);
       if (a.uid === uid) return json({ error: 'own' }, 409);
-      await db.prepare("INSERT INTO star_apps (aid, uid, st, at) VALUES (?, ?, '접수', ?) ON CONFLICT(aid, uid) DO NOTHING").bind(aid, uid, Date.now()).run();
+      const x = JSON.stringify({ role: S(b.role, 40), msg: S(b.msg, 300), video: okVideo(b.video) ? S(b.video, 300) : '' });
+      await db.prepare("INSERT INTO star_apps (aid, uid, st, at, x) VALUES (?, ?, '접수', ?, ?) ON CONFLICT(aid, uid) DO UPDATE SET x = excluded.x WHERE star_apps.st = '접수'").bind(aid, uid, Date.now(), x).run();
       return json({ ok: 1 });
     }
     if (path === 'apply' && method === 'DELETE') {
@@ -190,9 +220,11 @@ export async function onRequest({ request, env, params }) {
     // ── 내 지원 · 내 공고
     if (path === 'mine' && method === 'GET') {
       if (!uid) return json({ login: false });
-      const a = await db.prepare('SELECT a.id, a.d, a.st, a.at, p.st AS my FROM star_apps p JOIN star_auditions a ON a.id = p.aid WHERE p.uid = ? ORDER BY p.at DESC LIMIT 100').bind(uid).all();
+      const a = await db.prepare('SELECT a.id, a.d, a.st, a.at, a.v, a.vf, p.st AS my FROM star_apps p JOIN star_auditions a ON a.id = p.aid WHERE p.uid = ? ORDER BY p.at DESC LIMIT 100').bind(uid).all();
       const o = await db.prepare('SELECT a.id, a.d, a.st, a.at, (SELECT COUNT(*) FROM star_apps p WHERE p.aid = a.id) AS n FROM star_auditions a WHERE a.uid = ? ORDER BY a.at DESC LIMIT 100').bind(uid).all();
-      return json({ login: true, applied: (a.results || []).map(r => Object.assign(pubAudition(r, false), { my: shown(r.my, r.st) })), posted: (o.results || []).map(r => pubAudition(r, true)) });
+      const pr = await db.prepare('SELECT d FROM star_profiles WHERE uid = ?').bind(uid).first();
+      let praw = null; if (pr) { try { praw = JSON.parse(pr.d); } catch (e) {} }
+      return json({ login: true, p: praw, applied: (a.results || []).map(r => Object.assign(pubAudition(r, false), { my: shown(r.my, r.st) })), posted: (o.results || []).map(r => pubAudition(r, true)) });
     }
     // ── 사진 올리기
     if (path === 'photo' && method === 'POST') {

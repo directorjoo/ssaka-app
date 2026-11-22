@@ -18,6 +18,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../img/favicon.png?v=4">
   <link rel="stylesheet" href="../css/brand.css">
+  <link rel="stylesheet" href="../css/steps.css?v=3">
   <!-- 싸바스타 (11-21): 배우 프로필 접수 + 오디션 올리기·지원·심사·발표. 서버는 functions/api/star/[[path]].js -->
   <style>
     * { box-sizing: border-box; } [hidden] { display: none !important; }
@@ -106,6 +107,74 @@
     .foot .ln a { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 16px; background: #FFF8EF; color: #3A322B; text-decoration: none; font-size: 15px; font-weight: 800; line-height: 1.3; }
     .foot .ln a small { font-size: 12.5px; font-weight: 600; color: #8A8178; }
     .foot .by { margin: 14px 0 0; font-size: 12.5px; color: #A39A90; text-align: center; }
+    /* 11-23 모집요강·지원 다시 (대표님: 캐스팅 앱 참고) — 체리색 그대로, 한 화면 2~3색 */
+    .fl { display: flex; gap: 6px; overflow-x: auto; margin: 0 -16px 12px; padding: 2px 16px 4px; scrollbar-width: none; }
+    .fl::-webkit-scrollbar { display: none; }
+    .fl button { flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #E9E2D8; background: #fff; color: #4A4038; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .fl button.on { background: #B3132B; border-color: #B3132B; color: #fff; }
+    .ac { position: relative; }
+    .ac .bm { position: absolute; right: 12px; top: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #FFF8EF; font-size: 19px; cursor: pointer; }
+    .ac h3 { padding-right: 44px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; font-size: 15px; color: #6B6259; }
+    .rchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .rchips span { padding: 3px 10px; border-radius: 10px; background: #FFF8EF; border: 1px solid #EFE6D6; font-size: 14.5px; font-weight: 700; color: #5A4A3A; }
+    .rchips span b { color: #B3132B; margin-right: 4px; }
+    .ptag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 14px; font-weight: 800; margin: 0 4px 4px 0; }
+    .ptag.u { background: #B3132B; color: #fff; } .ptag.v { background: #E8F4EC; color: #17573F; }
+    .hd { padding: 18px 16px 14px; }
+    .hd h2 { margin: 6px 0 4px; font-size: 24px; font-weight: 900; letter-spacing: -.03em; line-height: 1.3; word-break: keep-all; }
+    .hd .org { font-size: 16px; color: #4A4038; font-weight: 700; }
+    .hd .stat { margin-top: 10px; padding-top: 10px; border-top: 1px solid #F3E8DC; font-size: 14.5px; color: #8A8178; }
+    .box { margin: 0 0 12px; padding: 16px; border-radius: 20px; background: #fff; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
+    .box > h3 { margin: 0 0 12px; font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
+    .box .k { margin: 14px 0 4px; font-size: 15px; font-weight: 800; color: #8A8178; }
+    .box .k:first-of-type { margin-top: 0; }
+    .box .dl div:first-child { border-top: 0; } .box .dl dt { width: 96px; }
+    .box .t { font-size: 16.5px; line-height: 1.6; color: #2b2420; white-space: pre-line; word-break: keep-all; }
+    .role { margin: 0 0 8px; padding: 12px 14px; border-radius: 14px; background: #FFFCF5; border: 1px solid #EFE6D6; }
+    .role .r1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 16.5px; font-weight: 900; }
+    .role .r1 i { font-style: normal; padding: 2px 9px; border-radius: 999px; background: #B3132B; color: #fff; font-size: 14px; }
+    .role .r1 small { font-size: 14.5px; font-weight: 700; color: #6B6259; }
+    .role p { margin: 6px 0 0; font-size: 15.5px; line-height: 1.5; color: #4A4038; word-break: keep-all; }
+    .pay { font-size: 18px; font-weight: 900; color: #17573F; }
+    .needs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .needs span { padding: 5px 11px; border-radius: 999px; background: #F1EEEA; font-size: 15px; font-weight: 700; }
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 15px; font-weight: 800; }
+    .flow span { padding: 6px 11px; border-radius: 12px; background: #FFF8EF; border: 1px solid #EFE6D6; }
+    .flow em { font-style: normal; color: #C9B9A8; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 -8px 20px -14px rgba(0,0,0,.4); }
+    .bar .in { max-width: 560px; margin: 0 auto; display: flex; gap: 8px; }
+    .bar .btn { margin: 0; flex: 1; }
+    .bar .sq { flex: none; width: 56px; min-height: 56px; border-radius: 18px; border: 1.5px solid #E9E2D8; background: #fff; font-size: 22px; cursor: pointer; }
+    .sheet { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: rgba(20,10,5,.45); }
+    .sheet .pn { width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); border-radius: 26px 26px 0 0; background: #FFFCF5; }
+    .sheet h3 { margin: 0 0 4px; font-size: 21px; font-weight: 900; }
+    .me { display: flex; gap: 12px; align-items: center; }
+    .me .ph { flex: none; width: 72px; aspect-ratio: 3/4; border-radius: 12px; background: #F3ECE6 center/cover; }
+    .me b { font-size: 18px; } .me p { margin: 3px 0 0; font-size: 15px; color: #6B6259; }
+    .gauge { margin: 10px 0 0; } .gauge .g0 { height: 8px; border-radius: 99px; background: #F1EEEA; overflow: hidden; }
+    .gauge .g1 { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #D8475E, #B3132B); }
+    .gauge .gt { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14.5px; font-weight: 800; color: #6B6259; }
+    .gauge .gt b { color: #B3132B; }
+    .rpick label { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 8px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid #E9E2D8; background: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .rpick label:has(input:checked) { border-color: #B3132B; background: #FFF1F3; }
+    .rpick input { width: 20px; height: 20px; margin-top: 2px; accent-color: #B3132B; flex: none; }
+    .done { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: rgba(20,10,5,.5); }
+    .done .pn { width: 100%; max-width: 360px; padding: 26px 20px 20px; border-radius: 24px; background: #fff; text-align: center; animation: pop .35s ease-out; }
+    .done .big { font-size: 56px; line-height: 1; }
+    .done h3 { margin: 10px 0 6px; font-size: 21px; font-weight: 900; } .done p { margin: 0; font-size: 16px; color: #4A4038; line-height: 1.55; word-break: keep-all; }
+    @keyframes pop { from { transform: scale(.8); opacity: 0; } to { transform: none; opacity: 1; } }
+    .track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 10px; }
+    .track span { padding: 6px 2px; border-radius: 10px; background: #F1EEEA; color: #A39A90; font-size: 13.5px; font-weight: 800; text-align: center; }
+    .track span.on { background: #B3132B; color: #fff; } .track span.no { background: #6B6259; color: #fff; }
+    .rlist .rw { position: relative; margin: 0 0 10px; padding: 12px; border-radius: 16px; background: #fff; border: 1.5px solid #E9E2D8; }
+    .rlist .rw .row2 { margin-top: 8px; }
+    .rlist .rw .x { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #F1EEEA; font-size: 15px; cursor: pointer; }
+    .rlist .rw input, .rlist .rw select { padding: 11px 12px; font-size: 16px; }
+    .addrole { display: block; width: 100%; min-height: 48px; border-radius: 14px; border: 2px dashed #D9C9BB; background: #fff; color: #8E0F22; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .amsg { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #FFFCF5; border: 1px solid #EFE6D6; font-size: 15px; line-height: 1.5; white-space: pre-line; }
+    .stp label.f:first-of-type { margin-top: 0; }
+    body.has-bar .w { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
   </style>
 </head>
 <body>
@@ -183,80 +252,201 @@
     '<li>공고를 열고 <b>[지원하기]</b> 한 번 → 결과는 <b>내 지원</b>에서</li>' +
     '<li><b>캐스팅 담당</b> — 오디션 올리기 → 카톡으로 공고 알리기</li>' +
     '<li>지원자마다 1차·2차·최종 결과 고르기 → <b>[최종 발표하기]</b></li></ol></div></details>';
+  // ── 저장한 공고(🔖, 이 폰에만) · 프로필 완성도
+  function bmGet() { try { return JSON.parse(localStorage.getItem('star-bm') || '[]'); } catch (e) { return []; } }
+  function bmHas(id) { return bmGet().indexOf(+id) >= 0; }
+  function bmToggle(id) { var l = bmGet(), i = l.indexOf(+id); if (i >= 0) l.splice(i, 1); else l.unshift(+id); try { localStorage.setItem('star-bm', JSON.stringify(l.slice(0, 200))); } catch (e) {} return i < 0; }
+  function fillRate(p) {
+    if (!p) return 0;
+    var ks = [p.name, (p.photos || []).length, (p.photos || []).length >= 3, p.sex, p.born, p.height, p.area, (p.fields || []).length, p.skill, p.career, p.intro, p.video];
+    return Math.round(ks.filter(Boolean).length / ks.length * 100);
+  }
+  function gauge(n) {
+    return '<div class="gauge"><div class="gt"><span>프로필 완성도</span><b>' + n + '%</b></div><div class="g0"><div class="g1" style="width:' + n + '%"></div></div>' +
+      (n < 100 ? '<p style="margin:6px 0 0;font-size:14px;color:#8A8178">사진 3장·출연작·연기 영상까지 채우면 캐스팅 담당 눈에 더 잘 띄어요.</p>' : '') + '</div>';
+  }
+  function roleLine(r) { return [r.a, r.s && r.s !== '무관' ? r.s + '성' : (r.s === '무관' ? '성별 무관' : '')].filter(Boolean).join(' · '); }
+  function payText(a) { return [a.payt && a.payt !== '협의' ? a.payt : '', a.pay].filter(Boolean).join(' ') || (a.payt === '협의' ? '협의' : ''); }
+  function tags(a) {
+    return (a.urgent && a.st === 'open' ? '<span class="ptag u">📢 급구</span>' : '') + stPill(a) + (a.kind ? '<span class="pill k">' + esc(a.kind) + '</span>' : '') + (a.vf ? '<span class="ptag v">✓ 싸바 확인</span>' : '');
+  }
+
   // ── 공고 목록
+  var LIST = [], FL = '전체';
   function viewList() {
     tabOn('list');
-    $v.innerHTML = INTRO + '<h2 class="sec" style="margin-top:6px">🎬 지금 모집 중인 오디션</h2><div id="ls" class="empty">불러오는 중…</div>';
+    $v.innerHTML = INTRO + '<h2 class="sec" style="margin-top:6px">🎬 지금 모집 중인 오디션</h2>' +
+      '<div class="fl" id="fl">' + ['전체', '📢 급구', '🔖 저장한 공고'].concat(KINDS.filter(function (k) { return k !== '기타'; })).map(function (k) { return '<button type="button" data-k="' + k + '"' + (k === FL ? ' class="on"' : '') + '>' + k + '</button>'; }).join('') + '</div>' +
+      '<div id="ls" class="empty">불러오는 중…</div>';
+    document.querySelectorAll('#fl button').forEach(function (b) { b.onclick = function () { FL = b.dataset.k; document.querySelectorAll('#fl button').forEach(function (x) { x.classList.toggle('on', x === b); }); drawList(); }; });
     api('auditions').then(function (j) {
       var ls = document.getElementById('ls');
       if (j.error) { ls.textContent = errText(j.error); return; }
-      if (!j.list.length) { ls.innerHTML = '아직 올라온 오디션이 없어요.<br>캐스팅 담당이시면 <a href="#post">오디션 올리기</a>로 첫 공고를 올려 주세요.'; return; }
-      ls.className = ''; ls.innerHTML = j.list.map(function (a) {
-        return '<a class="card" href="#a/' + a.id + '">' + stPill(a) + (a.kind ? '<span class="pill k">' + esc(a.kind) + '</span>' : '') +
-          '<h3>' + esc(a.title) + '</h3><p>' + esc(a.org || '') + (a.where ? ' · ' + esc(a.where) : '') + '</p>' +
-          (a.who ? '<p>🎭 ' + esc(a.who) + '</p>' : '') + '<p>지원 ' + (a.n || 0) + '명</p></a>';
-      }).join('');
+      LIST = j.list || []; drawList();
     });
   }
+  function drawList() {
+    var ls = document.getElementById('ls'); if (!ls) return;
+    var l = LIST.filter(function (a) {
+      if (FL === '전체') return true;
+      if (FL === '📢 급구') return a.urgent && a.st === 'open';
+      if (FL === '🔖 저장한 공고') return bmHas(a.id);
+      return a.kind === FL;
+    });
+    if (!LIST.length) { ls.className = 'empty'; ls.innerHTML = '아직 올라온 오디션이 없어요.<br>캐스팅 담당이시면 <a href="#post">오디션 올리기</a>로 첫 공고를 올려 주세요.'; return; }
+    if (!l.length) { ls.className = 'empty'; ls.innerHTML = FL === '🔖 저장한 공고' ? '저장한 공고가 없어요. 공고 오른쪽 위 🔖를 누르면 여기 모여요.' : '이 분야 공고는 아직 없어요.'; return; }
+    ls.className = '';
+    ls.innerHTML = l.map(function (a) {
+      var rl = (a.rl || []).slice(0, 4);
+      return '<a class="card ac" href="#a/' + a.id + '">' + tags(a) +
+        '<button class="bm" type="button" data-bm="' + a.id + '" aria-label="공고 저장">' + (bmHas(a.id) ? '🔖' : '🏷️') + '</button>' +
+        '<h3>' + esc(a.title) + '</h3><p>' + esc(a.org || '') + '</p>' +
+        (rl.length ? '<div class="rchips">' + rl.map(function (r) { return '<span>' + (r.t ? '<b>' + esc(r.t) + '</b>' : '') + esc(r.n || '') + (roleLine(r) ? ' · ' + esc(roleLine(r)) : '') + '</span>'; }).join('') + ((a.rl || []).length > 4 ? '<span>+' + ((a.rl || []).length - 4) + '</span>' : '') + '</div>' : (a.who ? '<p>🎭 ' + esc(a.who) + '</p>' : '')) +
+        '<div class="meta">' + [a.deadline ? '📅 마감 ' + esc(a.deadline.slice(5).replace('-', '/')) : '', a.when ? '🎬 ' + esc(a.when) : '', a.where ? '📍 ' + esc(a.where) : '', payText(a) ? '💰 ' + esc(payText(a)) : ''].filter(Boolean).join('<span></span>') + '</div>' +
+        '<div class="meta">조회 ' + (a.v || 0) + ' · 지원자 ' + (a.n || 0) + '명</div></a>';
+    }).join('');
+    ls.querySelectorAll('[data-bm]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); b.textContent = bmToggle(b.dataset.bm) ? '🔖' : '🏷️'; if (FL === '🔖 저장한 공고') drawList(); }; });
+  }
 
-  // ── 공고 하나
+  // ── 공고 하나 (모집 요강 · 작품 정보 · 일정)
+  var CUR = null;
   function viewAudition(id) {
     tabOn('list');
     $v.innerHTML = '<div class="empty">불러오는 중…</div>';
     api('audition/' + id).then(function (j) {
       if (j.error) { $v.innerHTML = '<div class="empty">' + errText(j.error) + '</div>'; return; }
-      var a = j.a, h = '';
-      h += '<div class="card">' + stPill(a) + (a.kind ? '<span class="pill k">' + esc(a.kind) + '</span>' : '') + '<h3 style="font-size:23px">' + esc(a.title) + '</h3>';
-      h += '<dl class="dl">' + [['제작', a.org], ['모집 배역', a.roles], ['찾는 배우', a.who], ['촬영·공연', a.when], ['장소', a.where], ['출연료', a.pay], ['마감', a.deadline ? a.deadline + ' (' + dday(a.deadline) + ')' : ''], ['심사 순서', a.steps], ['자세히', a.detail]]
-        .filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl></div>';
+      var a = j.a, h = '', rl = a.rl || []; CUR = j;
+      h += '<div class="box hd">' + tags(a) + '<h2>' + esc(a.title) + '</h2><div class="org">' + esc([a.org, a.dir ? '감독 ' + a.dir : ''].filter(Boolean).join(' · ')) + '</div>' +
+        '<div class="stat">조회 ' + (a.v || 0) + ' · 지원자 ' + (a.n || 0) + '명' + (a.deadline ? ' · 마감 ' + esc(a.deadline) + ' (' + dday(a.deadline) + ')' : '') + '</div></div>';
       if (j.winners) h += '<div class="win"><h3>🏆 최종 합격을 축하합니다</h3><p>' + (j.winners.length ? j.winners.map(esc).join(' · ') : '합격자 없음') + '</p></div>';
-      if (j.my) {
-        h += '<div class="notice">내 결과: <b>' + esc(j.my) + '</b>' + (j.my === '최종 합격' && a.contact ? '<br>📞 캐스팅 담당 연락처: <b>' + esc(a.contact) + '</b><br>연락은 배우님이 정하세요.' : '') + '</div>';
-        if (j.my === '접수' && a.st === 'open') h += '<button class="btn lite" id="cancel">지원 취소하기</button>';
-      } else if (!j.owner && a.st === 'open' && dday(a.deadline) !== '마감') {
-        h += j.login ? '<button class="btn" id="apply">⭐ 이 오디션에 지원하기</button><p class="msg" id="am"></p>' : loginBox('지원하려면 싸바 회원 로그인이 필요해요. 연락처는 아무에게도 보이지 않아요.');
+      if (j.my) h += myBox(j.my, a);
+      // 모집 요강
+      h += '<div class="box"><h3>👥 모집 요강</h3>';
+      if (rl.length) h += '<div class="k">모집 배역</div>' + rl.map(function (r) { return '<div class="role"><div class="r1">' + (r.t ? '<i>' + esc(r.t) + '</i>' : '') + esc(r.n || '배역') + (roleLine(r) ? '<small>' + esc(roleLine(r)) + '</small>' : '') + '</div>' + (r.d ? '<p>' + esc(r.d) + '</p>' : '') + '</div>'; }).join('');
+      else if (a.roles) h += '<div class="k">모집 배역</div><div class="t">' + esc(a.roles) + '</div>';
+      if (a.who) h += '<div class="k">찾는 배우</div><div class="t">' + esc(a.who) + '</div>';
+      if (a.qual) h += '<div class="k">지원 자격</div><div class="t">' + esc(a.qual) + '</div>';
+      if (a.plus) h += '<div class="k">우대 사항</div><div class="t">' + esc(a.plus) + '</div>';
+      if (payText(a)) h += '<div class="k">출연료</div><div class="pay">💰 ' + esc(payText(a)) + '</div>';
+      if ((a.need || []).length) h += '<div class="k">준비할 것</div><div class="needs">' + a.need.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
+      h += '</div>';
+      // 작품 정보
+      var kv = function (l) { return '<dl class="dl" style="margin:0">' + l.filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>'; };
+      if (a.syn || a.dir || a.org) h += '<div class="box"><h3>🎞️ 작품 정보</h3>' + kv([['작품명', a.title], ['분야', a.kind], ['제작사', a.org], ['감독', a.dir], ['줄거리', a.syn]]) + '</div>';
+      // 일정 · 장소 · 심사
+      var sc = [['접수 마감', a.deadline ? a.deadline + ' (' + dday(a.deadline) + ')' : ''], ['오디션 일시', a.adate], ['오디션 장소', a.aplace], ['촬영·공연 시기', a.when], ['촬영·공연 장소', a.where]].filter(function (x) { return x[1]; });
+      if (sc.length || a.steps) {
+        h += '<div class="box"><h3>📅 일정 · 장소</h3>' + kv(sc);
+        if (a.steps) h += '<div class="k">심사 순서</div><div class="flow">' + a.steps.split(/\s*(?:→|->|>)\s*/).filter(Boolean).map(function (s) { return '<span>' + esc(s) + '</span>'; }).join('<em>›</em>') + '</div>';
+        h += '</div>';
       }
-      h += '<button class="btn kakao" id="share">💬 카톡으로 이 공고 알리기</button>';
+      if (a.detail) h += '<div class="box"><h3>📝 자세한 내용</h3><div class="t">' + esc(a.detail) + '</div></div>';
+      h += '<div class="notice">🔒 싸바스타는 배우 전화번호·이메일을 받지 않아요. 최종 합격자에게만 캐스팅 담당 연락처가 보이고, 연락은 배우님이 정해요.</div>';
       if (j.owner) h += ownerPart(a, j.apps || []);
-      if (j.admin && !j.owner) h += '<button class="btn lite" id="adel">관리자: 이 공고 지우기</button>';
+      if (j.admin) h += '<button class="btn lite" id="avf">관리자: ' + (a.vf ? '✓ 싸바 확인 빼기' : '✓ 싸바 확인 공고로 표시') + '</button>' + (j.owner ? '' : '<button class="btn lite" id="adel">관리자: 이 공고 지우기</button>');
       $v.innerHTML = h;
+      // 아래 고정 띠: 🔖 · 💬 · 지원하기
+      var can = !j.my && !j.owner && a.st === 'open' && dday(a.deadline) !== '마감';
+      var main = can ? '<button class="btn" id="apply">⭐ 지원하기</button>' : j.my === '접수' && a.st === 'open' ? '<button class="btn lite" id="cancel">지원 취소하기</button>' : j.owner ? '<a class="btn lite" href="#post/' + a.id + '">✏️ 공고 고치기</a>' : '<button class="btn" disabled>' + (j.my ? '지원 완료 · ' + esc(j.my) : '접수가 끝났어요') + '</button>';
+      setBar('<button class="sq" id="bmk" aria-label="공고 저장">' + (bmHas(a.id) ? '🔖' : '🏷️') + '</button><button class="sq" id="share" aria-label="카톡으로 알리기">💬</button>' + main);
       var b;
-      if ((b = document.getElementById('apply'))) b.onclick = function () {
-        b.disabled = true;
-        api('apply', { method: 'POST', json: { aid: a.id } }).then(function (r) {
-          if (r.ok) { viewAudition(id); return; }
-          b.disabled = false;
-          if (r.error === 'no-profile') { try { sessionStorage.setItem('star-want', String(a.id)); } catch (e) {} location.hash = '#profile'; return; }
-          document.getElementById('am').innerHTML = errText(r.error);
-        });
-      };
+      document.getElementById('bmk').onclick = function () { this.textContent = bmToggle(a.id) ? '🔖' : '🏷️'; };
+      if ((b = document.getElementById('apply'))) b.onclick = function () { if (!j.login) { location.href = loginHref(); return; } openApply(a, id); };
       if ((b = document.getElementById('cancel'))) b.onclick = function () { if (confirmBox('지원을 취소할까요?')) api('apply?aid=' + a.id, { method: 'DELETE' }).then(function () { viewAudition(id); }); };
       document.getElementById('share').onclick = function () {
-        var o = { url: 'https://sava.kr/star/#a/' + a.id, title: '⭐ ' + a.title + ' 오디션', description: (a.who || a.roles || '').slice(0, 60) + (a.deadline ? ' · 마감 ' + a.deadline : ''), imageUrl: 'https://sava.kr/img/star-share.jpg?v=1', imageWidth: 1200, imageHeight: 630, buttonTitle: '공고 보기' };
+        var o = { url: 'https://sava.kr/star/#a/' + a.id, title: '⭐ ' + a.title + ' 오디션', description: (rl.length ? rl.map(function (r) { return r.n; }).filter(Boolean).join('·') : (a.who || a.roles || '')).slice(0, 60) + (a.deadline ? ' · 마감 ' + a.deadline : ''), imageUrl: 'https://sava.kr/img/star-share.jpg?v=1', imageWidth: 1200, imageHeight: 630, buttonTitle: '공고 보기' };
         if (window.SsakaShare) SsakaShare(o); else if (navigator.share) navigator.share({ title: o.title, url: o.url }).catch(function () {});
       };
+      if ((b = document.getElementById('avf'))) b.onclick = function () { api('audition/' + a.id + '/verify', { method: 'POST', json: { on: !a.vf } }).then(function () { viewAudition(id); }); };
       if ((b = document.getElementById('adel'))) b.onclick = function () { if (confirmBox('정말 지울까요?')) api('remove', { method: 'POST', json: { type: 'audition', id: a.id } }).then(function () { location.hash = '#list'; }); };
       if (j.owner) bindOwner(a, id);
+      if (sessionStorage.getItem('star-open-apply') === String(a.id) && can && j.login) { sessionStorage.removeItem('star-open-apply'); openApply(a, id); }
     });
   }
+  function setBar(html) {
+    var bar = document.getElementById('sbar');
+    if (!html) { if (bar) bar.remove(); document.body.classList.remove('has-bar'); return; }
+    if (!bar) { bar = document.createElement('div'); bar.className = 'bar'; bar.id = 'sbar'; document.body.appendChild(bar); }
+    bar.innerHTML = '<div class="in">' + html + '</div>'; document.body.classList.add('has-bar');
+  }
+  var STEP4 = ['접수', '1차 합격', '2차 합격', '최종 합격'];
+  function track(my) {
+    var k = my === '심사 중' ? 2 : STEP4.indexOf(my), no = my === '불합격';
+    return '<div class="track">' + STEP4.map(function (s, i) { return '<span class="' + (no ? (i === 0 ? 'on' : '') : (i <= k ? 'on' : '')) + '">' + (i === 3 && my === '심사 중' ? '최종 심사 중' : s) + '</span>'; }).join('') + '</div>' + (no ? '<p style="margin:8px 0 0;font-size:15px">이번엔 함께하지 못했어요. 다음 공고에서 꼭 만나요 🍒</p>' : '');
+  }
+  function myBox(my, a) {
+    return '<div class="box"><h3>📬 내 지원 결과: <span style="color:#B3132B">' + esc(my) + '</span></h3>' + track(my) +
+      (my === '최종 합격' && a.contact ? '<div class="notice" style="margin:12px 0 0">📞 캐스팅 담당 연락처: <b>' + esc(a.contact) + '</b><br>연락은 배우님이 정하세요.</div>' : '') + '</div>';
+  }
+
+  // ── 지원하기 (아래에서 올라오는 창): 내 프로필 확인 → 배역 고르기 → 한마디·영상 → 보내기
+  function openApply(a, id) {
+    api('profile').then(function (pj) {
+      if (!pj.login) { location.href = loginHref(); return; }
+      if (!pj.p) { try { sessionStorage.setItem('star-want', String(a.id)); } catch (e) {} location.hash = '#profile'; return; }
+      var p = pj.p, rl = a.rl || [], n = fillRate(p), age = p.born ? (new Date().getFullYear() - (+p.born)) + '세' : '';
+      var el = document.createElement('div'); el.className = 'sheet';
+      el.innerHTML = '<div class="pn" role="dialog" aria-label="오디션 지원하기">' +
+        '<h3>⭐ 지원하기</h3><p style="margin:0 0 12px;font-size:15px;color:#6B6259">' + esc(a.title) + '</p>' +
+        '<div class="stp s1"><div class="stp-h"><span class="stp-n">1</span>이 프로필로 지원해요</div>' +
+        '<div class="me"><div class="ph" style="background-image:url(' + ((p.photos || [])[0] ? '/api/star/photo/' + p.photos[0] + '.jpg' : '') + ')"></div><div><b>' + esc(p.name) + '</b><p>' + [p.sex, age, p.height ? p.height + 'cm' : '', p.area].filter(Boolean).map(esc).join(' · ') + '</p><p><a href="#profile" id="goP">프로필 고치기 ›</a></p></div></div>' + gauge(n) + '</div>' +
+        (rl.length ? '<div class="stp s2"><div class="stp-h"><span class="stp-n">2</span>어느 배역에 지원할까요?</div><div class="rpick">' +
+          rl.map(function (r, i) { var v = [r.t, r.n].filter(Boolean).join(' '); return '<label><input type="radio" name="rp" value="' + esc(v) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(v || '배역') + (roleLine(r) ? '<br><small style="color:#6B6259;font-weight:600">' + esc(roleLine(r)) + '</small>' : '') + '</span></label>'; }).join('') + '</div></div>' : '') +
+        '<div class="stp opt"><div class="stp-h"><span class="stp-n">+</span>캐스팅 담당에게 한마디<small>안 써도 돼요</small></div>' +
+        '<textarea id="amsg" maxlength="300" placeholder="예: 전라도 사투리가 자연스럽고 승마를 3년 했습니다. 꼭 만나 뵙고 싶어요."></textarea>' +
+        '<label class="f">이 오디션용 연기 영상 <small>선택 · 유튜브 등</small></label><input type="url" id="avid" placeholder="https://youtu.be/..." value="' + esc(p.video || '') + '"></div>' +
+        '<p style="margin:4px 0 0;font-size:14.5px;color:#6B6259">🔒 전화번호·이메일은 보내지 않아요. 결과는 <b>내 지원</b>에서 단계마다 알려 드려요.</p>' +
+        '<div style="display:flex;gap:8px"><button class="btn lite" id="aNo" style="flex:none;width:34%">닫기</button><button class="btn" id="aGo">⭐ 지원서 보내기</button></div><p class="msg" id="am"></p></div>';
+      document.body.appendChild(el);
+      var close = function () { el.remove(); };
+      el.onclick = function (e) { if (e.target === el) close(); };
+      el.querySelector('#aNo').onclick = close;
+      el.querySelector('#goP').onclick = function () { try { sessionStorage.setItem('star-want', String(a.id)); } catch (e) {} close(); };
+      el.querySelector('#aGo').onclick = function () {
+        var b = this, r = el.querySelector('input[name=rp]:checked'), vid = el.querySelector('#avid').value.trim();
+        if (vid && !/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be|vimeo\.com|tv\.naver\.com|naver\.me)\//.test(vid)) { el.querySelector('#am').textContent = '영상 주소는 유튜브·비메오·네이버TV 주소만 돼요.'; return; }
+        b.disabled = true;
+        api('apply', { method: 'POST', json: { aid: a.id, role: r ? r.value : '', msg: el.querySelector('#amsg').value, video: vid } }).then(function (res) {
+          if (!res.ok) { b.disabled = false; el.querySelector('#am').textContent = errText(res.error); return; }
+          close(); doneBox(p.name, a.title, r ? r.value : ''); viewAudition(id);
+        });
+      };
+    });
+  }
+  function doneBox(name, title, role) {
+    var el = document.createElement('div'); el.className = 'done';
+    el.innerHTML = '<div class="pn"><div class="big">🎉</div><h3>' + esc(name) + ' 배우님</h3><p>「' + esc(title) + '」' + (role ? '<br><b>' + esc(role) + '</b>' : '') + '<br>지원이 완료되었어요!</p>' +
+      '<p style="margin-top:10px;font-size:14.5px;color:#8A8178">1차·2차·최종 결과는 <b>내 지원</b>에서 바로 볼 수 있어요.</p>' +
+      '<button class="btn" id="dOk">확인</button><a class="btn lite" href="#mine" id="dMine" style="margin-top:8px">📋 내 지원 보기</a></div>';
+    document.body.appendChild(el);
+    el.querySelector('#dOk').onclick = function () { el.remove(); };
+    el.querySelector('#dMine').onclick = function () { el.remove(); };
+  }
   function confirmBox(t) { return window.confirm(t); }
+  var RF = '';
   function ownerPart(a, apps) {
+    var roles = []; apps.forEach(function (p) { var r = p.ax && p.ax.role; if (r && roles.indexOf(r) < 0) roles.push(r); });
     var h = '<h2 class="sec">📋 지원한 배우 ' + apps.length + '명</h2>';
     h += '<div class="notice">심사 결과를 고르면 배우가 <b>내 지원</b>에서 바로 봐요. 다 고른 뒤 <b>[최종 발표하기]</b>를 누르면 공고에 합격자 활동명이 오르고, <b>최종 합격자에게만</b> 공고에 적은 연락처가 보여요.</div>';
+    if (roles.length > 1) h += '<div class="fl" id="rf">' + ['전체 배역'].concat(roles).map(function (r) { return '<button type="button" data-r="' + esc(r) + '"' + ((RF || '전체 배역') === r ? ' class="on"' : '') + '>' + esc(r) + '</button>'; }).join('') + '</div>';
     h += apps.length ? apps.map(function (p) {
-      return '<div class="card app"><div class="ph" style="background-image:url(' + esc((p.photos || [])[0] || '') + ')"></div><div class="tx">' +
-        '<h3>' + esc(p.name || '(프로필 없음)') + '</h3><p>' + [p.sex, p.born ? p.born + '년생' : '', p.height ? p.height + 'cm' : '', p.area].filter(Boolean).map(esc).join(' · ') + '</p>' +
+      var ax = p.ax || {}, age = p.born ? (new Date().getFullYear() - (+p.born)) + '세' : '';
+      return '<div class="card app" data-role="' + esc(ax.role || '') + '"><div class="ph" style="background-image:url(' + esc((p.photos || [])[0] || '') + ')"></div><div class="tx">' +
+        (ax.role ? '<span class="pill">' + esc(ax.role) + '</span>' : '') + '<h3>' + esc(p.name || '(프로필 없음)') + '</h3><p>' + [p.sex, age, p.height ? p.height + 'cm' : '', p.area].filter(Boolean).map(esc).join(' · ') + '</p>' +
         (p.fields && p.fields.length ? '<p>' + p.fields.map(esc).join(' · ') + '</p>' : '') +
-        '<p><a href="#p/' + a.id + '/' + p.uid + '">프로필 자세히 ›</a></p>' +
+        (ax.msg ? '<div class="amsg">💬 ' + esc(ax.msg) + '</div>' : '') +
+        '<p><a href="#p/' + a.id + '/' + p.uid + '">프로필 자세히 ›</a>' + ((ax.video || p.video) ? ' · <a href="' + esc(ax.video || p.video) + '" target="_blank" rel="noopener">▶ 연기 영상</a>' : '') + '</p>' +
         '<select data-uid="' + p.uid + '">' + ST.map(function (s) { return '<option' + (s === p.st ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></div></div>';
-    }).join('') : '<div class="empty">아직 지원한 배우가 없어요. 카톡으로 공고를 알려 보세요.</div>';
-    h += '<a class="btn lite" href="#post/' + a.id + '">✏️ 공고 고치기</a>';
+    }).join('') : '<div class="empty">아직 지원한 배우가 없어요. 아래 💬로 카톡에 공고를 알려 보세요.</div>';
     if (a.st === 'open') h += '<button class="btn lite" data-st="closed">⏸ 접수 마감하기</button>';
     if (a.st !== 'open' && a.st !== 'announced') h += '<button class="btn lite" data-st="open">▶ 다시 접수 받기</button>';
     if (a.st !== 'announced') h += '<button class="btn" data-st="announced">🏆 최종 발표하기</button>';
     return h;
   }
   function bindOwner(a, id) {
+    var rf = function () { $v.querySelectorAll('.card.app').forEach(function (c) { c.hidden = !!RF && RF !== '전체 배역' && c.dataset.role !== RF; }); };
+    $v.querySelectorAll('#rf button').forEach(function (b) { b.onclick = function () { RF = b.dataset.r; $v.querySelectorAll('#rf button').forEach(function (x) { x.classList.toggle('on', x === b); }); rf(); }; });
+    rf();
     $v.querySelectorAll('select[data-uid]').forEach(function (s) {
       s.onchange = function () { api('result', { method: 'POST', json: { aid: a.id, uid: +s.dataset.uid, st: s.value } }); };
     });
@@ -295,7 +485,7 @@
       var f = function (k) { return esc(p[k] || ''); };
       $v.innerHTML =
         (function () { var w = ''; try { w = sessionStorage.getItem('star-want') || ''; } catch (e) {} return w ? '<div class="notice" style="background:#FFF4C2;color:#5A4200">⭐ 지원하려면 프로필이 먼저 있어야 해요. 아래를 채우고 저장하면 <b>바로 그 오디션으로 돌아가요.</b></div>' : ''; })() +
-        '<div class="notice">전화번호·이메일은 <b>받지 않아요</b>. 캐스팅 담당에게는 아래 프로필만 보여요.</div>' +
+        '<div class="notice">전화번호·이메일은 <b>받지 않아요</b>. 캐스팅 담당에게는 아래 프로필만 보여요.' + (j.p ? gauge(fillRate(p)) : '') + '</div>' +
         '<label class="f">활동명 <small>꼭 써 주세요</small></label><input type="text" id="name" maxlength="20" value="' + f('name') + '" placeholder="예: 김싸바">' +
         '<label class="f">프로필 사진 <small>6장까지 · 첫 장이 대표</small></label><div class="photos" id="ph"></div>' +
         '<div class="row2"><div><label class="f">성별</label><select id="sex">' + ['', '여', '남', '기타'].map(function (s) { return '<option' + (s === (p.sex || '') ? ' selected' : '') + ' value="' + s + '">' + (s || '고르세요') + '</option>'; }).join('') + '</select></div>' +
@@ -352,39 +542,71 @@
     api('profile', { method: 'PUT', json: { d: d, pub: document.getElementById('pub').checked } }).then(function (j) {
       if (!j.ok) { m.textContent = errText(j.error); return; }
       var want = ''; try { want = sessionStorage.getItem('star-want') || ''; sessionStorage.removeItem('star-want'); } catch (e) {}
-      if (want) { m.innerHTML = '저장했어요! 🍒 <a href="#a/' + want + '">지원하던 오디션으로 돌아가 지원하기 ›</a>'; setTimeout(function () { location.hash = '#a/' + want; }, 1200); }
+      if (want) { try { sessionStorage.setItem('star-open-apply', want); } catch (e) {} m.innerHTML = '저장했어요! 🍒 <a href="#a/' + want + '">지원하던 오디션으로 돌아가 지원하기 ›</a>'; setTimeout(function () { location.hash = '#a/' + want; }, 1200); }
       else m.innerHTML = '저장했어요! 🍒 이제 오디션 공고에서 [지원하기]만 누르면 돼요. <a href="#list">공고 보러 가기 ›</a>';
     });
   }
 
   // ── 오디션 올리기 · 고치기
+  // ── 오디션 올리기 (모집 요강) — ① 작품 정보 ② 모집 배역 ③ 조건·준비물 ④ 일정·장소 ⑤ 심사·발표
+  var ROLE_T = ['주연', '조연', '단역', '앙상블', '보조출연', '기타'], NEED = ['프로필 사진', '연기 영상', '자유 연기', '지정 대본', '노래', '춤', '사투리', '포트폴리오'], PAYT = ['회차당', '일당', '총액', '협의'];
+  function roleRow(r) {
+    r = r || {};
+    return '<div class="rw"><button class="x" type="button" aria-label="배역 빼기">✕</button>' +
+      '<input type="text" class="rn" maxlength="30" placeholder="배역 이름 (예: 무사, 엄마, 손님1)" value="' + esc(r.n || '') + '">' +
+      '<div class="row2"><select class="rt">' + [''].concat(ROLE_T).map(function (t) { return '<option value="' + t + '"' + (t === (r.t || '') ? ' selected' : '') + '>' + (t || '비중 고르기') + '</option>'; }).join('') + '</select>' +
+      '<select class="rs">' + ['', '무관', '여', '남'].map(function (t) { return '<option value="' + t + '"' + (t === (r.s || '') ? ' selected' : '') + '>' + (t ? (t === '무관' ? '성별 무관' : t + '성') : '성별 고르기') + '</option>'; }).join('') + '</select></div>' +
+      '<div class="row2"><input type="text" class="ra" maxlength="20" placeholder="나이 (예: 30대)" value="' + esc(r.a || '') + '"><span></span></div>' +
+      '<input type="text" class="rd" maxlength="200" style="margin-top:8px" placeholder="배역 설명 (예: 조선시대 무사, 과묵하지만 따뜻함)" value="' + esc(r.d || '') + '"></div>';
+  }
   function viewPost(id) {
     tabOn('post');
     api('profile').then(function (pj) {
       if (!pj.login) { $v.innerHTML = loginBox('<b>오디션 올리기</b> — 감독·캐스팅 담당·극단·제작사 누구나 무료로 올려요. 지원자 연락처를 받지 않고, 싸바 안에서 1차·2차·최종 심사를 해요.'); return; }
       var go = function (a) {
         a = a || {}; var f = function (k) { return esc(a[k] || ''); };
+        var rl = (a.rl && a.rl.length) ? a.rl : (a.roles ? [{ d: a.roles }] : [{}]);
         $v.innerHTML =
-          '<div class="notice">배우 연락처는 받지 않아요. 지원자 프로필은 <b>올린 분만</b> 봐요. 아래 <b>발표 때 공개할 연락처</b>는 <b>최종 합격자에게만</b> 보여요.</div>' +
+          '<div class="notice">배우 연락처는 받지 않아요. 지원자 프로필은 <b>올린 분만</b> 봐요. 맨 아래 <b>발표 때 공개할 연락처</b>는 <b>최종 합격자에게만</b> 보여요.</div>' +
+          '<div class="stp s1"><div class="stp-h"><span class="stp-n">1</span>작품 정보</div>' +
           '<label class="f">작품 이름 <small>꼭 써 주세요</small></label><input type="text" id="title" maxlength="60" value="' + f('title') + '" placeholder="예: 단편영화 「봄날」">' +
           '<label class="f">분야</label><div class="chips" id="kind">' + KINDS.map(function (x) { return '<label><input type="radio" name="kind" value="' + x + '"' + (a.kind === x ? ' checked' : '') + '>' + x + '</label>'; }).join('') + '</div>' +
-          '<label class="f">제작사 · 극단</label><input type="text" id="org" value="' + f('org') + '" placeholder="예: 싸바필름">' +
-          '<label class="f">모집 배역 <small>꼭 써 주세요</small></label><textarea id="roles" placeholder="예: 주연 민지(20대 여성, 밝은 대학생)&#10;조연 아버지(50대 남성)">' + f('roles') + '</textarea>' +
-          '<label class="f">찾는 배우 <small>한 줄</small></label><input type="text" id="who" value="' + f('who') + '" placeholder="예: 20대 여성, 전라도 사투리 가능자 우대">' +
-          '<div class="row2"><div><label class="f">촬영·공연 시기</label><input type="text" id="when" value="' + f('when') + '" placeholder="예: 2027년 2월"></div>' +
-          '<div><label class="f">장소</label><input type="text" id="where" value="' + f('where') + '" placeholder="예: 광주"></div></div>' +
-          '<div class="row2"><div><label class="f">출연료</label><input type="text" id="pay" value="' + f('pay') + '" placeholder="예: 회차당 협의"></div>' +
-          '<div><label class="f">접수 마감</label><input type="date" id="deadline" value="' + f('deadline') + '"></div></div>' +
-          '<label class="f">심사 순서</label><input type="text" id="steps" value="' + esc(a.steps || '1차 프로필·사진 → 2차 영상 → 3차 현장 연기 → 최종 발표') + '">' +
-          '<label class="f">자세한 내용</label><textarea id="detail" placeholder="작품 소개, 준비할 것 등">' + f('detail') + '</textarea>' +
-          '<label class="f">발표 때 공개할 연락처 <small>최종 합격자에게만</small></label><input type="text" id="contact" value="' + f('contact') + '" placeholder="예: 010-0000-0000 또는 이메일">' +
+          '<div class="row2"><div><label class="f">제작사 · 극단</label><input type="text" id="org" value="' + f('org') + '" placeholder="예: 싸바필름"></div>' +
+          '<div><label class="f">감독 <small>선택</small></label><input type="text" id="dir" value="' + f('dir') + '" placeholder="예: 주경중"></div></div>' +
+          '<label class="f">줄거리 <small>두세 줄</small></label><textarea id="syn" style="min-height:80px" placeholder="예: 좀비와 싸우는 조선시대 무사들 이야기">' + f('syn') + '</textarea></div>' +
+          '<div class="stp s2"><div class="stp-h"><span class="stp-n">2</span>모집 배역<small>배역마다 따로 — 배우가 배역을 골라 지원해요</small></div>' +
+          '<div class="rlist" id="rlist">' + rl.map(roleRow).join('') + '</div><button type="button" class="addrole" id="addr">＋ 배역 더하기</button></div>' +
+          '<div class="stp s1"><div class="stp-h"><span class="stp-n">3</span>지원 조건 · 출연료</div>' +
+          '<label class="f">지원 자격</label><input type="text" id="qual" value="' + f('qual') + '" placeholder="예: 액션 연기 가능, 2월 촬영 일정 가능한 분">' +
+          '<label class="f">우대 사항 <small>선택</small></label><input type="text" id="plus" value="' + f('plus') + '" placeholder="예: 승마 가능자, 전라도 사투리">' +
+          '<label class="f">출연료</label><div class="chips" id="payt">' + PAYT.map(function (x) { return '<label><input type="radio" name="payt" value="' + x + '"' + ((a.payt || '') === x ? ' checked' : '') + '>' + x + '</label>'; }).join('') + '</div>' +
+          '<input type="text" id="pay" style="margin-top:8px" value="' + f('pay') + '" placeholder="예: 250만 원 / 교통비 지급">' +
+          '<label class="f">준비할 것 <small>여러 개 골라도 돼요</small></label><div class="chips" id="need">' + NEED.map(function (x) { return '<label><input type="checkbox" value="' + x + '"' + ((a.need || []).indexOf(x) >= 0 ? ' checked' : '') + '>' + x + '</label>'; }).join('') + '</div>' +
+          '<label class="toggle"><input type="checkbox" id="urgent"' + (a.urgent ? ' checked' : '') + '><span><b>📢 급구</b><br>급하게 구하는 공고는 목록에 빨간 급구 표시가 붙어요.</span></label></div>' +
+          '<div class="stp s2"><div class="stp-h"><span class="stp-n">4</span>일정 · 장소</div>' +
+          '<div class="row2"><div><label class="f">접수 마감</label><input type="date" id="deadline" value="' + f('deadline') + '"></div>' +
+          '<div><label class="f">오디션 일시</label><input type="text" id="adate" value="' + f('adate') + '" placeholder="예: 2/28(토) 오후 2시"></div></div>' +
+          '<label class="f">오디션 장소</label><input type="text" id="aplace" value="' + f('aplace') + '" placeholder="예: 광주 동구 ○○스튜디오 / 영상 심사">' +
+          '<div class="row2"><div><label class="f">촬영·공연 시기</label><input type="text" id="when" value="' + f('when') + '" placeholder="예: 2027년 3월"></div>' +
+          '<div><label class="f">촬영·공연 장소</label><input type="text" id="where" value="' + f('where') + '" placeholder="예: 경기 파주"></div></div></div>' +
+          '<div class="stp s3"><div class="stp-h"><span class="stp-n">5</span>심사 · 발표</div>' +
+          '<label class="f">심사 순서 <small>→ 로 나눠요</small></label><input type="text" id="steps" value="' + esc(a.steps || '1차 프로필·사진 → 2차 영상 → 3차 현장 연기 → 최종 발표') + '">' +
+          '<label class="f">발표 때 공개할 연락처 <small>최종 합격자에게만</small></label><input type="text" id="contact" value="' + f('contact') + '" placeholder="예: 010-0000-0000 또는 이메일"></div>' +
+          '<div class="stp opt"><div class="stp-h"><span class="stp-n">+</span>더 알릴 내용<small>안 써도 돼요</small></div>' +
+          '<textarea id="detail" placeholder="작품 소개, 현장 분위기, 준비할 것 등">' + f('detail') + '</textarea></div>' +
           '<button class="btn" id="go">📣 ' + (id ? '공고 고치기' : '오디션 올리기') + '</button><p class="msg" id="om"></p>';
+        var bindX = function () { document.querySelectorAll('#rlist .x').forEach(function (b) { b.onclick = function () { var l = document.querySelectorAll('#rlist .rw'); if (l.length > 1) b.parentNode.remove(); else b.parentNode.querySelectorAll('input').forEach(function (i) { i.value = ''; }); }; }); };
+        bindX();
+        document.getElementById('addr').onclick = function () { var l = document.getElementById('rlist'); if (l.children.length >= 10) return; l.insertAdjacentHTML('beforeend', roleRow({})); bindX(); l.lastElementChild.querySelector('.rn').focus(); };
         document.getElementById('go').onclick = function () {
           var g = function (k) { return document.getElementById(k).value; };
-          var k = document.querySelector('#kind input:checked');
-          var d = { title: g('title'), kind: k ? k.value : '', org: g('org'), roles: g('roles'), who: g('who'), when: g('when'), where: g('where'), pay: g('pay'), deadline: g('deadline'), steps: g('steps'), detail: g('detail'), contact: g('contact') };
+          var k = document.querySelector('#kind input:checked'), pt = document.querySelector('#payt input:checked');
+          var roles = [].slice.call(document.querySelectorAll('#rlist .rw')).map(function (w) { var q = function (c) { return w.querySelector(c).value.trim(); }; return { n: q('.rn'), t: q('.rt'), s: q('.rs'), a: q('.ra'), d: q('.rd') }; }).filter(function (r) { return r.n || r.d; });
+          var d = { title: g('title'), kind: k ? k.value : '', org: g('org'), dir: g('dir'), syn: g('syn'), rl: roles, qual: g('qual'), plus: g('plus'), payt: pt ? pt.value : '', pay: g('pay'),
+            need: [].slice.call(document.querySelectorAll('#need input:checked')).map(function (x) { return x.value; }), urgent: document.getElementById('urgent').checked,
+            deadline: g('deadline'), adate: g('adate'), aplace: g('aplace'), when: g('when'), where: g('where'), steps: g('steps'), contact: g('contact'), detail: g('detail'), who: a.who || '' };
           var m = document.getElementById('om');
-          if (!d.title.trim() || !d.roles.trim()) { m.textContent = '작품 이름과 모집 배역은 꼭 써 주세요.'; return; }
+          if (!d.title.trim() || !roles.length) { m.textContent = '작품 이름과 모집 배역(하나 이상)은 꼭 써 주세요.'; return; }
           api('audition', { method: 'POST', json: { id: id || 0, d: d } }).then(function (j) {
             if (j.ok) location.hash = '#a/' + j.id; else m.textContent = errText(j.error);
           });
@@ -399,8 +621,8 @@
     tabOn('mine');
     api('mine').then(function (j) {
       if (!j.login) { $v.innerHTML = loginBox('로그인하면 내가 지원한 오디션의 결과와, 내가 올린 공고를 한눈에 볼 수 있어요.'); return; }
-      var h = '<h2 class="sec">🙋 내가 지원한 오디션</h2>';
-      h += j.applied.length ? j.applied.map(function (a) { return '<a class="card" href="#a/' + a.id + '">' + stPill(a) + '<span class="pill">' + esc(a.my) + '</span><h3>' + esc(a.title) + '</h3><p>' + esc(a.org || '') + '</p></a>'; }).join('') : '<div class="empty">아직 지원한 오디션이 없어요. <a href="#list">공고 보러 가기 ›</a></div>';
+      var h = '<div class="box"><h3>🙋 내 프로필</h3>' + gauge(fillRate(j.p)) + '<a class="btn lite" href="#profile" style="margin-top:12px">프로필 채우기 ›</a></div><h2 class="sec">🙋 내가 지원한 오디션</h2>';
+      h += j.applied.length ? j.applied.map(function (a) { return '<a class="card" href="#a/' + a.id + '">' + stPill(a) + '<h3>' + esc(a.title) + '</h3><p>' + esc(a.org || '') + '</p>' + track(a.my) + '</a>'; }).join('') : '<div class="empty">아직 지원한 오디션이 없어요. <a href="#list">공고 보러 가기 ›</a></div>';
       h += '<h2 class="sec">📣 내가 올린 공고</h2>';
       h += j.posted.length ? j.posted.map(function (a) { return '<a class="card" href="#a/' + a.id + '">' + stPill(a) + '<h3>' + esc(a.title) + '</h3><p>지원 ' + (a.n || 0) + '명 · 눌러서 심사하기 ›</p></a>'; }).join('') : '<div class="empty">올린 공고가 없어요. <a href="#post">오디션 올리기 ›</a></div>';
       $v.innerHTML = h;
@@ -409,7 +631,7 @@
 
   function route() {
     var h = location.hash.replace(/^#/, ''), m;
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); setBar(''); document.querySelectorAll('.sheet,.done').forEach(function (x) { if (!/^a\//.test(h) || x.className === 'sheet') x.remove(); });
     if ((m = /^a\/(\d+)$/.exec(h))) return viewAudition(m[1]);
     if ((m = /^p\/(\d+)\/(\d+)$/.exec(h))) return viewApplicant(m[1], m[2]);
     if ((m = /^post\/(\d+)$/.exec(h))) return viewPost(m[1]);

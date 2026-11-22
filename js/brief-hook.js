@@ -1,5 +1,5 @@
 /* 싸바 브리핑 큰 제목 — 사장님용 훅 제목이 2초마다 돌아가며 바뀜 (11-22 대표님: 하루 한 번 → 2초에 한 번)
-   홈(app/) 싸바 브리핑 칸 h3, 브리핑 화면(today/) h1 이 같이 씀. 시작 제목은 한국 날짜 기준(날마다 다른 제목부터).
+   홈(app/) 싸바 브리핑 칸 h3, 브리핑 화면(today/) h1 이 같이 씀. 처음 열 땐 늘 메인 카피(목록 첫 줄)부터.
    움직임 줄이기 폰은 안 돌림, 화면 안 볼 땐 멈춤. 빠르기는 아래 MS.
    고치려면 아래 목록만 고치면 됨 — '|' 자리에서 줄이 바뀜 (한 줄 10자 안팎). 첫 줄은 기본 제목. */
 (function () {
@@ -49,7 +49,7 @@
   // 제목 칸(el)을 MS마다 다음 제목으로 — 살짝 사라졌다 나타남
   window.savaHookRotate = function (el) {
     if (!el) return;
-    var i = HOOKS.indexOf(today()); if (i < 0) i = 0;
+    var i = 0; // 처음 열 땐 늘 메인 카피(첫 줄) — 11-22 대표님
     el.innerHTML = html(HOOKS[i]);
     try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
     el.style.transition = 'opacity .25s ease';

@@ -32,7 +32,7 @@
   function mount(card, root, toast) {
     var R = card.roster; if (!R || !/^[a-z0-9]{8,16}$/.test(R.id || '')) return;
     toast = toast || function (m) { try { alert(m); } catch (e) {} };
-    var hk = '', isOwner = false, pub = R.pub != null ? R.pub | 0 : (R.priv ? 0 : 2), st = { count: 0, people: 0, no: 0, maybe: 0 };
+    var hk = '', isOwner = false, pub = R.pub != null ? R.pub | 0 : (R.priv ? 0 : 2), st = { count: 0, people: 0, no: 0, maybe: 0, cap: R.cap || 0, dl: R.dl || 0 };
     try { var qk = new URLSearchParams(location.search).get('rk'); if (qk && /^[a-z0-9]{16,32}$/.test(qk)) localStorage.setItem('sava-roster-key-' + R.id, qk); hk = localStorage.getItem('sava-roster-key-' + R.id) || ''; } catch (e) {}
     var tok = tokOf(R.id), stops = (R.st || []).filter(Boolean).slice(0, 8), list = [], live = window.self === window.top;
     // 카톡방에서 이미 받은 명단(총무가 붙여넣은 것)을 앞에 두고, 싸바로 신청한 사람을 뒤에 이어 붙임
@@ -52,6 +52,7 @@
     var head = el('div', 'sk-ro-head'), ttl = el('b', '', '🙋 참석 신청'), cnt = el('span', 'sk-ro-cnt', '');
     head.appendChild(ttl); head.appendChild(cnt); box.appendChild(head);
     var stat = el('div', 'sk-ro-stat'); box.appendChild(stat);
+    var bar = el('div', 'sk-ro-bar'), barIn = el('i'); bar.appendChild(barIn); box.appendChild(bar);
     var mode = el('div', 'sk-ro-mode'); mode.setAttribute('role', 'group'); mode.setAttribute('aria-label', '참석자 공개 방식'); box.appendChild(mode);
     var myLine = el('p', 'sk-ro-mine'); myLine.hidden = true; box.appendChild(myLine);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
@@ -61,6 +62,11 @@
     var join = el('button', 'sk-ro-join', '🙋 참석할게요'); join.type = 'button'; btns.appendChild(join);
     var nogo = el('button', 'sk-ro-no', '🙅 못 가요'); nogo.type = 'button'; btns.appendChild(nogo);
     box.appendChild(btns);
+    // 주최자 도구: 카톡 안 하는 분 — 문자로 공지 보내기 · 전화로 받은 답 대신 적기 (11-23)
+    var tools = el('div', 'sk-ro-tools');
+    var addFor = el('button', 'sk-ro-copy', '✍️ 대신 적기 (카톡 안 하는 분·전화로 받은 답)'); addFor.type = 'button'; tools.appendChild(addFor);
+    var smsAll = el('button', 'sk-ro-copy', '📱 문자로 공지 보내기 (카톡 안 하는 분께)'); smsAll.type = 'button'; tools.appendChild(smsAll);
+    box.appendChild(tools);
     var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button'; box.appendChild(copy);
     var fine = el('p', 'sk-fine', ''); box.appendChild(fine);
     MODES.forEach(function (m) {
@@ -83,7 +89,7 @@
       var showStat = isOwner || pub > 0;
       if (isOwner) {
         ttl.textContent = pub === 2 ? '🌐 참석 명단 · 단톡방 모두 보여요' : pub === 1 ? '🔢 참석 명단 · 인원만 공개' : '🔒 참석 명단 · 나만 보여요';
-        fine.textContent = (pub === 0 ? '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. ' : '고치거나 취소하면 단톡방 싸바 공지에 바로 반영돼요. ') + '전화번호는 모임 연 분만 보고, 누르면 바로 걸려요.';
+        fine.textContent = (pub === 0 ? '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. ' : '고치거나 취소하면 단톡방 싸바 공지에 바로 반영돼요. ') + '이름을 누르면 답을 바꾸거나 지울 수 있어요. 전화번호는 모임 연 분만 봐요.';
       } else if (pub === 2) {
         ttl.textContent = '🙋 참석 신청 · 단톡방 모두 보여요';
         fine.textContent = '신청·고치기·취소는 이 공지에 바로 반영돼요 (총무님께 따로 안 보내도 돼요). 전화번호는 모임 연 분만 봐요.';
@@ -102,11 +108,33 @@
         stat.appendChild(el('span', 'n', '🙅 불참 ' + cNo));
         if (cM) stat.appendChild(el('span', 'm', '🤔 미정 ' + cM));
       }
+      // 정원 · 응답 마감 (누구에게나)
+      var cap = st.cap | 0, full = cap && nP >= cap;
+      if (cap) { stat.style.display = ''; stat.appendChild(el('span', 'c' + (full ? ' full' : ''), (full ? '🈵 정원 다 참 ' : '👥 정원 ') + cap + '명' + (showStat && !full ? ' · 남은 자리 ' + Math.max(0, cap - nP) : ''))); }
+      if (st.dl) {
+        stat.style.display = '';
+        var dd = Math.ceil((st.dl - Date.now()) / 864e5), dt = new Date(st.dl);
+        stat.appendChild(el('span', 'd' + (st.closed ? ' full' : ''), st.closed ? '⏰ 응답 마감됐어요' : '⏰ ' + (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + dt.getHours() + ':' + ('0' + dt.getMinutes()).slice(-2) + '까지' + (dd <= 7 ? ' · D-' + Math.max(0, dd) : '')));
+      }
+      bar.style.display = cap && showStat ? '' : 'none';
+      barIn.style.width = cap ? Math.min(100, Math.round(nP / cap * 100)) + '%' : '0';
+      bar.classList.toggle('full', !!full);
       mode.style.display = isOwner ? '' : 'none';
       mode.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', +b.dataset.p === pub); b.setAttribute('aria-pressed', +b.dataset.p === pub ? 'true' : 'false'); });
       myLine.hidden = !mine || isOwner;
-      if (mine) myLine.textContent = mine.a === 'n' ? '🙅 불참으로 알렸어요' + (mine.w ? ' · ' + mine.w : '') : mine.a === 'm' ? '🤔 아직 몰라요로 알렸어요' : '✅ 참석 신청했어요: ' + line(mine, 0).replace(/^\d+\./, '');
       var going = mine && mine.a !== 'n' && mine.a !== 'm';
+      myLine.innerHTML = '';
+      if (mine) {
+        myLine.className = 'sk-ro-mine ' + (going ? 'y' : mine.a === 'n' ? 'n' : 'm');
+        myLine.appendChild(el('b', '', mine.n + '님, ' + (going ? '참석이 등록되었어요 🙌' : mine.a === 'n' ? '불참으로 알렸어요' : '아직 몰라요로 알렸어요')));
+        myLine.appendChild(el('small', '', going ? line(mine, 0).replace(/^\d+\./, '') + (mine.w ? ' · 💬 ' + mine.w : '') : (mine.w ? '💬 ' + mine.w : '')));
+        if (st.dl && !st.closed) { var d2 = new Date(st.dl); myLine.appendChild(el('small', '', (d2.getMonth() + 1) + '월 ' + d2.getDate() + '일 ' + d2.getHours() + ':' + ('0' + d2.getMinutes()).slice(-2) + '까지 바꿀 수 있어요')); }
+        if (!st.closed) {
+          var sw2 = el('button', 'sk-ro-swap', going ? '🙅 불참으로 바꿀게요' : '🙋 참석으로 바꿀게요'); sw2.type = 'button';
+          sw2.addEventListener('click', function () { if (going) { if (confirm('불참으로 바꿀까요?')) send({ op: 'del' }).then(function () { doneMsg('불참으로 바꿨어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(errT); } else openSheet('y'); });
+          myLine.appendChild(sw2);
+        }
+      }
       join.textContent = going ? '✏️ 내 신청 고치기' : '🙋 참석할게요';
       nogo.textContent = going ? '🙅 신청 취소' : mine && mine.a === 'n' ? '✏️ 한마디 고치기' : '🙅 못 가요';
       byStop.innerHTML = '';
@@ -118,7 +146,9 @@
       if (seeAll()) Y.forEach(function (x, i) {
         var li = el('li', x.me ? 'me' : '', line(x, i));
         if (x.w) li.appendChild(el('small', 'sk-ro-w', ' 💬 ' + x.w));
+        if (isOwner && x.k && x.k.charAt(0) === 'h') li.appendChild(el('small', 'sk-ro-w', ' ✍️대신 적음'));
         if (isOwner && x.ph) { var a = el('a', 'sk-ro-ph', x.ph); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); li.appendChild(document.createTextNode(' ')); li.appendChild(a); }
+        if (isOwner && x.k) hostEdit(li, x);
         ol.appendChild(li);
       });
       nos.innerHTML = '';
@@ -126,15 +156,76 @@
         if (!g[0].length) return;
         var p = el('p', '', ''); p.appendChild(el('b', '', g[1] + ' ' + g[0].length + ' · '));
         p.appendChild(document.createTextNode(g[0].map(function (x) { return x.n + (x.g ? x.g : '') + (x.w ? '(' + x.w + ')' : ''); }).join(', ')));
-        if (isOwner) g[0].forEach(function (x) { if (x.ph) { var a = el('a', 'sk-ro-ph', ' ' + x.n + ' ☎'); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); p.appendChild(a); } });
+        if (isOwner) g[0].forEach(function (x) { if (x.ph) { var a = el('a', 'sk-ro-ph', ' ' + x.n + ' ☎'); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); p.appendChild(a); } if (x.k) { var e2 = el('button', 'sk-ro-ed', '✏️' + x.n); e2.type = 'button'; hostEdit(e2, x, 1); p.appendChild(e2); } });
         nos.appendChild(p);
       });
       copy.style.display = seeAll() && Y.length ? '' : 'none';
-      btns.style.display = isOwner ? 'none' : '';
+      tools.style.display = isOwner ? '' : 'none';
+      btns.style.display = isOwner || (st.closed && !mine) ? 'none' : '';
+      join.disabled = !going && !!full; if (join.disabled) join.textContent = '🈵 정원이 다 찼어요';
+      if (st.closed && !isOwner && !mine) { cnt.textContent = '응답이 마감됐어요'; }
       ol.style.display = seeAll() ? '' : 'none';
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
-    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0 }; list = merge(j.list || []); draw(); }
+    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); }
+    var ERRS = { cap: '정원이 다 찼어요. 모임 연 분께 물어보세요', closed: '응답이 마감됐어요. 모임 연 분께 직접 알려 주세요', name: '이름을 적어 주세요', host: '모임 연 분만 할 수 있어요' };
+    function errT(e) { toast(ERRS[e && e.message] || '잠시 뒤 다시 눌러 주세요'); }
+    function hostOp(o) { return send(Object.assign({ hk: hk }, o)); }
+    // 주최자: 줄을 누르면 답 바꾸기·지우기
+    function hostEdit(node, x, isBtn) {
+      if (!isBtn) node.classList.add('ed');
+      node.addEventListener('click', function (e) {
+        if (e.target.tagName === 'A') return;
+        var sh = el('div', 'sk-sheet'), bx = el('div', 'sk-sheet-box'), hd = el('div', 'sk-sheet-head'), xx = el('button', 'sk-x', '닫기'); xx.type = 'button';
+        hd.appendChild(el('strong', '', '✏️ ' + x.n + (x.g || '') + ' 답 바꾸기')); hd.appendChild(xx); bx.appendChild(hd);
+        var row = el('div', 'sk-ro-btns');
+        [['y', '🙋 참석'], ['n', '🙅 불참'], ['m', '🤔 미정']].forEach(function (o) { var b = el('button', o[0] === 'y' ? 'sk-ro-join' : 'sk-ro-no', o[1]); b.type = 'button'; if (x.a === o[0]) b.disabled = true; b.addEventListener('click', function () { hostOp({ op: 'hostset', k: x.k, a: o[0] }).then(function () { shut(); toast(x.n + ' → ' + o[1]); }).catch(errT); }); row.appendChild(b); });
+        bx.appendChild(row);
+        var del = el('button', 'sk-ro-copy', '🗑 명단에서 지우기'); del.type = 'button'; bx.appendChild(del);
+        del.addEventListener('click', function () { if (confirm(x.n + '님을 명단에서 지울까요?')) hostOp({ op: 'hostdel', k: x.k }).then(function () { shut(); toast('지웠어요'); }).catch(errT); });
+        function shut() { sh.remove(); }
+        xx.addEventListener('click', shut); sh.addEventListener('click', function (ev) { if (ev.target === sh) shut(); });
+        sh.appendChild(bx); root.appendChild(sh);
+      });
+    }
+    // 주최자: 카톡 안 하는 분·전화로 받은 답 대신 적기
+    addFor.addEventListener('click', function () {
+      if (!live) { toast('미리보기에선 적을 수 없어요'); return; }
+      var sh = el('div', 'sk-sheet'), bx = el('div', 'sk-sheet-box'), hd = el('div', 'sk-sheet-head'), xx = el('button', 'sk-x', '닫기'); xx.type = 'button';
+      hd.appendChild(el('strong', '', '✍️ 대신 적기')); hd.appendChild(xx); bx.appendChild(hd);
+      bx.appendChild(el('p', 'sk-fine', '카톡을 안 하시거나 전화·문자로 답한 분을 명단에 넣어요. 통계에도 바로 들어가요.'));
+      var form = el('div', 'sk-rform');
+      function field(label, inp) { var l = el('label', 'sk-f'); l.appendChild(el('span', 'sk-f-l', label)); l.appendChild(inp); form.appendChild(l); return inp; }
+      var nm = document.createElement('input'); nm.maxLength = 12; nm.placeholder = '홍길동'; field('이름', nm);
+      var gs = null; if (R.g) { gs = document.createElement('input'); gs.maxLength = 6; gs.inputMode = 'numeric'; gs.placeholder = '예: 28'; field('기수 (선택)', gs); }
+      var ph = document.createElement('input'); ph.type = 'tel'; ph.inputMode = 'tel'; ph.maxLength = 20; ph.placeholder = '010-0000-0000'; field('전화번호 (선택 · 나만 봐요)', ph);
+      var a = 'y', plus = 0, seg = el('div', 'sk-ro-mode');
+      [['y', '🙋 참석'], ['n', '🙅 불참'], ['m', '🤔 미정']].forEach(function (o) { var b = el('button', o[0] === 'y' ? 'on' : '', o[1]); b.type = 'button'; b.addEventListener('click', function () { a = o[0]; seg.querySelectorAll('button').forEach(function (q) { q.classList.toggle('on', q === b); }); stepBox.style.display = a === 'y' ? '' : 'none'; }); seg.appendChild(b); });
+      form.appendChild(seg);
+      var out = el('output', '', '+0'), step = el('div', 'sk-step sm'), mi = el('button', '', '−'), pl = el('button', '', '+'); mi.type = pl.type = 'button';
+      mi.addEventListener('click', function () { plus = Math.max(0, plus - 1); out.textContent = '+' + plus; });
+      pl.addEventListener('click', function () { plus = Math.min(9, plus + 1); out.textContent = '+' + plus; });
+      step.appendChild(mi); step.appendChild(out); step.appendChild(pl);
+      var stepBox = el('div', 'sk-f'); stepBox.appendChild(el('span', 'sk-f-l', '함께 오는 분 (본인 빼고)')); stepBox.appendChild(step); form.appendChild(stepBox);
+      bx.appendChild(form);
+      var ok = el('button', 'sk-ro-join', '✅ 명단에 넣기'); ok.type = 'button'; bx.appendChild(ok);
+      ok.addEventListener('click', function () {
+        var n = nm.value.trim(); if (!n) { toast('이름을 적어 주세요'); nm.focus(); return; }
+        ok.disabled = true;
+        hostOp({ op: 'hostadd', n: n, g: gs ? gs.value.trim().replace(/기$/, '') : '', ph: ph.value.trim(), a: a, p: plus }).then(function () { shut(); toast(n + '님을 명단에 넣었어요'); }).catch(function (e) { ok.disabled = false; errT(e); });
+      });
+      function shut() { sh.remove(); }
+      xx.addEventListener('click', shut); sh.addEventListener('click', function (ev) { if (ev.target === sh) shut(); });
+      sh.appendChild(bx); root.appendChild(sh); setTimeout(function () { nm.focus(); }, 50);
+    });
+    // 주최자: 문자로 공지 보내기 — 받는 사람은 문자앱에서 고름. 주최자 열쇠(rk)는 링크에서 뺌
+    smsAll.addEventListener('click', function () {
+      if (!live) { toast('미리보기에선 문자가 열리지 않아요'); return; }
+      var u = location.href.replace(/([?&])rk=[^&#]*&?/, '$1').replace(/[?&]$/, '');
+      var body = '[' + (card.title || '모임 안내') + ']' + (card.subtitle ? '\n' + card.subtitle : '') + '\n참석·불참은 아래 링크에서 눌러 주세요 (카톡 없어도 돼요)\n' + u;
+      var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      location.href = 'sms:' + (ios ? '&' : '?') + 'body=' + encodeURIComponent(body);
+    });
     function load() {
       return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
         .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
@@ -159,7 +250,7 @@
       var mine = list.filter(function (x) { return x.me; })[0];
       if (mine && mine.a !== 'n' && mine.a !== 'm') {
         if (!confirm('참석 신청을 취소할까요? (불참으로 기록돼요)')) return;
-        send({ op: 'del' }).then(function () { doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); });
+        send({ op: 'del' }).then(function () { doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(errT);
       } else openSheet('n');
     });
     function tellBoss(nm, what) { var b = boss(); if (b && live) setTimeout(function () { location.href = smsHref(b, '[' + (card.title || '모임') + ']\n' + (nm ? nm + ' ' : '') + what + '\n싸바!'); }, 600); }
@@ -225,7 +316,7 @@
       var going = mine.n && mine.a !== 'n' && mine.a !== 'm';
       var ok = el('button', isNo ? 'sk-ro-no' : 'sk-ro-join', isNo ? '🙅 불참으로 알리기' : going ? '✅ 고친 내용으로 저장' : '✅ 참석할게요'); ok.type = 'button'; ok.style.marginTop = '16px'; ok.style.width = '100%'; bx.appendChild(ok);
       if (going && !isNo) { var del = el('button', 'sk-ro-copy', '이번엔 못 가요 (신청 취소)'); del.type = 'button'; bx.appendChild(del);
-        del.addEventListener('click', function () { send({ op: 'del' }).then(function () { shut(); doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(function () { toast('잠시 뒤 다시 눌러 주세요'); }); }); }
+        del.addEventListener('click', function () { send({ op: 'del' }).then(function () { shut(); doneMsg('신청을 취소했어요'); tellBoss(mine.n, '이번에는 참석이 어려워요 🙏'); }).catch(errT); }); }
       ok.addEventListener('click', function () {
         var n = nm.value.trim(); if (!n) { toast('이름을 적어주세요'); nm.focus(); return; }
         var g = gs ? gs.value.trim().replace(/기$/, '') : '', s = stSel ? stSel.value : '', w = wv.value.trim();
@@ -239,7 +330,7 @@
             tellBoss(me, (isNo ? '이번에는 참석이 어려워요 🙏' : going ? '신청 내용 고쳤어요' : '참석합니다') + (w ? '\n💬 ' + w : ''));
           }
         })
-          .catch(function () { ok.disabled = false; toast('잠시 뒤 다시 눌러 주세요'); });
+          .catch(function (e) { ok.disabled = false; errT(e); });
       });
       function shut() { sheet.remove(); document.removeEventListener('keydown', esc); }
       function esc(e) { if (e.key === 'Escape') shut(); }

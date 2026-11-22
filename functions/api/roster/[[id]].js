@@ -22,7 +22,7 @@ async function body(request) {
 //   0 = 🔒 비공개: 주최자만 (예전 카드·주인 없는 명단도 이렇게)
 // 주최자 = 열쇠 hk 또는 같은 로그인 계정
 async function isHost(db, request, id, hk) {
-  const meta = await db.prepare('SELECT hk, uid, pub FROM roster_meta WHERE rid = ?').bind(id).first();
+  const meta = await db.prepare('SELECT hk, uid, pub, cap, dl FROM roster_meta WHERE rid = ?').bind(id).first();
   if (!meta) return { meta: null, host: false, pub: 0 };
   const me = await currentUser(request, db).catch(() => null);
   const byKey = !!hk && meta.hk === hk, byLogin = !!(me && meta.uid && String(me.id) === String(meta.uid));
@@ -37,7 +37,10 @@ async function list(db, request, id, tok, hk) {
   const yes = all.filter(x => x.a === 'y');
   const stat = { count: yes.length, people: yes.reduce(function (a, x) { return a + 1 + (x.p || 0); }, 0), no: all.filter(x => x.a === 'n').length, maybe: all.filter(x => x.a === 'm').length };
   const h = await isHost(db, request, id, hk);
-  if (h.host) return Object.assign({ pub: h.pub, owner: 1, list: all }, stat);
+  // 정원(cap)·응답 마감(dl, ms) — 모임 연 분이 정함. 누구에게나 보임
+  if (h.meta) { if (h.meta.cap) stat.cap = h.meta.cap; if (h.meta.dl) { stat.dl = h.meta.dl; if (Date.now() > h.meta.dl) stat.closed = 1; } }
+  // 주최자에겐 줄마다 k(고치기·지우기용 열쇠)도 — 카톡 안 하는 분을 대신 적거나 전화로 받은 답을 바꿀 때
+  if (h.host) return Object.assign({ pub: h.pub, owner: 1, list: all.map(function (x, i) { return Object.assign({ k: r.results[i].tok }, x); }) }, stat);
   const mine = all.filter(function (x) { return x.me; });
   if (h.pub === 2) return Object.assign({ pub: 2, list: all.map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, t: x.t, a: x.a, w: x.w, me: x.me }; }) }, stat);
   if (h.pub === 1) return Object.assign({ pub: 1, list: mine }, stat);
@@ -53,6 +56,8 @@ export async function onRequest({ request, env, params }) {
     try { await db.prepare('ALTER TABLE roster_meta ADD COLUMN uid TEXT').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster ADD COLUMN ph TEXT').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster_meta ADD COLUMN pub INTEGER').run(); } catch (e) {}
+    try { await db.prepare('ALTER TABLE roster_meta ADD COLUMN cap INTEGER').run(); } catch (e) {}
+    try { await db.prepare('ALTER TABLE roster_meta ADD COLUMN dl INTEGER').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster ADD COLUMN a TEXT').run(); } catch (e) {}
     try { await db.prepare('ALTER TABLE roster ADD COLUMN w TEXT').run(); } catch (e) {}
     if (Math.random() < 0.05) await db.prepare('DELETE FROM roster WHERE t < ?').bind(Date.now() - KEEP).run();
@@ -73,18 +78,42 @@ export async function onRequest({ request, env, params }) {
       if (m && m.hk !== hk) return json({ error: 'taken' }, 403);
       const me = await currentUser(request, db).catch(() => null);
       const pub = b.pub === 0 || b.pub === 1 || b.pub === 2 ? b.pub : null;
-      if (!m) await db.prepare('INSERT INTO roster_meta (rid, hk, t, uid, pub) VALUES (?, ?, ?, ?, ?)').bind(id, hk, Date.now(), me ? String(me.id) : null, pub == null ? 0 : pub).run();
+      if (!m) await db.prepare('INSERT INTO roster_meta (rid, hk, t, uid, pub, cap, dl) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(id, hk, Date.now(), me ? String(me.id) : null, pub == null ? 0 : pub, Math.max(0, Math.min(5000, b.cap | 0)) || null, +b.dl > 0 ? +b.dl : null).run();
       else {
         if (me) await db.prepare('UPDATE roster_meta SET uid = ? WHERE rid = ? AND uid IS NULL').bind(String(me.id), id).run();
         if (pub != null && b.set) await db.prepare('UPDATE roster_meta SET pub = ? WHERE rid = ?').bind(pub, id).run(); // 바꾸기는 set:1 일 때만 (카드를 열 때마다 되돌리지 않게)
+        if (b.set && 'cap' in b) await db.prepare('UPDATE roster_meta SET cap = ? WHERE rid = ?').bind(Math.max(0, Math.min(5000, b.cap | 0)) || null, id).run();
+        if (b.set && 'dl' in b) await db.prepare('UPDATE roster_meta SET dl = ? WHERE rid = ?').bind(+b.dl > 0 ? +b.dl : null, id).run();
       }
       return json(await list(db, request, id, clean(b.tok, 24), hk));
+    }
+    // 주최자 전용: 카톡 안 하는 분·전화로 답한 분을 대신 적기(hostadd), 답 바꾸기(hostset), 지우기(hostdel)
+    if (/^host(add|set|del)$/.test(b.op)) {
+      const h = await isHost(db, request, id, hk);
+      if (!h.host) return json({ error: 'host' }, 403);
+      const a = b.a === 'n' || b.a === 'm' ? b.a : 'y';
+      if (b.op === 'hostadd') {
+        const n = clean(b.n, 12); if (!n) return json({ error: 'name' }, 400);
+        const cnt = await db.prepare('SELECT COUNT(*) AS c FROM roster WHERE rid = ?').bind(id).first();
+        if (cnt && cnt.c >= MAX) return json({ error: 'full' }, 409);
+        const rk = 'h' + [...crypto.getRandomValues(new Uint8Array(12))].map(x => 'abcdefghjkmnpqrstuvwxyz23456789'[x % 31]).join('');
+        const ph = clean(b.ph, 20).replace(/[^\d+\-\s]/g, '').trim();
+        await db.prepare('INSERT INTO roster (rid, tok, n, ph, g, s, p, t, a, w) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+          .bind(id, rk, n, ph || null, clean(b.g, 6) || null, a === 'y' ? clean(b.s, 24) || null : null, a === 'y' ? Math.max(0, Math.min(9, b.p | 0)) : 0, Date.now(), a, clean(b.w, 40) || null).run(); // 대신 적은 줄은 열쇠가 h로 시작 (주최자 화면에만 ✍️ 표시)
+      } else {
+        const k = clean(b.k, 24); if (!/^[a-z0-9]{12,24}$/.test(k)) return json({ error: 'bad' }, 400);
+        if (b.op === 'hostdel') await db.prepare('DELETE FROM roster WHERE rid = ? AND tok = ?').bind(id, k).run();
+        else await db.prepare('UPDATE roster SET a = ?, p = CASE WHEN ? = \'y\' THEN p ELSE 0 END WHERE rid = ? AND tok = ?').bind(a, a, id, k).run();
+      }
+      return json(await list(db, request, id, '', hk));
     }
     const tok = clean(b.tok, 24);
     if (!/^[a-z0-9]{12,24}$/.test(tok)) return json({ error: 'bad' }, 400);
 
     // 신청 취소 = 지우지 않고 '불참'으로 남김 (통계에 자동 기록 — 11-23 대표님)
     if (b.op === 'del') {
+      const hd = await isHost(db, request, id, hk);
+      if (!hd.host && hd.meta && hd.meta.dl && Date.now() > hd.meta.dl) return json({ error: 'closed' }, 409);
       await db.prepare('UPDATE roster SET a = \'n\', p = 0 WHERE rid = ? AND tok = ?').bind(id, tok).run();
       return json(await list(db, request, id, tok, hk));
     }
@@ -95,6 +124,14 @@ export async function onRequest({ request, env, params }) {
       const mine = await db.prepare('SELECT t FROM roster WHERE rid = ? AND tok = ?').bind(id, tok).first();
       if (!mine && cnt && cnt.c >= MAX) return json({ error: 'full' }, 409);
       const a = b.a === 'n' || b.a === 'm' ? b.a : 'y', w = clean(b.w, 40);
+      const hh = await isHost(db, request, id, hk);
+      if (!hh.host && hh.meta && hh.meta.dl && Date.now() > hh.meta.dl) return json({ error: 'closed' }, 409); // 응답 마감 지남
+      if (!hh.host && hh.meta && hh.meta.cap && a === 'y') { // 정원: 이미 참석인 사람이 고치는 건 괜찮음
+        const was = await db.prepare('SELECT a, p FROM roster WHERE rid = ? AND tok = ?').bind(id, tok).first();
+        const yes = await db.prepare('SELECT COALESCE(SUM(1 + p), 0) AS n FROM roster WHERE rid = ? AND (a IS NULL OR a = \'y\') AND tok <> ?').bind(id, tok).first();
+        const want = 1 + Math.max(0, Math.min(9, b.p | 0));
+        if ((yes ? yes.n : 0) + want > hh.meta.cap && !(was && (was.a == null || was.a === 'y') && want <= 1 + (was.p | 0))) return json({ error: 'cap' }, 409);
+      }
       const g = clean(b.g, 6), s = a === 'y' ? clean(b.s, 24) : '', p = a === 'y' ? Math.max(0, Math.min(9, b.p | 0)) : 0;
       const ph0 = clean(b.ph, 20).replace(/[^\d+\-\s]/g, '').trim();
       // 고칠 때는 처음 신청한 순서(시각)를 그대로 둠. 불참·미정으로 바꿀 때 전화번호를 안 보내면 예전 번호 그대로

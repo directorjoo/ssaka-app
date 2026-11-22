@@ -751,3 +751,16 @@
 .sk-ro-nos:empty { display: none; }
 .sk-ro-nos p { margin: 4px 0; color: var(--ink-2, #555); }
 .sk-ro-w { font-size: 13.5px; font-weight: 600; opacity: .8; }
+.sk-ro-stat .c, .sk-ro-stat .d { background: rgba(0,0,0,.05); }
+.sk-ro-stat .full { background: #FDE2E2; color: #B3132B; }
+.sk-ro-bar { height: 8px; margin-top: 8px; border-radius: 99px; background: rgba(0,0,0,.08); overflow: hidden; }
+.sk-ro-bar i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .4s; }
+.sk-ro-bar.full i { background: #B3132B; }
+.sk-ro-mine { display: grid; gap: 3px; }
+.sk-ro-mine.y { background: color-mix(in srgb, var(--accent) 14%, var(--paper, #fff)); }
+.sk-ro-mine b { font-size: 16.5px; } .sk-ro-mine small { font-size: 14px; font-weight: 600; opacity: .85; }
+.sk-ro-swap { margin-top: 6px; min-height: 44px; border-radius: 12px; border: 1.5px solid var(--line-ink, rgba(0,0,0,.15)); background: var(--paper, #fff); color: var(--ink); font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+.sk-ro-join:disabled { opacity: .55; }
+.sk-ro-list li.ed { cursor: pointer; } .sk-ro-list li.ed::before { content: '✏️ '; font-size: 12px; opacity: .5; }
+.sk-ro-ed { margin-left: 4px; padding: 2px 8px; border: 1px solid var(--line-ink, rgba(0,0,0,.15)); border-radius: 99px; background: transparent; font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.sk-ro-tools { display: grid; gap: 0; }

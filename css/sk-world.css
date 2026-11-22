@@ -563,9 +563,9 @@
 .sk-thumb[data-style="tree"] .sk-title { font-size: 30px; }
 
 /* 🌳 체리나무 (11-22 21:40) — 투데이 카드 모양 그대로 + 제목 뒤 오른쪽에 단풍 체리나무가 살랑 (홈 싸바 브리핑 '황금체리나무') */
-.sk[data-style="tree"] .sk-titles { isolation: isolate; min-height: 150px; padding-right: 30%; }
-.sk[data-style="tree"] .sk-titles::before { content: ""; position: absolute; z-index: -1; right: -50px; top: -96px; width: 260px; height: 260px; pointer-events: none;
-  background: url(../img/today-tree-autumn.png) center / contain no-repeat; opacity: .55; filter: saturate(.85); transform-origin: 50% 100%; animation: skTreeSway 6s ease-in-out infinite; }
+.sk[data-style="tree"] .sk-titles { isolation: isolate; min-height: 150px; }
+.sk[data-style="tree"] .sk-titles::before { content: ""; position: absolute; z-index: -1; right: -190px; top: -230px; width: 580px; height: 580px; pointer-events: none;
+  background: url(../img/today-tree-autumn.png) center / contain no-repeat; opacity: .2; filter: saturate(.7) brightness(1.1) blur(.4px); transform-origin: 50% 100%; animation: skTreeSway 6s ease-in-out infinite; }
 .sk[data-style="tree"] .sk-photo.sk-nophoto { aspect-ratio: 16 / 7; }
 .sk[data-style="tree"] .sk-photo.sk-nophoto .sk-mono { display: none; }
 .sk-thumb[data-style="tree"] .sk-titles::before { animation: none; }

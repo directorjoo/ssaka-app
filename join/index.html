@@ -34,6 +34,7 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
 .foot{margin-top:18px;text-align:center;font-size:13.5px;color:var(--ink-2)}.foot a{color:var(--ink-2)}
 .me{text-align:center}.me .nick{font-size:22px;font-weight:900;margin:6px 0 16px}
 .me button{width:100%;min-height:50px;margin-top:10px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.me .more{margin-top:18px;border-top:1px solid #eee;padding-top:6px}.me .more summary{list-style:none;cursor:pointer;text-align:center;color:var(--ink-2);font-size:14px;padding:10px 0}.me .more summary::-webkit-details-marker{display:none}.me .more summary::after{content:" ▾"}.me .more[open] summary::after{content:" ▴"}.me .more p{margin:4px 0 0;font-size:13.5px;color:var(--ink-2);text-align:center;line-height:1.5;word-break:keep-all}
 .me .del{border:0;background:none;color:var(--ink-2);font-size:14px;text-decoration:underline;min-height:44px}
 .tog{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:14px;background:var(--bg-2);font-size:15px;font-weight:700;text-align:left;word-break:keep-all}
 .tog input{width:22px;height:22px;accent-color:var(--ssaka)}
@@ -90,7 +91,11 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
   <button type="button" id="codeGet" style="background:#1E2A44;color:#fff">📱 다른 곳에서 로그인할 숫자 받기</button>
   <p id="codeShow" style="font-size:15px;text-align:center;margin:4px 0 14px" hidden></p>
   <button type="button" id="logout">로그아웃</button>
-  <button type="button" class="del" id="delete">회원 탈퇴 (정보 바로 삭제)</button>
+  <!-- 11-23 대표님: 탈퇴는 너무 쉽게 누르면 안 되니 '더보기' 안으로 -->
+  <details class="more"><summary>더보기</summary>
+    <p>탈퇴하면 만든 카드·장부·싸바스타 프로필 등 회원 기록이 바로 지워지고 되돌릴 수 없어요.</p>
+    <button type="button" class="del" id="delete">회원 탈퇴 (정보 바로 삭제)</button>
+  </details>
 </section>
 
 <p class="foot" id="loading">불러오는 중…</p>
@@ -162,5 +167,5 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
   });
 })();
 </script>
-<script src="/js/home.js?v=14" defer></script>
+<script src="/js/home.js?v=15" defer></script>
 </body></html>

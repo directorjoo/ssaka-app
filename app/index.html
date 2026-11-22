@@ -532,9 +532,12 @@
     /* 11-22 대표님: 어디야 사진이 체리 → AI 인물 얼굴로 천천히 바뀜(시험). 겹친 층을 하나씩 사르르 */
     /* 11-22 04:30 대표님: 사람 사진일 때는 체리색을 완전히 빼고 사진이 칸 전체, 글씨·단추만 위에 */
     /* 11-22 대표님: 움직임이 불편하면 마음에 드는 사진에서 ⏸ 멈춤 — 다음에 열어도 그 사진 그대로 */
-    #v-home.v2 .pz { position: absolute; z-index: 3; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 11px; border: 0; border-radius: 999px; background: rgba(0,0,0,.42); color: #fff; font: inherit; font-size: 15px; font-weight: 800; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
-    #v-home.v2 .pz:active { transform: scale(.95); }
-    #v-home.v2 .v2-mk .pz { top: 8px; left: 8px; right: auto; padding: 4px 10px; }
+    /* 11-23 대표님: 글씨 빼고 오른쪽 위 구석에 아이콘 두 개만 — › 다음 사진 · ⏸/▶ 멈춤·다시 */
+    #v-home.v2 .pzw { position: absolute; z-index: 3; top: 8px; right: 8px; display: flex; gap: 6px; }
+    #v-home.v2 .pz { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,.38); color: #fff; font: inherit; font-size: 15px; font-weight: 900; line-height: 1; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer; }
+    #v-home.v2 .pz svg { width: 16px; height: 16px; fill: #fff; }
+    #v-home.v2 .pz:active { transform: scale(.92); }
+    #v-home.v2 .v2-mk .pzw { top: 8px; left: 8px; right: auto; }
     #v-home.v2 .v2-eo .bgx { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
     #v-home.v2 .v2-eo .bgx .ly { position: absolute; inset: 0; background-size: cover; background-position: center 30%; opacity: 0; transition: opacity 1.4s ease; }
     #v-home.v2 .v2-eo .bgx .ly.ch { bottom: auto; height: 190px; background-position: center 40%; }
@@ -1169,8 +1172,14 @@
     var reduce = false; try { reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
     function show(i) { lys[k].classList.remove('on'); k = i; lys[k].classList.add('on'); if (o.onShow) o.onShow(k); }
     if (stopped) show(+saved); else if (o.onShow) o.onShow(0);
+    var wr = document.createElement('div'); wr.className = 'pzw';
+    var nx = document.createElement('button'); nx.type = 'button'; nx.className = 'pz'; nx.setAttribute('aria-label', '다음 사진');
+    nx.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8.6 4.6 7 6.2l5.8 5.8L7 17.8l1.6 1.6 7.4-7.4z"/></svg>';
     var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'pz';
-    function label() { bt.textContent = stopped ? '▶ 사진 넘기기' : '⏸ 이 사진으로'; bt.setAttribute('aria-label', stopped ? '사진 다시 돌리기' : '지금 사진에서 멈추기'); }
+    var IC_STOP = '<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>', IC_PLAY = '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg>';
+    function label() { bt.innerHTML = stopped ? IC_PLAY : IC_STOP; bt.setAttribute('aria-label', stopped ? '사진 다시 돌리기' : '지금 사진에서 멈추기'); }
+    nx.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); show((k + 1) % n); if (stopped) picStop(o.key, k); });
+    wr.appendChild(nx); wr.appendChild(bt);
     function tick() {
       tm = setTimeout(function () {
         if (!document.body.contains(o.host)) return;
@@ -1184,7 +1193,7 @@
       if (!stopped) show((k + 1) % n);
       label();
     });
-    label(); (o.btnHost || o.host).appendChild(bt);
+    label(); (o.btnHost || o.host).appendChild(wr);
     if (reduce && !stopped) { bt.hidden = true; return; } // 움직임 줄이기면 첫 사진만
     clearTimeout(tm); tm = setTimeout(tick, o.delay || 0);
   }
@@ -1485,7 +1494,7 @@
     m.appendChild(acct);
     fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (j) {
       if (j && j.user) {
-        acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = j.user.agreed ? '로그아웃 · 탈퇴' : '가입 마무리';
+        acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = j.user.agreed ? '별명 · 로그아웃' : '가입 마무리';
         // 김치 주문 관리 (관리자만 내용이 보임)
         var od = el('a', ''); od.href = '/app/orders/?admin=1'; od.appendChild(document.createTextNode('🥬 주문 관리')); od.appendChild(el('span', '', '관리자'));
         var ad = el('a', ''); ad.href = '/admin/'; ad.appendChild(document.createTextNode('🔑 싸바 관리자 화면')); ad.appendChild(el('span', '', '대표 전용'));
@@ -1601,6 +1610,6 @@
   window.addEventListener('pageshow', function (e) { if (e.persisted) renderAll(); });
 })();
 </script>
-<script src="/js/home.js?v=14" defer data-bar="0"></script>
+<script src="/js/home.js?v=15" defer data-bar="0"></script>
 </body>
 </html>

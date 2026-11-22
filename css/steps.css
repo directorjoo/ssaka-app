@@ -30,3 +30,17 @@
 .stp-go { display: block; width: 100%; margin-top: 10px; min-height: 46px; border-radius: 14px; border: 1.5px solid #B3132B; background: #fff; color: #B3132B; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
 html.bigtxt .stp-h small { display: none; }
 html.bigtxt .grp-h em { display: none; }
+
+/* 11-23 대표님: 질문 글씨(만나서 뭐할까? · 언제? · 어디서? …)를 상자로 — 내용 칸과 확실히 구분되게.
+   steps.css를 쓰는 모든 쓰기·고르기 화면(어디야·만들기·블로그·오늘도 싸바?·싸바스타·홍보·이야기·관리자)에 한 번에 적용 */
+.stp-h { margin: -2px -2px 12px; padding: 9px 12px 9px 9px; border-radius: 14px; background: linear-gradient(90deg, #FFF3E8 0%, #FFF9F3 100%); border: 1.5px solid #EED9C4; box-shadow: inset 4px 0 0 #B3132B; }
+.stp.s2 .stp-h { background: linear-gradient(90deg, #FDF0D9 0%, #FFF8EA 100%); border-color: #EBD6AE; }
+.stp.s3 .stp-h { background: linear-gradient(90deg, #FFE9EC 0%, #FFF5F6 100%); border-color: #F1C4CB; }
+.stp.opt .stp-h { background: #FAF7F2; border: 1.5px dashed #DDD3C6; box-shadow: none; }
+.stp-h small { padding-left: 38px; }
+/* 묶음 소제목도 옅은 띠로 */
+.grp-h { padding: 6px 10px; border-radius: 10px; background: #FAF3EA; border: 1px solid #EFE2D2; }
+.grp-h::after { display: none; }
+/* 칸 이름(활동명·우리 집 자랑·작은 글씨 …)도 작은 이름표 상자로 — 입력 칸과 구분 */
+.stp label.f, .stp label:not([class]):not(:has(input, select, textarea, button)) { display: block; width: fit-content; max-width: 100%; margin: 14px 0 6px; padding: 5px 11px 5px 12px; border-radius: 10px; background: #F7EFE6; color: #3a2a22; font-weight: 800; box-shadow: inset 3px 0 0 #B3132B; }
+.stp label.f:first-child, .stp > label:not([class]):first-child { margin-top: 2px; }

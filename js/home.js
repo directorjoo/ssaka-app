@@ -62,7 +62,7 @@
       var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); box.appendChild(a);
     });
     fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.user) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = '로그아웃 · 탈퇴'; acct.href = '/join/'; }
+      if (j && j.user) { acct.firstChild.textContent = '🍒 내 정보 (' + j.user.nick + '님 · 회원번호 ' + j.user.id + ')'; acct.lastChild.textContent = '별명 · 로그아웃'; acct.href = '/join/'; }
       // 11-23: 로그인이 풀리거나 다른 계정이면 관리자 칸이 통째로 사라져 헷갈림 → 이 폰에서 한 번이라도 관리자였으면 '다시 로그인' 줄을 남김
       var seen = false; try { if (j && j.admin) localStorage.setItem('sava-admin-seen', '1'); seen = localStorage.getItem('sava-admin-seen') === '1'; } catch (e) {}
       if (j && !j.admin && seen) {

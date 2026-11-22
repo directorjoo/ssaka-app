@@ -242,7 +242,8 @@
     html.bigtxt .circles { grid-template-columns: 1fr; }
     /* 11-22 21:20 홈 알약에서 온 화면(?go=1): 내용 먼저, 고르기는 아래 */
     body.go .hero { display: none; }
-    .gotop { display: flex; align-items: center; gap: 8px; margin: 8px 14px 8px; }
+    .gotop { display: flex; align-items: center; gap: 8px; margin: 8px calc(100px + env(safe-area-inset-right)) 8px 14px; min-height: 40px; } /* 오른쪽 위 언어·설정 동그라미(home.js, 고정) 자리 비워 둠 */
+    .gotop b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .gotop a, .gotop button { flex: none; padding: 8px 14px; border-radius: 999px; border: 1px solid #E9E2D8; background: #fff; color: #4A3104; font: inherit; font-size: 15px; font-weight: 800; text-decoration: none; }
     .gotop b { flex: 1; text-align: center; font-size: 18px; font-weight: 900; }
     .gohd { margin: 22px 14px 10px; font-size: 20px; font-weight: 900; letter-spacing: -.03em; }
@@ -334,13 +335,24 @@
       var b = el(x.href ? 'a' : 'button', 'cb' + (x.n ? ' new' : '')); if (x.href) b.href = x.href; else b.type = 'button';
       b.style.setProperty('--c', x.c); b.dataset.k = x.k;
       var i = el('i', '', x.i), t = el('b', '', x.t); b.appendChild(i); b.appendChild(t);
-      if (!x.href) b.addEventListener('click', function () { fromLink = false; show(x.k); var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      if (!x.href) b.addEventListener('click', function () { fromLink = false; show(x.k); paneTop(); });
       row.appendChild(b);
     });
     bar.appendChild(box);
   });
   function paintBar() { bar.querySelectorAll('.cb').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.k === cur ? 'true' : 'false'); }); }
   var pane = $('pane');
+  // 11-23 대표님: 탭을 누르면 항상 그 내용 맨 윗부분부터. 내용이 늦게 와서 길이가 바뀌어도 2.5초 동안 맨 위에 붙잡아 둠(손가락으로 움직이면 놓아 줌)
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+  var pinT = 0, pinOb = null;
+  function paneY() { return document.body.classList.contains('go') ? 0 : Math.max(0, pane.getBoundingClientRect().top + (window.pageYOffset || 0) - 56); }
+  function unpin() { clearTimeout(pinT); if (pinOb) { pinOb.disconnect(); pinOb = null; } }
+  function paneTop() {
+    unpin(); window.scrollTo(0, paneY());
+    if (window.MutationObserver) { pinOb = new MutationObserver(function () { window.scrollTo(0, paneY()); }); pinOb.observe(pane, { childList: true, subtree: true }); }
+    pinT = setTimeout(unpin, 2500);
+  }
+  ['touchstart', 'wheel', 'keydown'].forEach(function (ev) { window.addEventListener(ev, unpin, { passive: true }); });
   function msg(t) { pane.innerHTML = '<div class="msg">' + t + '</div>'; }
   function show(k) {
     if (k !== 'music' && typeof auStop === 'function') try { auStop(); } catch (e) {}
@@ -375,7 +387,7 @@
     });
     B.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-k]'); if (!b) return;
-      fromLink = false; show(b.dataset.k); var p = $('pane'); if (p.scrollIntoView) p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      fromLink = false; show(b.dataset.k); paneTop();
     });
     Promise.all([
       fetch('https://api.open-meteo.com/v1/forecast?latitude=' + wc[1] + '&longitude=' + wc[2] + '&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1').then(function (r) { return r.json(); }),
@@ -544,7 +556,7 @@
       pane.innerHTML = '<h2>🌐 오늘 지구촌 뉴스</h2><div class="src">' + esc(d.at) + ' 기준 · 세계에서 일어난 일 10가지 · 제목을 누르면 원문</div>' + nlist(d.list || [], true) +
         '<div class="grid2" style="margin-top:12px"><button type="button" class="lk" id="gToW" style="font:inherit;text-align:left;cursor:pointer"><b>🌏 세계 방송</b><span>BBC·NHK·알자지라 제목 · 생방송</span></button><button type="button" class="lk" id="gToM" style="font:inherit;text-align:left;cursor:pointer"><b>🎵 인기 노래</b><span>세계 차트 · 바로 듣기</span></button></div>' +
         '<p class="note">제목과 원문 링크는 구글 뉴스(세계) 한국어판에서 모아 와요. 1시간마다 새로 바뀌어요.</p>';
-      $('gToW').onclick = function () { show('world'); }; $('gToM').onclick = function () { show('music'); };
+      $('gToW').onclick = function () { show('world'); paneTop(); }; $('gToM').onclick = function () { show('music'); paneTop(); };
     }).catch(function () { if (cur === 'globe') msg('지구촌 뉴스를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
   }
 
@@ -1123,7 +1135,7 @@
       h += links([['📊 네이버 증권', '종목 찾기 · 차트 · 뉴스', 'https://m.stock.naver.com'], ['📈 다음 금융', '시세 · 공시', 'https://m.finance.daum.net'], ['🏛️ 한국거래소', '공식 시장 정보', 'https://data.krx.co.kr'], ['💱 환율 자세히', '엔·유로·위안·동·바트', '#fx']]);
       h += '<p class="note">장 마감 뒤엔 마지막 가격이에요. 참고용이며 사고팔라는 권유가 아니에요.</p>';
       pane.innerHTML = h;
-      var fxa = pane.querySelector('a[href="#fx"]'); if (fxa) { fxa.removeAttribute('target'); fxa.addEventListener('click', function (e) { e.preventDefault(); show('fx'); }); }
+      var fxa = pane.querySelector('a[href="#fx"]'); if (fxa) { fxa.removeAttribute('target'); fxa.addEventListener('click', function (e) { e.preventDefault(); show('fx'); paneTop(); }); }
     }).catch(function () { if (cur === 'stock') msg('주식 정보를 불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.'); });
   }
 
@@ -1161,7 +1173,7 @@
   }
   paintBar(); show(cur);
   if (GO) {} else if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
-  var a = bar.querySelector('[aria-pressed="true"]'); if (a && a.scrollIntoView) a.scrollIntoView({ inline: 'center', block: 'nearest' });
+  if (GO) paneTop(); // 처음 열 때도 맨 위부터 (예전 '고른 동그라미 보이게' 줄이 화면을 아래로 끌어내려 중간부터 보였음 — 뺌)
 })();
 </script>
 <script src="/js/share.js?v=3" defer></script>

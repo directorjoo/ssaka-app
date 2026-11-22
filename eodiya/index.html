@@ -48,7 +48,8 @@
     .more-opt { margin-top: 12px; }
     .bubble { display: inline-block; padding: 14px 18px; border-radius: 20px 20px 20px 6px; background: var(--ssaka-soft, #FBE9EC); font-size: 22px; }
     .bubble b { color: var(--ssaka-deep, #8E0A1C); }
-    #useGps { width: 100%; }
+    #useGps { width: 100%; word-break: keep-all; line-height: 1.2; padding: 6px 12px; flex-wrap: wrap; }
+    #useGps .re { font-size: .72em; font-weight: 800; padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,.22); white-space: nowrap; }
     .more-opt summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--ink-2); min-height: 40px; display: flex; align-items: center; }
     input[type=text], input[type=tel], input[type=time] {
       width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-size: 16px;
@@ -1900,7 +1901,7 @@
   });
   function setPlace(p, note) {
     place = p;
-    $('useGps').textContent = p && hasXY(p) && !p.addr ? '📍 내 위치 잡았어요 ✓ (다시 잡기)' : '📍 지금 내 위치 잡기';
+    $('useGps').innerHTML = p && hasXY(p) && !p.addr ? '<span style="white-space:nowrap">📍 위치 잡았어요 ✓</span> <span class="re">↻ 다시</span>' : '📍 지금 내 위치 잡기';
     $('usePost').classList.toggle('on', !!(p && p.addr));
     if (p && p.name) $('placeName').value = p.name;
     $('placeNote').textContent = note || '"어디야?" 문자를 받았으면 이것만 누르고 보내면 돼요.';

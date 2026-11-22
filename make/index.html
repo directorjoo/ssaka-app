@@ -207,7 +207,9 @@
     .inds.circ .ind-grid button { display: grid; justify-items: center; gap: 6px; padding: 4px 0; border: 0; border-radius: 0; background: none; color: var(--text); font: inherit; font-size: 15px; font-weight: 700; line-height: 1.25; white-space: normal; word-break: keep-all; text-align: center; cursor: pointer; }
     .inds.circ .ind-grid button i { font-style: normal; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: #fff; box-shadow: 0 0 0 1.5px #E4E4E7, 0 2px 6px rgba(0,0,0,.06); }
     .inds.circ .ind-grid button[aria-pressed="true"] { background: none; color: #B3132B; font-weight: 900; }
-    .inds.circ .ind-grid button[aria-pressed="true"] i { background: #FFF1F2; box-shadow: 0 0 0 3px #B3132B, 0 4px 12px rgba(179,19,43,.25); }
+    .inds.circ .ind-grid button[aria-pressed="true"] i { position: relative; background: #B3132B; box-shadow: 0 0 0 3px #fff, 0 0 0 5.5px #B3132B, 0 6px 14px rgba(179,19,43,.4); }
+    /* 11-23 대표님: 고른 동그라미는 체리색으로 속까지 확실하게 + ✓ */
+    .inds.circ .ind-grid button[aria-pressed="true"] i::after { content: '✓'; position: absolute; right: -6px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #B3132B; font-size: 14px; font-weight: 900; box-shadow: 0 0 0 2px #B3132B; }
     .inds.circ .ind-grid button:focus-visible { outline: 3px solid #B3132B; outline-offset: 2px; border-radius: 12px; }
     .gallery { display: grid; grid-auto-flow: column; grid-auto-columns: 118px; gap: 12px; overflow-x: auto; padding: 6px 6px 14px; margin-bottom: 12px; scrollbar-width: none; }
     .gallery::-webkit-scrollbar { display: none; }
@@ -459,11 +461,12 @@
   html.bigtxt .ind-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   html.bigtxt header .mk-hero h1 { font-size: 25px; }
   .dests button { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 6px; min-height: 58px; padding: 8px 10px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; font: inherit; text-align: left; cursor: pointer; color: var(--text); }
-  .dests button i { font-style: normal; font-size: 24px; text-align: center; }
+  .dests button i { font-style: normal; font-size: 21px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 0 0 1.5px #E4E4E7; }
   .dests button b { display: block; font-size: 15px; font-weight: 900; line-height: 1.25; word-break: keep-all; }
   .dests button small { display: block; font-size: 15px; font-weight: 700; color: var(--muted); }
   .dests button[aria-pressed="true"] { border-color: #B3132B; background: #FFF1F2; box-shadow: 0 0 0 1.5px #B3132B inset; }
   .dests button[aria-pressed="true"] b { color: #B3132B; }
+  .dests button[aria-pressed="true"] i { background: #B3132B; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #B3132B, 0 4px 10px rgba(179,19,43,.35); }
   .use-go { margin: 6px 0 2px; font-size: 15px; font-weight: 700; color: #8E0A1C; }
   #resumeBtn { display: block; width: 100%; min-height: 48px; margin: 4px 0 6px; border-radius: 14px; border: 1.5px dashed #B3132B; background: #fff; color: #8E0A1C; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
   #d2next { display: none; width: 100%; min-height: 56px; margin-top: 12px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 18px -10px rgba(179,19,43,.8); }

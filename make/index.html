@@ -69,6 +69,8 @@
     .bchips small { width: 100%; font-size: 12.5px; font-weight: 800; color: #8a7f76; }
     .bchips button { min-height: 36px; padding: 0 11px; border-radius: 999px; border: 1.5px dashed #DDD3C6; background: #fff; font: inherit; font-size: 13.5px; font-weight: 700; color: #5a4a42; cursor: pointer; }
     .bchips button:active { background: #FFE8EB; }
+    .bchips button.on { background: #B3132B; border: 1.5px solid #B3132B; color: #fff; }
+    .bchips button.on::before { content: '✓ '; font-weight: 900; }
     .caplab { margin-top: 12px; }
     #galCapList .gcap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
     #galCapList .gcap img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; flex: none; }
@@ -1696,8 +1698,12 @@
           try { t.setSelectionRange(t.value.length, t.value.length); } catch (e) {}
           t.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        bc.appendChild(b);
+        b.dataset.c = c; bc.appendChild(b);
       });
+      // 11-23 대표님: 넣은 말은 색이 바뀌어 무엇을 골랐는지 보이게 (글에서 지우면 다시 원래대로)
+      var bcPaint = function () { var v = $('body').value; bc.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', v.indexOf(x.dataset.c.replace(/:\s*$/, '')) >= 0); }); };
+      if (!bc._lis) { bc._lis = 1; $('body').addEventListener('input', function () { if (bc._paint) bc._paint(); }); }
+      bc._paint = bcPaint; bcPaint();
     }
     try { fsPaint(); } catch (e) {}
     PHOTO_OVR = ASK.photo || []; if ($('photoHelp')) { if (PHOTO_OVR[1]) $('photoHelp').textContent = PHOTO_OVR[1]; showThumb($('image').value); }

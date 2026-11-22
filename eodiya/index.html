@@ -111,6 +111,9 @@
     .rtitle .gcount { display: block; font-size: 13px; margin-top: 2px; }
     #rChips .chip { border-color: #c9c9cf; color: var(--ink); font-weight: 800; }
     #rChips .chip[aria-pressed="true"] { color: #fff; }
+    /* 고른 인사말: 체리로 채우고 앞에 ✓ */
+    .chip[aria-pressed="true"]:not(.tab) { background: #B3132B !important; border-color: #B3132B !important; color: #fff !important; box-shadow: 0 4px 10px -6px rgba(179,19,43,.7); }
+    .chips .chip[aria-pressed="true"]::before { content: '✓ '; font-weight: 900; }
     .chips .chip.pop { animation: chipPop .35s ease; }
     @keyframes chipPop { 50% { transform: scale(1.08); background: #FBE9EC; } }
     .rta { position: relative; margin-bottom: 10px; }
@@ -934,6 +937,20 @@
     return a.map(function (x, i) { var h = 0, k = x + s; for (var j = 0; j < k.length; j++) h = (h * 31 + k.charCodeAt(j)) | 0; return [h, x]; }).sort(function (p, q) { return p[0] - q[0]; }).map(function (p) { return p[1]; });
   }
   // o: { items, pin(앞에 고정할 개수), lead(맨 앞에 둘 버튼들), dice(🎲에서 고를 말들), open(전체 펼침?), onOpen(펼침 바꿈), pick(말, 버튼) }
+  // 11-23 대표님: 고른 인사말은 색이 바뀌어 무엇을 골랐는지 보이게 (다시 그려도 기억, 한 상자에 하나만)
+  // 여러 개 고를 수 있어서 고른 말 모두 표시. 보낼 말 칸에서 그 말을 지우면 표시도 꺼짐
+  function svTa(cb) { var sec = cb.closest('section,.stp-wrap,form') || document; return sec.querySelector('textarea'); }
+  function svPaint(cb) {
+    var ta = svTa(cb), v = ta ? ta.value : null, sel = cb._sel || [];
+    if (v !== null) sel = cb._sel = sel.filter(function (t) { return v.indexOf(t) >= 0; });
+    cb.querySelectorAll('.chip:not(.more):not(.dice)').forEach(function (x) { if (sel.indexOf(x.textContent.replace(/^⭐ /, '')) >= 0) x.setAttribute('aria-pressed', 'true'); else x.removeAttribute('aria-pressed'); });
+  }
+  function svMark(cb, t) {
+    cb._sel = cb._sel || []; if (cb._sel.indexOf(t) < 0) cb._sel.push(t);
+    var ta = svTa(cb); if (ta && !ta._svl) { ta._svl = 1; ta.addEventListener('input', function () { svPaint(cb); }); }
+    setTimeout(function () { svPaint(cb); }, 0);
+  }
+  window.svMark = svMark;
   window.svChips = function (cb, o) {
     cb.innerHTML = '';
     var items = o.items.slice(), pin = items.splice(0, o.pin || 0), fav = svFav();
@@ -943,7 +960,8 @@
     var room = Math.max(1, SV_SHOW - lead.length), shown = o.open ? all : all.slice(0, room);
     function mk(t, cls) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (cls ? ' ' + cls : ''); b.textContent = (stars.indexOf(t) >= 0 ? '⭐ ' : '') + t;
-      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
+      if ((cb._sel || []).indexOf(t) >= 0) b.setAttribute('aria-pressed', 'true');
+      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); svMark(cb, t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
       return b;
     }
     pin.length && shown.length && cb.appendChild(mk(shown[0]));
@@ -951,7 +969,7 @@
     shown.slice(pin.length ? 1 : 0).forEach(function (t) { cb.appendChild(mk(t)); });
     if (o.dice && o.dice.length) {
       var d = document.createElement('button'); d.type = 'button'; d.className = 'chip dice'; d.textContent = '🎲 아무 말이나';
-      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
+      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { svMark(cb, t); d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
       cb.appendChild(d);
     }
     if (all.length > room) {
@@ -993,7 +1011,8 @@
     var fav = svFav(), hidden = 0, many = o.groups.length > 1 && !!o.groups[0][0];
     function mk(t, star) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = (star ? '⭐ ' : '') + t;
-      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
+      if ((cb._sel || []).indexOf(t) >= 0) b.setAttribute('aria-pressed', 'true');
+      b.addEventListener('click', function () { if (o.pick(t, b) !== false) { svFavAdd(t); svMark(cb, t); b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); } });
       return b;
     }
     o.groups.forEach(function (g, gi) {
@@ -1013,7 +1032,7 @@
     var tail = document.createElement('div'); tail.className = 'grp-tail';
     if (o.dice && o.dice.length) {
       var d = document.createElement('button'); d.type = 'button'; d.className = 'chip dice'; d.textContent = '🎲 아무 말이나';
-      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
+      d.addEventListener('click', function () { var t = o.dice[Math.floor(Math.random() * o.dice.length)]; if (o.pick(t, d) !== false) { svMark(cb, t); d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop'); toast('🎲 ' + t); } });
       tail.appendChild(d);
     }
     if (hidden > 0 || o.open) {

@@ -145,7 +145,7 @@
     @keyframes tstar { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.25); opacity: .75; } }
     @keyframes tblink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
     @media (prefers-reduced-motion: reduce) { .camp2 .ph.snow .fl, .camp2 .ph.snow .tree * { animation: none; } }
-    /* 싸바 아침카드 오른쪽 날씨 (백화점 영업시간 칸의 기온처럼) */
+    /* 오늘 꼭 볼 정보 오른쪽 날씨 (백화점 영업시간 칸의 기온처럼) */
     .wr.today .tw { margin-left: auto; flex: none; display: grid; justify-items: end; line-height: 1; text-shadow: 0 0 2px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.8); }
     .wr.today .tw b { font-size: 34px; font-weight: 900; letter-spacing: -0.04em; }
     .wr.today .tw small { margin-top: 4px; font-size: 15px; font-weight: 800; }
@@ -597,9 +597,9 @@
     #v-home.v2 .v2-mk .sp b { display: block; font-size: 17px; font-weight: 800; }
     #v-home.v2 .v2-mk .sp small { display: block; font-size: 15px; color: #575319; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #v-home.v2 .v2-mk .sp u { color: #B3132B; }
-    /* 싸바 아침카드 — 미색에서 초록으로 섞임 + 체리 알·잎 */
+    /* 오늘 꼭 볼 정보 — 미색에서 초록으로 섞임 + 체리 알·잎 */
     #v-home.v2 .v2-td { background: radial-gradient(ellipse at 60% 35%, #ACCEAC 0%, #99BD99 45%, #8FB58F 100%); } /* 11-21 17:12 B안: 4번 빛 민트 */
-    /* 11-22 대표님: 위 카드 색이 아래 카드 윗부분에서 이어지게 — 싸바카드 위는 어디야 체리색에서 시작, 싸바 아침카드 위는 연두에서 시작해 원래 색과 섞이며 내려옴 */
+    /* 11-22 대표님: 위 카드 색이 아래 카드 윗부분에서 이어지게 — 싸바카드 위는 어디야 체리색에서 시작, 오늘 꼭 볼 정보 위는 연두에서 시작해 원래 색과 섞이며 내려옴 */
     /* 11-22 05:05 대표님: 체리색 번짐(그라데이션) 빼고, '🍒 싸바카드' 글자 줄만 가로 체리색 띠 */
     #v-home.v2 .v2-mk { background: linear-gradient(110deg, #E8E78D 0%, #ECE7BF 45%, #C8D7DA 100%); }
     #v-home.v2 .v2-mk .tx em { display: block; margin: -22px -20px 0; padding: 12px 20px; background: #6E0A22; color: #fff; font-size: 17px; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,.55); }
@@ -627,7 +627,7 @@
     #v-home.v2 .v2-td .lt { color: #1B331A; font-size: 17px; font-weight: 800; text-decoration: none; }
     #v-home.v2 .v2-td .btn { display: inline-flex; align-items: center; padding: 11px 20px; border-radius: 999px; background: linear-gradient(180deg, #3A6438, #284927); color: #fff; font-size: 18px; font-weight: 800; text-decoration: none; box-shadow: 0 8px 16px -10px rgba(30,70,20,.8); }
     #v-home.v2 .v2-mk .sp u, #v-home.v2 .v2-strip u, #v-home.v2 .v2-sv u { text-decoration: none; font-size: 24px; font-weight: 700; }
-    /* 11-22 대표님: 싸바 아침카드 = 황금 바탕 + 체리나무(대표님이 보낸 그림) — A2안. 위는 싸바카드 아래 연두에서 이어짐 */
+    /* 11-22 대표님: 오늘 꼭 볼 정보 = 황금 바탕 + 체리나무(대표님이 보낸 그림) — A2안. 위는 싸바카드 아래 연두에서 이어짐 */
     #v-home.v2 .v2-td { background:
       linear-gradient(180deg, #E3E68A 0%, rgba(240,220,120,.6) 10%, rgba(247,207,78,0) 26%),
       radial-gradient(ellipse at 70% 20%, #FFE58A 0%, #F7CF4E 45%, #EDB52E 100%); }
@@ -641,7 +641,7 @@
     #v-home.v2 .v2-td .tx p { word-break: keep-all; font-weight: 600; }
     #v-home.v2 .v2-td .ch span { background: rgba(255,255,255,.88); border-color: rgba(110,70,10,.2); color: #3B2A08; }
     #v-home.v2 .v2-td .btn { background: linear-gradient(180deg, #C98A12, #9A6408); text-shadow: 0 1px 2px rgba(0,0,0,.35); box-shadow: 0 8px 16px -10px rgba(110,70,0,.8); }
-    /* 싸바 아침카드 — 흰 띠 */
+    /* 오늘 꼭 볼 정보 — 흰 띠 */
     #v-home.v2 .v2-strip { display: flex; align-items: center; gap: 12px; margin: 0 18px 32px; padding: 14px 18px; border-radius: 20px; background: #fff; color: #1A1A1A; text-decoration: none; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
     #v-home.v2 .v2-strip i { font-style: normal; font-size: 30px; line-height: 1; }
     #v-home.v2 .v2-strip span { flex: 1; min-width: 0; }
@@ -1082,7 +1082,7 @@
     var hi = el('div', 'v2-hi');
     hi.innerHTML = '<small></small><b>오늘도 <span>싸바?</span></b>';
     hi.querySelector('small').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + DAYS[now.getDay()] + '요일';
-    // 오늘 필요한 한 줄(DESIGN 원칙 6, 롯데식): 날씨·기온 — 싸바 아침카드 날씨에서 고른 도시(sava-wx) 그대로, 누르면 날씨 자세히
+    // 오늘 필요한 한 줄(DESIGN 원칙 6, 롯데식): 날씨·기온 — 오늘 꼭 볼 정보 날씨에서 고른 도시(sava-wx) 그대로, 누르면 날씨 자세히
     var wxl = el('a', 'v2-wx'); wxl.href = '../today/#wx'; wxl.textContent = '☀️ 날씨 불러오는 중…';
     hi.appendChild(wxl);
     v.appendChild(hi);
@@ -1107,9 +1107,9 @@
     v.appendChild(mk);
     rotPics(mk.querySelector('.mkph'), MK_PICS, 2200);
 
-    // 3. 싸바 아침카드 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 싸바 아침카드 = 싸바가 매일 갖다 주는 것
+    // 3. 오늘 꼭 볼 정보 — 큰 카드 (11-21 대표님: 중요한데 너무 작음). 싸바카드 = 내가 만들어 보내는 것, 오늘 꼭 볼 정보 = 싸바가 매일 갖다 주는 것
     var td = el('section', 'v2c v2-td');
-    td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 싸바 아침카드</em><h3>검색 안 해도,<br>오늘 소식이 다 와요</h3><p><span class="bt-long">날씨·뉴스·혜택을 싸바가 아침마다 모아 드려요</span><span class="bt-short">날씨·뉴스·혜택 매일</span></p></div>' +
+    td.innerHTML = '<img class="tree" src="../img/today-tree-autumn.png" alt="" aria-hidden="true"><div class="tx"><em>☀️ 오늘 꼭 볼 정보</em><h3>검색 안 해도,<br>오늘 소식이 다 와요</h3><p><span class="bt-long">날씨·뉴스·혜택을 싸바가 아침마다 모아 드려요</span><span class="bt-short">날씨·뉴스·혜택 매일</span></p></div>' +
       '<div class="ch"><span>☀️ 날씨</span><span>🗞️ 뉴스 요약</span><span>🔥 인기 검색어</span><span>💊 건강</span><span>🔔 정부 혜택</span><span>📻 라디오·TV</span></div>' +
       '<div class="ft"><a class="lt" href="../letter/">💌 오늘도 싸바? 받기</a><a class="btn" href="../today/">오늘 보기 ›</a></div>';
     tapGo(td, '../today/');
@@ -1240,11 +1240,11 @@
     tapGo(mk, '#alim');
     v.appendChild(mk);
 
-    // 4. 싸바 아침카드 — 예전 파란 탭(남산타워 사진) 그대로 되돌림, 싸바알림판 바로 아래 (11-21 대표님)
-    var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '싸바 아침카드');
-    rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>싸바 아침카드</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
+    // 4. 오늘 꼭 볼 정보 — 예전 파란 탭(남산타워 사진) 그대로 되돌림, 싸바알림판 바로 아래 (11-21 대표님)
+    var rd = el('a', 'wr today'); rd.href = '../today/'; rd.setAttribute('aria-label', '오늘 꼭 볼 정보');
+    rd.innerHTML = '<i aria-hidden="true">☀️</i><div><b>오늘 꼭 볼 정보</b><span>뉴스 요약 · 날씨 · 인기 검색어 · 유튜브 · 건강 · 정부 혜택 · 라디오</span></div><em>보기 ›</em>';
     v.appendChild(rd);
-    // 광주 기온은 지움 (11-21 대표님) — 전국 날씨는 싸바 아침카드 '전국 날씨' 탭에서
+    // 광주 기온은 지움 (11-21 대표님) — 전국 날씨는 오늘 꼭 볼 정보 '전국 날씨' 탭에서
 
     // 5. 지금 보내기 좋은 카드
     var pnl = el('section', 'n-panel');
@@ -1335,7 +1335,7 @@
     return w;
   }
 
-  // ---------- 싸바 아침카드 칸 오른쪽에 날씨 (싸바 아침카드에서 고른 도시, 없으면 광주) ----------
+  // ---------- 오늘 꼭 볼 정보 칸 오른쪽에 날씨 (오늘 꼭 볼 정보에서 고른 도시, 없으면 광주) ----------
   function homeWeather(box) {
     var c = null; try { c = JSON.parse(localStorage.getItem('sava-wx') || 'null'); } catch (e) {}
     if (!c || !c[1]) c = ['광주', 35.1595, 126.8526];

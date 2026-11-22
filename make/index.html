@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="../css/sk.css?v=97">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
-  <link rel="stylesheet" href="../css/steps.css?v=5">
+  <link rel="stylesheet" href="../css/steps.css?v=6">
   <meta property="og:title" content="1분 만에 싸바 카드 만들기">
   <meta property="og:description" content="앱 없이 카톡으로 보내는 내 카드 — 통화 · 길찾기 · 주소록 · 복사">
   <meta property="og:image" content="https://sava.kr/img/ssaka-share.png?v=5">
@@ -594,8 +594,10 @@
   #form > .sec-h, #form > .sec-h[data-sec="basic"] { background: #fff; border-color: #E9E2D8; }
   #form > .sec-h[data-sec="photo"], #form > .sec-h[data-sec="video"] { background: #FFFCF5; border-color: #EFE6D6; }
   #form > .sec-h[data-sec="deco"] { background: #fff; border-color: #DDD3C6; }
-  /* 11-23 대표님: 왼쪽 색 줄이 있는 상자는 모서리 사각 (둥글면 줄이 C자로 휘어 보임) */
-  .sec-h, .tp-head, #form > fieldset[data-sg] { border-radius: 0 !important; }
+  /* 11-23 05:55 대표님: 왼쪽 빨간 줄이 튐 → 줄 없이 옅은 그라데이션 바탕 + 옅은 테두리 + 부드러운 모서리 */
+  .sec-h { border-left: 0 !important; border: 1px solid #F1DCD6; border-radius: 14px !important; background: linear-gradient(90deg, #FCE9EC 0%, #FFF6F2 55%, #fff 100%); }
+  .tp-head { border-left: 0 !important; border: 1px solid #F1DCD6; border-radius: 12px !important; background: linear-gradient(90deg, #FCE9EC 0%, #FFF8F5 60%, #fff 100%); }
+  #form > fieldset[data-sg] { margin-left: 0; border-left: 1.5px solid #EFE3D8 !important; border-radius: 16px !important; }
   #form > fieldset[data-sg] { border-left-color: #E9E2D8; }
   #form > fieldset[data-sg="basic"], #form > fieldset[data-sg="deco"] { background: #fff; }
   #form > fieldset[data-sg="photo"], #form > fieldset[data-sg="video"] { background: #FFFCF5; border-left-color: #EFE6D6; }

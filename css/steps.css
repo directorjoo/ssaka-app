@@ -45,7 +45,11 @@ html.bigtxt .grp-h em { display: none; }
 .stp label.f, .stp label:not([class]):not(:has(input, select, textarea, button)) { display: block; width: fit-content; max-width: 100%; margin: 14px 0 6px; padding: 5px 11px 5px 12px; border-radius: 10px; background: #F7EFE6; color: #3a2a22; font-weight: 800; box-shadow: inset 3px 0 0 #B3132B; }
 .stp label.f:first-child, .stp > label:not([class]):first-child { margin-top: 2px; }
 
-/* 11-23 대표님: 왼쪽 체리 줄이 있는 상자는 모서리를 둥글게 하면 빨간 줄이 C자처럼 휘어 보여 거슬림 → 모서리 사각, 빨간 줄은 곧은 l자 선택 표시처럼 */
-.stp-h, .stp.s2 .stp-h, .stp.s3 .stp-h, .stp.opt .stp-h,
-.grp-h,
-.stp label.f, .stp label:not([class]):not(:has(input, select, textarea, button)) { border-radius: 0; }
+/* 11-23 05:55 대표님: 빨간 l자 줄도 너무 튐 → 줄은 없애고 자연스럽게: 왼쪽에서 오른쪽으로 옅어지는 연분홍 바탕 + 옅은 테두리 + 부드러운 모서리.
+   단계 표시는 앞의 빨간 번호 동그라미가 맡음. 앞으로 상자에 굵은 색 줄(왼쪽 띠) 쓰지 않기 */
+.stp-h { box-shadow: none; border-radius: 12px; background: linear-gradient(90deg, #FCE6E9 0%, #FFF4EF 55%, #FFFBF8 100%); border: 1px solid #F3DDD6; }
+.stp.s2 .stp-h { background: linear-gradient(90deg, #FBEBD3 0%, #FFF6E9 55%, #FFFCF6 100%); border-color: #EFE0C6; }
+.stp.s3 .stp-h { background: linear-gradient(90deg, #FBDDE2 0%, #FFF1F2 55%, #FFFAFA 100%); border-color: #F2D2D7; }
+.stp.opt .stp-h { background: #FAF7F2; border: 1px dashed #DDD3C6; }
+.grp-h { border-radius: 8px; }
+.stp label.f, .stp label:not([class]):not(:has(input, select, textarea, button)) { box-shadow: none; border-radius: 8px; background: linear-gradient(90deg, #F8E9E3 0%, #FBF4EE 100%); }

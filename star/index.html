@@ -87,13 +87,17 @@
     .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .top a.sava { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px; border-radius: 999px; background: #fff; color: #8E0F22; font-size: 14px; font-weight: 800; text-decoration: none; box-shadow: 0 0 0 1.5px #F2D3D8; }
     h1 { padding-right: 0; }
-    .hero { margin: 0 0 16px; padding: 20px 18px 18px; border-radius: 24px; color: #fff; background: linear-gradient(120deg, #4A030E 0%, #7E0A1C 45%, #B3132B 100%); box-shadow: 0 16px 30px -22px rgba(90,10,20,.8); }
-    .hero .k { font-size: 13px; font-weight: 800; letter-spacing: .08em; color: #FFD54A; }
-    .hero h2 { margin: 6px 0 8px; font-size: 25px; font-weight: 900; letter-spacing: -.03em; line-height: 1.3; word-break: keep-all; }
-    .hero p { margin: 0; font-size: 16px; line-height: 1.6; opacity: .95; word-break: keep-all; }
+    /* 황금체리나무 (11-23 대표님: 체리색 설명 바탕 → 홈 황금체리나무 색) */
+    .hero { position: relative; overflow: hidden; margin: 0 0 16px; padding: 20px 18px 18px; border-radius: 24px; color: #1A1A1A; background: radial-gradient(120% 140% at 0% 0%, #FFE58A 0%, #F7CF4E 55%, #EDB52E 100%); box-shadow: 0 16px 30px -22px rgba(120,80,10,.8); }
+    .hero::before { content: ''; position: absolute; right: -110px; top: -50px; width: 420px; height: 420px; background: url(../img/today-tree.png) no-repeat center / contain; opacity: .32; filter: saturate(.8); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(247,207,78,.86) 0%, rgba(247,207,78,.62) 50%, rgba(247,207,78,.18) 100%), linear-gradient(0deg, rgba(237,181,46,.55) 0%, transparent 40%); pointer-events: none; }
+    .hero > * { position: relative; z-index: 1; }
+    .hero .k { display: inline-block; padding: 4px 11px; border-radius: 999px; background: rgba(255,255,255,.88); border: 1px solid rgba(110,70,10,.2); font-size: 13px; font-weight: 800; letter-spacing: .06em; color: #4A3104; }
+    .hero h2 { margin: 10px 0 8px; font-size: 25px; font-weight: 900; letter-spacing: -.03em; line-height: 1.3; word-break: keep-all; color: #1A1A1A; text-shadow: 0 0 4px rgba(255,236,170,.95), 0 0 12px rgba(255,236,170,.8); }
+    .hero p { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.6; color: #4A3104; word-break: keep-all; text-shadow: 0 0 4px rgba(255,236,170,.95), 0 0 12px rgba(255,236,170,.8); }
     .hero .go { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .hero .go a { display: grid; place-items: center; min-height: 52px; border-radius: 16px; background: #fff; color: #8E0F22; font-size: 16px; font-weight: 900; text-decoration: none; text-align: center; line-height: 1.2; }
-    .hero .go a.y { background: #FFD54A; color: #3A1D00; }
+    .hero .go a { display: grid; place-items: center; min-height: 52px; border-radius: 16px; background: #fff; color: #4A3104; border: 1px solid rgba(110,70,10,.2); font-size: 16px; font-weight: 900; text-decoration: none; text-align: center; line-height: 1.2; }
+    .hero .go a.y { background: linear-gradient(180deg, #C98A12, #9A6408); color: #fff; border: 0; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
     .diff { margin: 0 0 16px; padding: 4px 0 0; }
     .diff h2 { margin: 0 0 10px; font-size: 20px; font-weight: 900; letter-spacing: -.03em; }
     .vs { display: grid; gap: 10px; }

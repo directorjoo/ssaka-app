@@ -136,7 +136,7 @@ export async function onRequest({ request, env, params }) {
   await ensure(db);
   const me = await currentUser(request, db).catch(() => null);
   const uid = me ? Number(me.id) : 0;
-  const admin = !!me && String(env.SAVA_ADMIN_UID || '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id));
+  const admin = !!me && String(env.SAVA_ADMIN_UID || '').replace(/["'\s]/g, '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id));
   const body = async () => { const t = await request.text(); if (t.length > 60000) throw new Error('big'); return JSON.parse(t || '{}'); };
   const need = () => uid ? null : json({ error: 'login' }, 401);
 

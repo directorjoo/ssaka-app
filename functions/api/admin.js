@@ -31,7 +31,7 @@ async function isAdmin(request, env, db) {
   if (!env.SAVA_ADMIN_UID) return { ok: false, setup: !env.ADMIN_KEY };
   try {
     const me = await currentUser(request, db);
-    if (me && String(env.SAVA_ADMIN_UID || '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id))) return { ok: true, by: 'login', nick: me.alias || me.nick || '' };
+    if (me && String(env.SAVA_ADMIN_UID || '').replace(/["'\s]/g, '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id))) return { ok: true, by: 'login', nick: me.alias || me.nick || '' };
     return { ok: false, login: !!me };
   } catch (e) { return { ok: false }; }
 }

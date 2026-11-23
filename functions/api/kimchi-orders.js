@@ -22,8 +22,8 @@ export async function onRequest({request,env}){
  await ensure(env.DB);
  let b={};try{const raw=await request.text();if(raw.length>16000)return json({error:'large'},413);b=JSON.parse(raw);}catch(e){return json({error:'bad'},400);}
  const user=await currentUser(request,env.DB);
- const kimchiAdmins=String(env.SAVA_ADMIN_UID||'').split(',').concat(String(env.SAVA_KIMCHI_ADMINS||'').split(',')).map(function(s){return String(s||'').trim();}).filter(Boolean); // 김치 주문 관리자: 대표 + SAVA_KIMCHI_ADMINS(쉼표로 여러 명)
- const owner=!!user&&String(env.SAVA_ADMIN_UID||'').split(',').map(function(x){return x.trim();}).filter(Boolean).indexOf(String(user.id))>=0;
+ const kimchiAdmins=String(env.SAVA_ADMIN_UID||'').replace(/["'\s]/g,'').split(',').concat(String(env.SAVA_KIMCHI_ADMINS||'').split(',')).map(function(s){return String(s||'').trim();}).filter(Boolean); // 김치 주문 관리자: 대표 + SAVA_KIMCHI_ADMINS(쉼표로 여러 명)
+ const owner=!!user&&String(env.SAVA_ADMIN_UID||'').replace(/["'\s]/g,'').split(',').map(function(x){return x.trim();}).filter(Boolean).indexOf(String(user.id))>=0;
  await env.DB.prepare('CREATE TABLE IF NOT EXISTS kimchi_admins (uid TEXT PRIMARY KEY, name TEXT, added INTEGER NOT NULL)').run();
  await env.DB.prepare('CREATE TABLE IF NOT EXISTS kimchi_invites (code TEXT PRIMARY KEY, expires INTEGER NOT NULL, used_by TEXT)').run();
  let admin=!!user&&kimchiAdmins.indexOf(String(user.id))>=0;

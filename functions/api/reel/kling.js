@@ -58,7 +58,7 @@ async function who(request, env) {
   let me = null;
   if (env.DB) { try { me = await currentUser(request, env.DB); } catch (e) {} }
   const key = request.headers.get('x-admin-key');
-  const admin = (key && env.ADMIN_KEY && same(key, env.ADMIN_KEY)) || (me && env.SAVA_ADMIN_UID && String(env.SAVA_ADMIN_UID || '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id)));
+  const admin = (key && env.ADMIN_KEY && same(key, env.ADMIN_KEY)) || (me && env.SAVA_ADMIN_UID && String(env.SAVA_ADMIN_UID || '').replace(/["'\s]/g, '').split(',').map(x => x.trim()).filter(Boolean).includes(String(me.id)));
   return { me, admin: !!admin };
 }
 async function ensure(db) {

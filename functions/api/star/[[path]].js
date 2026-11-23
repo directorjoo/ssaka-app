@@ -17,6 +17,12 @@
 // GET  /api/star/photo/<key>.jpg         사진
 // POST /api/star/file                    배우가 이미 만들어 둔 프로필 파일(PDF·JPG·PNG, 10MB까지) → {key, x}
 // GET  /api/star/file/<key>.<pdf|jpg|png> 프로필 파일 보기
+// GET  /api/star/board?before=<id>        자유게시판 글 30개(공지 먼저) + 댓글
+// POST /api/star/board {t,b,pin}          글 쓰기 (pin은 관리자만 — 📌 공지)
+// POST /api/star/board/<id>/c {b}         댓글
+// POST /api/star/board/<id>/report        신고 (3명 넘으면 저절로 가림, 관리자는 계속 봄)
+// POST /api/star/board/<id>/pin           관리자: 공지 걸기·풀기
+// DELETE /api/star/board/<id> · /api/star/board/c/<id>   지우기 (쓴 사람 또는 관리자)
 // POST /api/star/remove                  {type: audition|profile, id}  관리자만
 // POST /api/star/audition/<id>/verify    {on}  관리자: ✓ 싸바 확인 공고 표시
 // (11-23 대표님: 모집요강·지원 다시) 공고 d에 rl(배역 여러 개 {n 배역, t 비중, s 성별, a 나이, d 설명}), qual 지원 자격, plus 우대,
@@ -51,6 +57,15 @@ function cleanProfile(d) {
 const ROLE_T = ['주연', '조연', '단역', '앙상블', '보조출연', '기타'];
 const NEED = ['프로필 사진', '연기 영상', '자유 연기', '지정 대본', '노래', '춤', '사투리', '포트폴리오'];
 const okVideo = v => /^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be|vimeo\.com|tv\.naver\.com|naver\.me)\//.test(String(v || ''));
+// 자유게시판: 연락처 원칙 — 글 속 전화번호·이메일은 가림
+const BOARD_T = ['자유', '질문', '정보', '구인·구직', '후기'];
+const hideContact = t => String(t || '').replace(/(01[016-9]|0\d{1,2})[\s.\-)]*\d{3,4}[\s.\-]*\d{4}/g, '☎ (번호 가림)').replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, '✉ (이메일 가림)');
+const boardText = (v, n) => hideContact(String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').trim().slice(0, n));
+async function boardNick(db, uid, me) {
+  const r = await db.prepare('SELECT d FROM star_profiles WHERE uid = ?').bind(uid).first();
+  let n = ''; try { n = r ? JSON.parse(r.d).name : ''; } catch (e) {}
+  return S(n || (me && (me.alias || me.nick)) || '싸바 친구', 20);
+}
 function cleanRoles(rl) {
   return (Array.isArray(rl) ? rl : []).map(r => ({ n: S(r && r.n, 30), t: ROLE_T.includes(r && r.t) ? r.t : '', s: ['무관', '여', '남'].includes(r && r.s) ? r.s : '', a: S(r && r.a, 20), d: S(r && r.d, 200) }))
     .filter(r => r.n || r.d).slice(0, 10);
@@ -85,6 +100,9 @@ async function ensure(db) {
   await db.prepare('CREATE TABLE IF NOT EXISTS star_profiles (uid INTEGER PRIMARY KEY, d TEXT NOT NULL, pub INTEGER DEFAULT 0, at INTEGER NOT NULL)').run();
   await db.prepare('CREATE TABLE IF NOT EXISTS star_auditions (id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER NOT NULL, d TEXT NOT NULL, deadline TEXT, st TEXT NOT NULL DEFAULT \'open\', at INTEGER NOT NULL)').run();
   await db.prepare('CREATE TABLE IF NOT EXISTS star_apps (aid INTEGER NOT NULL, uid INTEGER NOT NULL, st TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (aid, uid))').run();
+  await db.prepare('CREATE TABLE IF NOT EXISTS star_posts (id INTEGER PRIMARY KEY AUTOINCREMENT, uid INTEGER NOT NULL, nick TEXT, t TEXT, b TEXT NOT NULL, pin INTEGER DEFAULT 0, rep INTEGER DEFAULT 0, nc INTEGER DEFAULT 0, at INTEGER NOT NULL)').run();
+  await db.prepare('CREATE TABLE IF NOT EXISTS star_cmts (id INTEGER PRIMARY KEY AUTOINCREMENT, pid INTEGER NOT NULL, uid INTEGER NOT NULL, nick TEXT, b TEXT NOT NULL, at INTEGER NOT NULL)').run();
+  await db.prepare('CREATE TABLE IF NOT EXISTS star_reps (pid INTEGER NOT NULL, uid INTEGER NOT NULL, PRIMARY KEY (pid, uid))').run();
   if (altered) return;
   // 11-23: 조회수(v)·싸바 확인(vf)·지원 내용(x) — 이미 있으면 오류 나므로 하나씩 조용히
   for (const q of ['ALTER TABLE star_auditions ADD COLUMN v INTEGER DEFAULT 0', 'ALTER TABLE star_auditions ADD COLUMN vf INTEGER DEFAULT 0', 'ALTER TABLE star_apps ADD COLUMN x TEXT']) {
@@ -252,6 +270,66 @@ export async function onRequest({ request, env, params }) {
       const key = [...crypto.getRandomValues(new Uint8Array(12))].map(x => x.toString(16).padStart(2, '0')).join('');
       await env.VIDEO.put('star/' + key + '.jpg', bin, { httpMetadata: { contentType: 'image/jpeg' }, customMetadata: { uid: String(uid) } });
       return json({ key, url: photoUrl(key) });
+    }
+    // ── 자유게시판 (11-23 대표님: 공지 올리고 배우들도 자유롭게, 이상한 글은 관리자가 지움)
+    if (path === 'board' && method === 'GET') {
+      const before = +new URL(request.url).searchParams.get('before') || 0;
+      const hide = admin ? '' : ' AND rep < 3';
+      const pins = before ? [] : (await db.prepare('SELECT * FROM star_posts WHERE pin = 1' + hide + ' ORDER BY id DESC LIMIT 5').all()).results;
+      const list = (await db.prepare('SELECT * FROM star_posts WHERE pin = 0' + hide + (before ? ' AND id < ?' : '') + ' ORDER BY id DESC LIMIT 30').bind(...(before ? [before] : [])).all()).results;
+      const all = pins.concat(list), ids = all.map(r => r.id);
+      let cm = [];
+      if (ids.length) cm = (await db.prepare('SELECT * FROM star_cmts WHERE pid IN (' + ids.map(() => '?').join(',') + ') ORDER BY id').bind(...ids).all()).results;
+      let mine = [];
+      if (uid && ids.length) mine = (await db.prepare('SELECT pid FROM star_reps WHERE uid = ? AND pid IN (' + ids.map(() => '?').join(',') + ')').bind(uid, ...ids).all()).results.map(r => r.pid);
+      const out = r => ({ id: r.id, nick: r.nick, t: r.t, b: r.b, pin: !!r.pin, at: r.at, mine: r.uid === uid, rep: admin ? r.rep : undefined, hid: r.rep >= 3, reported: mine.includes(r.id),
+        c: cm.filter(c => c.pid === r.id).map(c => ({ id: c.id, nick: c.nick, b: c.b, at: c.at, mine: c.uid === uid })) });
+      return json({ login: !!uid, admin, posts: all.map(out), more: list.length === 30 ? list[list.length - 1].id : 0 });
+    }
+    if (path === 'board' && method === 'POST') {
+      const n = need(); if (n) return n;
+      const b = await body();
+      const text = boardText(b.b, 1000); if (text.length < 2) return json({ error: 'few' }, 400);
+      if (!admin) {
+        const c = await db.prepare('SELECT COUNT(*) n FROM star_posts WHERE uid = ? AND at > ?').bind(uid, Date.now() - 864e5).first();
+        if (c && c.n >= 20) return json({ error: 'blimit' }, 429);
+      }
+      const t = BOARD_T.includes(b.t) ? b.t : (admin && b.t === '공지' ? '공지' : '자유');
+      await db.prepare('INSERT INTO star_posts (uid, nick, t, b, pin, at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, await boardNick(db, uid, me), t, text, admin && b.pin ? 1 : 0, Date.now()).run();
+      return json({ ok: 1 });
+    }
+    m = /^board\/(\d+)\/(c|report|pin)$/.exec(path);
+    if (m && method === 'POST') {
+      const n = need(); if (n) return n;
+      const pid = +m[1], post = await db.prepare('SELECT * FROM star_posts WHERE id = ?').bind(pid).first();
+      if (!post) return json({ error: 'none' }, 404);
+      if (m[2] === 'c') {
+        const b = await body(); const text = boardText(b.b, 300); if (text.length < 1) return json({ error: 'few' }, 400);
+        if (!admin) { const c = await db.prepare('SELECT COUNT(*) n FROM star_cmts WHERE uid = ? AND at > ?').bind(uid, Date.now() - 864e5).first(); if (c && c.n >= 100) return json({ error: 'blimit' }, 429); }
+        await db.prepare('INSERT INTO star_cmts (pid, uid, nick, b, at) VALUES (?, ?, ?, ?, ?)').bind(pid, uid, await boardNick(db, uid, me), text, Date.now()).run();
+        await db.prepare('UPDATE star_posts SET nc = nc + 1 WHERE id = ?').bind(pid).run();
+        return json({ ok: 1 });
+      }
+      if (m[2] === 'report') {
+        if (post.uid === uid) return json({ error: 'own' }, 400);
+        const had = await db.prepare('SELECT 1 x FROM star_reps WHERE pid = ? AND uid = ?').bind(pid, uid).first();
+        if (!had) { await db.prepare('INSERT INTO star_reps (pid, uid) VALUES (?, ?)').bind(pid, uid).run(); await db.prepare('UPDATE star_posts SET rep = rep + 1 WHERE id = ?').bind(pid).run(); }
+        return json({ ok: 1 });
+      }
+      if (!admin) return json({ error: 'admin' }, 403);
+      await db.prepare('UPDATE star_posts SET pin = ? WHERE id = ?').bind(post.pin ? 0 : 1, pid).run();
+      return json({ ok: 1, pin: !post.pin });
+    }
+    m = /^board\/(c\/)?(\d+)$/.exec(path);
+    if (m && method === 'DELETE') {
+      const n = need(); if (n) return n;
+      const id = +m[2], tb = m[1] ? 'star_cmts' : 'star_posts';
+      const r = await db.prepare('SELECT * FROM ' + tb + ' WHERE id = ?').bind(id).first();
+      if (!r) return json({ ok: 1 });
+      if (r.uid !== uid && !admin) return json({ error: 'not-yours' }, 403);
+      if (m[1]) { await db.prepare('DELETE FROM star_cmts WHERE id = ?').bind(id).run(); await db.prepare('UPDATE star_posts SET nc = MAX(nc - 1, 0) WHERE id = ?').bind(r.pid).run(); }
+      else { await db.prepare('DELETE FROM star_cmts WHERE pid = ?').bind(id).run(); await db.prepare('DELETE FROM star_reps WHERE pid = ?').bind(id).run(); await db.prepare('DELETE FROM star_posts WHERE id = ?').bind(id).run(); }
+      return json({ ok: 1 });
     }
     // ── 프로필 파일 올리기 (11-23 대표님: 배우들이 이미 만들어 둔 프로필 파일도)
     if (path === 'file' && method === 'POST') {

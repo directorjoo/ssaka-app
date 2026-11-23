@@ -35,7 +35,7 @@
     h1 { margin: 6px 0 2px; font-size: 28px; font-weight: 900; letter-spacing: -.035em; padding-right: 90px; }
     h1 b { color: #B3132B; }
     .sub { margin: 0 0 14px; font-size: 16px; color: #6B6259; line-height: 1.5; word-break: keep-all; }
-    .tabs { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 -16px 16px; padding: 8px 16px; background: rgba(255,250,244,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .tabs { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 0 -16px 16px; padding: 8px 16px; background: rgba(255,250,244,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
     .tabs a { display: grid; place-items: center; gap: 1px; min-height: 56px; padding: 6px 2px; border-radius: 16px; background: #fff; color: #4A4038; text-decoration: none; font-size: 15px; font-weight: 800; text-align: center; line-height: 1.15; box-shadow: 0 6px 16px -12px rgba(90,40,20,.6); }
     .tabs a i { font-style: normal; font-size: 20px; }
     .tabs a.on { background: #B3132B; color: #fff; }
@@ -70,6 +70,30 @@
     .pfile button { flex: none; min-height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: #F3ECE6; color: #5A4A3E; font: inherit; font-size: 14px; font-weight: 800; }
     .pfile.add { border: 2px dashed #D9C9BB; color: #5A4A3E; cursor: pointer; line-height: 1.35; }
     .pfile.add small { font-size: 13px; font-weight: 700; color: #8A8178; }
+    /* 자유게시판 (11-23) */
+    .bw { margin: 0 0 14px; padding: 14px; border-radius: 20px; background: #fff; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
+    .bw textarea { min-height: 90px; }
+    .bt { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+    .bt button { min-height: 40px; padding: 0 13px; border-radius: 999px; border: 1.5px solid #E8DCCF; background: #fff; color: #4A4038; font: inherit; font-size: 15px; font-weight: 800; }
+    .bt button.on { background: #B3132B; border-color: #B3132B; color: #fff; }
+    .bp { margin: 0 0 12px; padding: 14px 16px 12px; border-radius: 20px; background: #fff; box-shadow: 0 12px 26px -20px rgba(90,40,20,.6); }
+    .bp.pin { background: linear-gradient(100deg, #FFF6D6, #FFFDF5); border: 1.5px solid #F0D27A; }
+    .bp.hid { opacity: .55; border: 2px dashed #D8475E; }
+    .bp .bh { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 14px; color: #8A8178; }
+    .bp .bh b { color: #1A1A1A; font-size: 16px; }
+    .bp .tg { padding: 2px 9px; border-radius: 999px; background: #F3ECE6; color: #5A4A3E; font-size: 13px; font-weight: 800; }
+    .bp.pin .tg { background: #C98A12; color: #fff; }
+    .bp .bb { margin: 8px 0 6px; font-size: 16.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .bp .ba { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+    .bp .ba button { min-height: 36px; padding: 0 11px; border: 0; border-radius: 999px; background: #F6F0EA; color: #5A4A3E; font: inherit; font-size: 13.5px; font-weight: 800; }
+    .bp .ba button.del { background: #FFE9EC; color: #8E0F22; }
+    .bp .cm { margin-top: 8px; padding-top: 8px; border-top: 1px solid #F0E8DF; }
+    .bp .cm p { margin: 0 0 6px; font-size: 15px; line-height: 1.5; word-break: break-word; }
+    .bp .cm p b { margin-right: 6px; }
+    .bp .cm p button { margin-left: 4px; border: 0; background: none; color: #B3132B; font: inherit; font-size: 13px; font-weight: 800; }
+    .bp .cw { display: flex; gap: 6px; margin-top: 6px; }
+    .bp .cw input { flex: 1; min-height: 44px; }
+    .bp .cw button { flex: none; min-height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #B3132B; color: #fff; font: inherit; font-size: 15px; font-weight: 800; }
     .fnote { margin: 8px 2px 0; font-size: 14px; line-height: 1.5; color: #6B5A4A; word-break: keep-all; }
     .photos label.add i { display: block; font-style: normal; font-size: 30px; }
     .toggle { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 14px 16px; border-radius: 16px; background: #fff; font-size: 16px; line-height: 1.45; }
@@ -208,6 +232,7 @@
     <a href="#profile" data-t="profile"><i>🙋</i>내<br>프로필</a>
     <a href="#post" data-t="post"><i>📣</i>오디션<br>올리기</a>
     <a href="#mine" data-t="mine"><i>📋</i>내 지원<br>내 공고</a>
+    <a href="#board" data-t="board"><i>💬</i>자유<br>게시판</a>
   </nav>
   <div id="view"></div>
 
@@ -253,7 +278,7 @@
     return '<span class="pill g">모집 중</span>' + (a.deadline ? '<span class="pill">' + dday(a.deadline) + '</span>' : '');
   }
   function errText(e) {
-    return { login: '로그인이 필요해요.', 'no-profile': '먼저 내 프로필을 올려 주세요.', closed: '마감된 오디션이에요.', own: '내가 올린 오디션에는 지원할 수 없어요.', few: '꼭 써야 할 칸을 채워 주세요.', limit: '하루에 올릴 수 있는 공고(5개)를 넘었어요.', size: '사진이 너무 커요. 다른 사진으로 해 주세요.', 'no-db': '잠시 후 다시 해 주세요.', net: '인터넷이 끊겼어요. 연결을 확인하고 다시 눌러 주세요.', 'no-store': '사진 저장소를 준비 중이에요. 사진 없이 먼저 저장해 두세요.', type: '이 사진 형식은 안 돼요. 다른 사진으로 해 주세요.', none: '지워졌거나 없는 공고예요.', 'not-yours': '내가 올린 공고만 고칠 수 있어요.', http413: '사진이 너무 커요.', ftype: 'PDF나 사진(JPG·PNG) 파일만 올릴 수 있어요.', fsize: '파일이 10MB보다 커요. 더 작은 파일로 해 주세요.', http500: '잠시 후 다시 해 주세요.' }[e] || '문제가 생겼어요 (' + e + ')';
+    return { login: '로그인이 필요해요.', 'no-profile': '먼저 내 프로필을 올려 주세요.', closed: '마감된 오디션이에요.', own: '내가 올린 오디션에는 지원할 수 없어요.', few: '꼭 써야 할 칸을 채워 주세요.', limit: '하루에 올릴 수 있는 공고(5개)를 넘었어요.', size: '사진이 너무 커요. 다른 사진으로 해 주세요.', 'no-db': '잠시 후 다시 해 주세요.', net: '인터넷이 끊겼어요. 연결을 확인하고 다시 눌러 주세요.', 'no-store': '사진 저장소를 준비 중이에요. 사진 없이 먼저 저장해 두세요.', type: '이 사진 형식은 안 돼요. 다른 사진으로 해 주세요.', none: '지워졌거나 없는 공고예요.', 'not-yours': '내가 올린 공고만 고칠 수 있어요.', http413: '사진이 너무 커요.', blimit: '오늘은 더 올릴 수 없어요. 내일 다시 써 주세요.', admin: '관리자만 할 수 있어요.', ftype: 'PDF나 사진(JPG·PNG) 파일만 올릴 수 있어요.', fsize: '파일이 10MB보다 커요. 더 작은 파일로 해 주세요.', http500: '잠시 후 다시 해 주세요.' }[e] || '문제가 생겼어요 (' + e + ')';
   }
   function tabOn(t) { document.querySelectorAll('.tabs a').forEach(function (a) { a.classList.toggle('on', a.dataset.t === t); }); }
 
@@ -674,6 +699,61 @@
     });
   }
 
+  // ── 자유게시판 (11-23 대표님: 공지 올리고, 배우들도 자유롭게, 이상한 글은 관리자가 지움)
+  var BT = ['자유', '질문', '정보', '구인·구직', '후기'], bType = '자유', bOpen = {};
+  function ago(t) { var m = Math.floor((Date.now() - t) / 60000); if (m < 1) return '방금'; if (m < 60) return m + '분 전'; if (m < 1440) return Math.floor(m / 60) + '시간 전'; var d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate(); }
+  function viewBoard() {
+    tabOn('board');
+    $v.innerHTML = '<div class="empty">불러오는 중…</div>';
+    api('board').then(function (j) {
+      if (j.error) { $v.innerHTML = '<div class="empty">' + errText(j.error) + '</div>'; return; }
+      var h = '<div class="notice">💬 <b>배우·캐스팅 담당 누구나</b> 자유롭게 이야기하는 곳이에요. 글 속 <b>전화번호·이메일은 저절로 가려져요.</b> 욕설·광고·비방 글은 관리자가 지워요.</div>';
+      if (j.login) {
+        h += '<div class="bw"><div class="bt" id="btp">' + (j.admin ? ['공지'] : []).concat(BT).map(function (t) { return '<button type="button" data-t="' + t + '"' + (t === bType ? ' class="on"' : '') + '>' + (t === '공지' ? '📌 공지' : t) + '</button>'; }).join('') + '</div>' +
+          '<textarea id="bbody" maxlength="1000" placeholder="하고 싶은 이야기를 써 주세요 (1,000자까지)"></textarea>' +
+          '<button class="btn" id="bgo" style="margin-top:10px">💬 글 올리기</button><p class="msg" id="bm"></p></div>';
+      } else h += '<a class="btn kakao" href="' + loginHref() + '" style="margin:0 0 14px">카카오로 로그인하고 글쓰기</a>';
+      h += j.posts.length ? j.posts.map(function (p) { return postHtml(p, j); }).join('') : '<div class="empty">아직 글이 없어요. 첫 글을 올려 주세요!</div>';
+      $v.innerHTML = h;
+      var tp = document.getElementById('btp');
+      if (tp) tp.querySelectorAll('button').forEach(function (b) { b.onclick = function () { bType = b.dataset.t; tp.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+      var go = document.getElementById('bgo');
+      if (go) go.onclick = function () {
+        var t = document.getElementById('bbody').value, m = document.getElementById('bm');
+        if (t.trim().length < 2) { m.textContent = '내용을 써 주세요.'; return; }
+        go.disabled = true;
+        api('board', { method: 'POST', json: { t: bType, b: t, pin: bType === '공지' } }).then(function (r) { go.disabled = false; if (!r.ok) { m.textContent = errText(r.error); return; } bType = '자유'; viewBoard(); });
+      };
+      $v.querySelectorAll('[data-act]').forEach(function (b) { b.onclick = function () { boardAct(b.dataset.act, b.dataset.id, b); }; });
+    });
+  }
+  function postHtml(p, j) {
+    var n = p.c.length, open = bOpen[p.id];
+    return '<div class="bp' + (p.pin ? ' pin' : '') + (p.hid ? ' hid' : '') + '"><div class="bh">' + (p.pin ? '<span class="tg">📌 공지</span>' : '<span class="tg">' + esc(p.t || '자유') + '</span>') + '<b>' + esc(p.nick) + '</b>· ' + ago(p.at) +
+      (j.admin && p.rep ? ' · <span style="color:#B3132B;font-weight:800">🚨 신고 ' + p.rep + (p.hid ? ' (가려짐)' : '') + '</span>' : '') + '</div>' +
+      '<div class="bb">' + esc(p.b) + '</div><div class="ba">' +
+      '<button type="button" data-act="open" data-id="' + p.id + '">💬 댓글 ' + n + '</button>' +
+      (j.login && !p.mine && !j.admin ? '<button type="button" data-act="rep" data-id="' + p.id + '"' + (p.reported ? ' disabled' : '') + '>' + (p.reported ? '신고함' : '🚨 신고') + '</button>' : '') +
+      (j.admin ? '<button type="button" data-act="pin" data-id="' + p.id + '">' + (p.pin ? '📌 공지 풀기' : '📌 공지로') + '</button>' : '') +
+      (p.mine || j.admin ? '<button type="button" class="del" data-act="del" data-id="' + p.id + '">🗑 지우기</button>' : '') + '</div>' +
+      (open ? '<div class="cm">' + p.c.map(function (c) { return '<p><b>' + esc(c.nick) + '</b>' + esc(c.b) + ' <small style="color:#8A8178">' + ago(c.at) + '</small>' + (c.mine || j.admin ? '<button type="button" data-act="cdel" data-id="' + c.id + '">지우기</button>' : '') + '</p>'; }).join('') +
+        (j.login ? '<div class="cw"><input type="text" id="ci' + p.id + '" maxlength="300" placeholder="댓글 쓰기"><button type="button" data-act="cgo" data-id="' + p.id + '">등록</button></div>' : '<p><a href="' + loginHref() + '">로그인하고 댓글 쓰기 ›</a></p>') + '</div>' : '') + '</div>';
+  }
+  function boardAct(a, id, btn) {
+    if (a === 'open') { bOpen[id] = !bOpen[id]; return viewBoard(); }
+    if (a === 'del' || a === 'cdel') {
+      if (btn.dataset.sure !== '1') { btn.dataset.sure = '1'; btn.textContent = '한 번 더 누르면 지워요'; return; }
+      return api('board/' + (a === 'cdel' ? 'c/' : '') + id, { method: 'DELETE' }).then(function () { viewBoard(); });
+    }
+    if (a === 'rep') { btn.disabled = true; return api('board/' + id + '/report', { method: 'POST' }).then(function () { btn.textContent = '신고함 — 관리자가 볼게요'; }); }
+    if (a === 'pin') return api('board/' + id + '/pin', { method: 'POST' }).then(viewBoard);
+    if (a === 'cgo') {
+      var inp = document.getElementById('ci' + id); if (!inp || !inp.value.trim()) return;
+      btn.disabled = true;
+      return api('board/' + id + '/c', { method: 'POST', json: { b: inp.value } }).then(function (r) { if (r.error) { btn.disabled = false; inp.placeholder = errText(r.error); return; } viewBoard(); });
+    }
+  }
+
   function route() {
     var h = location.hash.replace(/^#/, ''), m;
     window.scrollTo(0, 0); setBar(''); document.querySelectorAll('.sheet,.done').forEach(function (x) { if (!/^a\//.test(h) || x.className === 'sheet') x.remove(); });
@@ -683,6 +763,7 @@
     if (h === 'profile') return viewProfile();
     if (h === 'post') return viewPost(0);
     if (h === 'mine') return viewMine();
+    if (h === 'board') return viewBoard();
     viewList();
   }
   window.addEventListener('hashchange', route);

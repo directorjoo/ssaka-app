@@ -85,7 +85,7 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
 
 <!-- 3) 로그인됨 -->
 <section id="vMe" class="me" hidden>
-  <div class="hero"><img src="../img/icon-192.png?v=4" alt=""><div class="nick" id="mNick"></div></div>
+  <div class="hero"><img src="../img/icon-192.png?v=4" alt=""><div class="nick" id="mNick"></div><div id="mUid" style="margin-top:4px;font-size:15px;font-weight:700;color:#6B6259"></div></div>
   <div style="display:flex;gap:8px;margin-bottom:12px"><input class="al" id="mAlias" maxlength="10" aria-label="별명"><button type="button" id="mAliasGo" style="width:auto;margin:0;padding:0 18px">별명 저장</button></div>
   <label class="tog"><span>이벤트·혜택 소식 받기</span><input type="checkbox" id="mMkt"></label>
   <button type="button" id="codeGet" style="background:#1E2A44;color:#fff">📱 다른 곳에서 로그인할 숫자 받기</button>
@@ -142,7 +142,7 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}th,td{bord
     var u = j.user;
     if (!u) { show('vLogin'); var e = q.get('err') || (j.soon ? 'soon' : !j.ready ? 'setup' : ''); if (e && ERR[e]) { $('err').hidden = false; $('err').textContent = ERR[e]; } return; }
     if (!u.agreed) { $('aNick').textContent = u.nick; $('alias').value = u.nick.slice(0, 10); show('vAgree'); return; }
-    $('mNick').textContent = u.nick + '님'; $('mAlias').value = u.nick; $('mMkt').checked = u.marketing; show('vMe');
+    $('mNick').textContent = u.nick + '님'; $('mUid').textContent = '싸바 회원번호 ' + u.id; $('mAlias').value = u.nick; $('mMkt').checked = u.marketing; show('vMe');
   }).catch(function () { show('vLogin'); });
 
   var boxes = ['age14', 'privacy', 'marketing'];

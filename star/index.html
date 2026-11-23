@@ -583,7 +583,7 @@
           '<label class="f">작품 이름 <small>꼭 써 주세요</small></label><input type="text" id="title" maxlength="60" value="' + f('title') + '" placeholder="예: 단편영화 「봄날」">' +
           '<label class="f">분야</label><div class="chips" id="kind">' + KINDS.map(function (x) { return '<label><input type="radio" name="kind" value="' + x + '"' + (a.kind === x ? ' checked' : '') + '>' + x + '</label>'; }).join('') + '</div>' +
           '<div class="row2"><div><label class="f">제작사 · 극단</label><input type="text" id="org" value="' + f('org') + '" placeholder="예: 싸바필름"></div>' +
-          '<div><label class="f">감독 <small>선택</small></label><input type="text" id="dir" value="' + f('dir') + '" placeholder="예: 주경중"></div></div>' +
+          '<div><label class="f">감독 <small>선택</small></label><input type="text" id="dir" value="' + f('dir') + '" placeholder="예: 봉준호"></div></div>' +
           '<label class="f">줄거리 <small>두세 줄</small></label><textarea id="syn" style="min-height:80px" placeholder="예: 좀비와 싸우는 조선시대 무사들 이야기">' + f('syn') + '</textarea></div>' +
           '<div class="stp s2"><div class="stp-h"><span class="stp-n">2</span>모집 배역<small>배역마다 따로 — 배우가 배역을 골라 지원해요</small></div>' +
           '<div class="rlist" id="rlist">' + rl.map(roleRow).join('') + '</div><button type="button" class="addrole" id="addr">＋ 배역 더하기</button></div>' +

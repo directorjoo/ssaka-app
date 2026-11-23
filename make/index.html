@@ -227,6 +227,30 @@
     .dcols button i { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
     .dcols button[aria-pressed="true"] { border-color: #B3132B; box-shadow: 0 0 0 2px #B3132B inset; }
     .dcols button.ph-best { position: relative; } .dcols button.ph-best::after { content: "📸"; position: absolute; top: -9px; right: -6px; font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+    /* 11-23 대표님: 업종 다 늘어놓지 않고 써넣기 → 저절로 맞춤 (js/indfind.js) */
+    .indq { position: relative; margin: 2px 0 10px; }
+    .indq input { width: 100%; box-sizing: border-box; height: 58px; padding: 0 48px 0 16px; border: 2px solid #E2D5CC; border-radius: 16px; background: #fff; font: inherit; font-size: 19px; font-weight: 700; color: #1A1A1A; }
+    .indq input:focus { outline: none; border-color: #B3132B; box-shadow: 0 0 0 4px rgba(179,19,43,.12); }
+    .indq .indq-x { position: absolute; right: 8px; top: 9px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #F3ECE7; color: #6b5d55; font-size: 18px; padding: 0; }
+    .indq-res { margin: 0 0 10px; }
+    .indq-res:empty { display: none; }
+    .inds .indq-go { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 70px; padding: 10px 16px; border: 0; border-radius: 18px; background: #B3132B; color: #fff; font: inherit; font-size: 18px; font-weight: 900; text-align: left; white-space: normal; word-break: keep-all; box-shadow: 0 8px 18px -10px rgba(179,19,43,.7); }
+    .inds .indq-go i { font-style: normal; flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 25px; background: #fff; }
+    .inds .indq-go span { flex: 1; line-height: 1.3; }
+    .inds .indq-go small { display: block; font-size: 14.5px; font-weight: 600; opacity: .88; }
+    .inds .indq-go b { font-size: 22px; }
+    .inds .indq-go[aria-pressed] { border: 0; background: #B3132B; color: #fff; }
+    .indq-or { margin: 10px 2px 6px; font-size: 15px; font-weight: 700; color: #7a6d64; }
+    .indq-none { padding: 12px 14px; border-radius: 14px; background: #FFF6F0; font-size: 16px; line-height: 1.45; color: #4a3a32; word-break: keep-all; }
+    .indq-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .inds .indq-chips button { padding: 9px 14px; border: 1.5px solid #E2D5CC; border-radius: 999px; background: #fff; font-size: 16px; font-weight: 700; color: #1A1A1A; white-space: nowrap; }
+    .inds .indq-chips button[aria-pressed="true"] { border-color: #B3132B; background: #B3132B; color: #fff; }
+    .ind-all { margin-top: 14px; }
+    .ind-all > summary { list-style: none; cursor: pointer; padding: 12px 14px; border-radius: 14px; background: #F7F2EE; font-size: 16px; font-weight: 800; color: #4a3a32; }
+    .ind-all > summary::-webkit-details-marker { display: none; }
+    .ind-all > summary::after { content: ' ▾'; }
+    .ind-all[open] > summary::after { content: ' ▴'; }
+    .ind-all[open] > summary { margin-bottom: 12px; }
     @media (min-width: 860px) { .inds { flex-wrap: wrap; overflow: visible; } }
     /* 휴대폰: 디자인 12가지를 옆으로 밀지 않고 3칸 격자로 한눈에 */
     @media (max-width: 859px) {
@@ -665,7 +689,7 @@
       <button type="button" id="resumeBtn" hidden></button>
       <section class="stp s1"><h3 class="stp-h"><span class="stp-n">1</span>어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></h3>
       <div class="dest-groups" id="dests" role="group" aria-label="올릴 곳"></div></section>
-      <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>무엇을 알릴까요? <small>종류별로 묶었어요 · 하나만 고르세요</small></h3>
+      <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>무엇을 알릴까요? <small>하는 일을 한 단어로 써 주세요 · 맞는 카드를 찾아 드려요</small></h3>
       <div class="inds" id="inds" role="group" aria-label="용도"></div></section>
       <div class="use-go" id="useGo">👆 고르면 거기에 맞는 디자인이 바로 아래에 나와요</div>
       <div class="hlinks" id="hLinks" hidden></div>
@@ -1184,6 +1208,7 @@
 <script src="../js/designs.js?v=95"></script>
 <script src="../js/mkfun.js?v=1"></script>
 <script src="../js/mkask.js?v=1"></script>
+<script src="../js/indfind.js?v=1"></script>
 <script src="../js/notice.js?v=4"></script>
 <script src="../js/render.js?v=86"></script>
 <script src="../js/reserve.js"></script>
@@ -1263,6 +1288,9 @@
     if (!curGroup) curGroup = (D.groupOf ? D.groupOf(industry) : groups[0] || {}).id;
     var old = $('grps'); if (old) old.remove();
     var list = groups.length ? groups : [{ label: '', ids: D.INDUSTRIES.filter(function (x) { return !D.isOpen || D.isOpen(x.id); }).map(function (x) { return x.id; }) }];
+    // 11-23 대표님: 다 늘어놓지 말고 써넣으면 저절로 맞춤 — 전체 동그라미는 '종류 전체 보기' 안으로 접어 둠
+    var all = indSearch(box);
+    var outer = box; box = all;
     // 11-21 대표님: 소제목별로 체리 탭을 박스 하나에 몰아 한눈에 (1차 공개도 묶음 박스로)
     list.forEach(function (g) {
       var wrap = document.createElement('div'); wrap.className = 'ind-box' + (g.id ? ' g-' + g.id : '');
@@ -1282,6 +1310,63 @@
       });
       wrap.appendChild(grid);
     });
+    box = outer;
+  }
+  // 업종 써넣기 상자 (js/indfind.js) — 쓰면 가장 맞는 것 하나를 큰 단추로, 나머지 둘은 '혹시'로
+  var IQ_KEY = 'mk-indq';
+  var QUICK = ['restaurant', 'cafe', 'beauty', 'academy', 'alumni', 'club', 'party', 'wedding', 'event', 'funeral'];
+  function indBtn(id, cls) {
+    var ind = D.industry(id); var b = document.createElement('button');
+    b.type = 'button'; b.dataset.ind = id; if (cls) b.className = cls;
+    b.setAttribute('aria-pressed', id === industry ? 'true' : 'false');
+    b.textContent = ind.emoji + ' ' + ind.label;
+    b.addEventListener('click', function () { setIndustry(id, true); afterUse(); });
+    return b;
+  }
+  function indSearch(box) {
+    var q = document.createElement('div'); q.className = 'indq';
+    q.innerHTML = '<input id="indQ" type="search" enterkeyhint="go" autocomplete="off" aria-label="하는 일이나 알릴 것" placeholder="예: 네일숍, 동창회, 김밥집"><button type="button" class="indq-x" aria-label="지우기" hidden>✕</button>';
+    var res = document.createElement('div'); res.className = 'indq-res'; res.id = 'indRes';
+    var quick = document.createElement('div');
+    quick.innerHTML = '<div class="indq-or">많이 만드는 것</div>';
+    var qc = document.createElement('div'); qc.className = 'indq-chips';
+    QUICK.filter(function (id) { return D.industry(id) && (!D.isOpen || D.isOpen(id)); }).forEach(function (id) { qc.appendChild(indBtn(id)); });
+    quick.appendChild(qc);
+    var det = document.createElement('details'); det.className = 'ind-all';
+    det.innerHTML = '<summary>📋 종류 전체 보기</summary>';
+    box.appendChild(q); box.appendChild(res); box.appendChild(quick); box.appendChild(det);
+    var inp = q.querySelector('input'), x = q.querySelector('.indq-x'), tm = 0;
+    function draw() {
+      var t = inp.value.trim(); x.hidden = !t; res.innerHTML = '';
+      try { localStorage.setItem(IQ_KEY, t); } catch (e) {}
+      quick.hidden = !!t;
+      if (!t) return;
+      var m = window.IndFind ? IndFind.match(t, D) : [];
+      if (!m.length) {
+        var n = document.createElement('div'); n.className = 'indq-none';
+        n.textContent = '‘' + t + '’에 딱 맞는 걸 못 찾았어요. 비슷한 말로 써 보시거나 아래 ‘종류 전체 보기’에서 골라 주세요.';
+        res.appendChild(n); det.open = true; return;
+      }
+      var top = D.industry(m[0].id), go = document.createElement('button');
+      go.type = 'button'; go.className = 'indq-go'; go.dataset.ind = top.id;
+      go.innerHTML = '<i aria-hidden="true"></i><span><small></small><b></b></span>›';
+      go.querySelector('i').textContent = top.emoji;
+      go.querySelector('small').textContent = '‘' + t + '’ → 이 카드로 만들어요';
+      go.querySelector('b').textContent = top.label;
+      go.addEventListener('click', function () { setIndustry(top.id, true); afterUse(); });
+      res.appendChild(go);
+      var rest = m.slice(1, 3);
+      if (rest.length) {
+        var o = document.createElement('div'); o.className = 'indq-or'; o.textContent = '혹시 이건가요?'; res.appendChild(o);
+        var c = document.createElement('div'); c.className = 'indq-chips';
+        rest.forEach(function (r) { c.appendChild(indBtn(r.id)); }); res.appendChild(c);
+      }
+    }
+    inp.addEventListener('input', function () { clearTimeout(tm); tm = setTimeout(draw, 150); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); draw(); var g = res.querySelector('.indq-go'); if (g) { inp.blur(); g.click(); } } });
+    x.addEventListener('click', function () { inp.value = ''; draw(); inp.focus(); });
+    try { var saved = localStorage.getItem(IQ_KEY); if (saved) { inp.value = saved; draw(); } } catch (e) {}
+    return det;
   }
   function thumb(d, ex) {
     var el = document.createElement('button');

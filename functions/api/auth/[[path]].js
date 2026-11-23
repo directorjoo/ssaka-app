@@ -152,7 +152,7 @@ export async function onRequest({ request, env, params }) {
   }
 
   // 3) 내 정보
-  if (path === 'me') { const cu = await currentUser(request, db); return json({ user: pub(cu), admin: !!cu && String(cu.id) === String(env.SAVA_ADMIN_UID || ''), ready: !!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT) && isOpen(env), soon: !isOpen(env) }); }
+  if (path === 'me') { const cu = await currentUser(request, db); return json({ user: pub(cu), admin: !!cu && String(env.SAVA_ADMIN_UID || '').split(',').map(x => x.trim()).filter(Boolean).includes(String(cu.id)), ready: !!(env.KAKAO_REST_KEY || KAKAO_REST_DEFAULT) && isOpen(env), soon: !isOpen(env) }); }
 
   // 4) 가입 동의 (만 14세 이상 · 개인정보 필수 · 마케팅 선택)
   if (path === 'agree' && request.method === 'POST') {

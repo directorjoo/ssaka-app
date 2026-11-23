@@ -15,6 +15,8 @@
 // GET  /api/star/mine                    내 지원 · 내 공고
 // POST /api/star/photo                   사진 올리기(image/jpeg, 2MB까지) → {key, url}
 // GET  /api/star/photo/<key>.jpg         사진
+// POST /api/star/file                    배우가 이미 만들어 둔 프로필 파일(PDF·JPG·PNG, 10MB까지) → {key, x}
+// GET  /api/star/file/<key>.<pdf|jpg|png> 프로필 파일 보기
 // POST /api/star/remove                  {type: audition|profile, id}  관리자만
 // POST /api/star/audition/<id>/verify    {on}  관리자: ✓ 싸바 확인 공고 표시
 // (11-23 대표님: 모집요강·지원 다시) 공고 d에 rl(배역 여러 개 {n 배역, t 비중, s 성별, a 나이, d 설명}), qual 지원 자격, plus 우대,
@@ -28,6 +30,9 @@ const ST = ['접수', '1차 합격', '2차 합격', '최종 합격', '불합격'
 const S = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f<>]/g, '').trim().slice(0, n);
 const KEY = /^[a-f0-9]{24}$/;
 const photoUrl = k => '/api/star/photo/' + k + '.jpg';
+const FILE_T = { pdf: 'application/pdf', jpg: 'image/jpeg', png: 'image/png' };
+const fileUrl = f => '/api/star/file/' + f.k + '.' + f.x;
+function cleanFile(f) { return f && KEY.test(f.k || '') && FILE_T[f.x] ? { k: f.k, x: f.x, n: S(f.n, 60) || '프로필 파일' } : null; }
 // 최종 합격은 발표 전까지 배우에게 '심사 중'으로 (발표일에 한꺼번에)
 const shown = (my, ast) => my === '최종 합격' && ast !== 'announced' ? '심사 중' : my;
 
@@ -39,7 +44,8 @@ function cleanProfile(d) {
     area: S(d.area, 20), fields: (Array.isArray(d.fields) ? d.fields : []).map(x => S(x, 10)).filter(Boolean).slice(0, 8),
     skill: S(d.skill, 120), career: S(d.career, 2000), intro: S(d.intro, 600), agency: S(d.agency, 40),
     video: okVideo(d.video) ? S(d.video, 300) : '',
-    photos: (Array.isArray(d.photos) ? d.photos : []).filter(k => KEY.test(k)).slice(0, 6)
+    photos: (Array.isArray(d.photos) ? d.photos : []).filter(k => KEY.test(k)).slice(0, 6),
+    file: cleanFile(d.file)
   };
 }
 const ROLE_T = ['주연', '조연', '단역', '앙상블', '보조출연', '기타'];
@@ -70,6 +76,7 @@ function pubAudition(r, withContact) {
 function pubProfile(r) {
   let d = {}; try { d = JSON.parse(r.d); } catch (e) {}
   d.photos = (d.photos || []).map(photoUrl);
+  if (d.file && d.file.k) d.file.url = fileUrl(d.file);
   return Object.assign(d, { uid: r.uid, pub: !!r.pub, at: r.at });
 }
 
@@ -98,6 +105,14 @@ export async function onRequest({ request, env, params }) {
     const o = await env.VIDEO.get('star/' + m[1] + '.jpg');
     if (!o) return new Response('not found', { status: 404 });
     return new Response(o.body, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'public, max-age=31536000, immutable' } });
+  }
+  // 프로필 파일 보기 (DB 없이)
+  m = /^file\/([a-f0-9]{24})\.(pdf|jpg|png)$/.exec(path);
+  if (m && method === 'GET') {
+    if (!env.VIDEO) return new Response('not found', { status: 404 });
+    const o = await env.VIDEO.get('star/f/' + m[1] + '.' + m[2]);
+    if (!o) return new Response('not found', { status: 404 });
+    return new Response(o.body, { headers: { 'content-type': FILE_T[m[2]], 'content-disposition': 'inline', 'x-content-type-options': 'nosniff', 'cache-control': 'private, max-age=86400' } });
   }
   if (!db) return json({ error: 'no-db' }, 503);
   await ensure(db);
@@ -237,6 +252,22 @@ export async function onRequest({ request, env, params }) {
       const key = [...crypto.getRandomValues(new Uint8Array(12))].map(x => x.toString(16).padStart(2, '0')).join('');
       await env.VIDEO.put('star/' + key + '.jpg', bin, { httpMetadata: { contentType: 'image/jpeg' }, customMetadata: { uid: String(uid) } });
       return json({ key, url: photoUrl(key) });
+    }
+    // ── 프로필 파일 올리기 (11-23 대표님: 배우들이 이미 만들어 둔 프로필 파일도)
+    if (path === 'file' && method === 'POST') {
+      const n = need(); if (n) return n;
+      if (!env.VIDEO) return json({ error: 'no-store' }, 503);
+      const ct = (request.headers.get('content-type') || '').split(';')[0].trim();
+      const x = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png' }[ct];
+      if (!x) return json({ error: 'ftype' }, 415);
+      const bin = await request.arrayBuffer();
+      if (bin.byteLength < 500 || bin.byteLength > 10 * 1024 * 1024) return json({ error: 'fsize' }, 413);
+      const h = new Uint8Array(bin, 0, 4);
+      const okMagic = x === 'pdf' ? (h[0] === 0x25 && h[1] === 0x50 && h[2] === 0x44 && h[3] === 0x46) : x === 'png' ? (h[0] === 0x89 && h[1] === 0x50) : (h[0] === 0xFF && h[1] === 0xD8);
+      if (!okMagic) return json({ error: 'ftype' }, 415);
+      const key = [...crypto.getRandomValues(new Uint8Array(12))].map(v => v.toString(16).padStart(2, '0')).join('');
+      await env.VIDEO.put('star/f/' + key + '.' + x, bin, { httpMetadata: { contentType: FILE_T[x] }, customMetadata: { uid: String(uid) } });
+      return json({ key, x, url: fileUrl({ k: key, x }) });
     }
     // ── 관리자 지우기
     if (path === 'remove' && method === 'POST') {

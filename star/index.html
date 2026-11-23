@@ -64,6 +64,13 @@
     .photos div { position: relative; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; background: #F3ECE6 center/cover; }
     .photos button.x { position: absolute; right: 4px; top: 4px; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; font-size: 16px; }
     .photos label.add { display: grid; place-items: center; aspect-ratio: 3 / 4; border: 2px dashed #D9C9BB; border-radius: 14px; color: #8A8178; font-size: 15px; font-weight: 800; text-align: center; cursor: pointer; background: #fff; }
+    .pfile { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 10px 14px; border-radius: 14px; background: #fff; border: 1.5px solid #E8DCCF; font-size: 16px; font-weight: 800; }
+    .pfile i { font-style: normal; font-size: 26px; flex: none; }
+    .pfile a { flex: 1; min-width: 0; color: #1A1A1A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pfile button { flex: none; min-height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: #F3ECE6; color: #5A4A3E; font: inherit; font-size: 14px; font-weight: 800; }
+    .pfile.add { border: 2px dashed #D9C9BB; color: #5A4A3E; cursor: pointer; line-height: 1.35; }
+    .pfile.add small { font-size: 13px; font-weight: 700; color: #8A8178; }
+    .fnote { margin: 8px 2px 0; font-size: 14px; line-height: 1.5; color: #6B5A4A; word-break: keep-all; }
     .photos label.add i { display: block; font-style: normal; font-size: 30px; }
     .toggle { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 14px 16px; border-radius: 16px; background: #fff; font-size: 16px; line-height: 1.45; }
     .toggle input { width: 24px; height: 24px; accent-color: #B3132B; flex: none; }
@@ -246,7 +253,7 @@
     return '<span class="pill g">모집 중</span>' + (a.deadline ? '<span class="pill">' + dday(a.deadline) + '</span>' : '');
   }
   function errText(e) {
-    return { login: '로그인이 필요해요.', 'no-profile': '먼저 내 프로필을 올려 주세요.', closed: '마감된 오디션이에요.', own: '내가 올린 오디션에는 지원할 수 없어요.', few: '꼭 써야 할 칸을 채워 주세요.', limit: '하루에 올릴 수 있는 공고(5개)를 넘었어요.', size: '사진이 너무 커요. 다른 사진으로 해 주세요.', 'no-db': '잠시 후 다시 해 주세요.', net: '인터넷이 끊겼어요. 연결을 확인하고 다시 눌러 주세요.', 'no-store': '사진 저장소를 준비 중이에요. 사진 없이 먼저 저장해 두세요.', type: '이 사진 형식은 안 돼요. 다른 사진으로 해 주세요.', none: '지워졌거나 없는 공고예요.', 'not-yours': '내가 올린 공고만 고칠 수 있어요.', http413: '사진이 너무 커요.', http500: '잠시 후 다시 해 주세요.' }[e] || '문제가 생겼어요 (' + e + ')';
+    return { login: '로그인이 필요해요.', 'no-profile': '먼저 내 프로필을 올려 주세요.', closed: '마감된 오디션이에요.', own: '내가 올린 오디션에는 지원할 수 없어요.', few: '꼭 써야 할 칸을 채워 주세요.', limit: '하루에 올릴 수 있는 공고(5개)를 넘었어요.', size: '사진이 너무 커요. 다른 사진으로 해 주세요.', 'no-db': '잠시 후 다시 해 주세요.', net: '인터넷이 끊겼어요. 연결을 확인하고 다시 눌러 주세요.', 'no-store': '사진 저장소를 준비 중이에요. 사진 없이 먼저 저장해 두세요.', type: '이 사진 형식은 안 돼요. 다른 사진으로 해 주세요.', none: '지워졌거나 없는 공고예요.', 'not-yours': '내가 올린 공고만 고칠 수 있어요.', http413: '사진이 너무 커요.', ftype: 'PDF나 사진(JPG·PNG) 파일만 올릴 수 있어요.', fsize: '파일이 10MB보다 커요. 더 작은 파일로 해 주세요.', http500: '잠시 후 다시 해 주세요.' }[e] || '문제가 생겼어요 (' + e + ')';
   }
   function tabOn(t) { document.querySelectorAll('.tabs a').forEach(function (a) { a.classList.toggle('on', a.dataset.t === t); }); }
 
@@ -450,7 +457,7 @@
         (ax.role ? '<span class="pill">' + esc(ax.role) + '</span>' : '') + '<h3>' + esc(p.name || '(프로필 없음)') + '</h3><p>' + [p.sex, age, p.height ? p.height + 'cm' : '', p.area].filter(Boolean).map(esc).join(' · ') + '</p>' +
         (p.fields && p.fields.length ? '<p>' + p.fields.map(esc).join(' · ') + '</p>' : '') +
         (ax.msg ? '<div class="amsg">💬 ' + esc(ax.msg) + '</div>' : '') +
-        '<p><a href="#p/' + a.id + '/' + p.uid + '">프로필 자세히 ›</a>' + ((ax.video || p.video) ? ' · <a href="' + esc(ax.video || p.video) + '" target="_blank" rel="noopener">▶ 연기 영상</a>' : '') + '</p>' +
+        '<p><a href="#p/' + a.id + '/' + p.uid + '">프로필 자세히 ›</a>' + ((ax.video || p.video) ? ' · <a href="' + esc(ax.video || p.video) + '" target="_blank" rel="noopener">▶ 연기 영상</a>' : '') + (p.file && p.file.url ? ' · <a href="' + esc(p.file.url) + '" target="_blank" rel="noopener">📄 프로필 파일</a>' : '') + '</p>' +
         '<select data-uid="' + p.uid + '">' + ST.map(function (s) { return '<option' + (s === p.st ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></div></div>';
     }).join('') : '<div class="empty">아직 지원한 배우가 없어요. 아래 💬로 카톡에 공고를 알려 보세요.</div>';
     if (a.st === 'open') h += '<button class="btn lite" data-st="closed">⏸ 접수 마감하기</button>';
@@ -486,7 +493,8 @@
       ((p.photos || []).length ? '<div class="gal">' + p.photos.map(function (u) { return '<img src="' + esc(u) + '" alt="">'; }).join('') + '</div>' : '') +
       '<dl class="dl">' + [['성별', p.sex], ['출생', p.born ? p.born + '년' : ''], ['키·몸무게', [p.height ? p.height + 'cm' : '', p.weight ? p.weight + 'kg' : ''].filter(Boolean).join(' · ')], ['지역', p.area], ['분야', (p.fields || []).join(' · ')], ['소속', p.agency], ['특기', p.skill], ['경력', p.career], ['소개', p.intro]]
         .filter(function (x) { return x[1]; }).map(function (x) { return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl>' +
-      (p.video ? '<a class="btn lite" href="' + esc(p.video) + '" target="_blank" rel="noopener">▶ 연기 영상 보기</a>' : '') + '</div>';
+      (p.video ? '<a class="btn lite" href="' + esc(p.video) + '" target="_blank" rel="noopener">▶ 연기 영상 보기</a>' : '') +
+      (p.file && p.file.url ? '<a class="btn lite" href="' + esc(p.file.url) + '" target="_blank" rel="noopener">📄 프로필 파일 보기</a>' : '') + '</div>';
   }
 
   // ── 내 프로필
@@ -496,7 +504,7 @@
     $v.innerHTML = '<div class="empty">불러오는 중…</div>';
     api('profile').then(function (j) {
       if (!j.login) { $v.innerHTML = loginBox('<b>배우 프로필 접수</b> — 싸바 회원으로 로그인하면 프로필을 한 번 올려 두고, 어떤 오디션이든 단추 하나로 지원할 수 있어요.<br>전화번호·이메일은 받지 않아요.'); return; }
-      var p = j.p || {}; photos = (p.photos || []).slice();
+      var p = j.p || {}; photos = (p.photos || []).slice(); pfile = p.file && p.file.k ? { k: p.file.k, x: p.file.x, n: p.file.n } : null;
       var f = function (k) { return esc(p[k] || ''); };
       $v.innerHTML =
         (function () { var w = ''; try { w = sessionStorage.getItem('star-want') || ''; } catch (e) {} return w ? '<div class="notice" style="background:#FFF4C2;color:#5A4200">⭐ 지원하려면 프로필이 먼저 있어야 해요. 아래를 채우고 저장하면 <b>바로 그 오디션으로 돌아가요.</b></div>' : ''; })() +
@@ -514,9 +522,10 @@
         '<label class="f">경력</label><textarea id="career" placeholder="예: 2025 단편영화 「○○」 주연&#10;2024 연극 「○○」 조연">' + f('career') + '</textarea>' +
         '<label class="f">자기소개</label><textarea id="intro" placeholder="나를 한두 줄로">' + f('intro') + '</textarea>' +
         '<label class="f">연기 영상 주소 <small>유튜브·비메오·네이버TV</small></label><input type="url" id="video" value="' + f('video') + '" placeholder="https://youtu.be/...">' +
+        '<label class="f">프로필 파일 <small>선택 · 이미 만들어 둔 PDF·사진 한 개, 10MB까지</small></label><div id="pfile"></div>' +
         '<label class="toggle"><input type="checkbox" id="pub"' + (p.pub ? ' checked' : '') + '><span><b>배우 찾기에 공개</b><br>지원하지 않아도 캐스팅 담당이 내 프로필을 볼 수 있어요. (끄면 지원한 공고에만 보여요)</span></label>' +
         '<button class="btn" id="save">⭐ 프로필 저장하기</button><p class="msg" id="pm"></p>';
-      drawPhotos();
+      drawPhotos(); drawFile();
       document.getElementById('save').onclick = saveProfile;
     });
   }
@@ -526,6 +535,27 @@
       (photos.length < 6 ? '<label class="add"><span><i>📷</i>사진 넣기</span><input type="file" accept="image/*" multiple hidden id="pf"></label>' : '');
     box.querySelectorAll('button.x').forEach(function (b) { b.onclick = function () { photos.splice(+b.dataset.i, 1); drawPhotos(); }; });
     var pf = document.getElementById('pf'); if (pf) pf.onchange = function () { upPhotos([].slice.call(pf.files, 0, 6 - photos.length)); };
+  }
+  // 프로필 파일 (11-23) — 배우가 이미 만들어 둔 PDF·사진 파일 하나
+  var pfile = null;
+  function drawFile() {
+    var box = document.getElementById('pfile'); if (!box) return;
+    box.innerHTML = pfile
+      ? '<div class="pfile"><i>' + (pfile.x === 'pdf' ? '📄' : '🖼️') + '</i><a href="/api/star/file/' + pfile.k + '.' + pfile.x + '" target="_blank" rel="noopener">' + esc(pfile.n) + '</a><button type="button" id="pfx" aria-label="파일 빼기">✕ 빼기</button></div>'
+      : '<label class="pfile add"><i>📎</i><span>프로필 파일 올리기<br><small>PDF 또는 사진(JPG·PNG)</small></span><input type="file" accept="application/pdf,.pdf,image/jpeg,image/png" hidden id="pff"></label>';
+    box.insertAdjacentHTML('beforeend', '<p class="fnote">⚠️ 파일 안에 <b>전화번호·이메일·주소</b>가 있으면 지우고 올려 주세요. 싸바스타는 연락처를 드러내지 않아요.</p>');
+    var x = document.getElementById('pfx'); if (x) x.onclick = function () { pfile = null; drawFile(); };
+    var inp = document.getElementById('pff'); if (inp) inp.onchange = function () { if (inp.files[0]) upFile(inp.files[0]); };
+  }
+  function upFile(fl) {
+    var m = document.getElementById('pm');
+    var t = fl.type || (/\.pdf$/i.test(fl.name) ? 'application/pdf' : '');
+    if (!/^(application\/pdf|image\/jpeg|image\/png)$/.test(t)) { m.textContent = 'PDF나 사진(JPG·PNG) 파일만 올릴 수 있어요.'; return; }
+    if (fl.size > 10 * 1024 * 1024) { m.textContent = '파일이 10MB보다 커요. 더 작은 파일로 해 주세요.'; return; }
+    m.textContent = '파일 올리는 중…';
+    fetch('/api/star/file', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': t }, body: fl }).then(function (r) { return r.json(); })
+      .then(function (j) { if (!j.key) { m.textContent = errText(j.error); return; } pfile = { k: j.key, x: j.x, n: fl.name.slice(0, 60) }; drawFile(); m.textContent = '파일을 넣었어요. 아래 [프로필 저장하기]를 눌러 주세요.'; })
+      .catch(function () { m.textContent = errText('net'); });
   }
   function shrink(file) {
     return new Promise(function (ok, no) {
@@ -549,7 +579,7 @@
   }
   function saveProfile() {
     var g = function (id) { return document.getElementById(id).value; };
-    var d = { name: g('name'), sex: g('sex'), born: g('born'), height: g('height'), weight: g('weight'), area: g('area'), agency: g('agency'), skill: g('skill'), career: g('career'), intro: g('intro'), video: g('video'), photos: photos,
+    var d = { name: g('name'), sex: g('sex'), born: g('born'), height: g('height'), weight: g('weight'), area: g('area'), agency: g('agency'), skill: g('skill'), career: g('career'), intro: g('intro'), video: g('video'), photos: photos, file: pfile,
       fields: [].slice.call(document.querySelectorAll('#fields input:checked')).map(function (x) { return x.value; }) };
     var m = document.getElementById('pm');
     if (!d.name.trim()) { m.textContent = '활동명을 써 주세요.'; document.getElementById('name').focus(); return; }

@@ -1,0 +1,67 @@
+{
+  "id": "/eodiya/",
+  "name": "어디야? — 싸바",
+  "short_name": "어디야",
+  "description": "카톡으로 \"어디야?\" 한마디 — 받은 사람은 눌러서 바로 답장. 앱 설치 없이.",
+  "start_url": "/eodiya/?app=1",
+  "scope": "/eodiya/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8EF",
+  "theme_color": "#B3132B",
+  "lang": "ko",
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/img/eodiya-icon-192.png?v=1",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/eodiya-icon-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/eodiya-icon-maskable-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "싸바? 보내기",
+      "url": "/eodiya/#ask",
+      "icons": [
+        {
+          "src": "/img/eodiya-icon-192.png?v=1",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "여기야! 보내기",
+      "url": "/eodiya/#come",
+      "icons": [
+        {
+          "src": "/img/eodiya-icon-192.png?v=1",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "놀자! 보내기",
+      "url": "/eodiya/#play",
+      "icons": [
+        {
+          "src": "/img/eodiya-icon-192.png?v=1",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

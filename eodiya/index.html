@@ -15,10 +15,13 @@
   <meta property="og:image:height" content="600">
   <meta property="og:type" content="website">
   <link rel="icon" href="../img/favicon.png?v=4">
-  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
-  <link rel="manifest" href="../manifest.webmanifest">
-  <meta name="apple-mobile-web-app-title" content="싸바">
+  <!-- 11-25 단독 앱: 같은 sava.kr 주소(/eodiya/)를 쓰되 홈 화면엔 어디야 아이콘으로 따로 설치. 로그인·서버는 싸바와 같이 씀 -->
+  <link rel="manifest" href="/eodiya/manifest.webmanifest?v=1">
+  <link rel="apple-touch-icon" href="/img/eodiya-apple-touch.png?v=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="어디야">
+  <meta name="application-name" content="어디야">
   <link rel="stylesheet" href="../css/brand.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
   <style>
@@ -958,7 +961,7 @@
 <script src="../js/share.js"></script>
 <script src="../js/kback.js?v=45"></script>
 <script src="../js/msgimg.js"></script>
-<script src="../js/install.js?v=3"></script>
+<script src="/js/install.js?v=4" data-name="어디야" data-mark="📍" data-icon="/img/eodiya-icon-192.png?v=1" data-url="sava.kr/eodiya"></script>
 <script src="../js/sound.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 <script>
@@ -2118,7 +2121,7 @@
   $('cancelBottom').addEventListener('click', cancelOut);
   // 홈에서 싸바?·여기야!·놀자! 를 눌러 들어오면 탭 줄 없이 바로 그 쓰는 칸 (시·음악 액자는 맨 위 그대로)
   if (/^#(ask|come|play)$/.test(location.hash)) { var cm = document.querySelector('.mode[data-mode="' + location.hash.slice(1) + '"]'); if (cm) cm.click(); var md = document.querySelector('.modes'); if (md) md.style.display = 'none'; }
-  if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '싸바 홈 화면에 추가');
+  if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '📍 어디야 앱으로 쓰기');
 })();
 </script>
 <script src="/js/home.js?v=16" defer></script>

@@ -1,0 +1,47 @@
+{
+  "id": "/today/",
+  "name": "싸바 브리핑 — 뉴스·날씨·혜택",
+  "short_name": "브리핑",
+  "description": "아침 뉴스 3줄, 우리 동네 날씨, 인기 검색어, 정부 혜택을 한 화면에.",
+  "start_url": "/today/?app=1",
+  "scope": "/today/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF3D2",
+  "theme_color": "#B3132B",
+  "lang": "ko",
+  "categories": [
+    "news",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "/img/brief-icon-192.png?v=1",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/brief-icon-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/brief-icon-maskable-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "날씨",
+      "url": "/today/#wx",
+      "icons": [
+        {
+          "src": "/img/brief-icon-192.png?v=1",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

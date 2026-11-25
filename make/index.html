@@ -14,9 +14,14 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>싸바 만들기</title>
   <meta name="theme-color" content="#FFFFFF">
-  <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" href="../img/favicon.png?v=4">
-  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=4">
+  <!-- 11-25 단독 앱: 같은 sava.kr 주소(/make/)를 쓰되 홈 화면엔 싸바카드 아이콘으로 따로 설치. 로그인·서버는 싸바와 같이 씀 -->
+  <link rel="manifest" href="/make/manifest.webmanifest?v=1">
+  <link rel="apple-touch-icon" href="/img/card-apple-touch.png?v=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="싸바카드">
+  <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
   <link rel="stylesheet" href="../css/sk.css?v=98">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
@@ -679,6 +684,7 @@
       <ol class="mk-flow"><li><b>1</b>용도</li><li><b>2</b>디자인 보며 쓰기</li><li><b>3</b>완성</li></ol>
       <img class="mk-dance" src="../img/cherry-dance-anim.svg" alt="">
     </section>
+    <div id="appInst"></div><style>#appInst:empty{display:none}#appInst .si-chip{margin:12px 0;border-color:#F2C2CA;background:#FFFCF8}</style>
   </header>
 
   <div class="layout">
@@ -3577,6 +3583,16 @@
   else goStage(3);
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();
+</script>
+<script src="/js/install.js?v=4" data-name="싸바카드" data-mark="💌" data-icon="/img/card-icon-192.png?v=1" data-url="sava.kr/make"></script>
+<script>
+  // 11-25 단독 앱: 홈 화면 앱으로 열리면 body.is-app, 아니면 위에 '💌 싸바카드 앱으로 쓰기' 띠 (조용한 공개 중엔 install.js가 알아서 숨김)
+  (function () {
+    var I = window.SsakaInstall; if (!I) return;
+    if (I.standalone()) { document.body.classList.add('is-app'); return; }
+    var c = I.chip(document.getElementById('appInst'), '💌 싸바카드 앱으로 쓰기');
+    if (c) c.querySelector('span').textContent = '홈 화면에 아이콘 하나 · 앱스토어 없이 3초';
+  })();
 </script>
 <script src="/js/home.js?v=16" defer data-shift=".bar"></script>
 <script src="../js/cherry.js?v=1"></script>

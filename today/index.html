@@ -11,6 +11,13 @@
   <meta property="og:url" content="https://sava.kr/today/">
   <meta property="og:image" content="https://sava.kr/img/today-share.jpg?v=1">
   <link rel="icon" href="../img/favicon.png?v=4">
+  <!-- 11-25 단독 앱: 같은 sava.kr 주소(/today/)를 쓰되 홈 화면엔 브리핑 아이콘으로 따로 설치. 로그인·서버는 싸바와 같이 씀 -->
+  <link rel="manifest" href="/today/manifest.webmanifest?v=1">
+  <link rel="apple-touch-icon" href="/img/brief-apple-touch.png?v=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="브리핑">
+  <meta name="application-name" content="브리핑">
   <link rel="stylesheet" href="../css/brand.css?v=2">
   <script src="/js/launch.js?v=3"></script>
   <link rel="stylesheet" href="../css/cherry.css?v=2">
@@ -260,6 +267,7 @@
       <div class="gl-b" id="glB" hidden></div>
     </div>
   </section>
+  <div id="appInst"></div><style>#appInst:empty{display:none}#appInst .si-chip{margin:12px 0;border-color:#F2C2CA;background:#FFFCF8}</style>
   <nav class="circles" id="circles" aria-label="오늘의 채널"></nav>
   <div class="welcome" id="welcome" hidden>🍒 <b>받으신 화면이에요.</b> 아래 내용을 먼저 보시고, 다 보신 뒤에는 위 동그라미를 눌러 싸바의 다른 것도 둘러보세요.<div class="row"><a class="btn l" href="#" id="wtop">⬆️ 둘러보기</a><a class="btn" href="../app/">🏠 싸바 처음 화면</a></div></div>
   <div class="sendbar"><button type="button" class="btn" id="send">★ 이 화면 카톡으로 보내기</button><button type="button" class="btn l" id="copy">🔗 링크</button></div>
@@ -1176,6 +1184,16 @@
   if (GO) {} else if (fromLink) setTimeout(function () { var w = $('welcome'); if (w.scrollIntoView) w.scrollIntoView({ block: 'start' }); }, 60);
   if (GO) paneTop(); // 처음 열 때도 맨 위부터 (예전 '고른 동그라미 보이게' 줄이 화면을 아래로 끌어내려 중간부터 보였음 — 뺌)
 })();
+</script>
+<script src="/js/install.js?v=4" data-name="브리핑" data-mark="☀️" data-icon="/img/brief-icon-192.png?v=1" data-url="sava.kr/today"></script>
+<script>
+  // 11-25 단독 앱: 홈 화면 앱으로 열리면 body.is-app, 아니면 위에 '☀️ 싸바 브리핑 앱으로 쓰기' 띠 (조용한 공개 중엔 install.js가 알아서 숨김)
+  (function () {
+    var I = window.SsakaInstall; if (!I) return;
+    if (I.standalone()) { document.body.classList.add('is-app'); return; }
+    var c = I.chip(document.getElementById('appInst'), '☀️ 싸바 브리핑 앱으로 쓰기');
+    if (c) c.querySelector('span').textContent = '홈 화면에 아이콘 하나 · 앱스토어 없이 3초';
+  })();
 </script>
 <script src="/js/share.js?v=3" defer></script>
 <script src="/js/home.js?v=16" defer></script>

@@ -167,6 +167,9 @@
     .rtel button { flex: none; min-height: 50px; padding: 0 14px; border-radius: 14px; border: 1.5px solid #E9C9CE; background: #fff; color: #8E0A1C; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
     .re-q { font-size: 34px !important; line-height: 1.25; word-break: keep-all; color: #B3132B; }
     .re-memo { text-align: left; font-size: 18px; font-weight: 700; }
+    .re-prev { margin: 4px auto 2px; max-width: 92%; padding: 8px 14px; border-radius: 16px 16px 4px 16px; background: #F3EDE6; color: #6A5A4A; font-size: 15px; font-weight: 700; text-align: right; word-break: keep-all; }
+    .rechips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+    .rechips .chip[aria-pressed="true"] { background: #B3132B; color: #fff; border-color: #B3132B; }
     .pbig a { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 66px; border-radius: 20px; font-size: 21px; font-weight: 900; text-decoration: none; color: inherit; }
     .pbig a.yes { color: #fff; }
     .pbig a small { font-size: 15px; font-weight: 700; opacity: .9; }
@@ -662,8 +665,8 @@
     .inmsg .who { margin-top: 0; }
     .inmsg .q { margin-bottom: 10px; }
     /* 답장 칸: 굵은 빨간 테 대신 미색 편지지 + 위에 떠 있는 이름표 */
-    #viewAsk .rbox { position: relative; margin-top: 34px; padding: 30px 14px 16px; border: 1px solid #EFDCCF; border-radius: 28px; background: linear-gradient(180deg, #FFF8EE 0%, #FFFDF9 45%, #FFFFFF 100%); box-shadow: 0 22px 44px -26px rgba(120,40,10,.45); }
-    #viewAsk .rtitle { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); margin: 0; padding: 9px 22px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #D0263F, #8E0A1C); color: #fff; font-size: 19px; white-space: nowrap; box-shadow: 0 8px 18px -8px rgba(142,10,28,.8); }
+    #viewAsk .rbox, #viewRe .rbox { position: relative; margin-top: 34px; padding: 30px 14px 16px; border: 1px solid #EFDCCF; border-radius: 28px; background: linear-gradient(180deg, #FFF8EE 0%, #FFFDF9 45%, #FFFFFF 100%); box-shadow: 0 22px 44px -26px rgba(120,40,10,.45); }
+    #viewAsk .rtitle, #viewRe .rtitle { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); margin: 0; padding: 9px 22px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #D0263F, #8E0A1C); color: #fff; font-size: 19px; white-space: nowrap; box-shadow: 0 8px 18px -8px rgba(142,10,28,.8); }
     #rChips .chip { background: #fff; border: 1.5px solid #ECD9CC; box-shadow: 0 2px 0 #F3E6DC; color: #3A2A14; }
     #rChips .chip:active { transform: translateY(1px); box-shadow: none; }
     /* 답장 글칸(아래 고정 칸): 줄 그은 편지지 */
@@ -875,11 +878,18 @@
     <img src="../img/cherry-dance-anim.svg" alt="" width="220" height="194" style="display:block;margin:-6px auto -6px">
     <div class="who" id="reWho" style="text-align:center"></div>
     <p class="pact" id="reAct" hidden style="text-align:center"></p>
+    <p class="re-prev" id="rePrev" hidden></p>
     <h1 class="q re-q" id="reText"></h1>
     <div class="memo re-memo" id="reMemo" hidden></div>
     <div class="pbig">
       <a class="yes re-call" id="reCall" href="#">📞 전화 걸기</a>
       <a class="no re-find" id="reFind" href="#">📒 번호 찾아 전화하기</a>
+    </div>
+    <div class="rbox" id="reBox" style="text-align:left">
+      <div class="rtitle">💬 이어서 답장하기</div>
+      <div class="rechips" id="reChips"></div>
+      <div class="rta"><textarea id="reText2" maxlength="100" rows="1" placeholder="이어서 할 말을 쓰거나 위 말을 눌러요"></textarea></div>
+      <button type="button" class="big red" id="reSend" style="margin-top:4px;width:100%;display:block">💬 답장 보내기</button>
     </div>
     <a class="mk" href="./#play">나도 <b>친구야 놀자!</b> 보내기</a>
   </section>
@@ -1385,6 +1395,7 @@
     $('maker').hidden = true;
     if (card.from && card.tel) bookAdd(card.from, card.tel);
     var who = card.from ? card.from + '님이' : '친구가';
+    var PREV = card.m === 're' ? card.r : card.m === 'play' ? '친구야 놀자! ' + (card.act || '') : card.m === 'come' ? (card.here ? '여기야!' : '여기서 만나!') : (Array.isArray(card.q) && card.q.length ? card.q.slice(0, 4).join(' ') : '어디야?');
     // 답장 보낼 사람 이름 (한 번 쓰면 기억)
     function myName() {
       var i = $('rName'); var n = i ? i.value.trim() : '';
@@ -1409,38 +1420,9 @@
       }
     }
     // 답장: 큰 그림이 붙은 카톡 카드로 보냄 (번호가 있으면 문자)
-    // 11-21 07:50 대표님: 답만 하고 닫으면 싸바는 끝 → 답장 화면마다 '싸바가 뭐지?' 카드, 답장 보내고 돌아오면 안내 창
-    (function () {
-      var ICON = '../img/cherry.webp';
-      ['viewAsk', 'viewCome', 'viewPlay', 'viewRe', 'viewTel'].forEach(function (id) {
-        var v = $(id); if (!v) return;
-        // 11-25 대표님: 질문→답→또 질문으로 대화가 이어져야 함 → 큰 '싸바가 뭐지?' 칸 대신 맨 아래 작은 글씨 한 줄
-        var a = document.createElement('a'); a.className = 'sv-inv-s'; a.href = '../?story=1';
-        a.textContent = '🍒 싸바가 뭐지?';
-        // 11-21 07:55 대표님: 받은 사람도 다른 누군가에게 어디야를 보낼 수 있게 → 작은 '나도 보내기' 글씨 대신 큰 칸 (설치 없이 바로)
-        var me = document.createElement('div'); me.className = 'sv-me';
-        me.innerHTML = '<b>🍒 나도 안부 전하기</b><span>지금 떠오르는 사람에게 톡! 설치 없이 바로 돼요</span>' +
-          '<div class="row"><a href="./#ask">싸바?<small>안부</small></a><a href="./#come">여기야!<small>위치</small></a><a href="./#play">놀자!<small>부르기</small></a></div>';
-        var mk = v.querySelector('.mk');
-        if (mk) { v.insertBefore(me, mk); mk.remove(); } else { v.appendChild(me); }
-        v.appendChild(a);
-      });
-      // 11-21 08:12 대표님: 답장 쓰는 중에 '나도 안부 전하기'가 글칸 바로 위에 떠서 헷갈림 → 답장을 보낸 뒤에만 보이게
-      var SK = 'svSent:' + location.pathname + location.search + location.hash;
-      var sent = false, shown = false;
-      try { if (sessionStorage.getItem(SK)) { sent = true; shown = true; document.documentElement.classList.add('sv-sent'); } } catch (e) {}
-      window.__svSent = function () { sent = true; document.documentElement.classList.add('sv-sent'); try { sessionStorage.setItem(SK, '1'); } catch (e) {} };
-      function after() {
-        if (!sent || shown || document.visibilityState !== 'visible') return; shown = true;
-        var d = document.createElement('div'); d.className = 'sv-after';
-        d.innerHTML = '<div class="in"><img src="' + ICON + '" alt=""><h3>답장 보냈어요 ✓</h3><p>이번엔 내가 먼저 안부를 전해 볼까요?<br>떠오르는 사람에게 톡! — 설치 없이 바로</p>' +
-          '<a class="a1" href="./#ask">🍒 나도 안부 전하기</a><button type="button" class="a3">닫기</button></div>';
-        d.addEventListener('click', function (e) { if (e.target === d || e.target.classList.contains('a3')) d.remove(); });
-        document.body.appendChild(d);
-      }
-      document.addEventListener('visibilitychange', function () { setTimeout(after, 400); });
-      window.addEventListener('focus', function () { setTimeout(after, 400); });
-    })();
+    // 11-25 18:15 대표님 규칙: 대화할 때는 다른 데로 가지 말고 질문↔답장만 이어 감
+    // → 받는 화면의 '싸바가 뭐지?'·'나도 안부 전하기'·답장 뒤 안내 창·'나도 ○○ 보내기'·설치 칩 모두 뺌
+    ['viewAsk', 'viewCome', 'viewPlay', 'viewRe', 'viewTel'].forEach(function (id) { var v = $(id); if (!v) return; v.querySelectorAll('.mk').forEach(function (a) { a.remove(); }); });
     function reply(o) {
       var name = myName();
       if (!name && $('rName')) { toast('✏️ 누가 답했는지 알 수 있게 맨 위에 이름을 먼저 적어 주세요'); $('rName').scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { $('rName').focus(); }, 350); return; }
@@ -1449,7 +1431,9 @@
       var rt = myTelR();
       if ($('rTel') && $('rTel').value.trim() && !rt) { toast('전화번호를 다시 확인해 주세요 (안 넣어도 돼요)'); $('rTel').focus(); return; }
       if (rt) o.desc = (o.desc ? o.desc + '\n' : '') + '📞 ' + rt.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
-      if (o.re && window.SsakaCodec) o.url = BASE + '?d=' + SsakaCodec.encode({ m: 're', from: name, tel: rt, r: o.re, memo: o.memo || '', act: o.act || '', t: Date.now() });
+      if (!o.url && !o.re && o.title) o.re = o.title;
+      if (o.re && window.SsakaCodec) o.url = BASE + '?d=' + SsakaCodec.encode({ m: 're', from: name, tel: rt, r: o.re, memo: o.memo || '', act: o.act || '', p: String(PREV || '').slice(0, 60), t: Date.now() });
+      if (o.btn === '다시 묻기' || o.btn === '👆 다시 묻기') o.btn = '💬 답장 보기';
       var url = o.url || BASE;
       if (window.__svSent) window.__svSent();
       if (card.phone) { location.href = sms(card.phone, title + (o.desc ? '\n' + o.desc : '') + '\n' + url); return; }
@@ -1457,8 +1441,6 @@
       window.SsakaShare({ title: title, description: o.desc || '', imageUrl: abs ? o.img : IMG_BASE + o.img, imageWidth: o.w || (wide ? 1000 : 800), imageHeight: o.h || (wide ? 600 : 800), url: url,
         buttonTitle: o.btn || '열어 보기', installTitle: '싸바 설치하기', noButtons: wide || o.nb, installUrl: BASE + '?install=1' });
     }
-    if (window.SAVA_QUIET) document.querySelectorAll('#viewAsk .mk, #viewCome .mk, #viewPlay .mk, #viewRe .mk, #viewTel .mk').forEach(function (a) { a.style.display = 'none'; });
-    else if (window.SsakaInstall) { SsakaInstall.chip($('viewAsk'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewCome'), '나도 싸바 설치하기'); SsakaInstall.chip($('viewPlay'), '나도 싸바 설치하기'); }
 
     if (card.m === 'tel') {
       $('viewTel').hidden = false;
@@ -1488,6 +1470,17 @@
       if (rtel.length >= 9) { $('reCall').href = 'tel:' + rtel; $('reCall').innerHTML = '📞 ' + (card.from || '') + ' 전화 걸기<small>' + rtel.replace(/^(\d{3})(\d{3,4})(\d{4})$/, '$1-$2-$3') + '</small>'; }
       else { $('reCall').hidden = true; }
       findCall($('reFind'));
+      if (card.p) { $('rePrev').hidden = false; $('rePrev').textContent = '내가 보낸 말: ' + card.p; }
+      // 11-25 대표님: 질문→답→또 답으로 계속 이어지게 — 답장 받은 화면에서 바로 또 답장
+      nameBox($('reBox'));
+      var RE2 = ['좋아! 👍', '알았어~', '고마워! 😊', '그래, 그때 보자', '지금 가는 중! 🏃', '전화할게 📞', 'ㅋㅋㅋ 😆', '잘 지내, 또 연락하자 🍒'];
+      RE2.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.addEventListener('click', function () { var ta = $('reText2'); ta.value = (ta.value.trim() ? ta.value.trim() + ' ' : '') + t; b.setAttribute('aria-pressed', 'true'); }); $('reChips').appendChild(b); });
+      $('reSend').addEventListener('click', function () {
+        var t = ($('reText2').value || '').trim().slice(0, 100); if (!t) { toast('할 말을 쓰거나 위 말을 눌러 주세요'); $('reText2').focus(); return; }
+        if (card.phone) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '💬 답장 보기' }); return; }
+        withMsgImg(t, { kind: 'reply' }, function (mi) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '💬 답장 보기', mi: mi }); });
+      });
+      if (window.SavaMsgImg) $('reText2').addEventListener('change', function () { var t = $('reText2').value.trim(); if (t) SavaMsgImg.soon(t, { kind: 'reply' }); });
       playSound('play');
     } else if (card.m === 'play') {
       $('viewPlay').hidden = false;
@@ -1670,8 +1663,12 @@
         withMsgImg(t, { kind: 'reply' }, function (mi) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '👆 다시 묻기', mi: mi }); });
       });
       if (window.SavaMsgImg) SavaMsgImg.soon(callText(), { kind: 'reply' });
-      // 🍻 놀자: 나도 "친구야 놀자!" 보내기 화면으로
-      $('playBtn').addEventListener('click', function () { location.href = BASE + '#play'; });
+      // 🍻 놀자: 보내기 화면으로 가지 않고 '놀자' 답장으로 이어 감 (11-25)
+      $('playBtn').addEventListener('click', function () {
+        var t = '우리 만나서 놀자! 🍻';
+        if (card.phone) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '💬 답장 보기' }); return; }
+        withMsgImg(t, { kind: 'reply' }, function (mi) { reply({ title: t, desc: '', img: 'eodiya-reply2.png?v=1', btn: '💬 답장 보기', mi: mi }); });
+      });
       // 📷 사진 최대 9장: 각각 줄여서 카카오에 올림 → 바둑판 모음 그림을 말풍선으로, 누르면 사진 모음 화면
       function loadImg(f) { return new Promise(function (ok, no) { var u = URL.createObjectURL(f), im = new Image(); im.onload = function () { ok(im); }; im.onerror = no; im.src = u; }); }
       function collage(files) {

@@ -123,9 +123,7 @@
       vd.muted = true; vd.loop = true; vd.autoplay = true; vd.playsInline = true; vd.setAttribute('playsinline', ''); vd.setAttribute('muted', ''); vd.preload = 'auto';
       if (card.image) vd.poster = card.image;
       photo.appendChild(vd);
-      var snd = el('button', 'sk-clip-snd', '🔇'); snd.type = 'button'; snd.setAttribute('aria-label', '영상 소리 켜기');
-      snd.addEventListener('click', function (e) { e.stopPropagation(); vd.muted = !vd.muted; snd.textContent = vd.muted ? '🔇' : '🔊'; snd.setAttribute('aria-label', vd.muted ? '영상 소리 켜기' : '영상 소리 끄기'); if (vd.paused) vd.play(); });
-      photo.appendChild(snd);
+      // 11-26 대표님: 영상 안 소리 단추는 없앰 — 소리는 맨 위 오른쪽 스피커 하나로 (demo/js/card.js)
       setTimeout(function () { var p = vd.play(); if (p && p.catch) p.catch(function () {}); }, 0);
     }
     if (card.image && !card.sos && (motion === 'steam' || motion === 'shine')) {

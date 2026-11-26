@@ -329,15 +329,40 @@
     app.appendChild(root);
 
     // 소리: 열자마자 먼저 재생해 보고, 브라우저가 막으면 "싸카 도착" 화면을 띄워 첫 탭에 재생
-    if (card.sound && window.SsakaSound && window.self === window.top && !new URL(location.href).searchParams.get('save')) {
+    // 11-26 대표님: 소리는 맨 위 오른쪽 스피커 하나로 — 영상이 있으면 영상 소리 켜기/끄기, 없으면 카드 소리 다시 듣기
+    var topOk = window.self === window.top && !new URL(location.href).searchParams.get('save');
+    var clipV = root.querySelector('video.sk-clip');
+    if (topOk && (clipV || (card.sound && window.SsakaSound))) {
+      var SPK_ON = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+      var SPK_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
       var replay = document.createElement('button');
       replay.type = 'button';
       replay.className = 'sk-replay';
-      replay.setAttribute('aria-label', '소리 다시 듣기');
-      replay.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-      replay.addEventListener('click', function () { SsakaSound.play(card.sound); });
-      root.appendChild(replay);
-
+      var curV = function () { return document.querySelector('video.sk-clip') || clipV; }; // 고치기로 영상이 새로 그려져도 따라감
+      var paint = function () {
+        var cv = curV();
+        var on = cv ? !cv.muted : true;
+        replay.innerHTML = on ? SPK_ON : SPK_OFF;
+        replay.classList.toggle('off', !on);
+        replay.setAttribute('aria-label', cv ? (on ? '소리 끄기' : '소리 켜기') : '소리 다시 듣기');
+        replay.setAttribute('aria-pressed', on ? 'true' : 'false');
+      };
+      replay.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var cv = curV();
+        if (cv) {
+          cv.muted = !cv.muted;
+          if (!cv.muted) cv.removeAttribute('muted'); // 속성 남아 있으면 일부 폰이 다시 음소거
+          var pr = cv.play(); if (pr && pr.catch) pr.catch(function () {});
+        } else SsakaSound.play(card.sound);
+        paint();
+        replay.classList.remove('tap'); void replay.offsetWidth; replay.classList.add('tap');
+      });
+      if (clipV) clipV.addEventListener('volumechange', paint);
+      paint();
+      document.body.appendChild(replay); // 카드 안쪽이 아니라 화면에 붙여야 위에 고정돼 눌림
+    }
+    if (card.sound && window.SsakaSound && topOk) {
       SsakaSound.tryAutoplay(card.sound).then(function (played) {
         if (played) return;
         var intro = document.createElement('div');

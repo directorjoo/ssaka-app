@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=108">
+  <link rel="stylesheet" href="../css/sk.css?v=109">
   <link rel="stylesheet" href="../css/sk-world.css?v=11">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -239,6 +239,30 @@
     .dcols button[aria-pressed="true"] { border-color: #B3132B; box-shadow: 0 0 0 2px #B3132B inset; }
     .dcols button.ph-best { position: relative; } .dcols button.ph-best::after { content: "📸"; position: absolute; top: -9px; right: -6px; font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
     /* 11-23 대표님: 업종 다 늘어놓지 않고 써넣기 → 저절로 맞춤 (js/indfind.js) */
+    /* 11-27 대표님: 고르기는 셋 — 모임 공지 하나 · 경조사(청첩장/부고) · 우리 영업장 홍보카드(업종은 글로) */
+    .mk3 { display: grid; gap: 10px; margin: 2px 0 6px; }
+    .inds .mk3-b { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 76px; padding: 12px 16px; border: 2px solid #EADDD3; border-radius: 18px; background: linear-gradient(90deg, #FFF7EF, #fff); color: #1A1A1A; font: inherit; text-align: left; white-space: normal; word-break: keep-all; box-shadow: 0 6px 16px -12px rgba(80,40,20,.45); }
+    .inds .mk3-b > i { font-style: normal; flex: 0 0 auto; width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; font-size: 27px; background: #fff; box-shadow: inset 0 0 0 1.5px #F0E4DA; }
+    .inds .mk3-b span { flex: 1; line-height: 1.3; }
+    .inds .mk3-b b { display: block; font-size: 20px; font-weight: 900; }
+    .inds .mk3-b small { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; color: #6b5d55; }
+    .inds .mk3-b::after { content: '›'; font-size: 26px; font-weight: 900; color: #B3132B; }
+    .inds .mk3-b.m-meet { border-color: #F6C79A; background: linear-gradient(90deg, #FFE7CF, #FFF8F1); }
+    .inds .mk3-b.m-life { border-color: #D9C8F2; background: linear-gradient(90deg, #EEE4FC, #FAF7FF); }
+    .inds .mk3-b.m-shop { border-color: #F3B7AE; background: linear-gradient(90deg, #FFDCD4, #FFF6F3); }
+    .inds .mk3-b[aria-expanded="true"]::after { content: '▾'; }
+    .mk3-sub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: -2px 0 4px; }
+    .mk3-sub[hidden], .mk3-shop[hidden] { display: none; }
+    .inds .mk3-sub button { min-height: 60px; border: 2px solid #D9C8F2; border-radius: 16px; background: #fff; font: inherit; font-size: 19px; font-weight: 900; color: #1A1A1A; }
+    .mk3-shop { margin: -2px 0 4px; padding: 12px; border: 2px solid #F3B7AE; border-radius: 18px; background: #FFF6F3; }
+    .mk3-shop .mk3-q { margin: 0 2px 8px; font-size: 16px; font-weight: 800; color: #4a3a32; }
+    .more-add { margin: 10px 0 4px; border: 1.5px dashed #D9CCC2; border-radius: 14px; background: #FCFAF8; }
+    .more-add > summary { list-style: none; cursor: pointer; padding: 12px 14px; font-size: 16px; font-weight: 800; color: #4a3a32; }
+    .more-add > summary::-webkit-details-marker { display: none; }
+    .more-add > summary small { font-weight: 600; color: #7a6d64; }
+    .more-add[open] > summary { border-bottom: 1px dashed #E5D9CF; }
+    .more-add > div, .more-add > label { margin-left: 12px; margin-right: 12px; }
+    .more-add[open] { padding-bottom: 10px; }
     .indq { position: relative; margin: 2px 0 10px; }
     .indq input { width: 100%; box-sizing: border-box; height: 58px; padding: 0 48px 0 16px; border: 2px solid #E2D5CC; border-radius: 16px; background: #fff; font: inherit; font-size: 19px; font-weight: 700; color: #1A1A1A; }
     .indq input:focus { outline: none; border-color: #B3132B; box-shadow: 0 0 0 4px rgba(179,19,43,.12); }
@@ -753,6 +777,7 @@
 
       <h2 class="sec-h" data-sec="basic"><span>3</span><b></b><small></small></h2>
       <div class="snsfit" id="snsFit" hidden></div>
+      <button type="button" class="pv-pre" id="topPreGo" hidden>💬 카톡에서 이미 받은 참석자 명단 붙여넣기<small id="topPreN">카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요</small></button>
       <fieldset data-for="club" data-tab="basic" data-part="notice">
         <legend>📋 공지·초대장 글 붙여넣고 자동 채우기</legend>
         <div class="hint">카톡 공지나 받은 초대장 글을 길게 눌러 복사해서 아래에 붙여넣으세요. 제목·날짜·시간·장소·내용·계좌를 알아서 채워 드려요.</div>
@@ -833,6 +858,16 @@
         </div>
         <button type="button" class="mini" id="findPlace" style="margin-top:8px;width:100%">📍 모일 장소 이름으로 찾기 (식당·역·산 입구)</button>
         <div class="hint">받는 사람이 누르면 카카오맵·네이버지도·구글지도에서 이 이름으로 찾아줘요.</div>
+      </fieldset>
+      <fieldset data-for="club" data-tab="basic" id="meetFs" hidden>
+        <legend>📋 모임 안내 <small style="font-weight:600;opacity:.7">적은 칸만 카드에 나와요</small></legend>
+        <label for="mFee">💰 회비 (선택)</label>
+        <input id="mFee" maxlength="60" placeholder="예: 3만원 (현장 납부 가능)">
+        <label for="mBring">🎒 준비물 (선택)</label>
+        <input id="mBring" maxlength="80" placeholder="예: 등산화 · 물 · 우비">
+        <label for="mNote">📢 특별당부 (선택)</label>
+        <textarea id="mNote" rows="2" maxlength="300" placeholder="예: 주차가 어려우니 대중교통을 이용해 주세요"></textarea>
+        <div class="hint">계좌를 넣고 누가 냈는지 체크하려면 아래 ‘💰 회비 받기’를 켜세요.</div>
       </fieldset>
 
       <fieldset data-for="shop profile" data-tab="basic" data-part="links" data-snsoff>
@@ -1012,11 +1047,14 @@
           <textarea id="pre" maxlength="3000" placeholder="👉 길게 눌러 [붙여넣기]&#10;참석자 이어가기&#10;1. 홍길동 32회&#10;2. 김싸바(35기) +1&#10;3. 이싸바 부부"></textarea>
           <div class="hint">번호·머리말이 붙은 채로 붙여도 이름·기수·동반 인원을 알아서 골라요. 위 '공지 글 붙여넣기'에 명단까지 통째로 붙여도 여기로 들어와요.</div>
           </div>
+          <details class="more-add" id="moreAdd">
+          <summary>➕ 더 넣기 <small>기수(학번) · 탑승지·집결지</small></summary>
+          <label class="switch" data-part="gisu"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기 <small>(동문회·향우회)</small></span></label>
           <div data-part="stops">
-          <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
+          <label for="stops">탑승지·집결지 (한 줄에 하나, 선택 · 산악회·여행)</label>
           <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
           </div>
-          <label class="switch" data-part="gisu"><input type="checkbox" id="gisuOn" checked> <span>기수(학번)도 받기</span></label>
+          </details>
           <div class="pubpick">
             <div class="pubpick-h">👀 참석자 명단 보이기 <small>모임 연 분이 정해요 · 나중에 카드에서도 바꿀 수 있어요</small></div>
             <div class="pubseg" id="pubSeg" role="group" aria-label="참석자 명단 공개 방식">
@@ -1266,12 +1304,12 @@
 </div>
 
 <script src="../js/codec.js"></script>
-<script src="../js/designs.js?v=95"></script>
+<script src="../js/designs.js?v=96"></script>
 <script src="../js/mkfun.js?v=1"></script>
-<script src="../js/mkask.js?v=2"></script>
-<script src="../js/indfind.js?v=2"></script>
+<script src="../js/mkask.js?v=3"></script>
+<script src="../js/indfind.js?v=3"></script>
 <script src="../js/notice.js?v=5"></script>
-<script src="../js/render.js?v=92"></script>
+<script src="../js/render.js?v=93"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1309,7 +1347,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'hideList', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'hideList', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'mFee', 'mBring', 'mNote', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -1340,7 +1378,7 @@
   // 업종마다 또렷이 구분되는 파스텔 바탕 (홈과 같은 색)
   var IND_TINT = { actor: '#FFE8B8', director: '#E9DDFB', freelancer: '#DDF1FF', insurance: '#E3E8F0', newcar: '#E3E8F0', usedcar: '#E3E8F0', sales: '#E3E8F0', realty: '#E4F5DC', restaurant: '#FFE1CF',
     cafe: '#F1E2D3', beauty: '#FBDCEB', toefl: '#D7ECFF', bigacademy: '#DDE3FF', academy: '#FFF3B8', entrance: '#FFD9D9', tutor: '#E2F7EE',
-    arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
+    arts: '#FDE2F7', fitness: '#D9F5E6', flower: '#FFE4EC', stay: '#D5F3F5', meet: '#FFE7CF', club: '#E1F0D5', alumni: '#EDE4FF', party: '#FFE0E6',
     greeting: '#E2EEFB', event: '#FFEFD1', wedding: '#FCE7F3', funeral: '#ECEDEF', news: '#EEF0F3', product: '#FFE3F1', kid: '#FFF5C7', senior: '#E6EEE0' };
   // 1. 업종 고르기 — 묶음 탭 없이 모든 업종을 동그라미로 한눈에
   function renderIndustries() {
@@ -1375,7 +1413,7 @@
   }
   // 업종 써넣기 상자 (js/indfind.js) — 쓰면 가장 맞는 것 하나를 큰 단추로, 나머지 둘은 '혹시'로
   var IQ_KEY = 'mk-indq';
-  var QUICK = ['restaurant', 'cafe', 'beauty', 'academy', 'alumni', 'club', 'party', 'wedding', 'event', 'funeral'];
+  var QUICK = ['greeting', 'news', 'actor', 'freelancer', 'insurance', 'kid', 'senior']; // '그 밖에' — 모임·경조사·영업장은 위 큰 칸 셋으로
   function indBtn(id, cls) {
     var ind = D.industry(id); var b = document.createElement('button');
     b.type = 'button'; b.dataset.ind = id; if (cls) b.className = cls;
@@ -1385,22 +1423,49 @@
     return b;
   }
   function indSearch(box) {
+    // 11-27 대표님: 고르기는 큰 칸 셋 — 🥂 모임 공지(모든 모임 하나) · 💌 경조사(청첩장/부고) · 🏪 우리 영업장 홍보카드(업종은 글로 쓰면 맞는 디자인)
+    var top3 = document.createElement('div'); top3.className = 'mk3';
+    var big = function (cls, emo, t, sub) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'mk3-b ' + cls;
+      b.innerHTML = '<i aria-hidden="true"></i><span><b></b><small></small></span>';
+      b.querySelector('i').textContent = emo; b.querySelector('b').textContent = t; b.querySelector('small').textContent = sub;
+      return b;
+    };
+    var bMeet = big('m-meet', '🥂', '모임 공지', '신년회 · 송년회 · 동문회 · 산악회 · 골프 · 돌잔치 모두');
+    bMeet.dataset.ind = 'meet';
+    bMeet.addEventListener('click', function () { setIndustry('meet', true); afterUse(); });
+    var bLife = big('m-life', '💌', '경조사', '청첩장 · 부고'); bLife.setAttribute('aria-expanded', 'false');
+    var life = document.createElement('div'); life.className = 'mk3-sub'; life.hidden = true;
+    [['wedding', '💍 청첩장'], ['funeral', '🕯️ 부고']].forEach(function (x) {
+      if (!D.industry(x[0]) || (D.isOpen && !D.isOpen(x[0]))) return;
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.ind = x[0]; b.textContent = x[1];
+      b.setAttribute('aria-pressed', x[0] === industry ? 'true' : 'false');
+      b.addEventListener('click', function () { setIndustry(x[0], true); afterUse(); });
+      life.appendChild(b);
+    });
+    bLife.addEventListener('click', function () { life.hidden = !life.hidden; bLife.setAttribute('aria-expanded', life.hidden ? 'false' : 'true'); });
+    var bShop = big('m-shop', '🏪', '우리 영업장 홍보카드', '1분에 만들기 · 무슨 가게인지만 쓰세요'); bShop.setAttribute('aria-expanded', 'false');
+    var shop = document.createElement('div'); shop.className = 'mk3-shop'; shop.hidden = true;
+    shop.innerHTML = '<div class="mk3-q">어떤 가게예요? 한 단어로 써 주세요</div>';
+    top3.appendChild(bMeet); top3.appendChild(bLife); top3.appendChild(life); top3.appendChild(bShop); top3.appendChild(shop);
     var q = document.createElement('div'); q.className = 'indq';
-    q.innerHTML = '<input id="indQ" type="search" enterkeyhint="go" autocomplete="off" aria-label="하는 일이나 알릴 것" placeholder="예: 네일숍, 동창회, 김밥집"><button type="button" class="indq-x" aria-label="지우기" hidden>✕</button>';
+    q.innerHTML = '<input id="indQ" type="search" enterkeyhint="go" autocomplete="off" aria-label="무슨 가게인지" placeholder="예: 김밥집, 네일숍, 피아노 학원"><button type="button" class="indq-x" aria-label="지우기" hidden>✕</button>';
     var res = document.createElement('div'); res.className = 'indq-res'; res.id = 'indRes';
+    shop.appendChild(q); shop.appendChild(res);
+    var openShop = function (on) { shop.hidden = !on; bShop.setAttribute('aria-expanded', on ? 'true' : 'false'); };
+    bShop.addEventListener('click', function () { openShop(shop.hidden); if (!shop.hidden) setTimeout(function () { inp.focus(); }, 50); });
     var quick = document.createElement('div');
-    quick.innerHTML = '<div class="indq-or">많이 만드는 것</div>';
+    quick.innerHTML = '<div class="indq-or">그 밖에</div>';
     var qc = document.createElement('div'); qc.className = 'indq-chips';
     QUICK.filter(function (id) { return D.industry(id) && (!D.isOpen || D.isOpen(id)); }).forEach(function (id) { qc.appendChild(indBtn(id)); });
     quick.appendChild(qc);
     var det = document.createElement('details'); det.className = 'ind-all';
     det.innerHTML = '<summary>📋 종류 전체 보기</summary>';
-    box.appendChild(q); box.appendChild(res); box.appendChild(quick); box.appendChild(det);
+    box.appendChild(top3); box.appendChild(quick); box.appendChild(det);
     var inp = q.querySelector('input'), x = q.querySelector('.indq-x'), tm = 0;
     function draw() {
       var t = inp.value.trim(); x.hidden = !t; res.innerHTML = '';
       try { localStorage.setItem(IQ_KEY, t); } catch (e) {}
-      quick.hidden = !!t;
       if (!t) return;
       var m = window.IndFind ? IndFind.match(t, D) : [];
       if (!m.length) {
@@ -1427,6 +1492,8 @@
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); draw(); var g = res.querySelector('.indq-go'); if (g) { inp.blur(); g.click(); } } });
     x.addEventListener('click', function () { inp.value = ''; draw(); inp.focus(); });
     try { var saved = localStorage.getItem(IQ_KEY); if (saved) { inp.value = saved; draw(); } } catch (e) {}
+    if (D.industry(industry) && D.industry(industry).type === 'shop') openShop(true);
+    if (industry === 'wedding' || industry === 'funeral') { life.hidden = false; bLife.setAttribute('aria-expanded', 'true'); }
     return det;
   }
   function thumb(d, ex) {
@@ -1845,6 +1912,11 @@
     // 업종별 기본 공개 방식 (청첩장은 손님 이름이 퍼지지 않게 인원만) — 대표님이 직접 고르면 그대로
     if (!pubTouched && PUBH) setPub(F.pub != null ? F.pub : 2);
     if (type === 'club') $('gisuOn').checked = !!F.gisu;
+    // 11-27 모임 공지: 회비·준비물·특별당부 칸 · 기수·탑승지는 '더 넣기'에 접어 둠 (예전 산악회·동문회 카드를 고칠 땐 펼쳐 둠)
+    $('meetFs').hidden = ind.id !== 'meet';
+    var ma = $('moreAdd'), maKids = ma.querySelectorAll('[data-part]');
+    ma.hidden = Array.prototype.every.call(maKids, function (k) { return k.hidden; });
+    ma.open = !F.more && !ma.hidden;
     $('placeLeg').textContent = ind.id === 'funeral' ? '빈소' : ind.id === 'wedding' ? '예식장' : '장소';
     if (F.sound !== undefined && typeof soundTouched !== 'undefined' && !soundTouched && $('sound')) $('sound').value = F.sound;
     // 업종별 예시 글 · 골라 넣기 단추 (js/mkask.js)
@@ -2014,6 +2086,12 @@
     if (/^ph-/.test(design)) { if (PHPAL && PHPAL[design] && v('image')) card.pal = PHPAL[design]; else card.design = D.list(industry)[0].id; }
     if (card.image && v('image') && (IP.z !== 100 || IP.x !== 50 || IP.y !== 50 || IP.f)) card.ip = [IP.z, Math.round(IP.x), Math.round(IP.y), IP.f ? 1 : 0];
     if (g('place')) card.place = { name: g('place') };
+    // 11-27 모임 공지: 회비·준비물·특별당부는 따로 적은 칸 — 안 적은 칸은 카드에 아예 안 나옴
+    if (industry === 'meet') {
+      card.meet = 1;
+      var mi = [['회비', g('mFee')], ['준비물', g('mBring')], ['특별당부', g('mNote')]].filter(function (x) { return String(x[1] || '').trim(); }).map(function (x) { return { k: x[0], v: String(x[1]).trim() }; });
+      if (mi.length) card.info = mi;
+    }
     // 당근·네이버·카톡 채널·인스타 (https 주소만)
     var lk = {}; [['dg', 'lkDg'], ['nv', 'lkNv'], ['nb', 'lkNb'], ['kc', 'lkKc'], ['ig', 'lkIg']].forEach(function (x) { var u = g(x[1]); if (/^https:\/\/\S+$/.test(u)) lk[x[0]] = u.slice(0, 300); });
     if (Object.keys(lk).length) card.links = lk;
@@ -2108,8 +2186,8 @@
       try {
         var preP = document.querySelector('#rosterBox [data-part="pre"]'), rosFs = document.querySelector('fieldset[data-part="roster"]');
         var preOk = type === 'club' && !destSns() && preP && !preP.hidden && rosFs && !rosFs.hidden;
-        $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk;
-        if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; var dps = $('donePre').querySelector('small'); if (dps) dps.textContent = $('pvPreN').textContent; }
+        $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk; $('topPreGo').hidden = !preOk;
+        if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; var dps = $('donePre').querySelector('small'); if (dps) dps.textContent = $('pvPreN').textContent; $('topPreN').textContent = $('pvPreN').textContent; }
       } catch (e) {}
       // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
       var url = new URL('../c/', location.href).href + '?d=' + SsakaCodec.encode(r.card);
@@ -2603,6 +2681,7 @@
   $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
   $('donePre').addEventListener('click', function () { fixNow(); setTimeout(function () { $('pvPreGo').click(); }, 350); });
+  $('topPreGo').addEventListener('click', function () { $('pvPreGo').click(); });
   $('pvPreGo').addEventListener('click', function () {
     if (!$('rosterOn').checked) { $('rosterOn').checked = true; $('rosterBox').hidden = false; $('rosterOn').dispatchEvent(new Event('change', { bubbles: true })); }
     peOpen('pre');
@@ -2724,7 +2803,7 @@
       if (d.design && D.get(d.design)) design = d.design;
       if (d.design && /^ph-/.test(d.design) && d.pal && d.pal[d.design]) { design = d.design; PHPAL = d.pal; PHFOR = d.palFor || ''; }
       if (d.industry && D.industry(d.industry)) return d.industry;
-      var byType = { profile: 'actor', club: 'club', shop: 'restaurant', safe: 'kid', greet: 'greeting' };
+      var byType = { profile: 'actor', club: 'meet', shop: 'restaurant', safe: 'kid', greet: 'greeting' };
       return byType[d.type] || 'actor';
     } catch (e) { return 'actor'; }
   }
@@ -3543,6 +3622,7 @@
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));
+    (Array.isArray(c.info) ? c.info : []).forEach(function (r) { var id = { '회비': 'mFee', '준비물': 'mBring', '특별당부': 'mNote' }[r && r.k]; if (id) set(id, r.v); });
     var lk = c.links || {}; set('lkDg', lk.dg); set('lkNv', lk.nv); set('lkNb', lk.nb); set('lkKc', lk.kc); set('lkIg', lk.ig);
     if (c.copy) { set('copyLabel', c.copy.label); set('copyValue', c.copy.value); }
     set('sosLabel', c.sosLabel); set('locMsg', c.locationMessage);
@@ -3727,6 +3807,10 @@
   // 이름·번호를 적으면 바로 기억 (다음 카드부터 자동으로 들어감)
   ['name', 'phone'].forEach(function (f) { $(f).addEventListener('change', function () { if ($('name').value.trim() && $('phone').value.trim()) saveMe(); }); });
   var qInd = new URLSearchParams(location.search).get('ind');
+  // 11-27: 예전 모임 업종(산악회·동문회·송년회·행사)은 모두 '모임 공지'로 — 예전 카드 고치기는 그대로
+  var LEGACY_MEET = ['club', 'alumni', 'party', 'event'];
+  if (qInd && LEGACY_MEET.indexOf(qInd) >= 0) qInd = 'meet';
+  if (!editCard && LEGACY_MEET.indexOf(industry) >= 0) { industry = 'meet'; design = D.list('meet')[0].id; }
   if (qInd && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
   else if (qInd && D.isOpen && !D.isOpen(qInd)) setTimeout(function () { toast((D.industry(qInd) || {}).label + ' 카드는 곧 열려요!'); }, 600);
   // 1차 공개에 없는 업종이 남아 있으면(예전 초안) 첫 공개 업종으로 (단, 고치기 중인 카드는 그대로)

@@ -847,7 +847,7 @@
 .sk-info-i { flex: none; width: 24px; text-align: center; font-size: 18px; line-height: 1.4; }
 .sk-info-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; word-break: keep-all; overflow-wrap: anywhere; }
 .sk-info-t b { font-size: 13px; font-weight: 800; color: var(--accent); }
-.sk-info-v { font-size: 16.5px; font-weight: 700; line-height: 1.45; }
+.sk-info-v { font-size: 16.5px; font-weight: 700; line-height: 1.45; white-space: pre-line; }
 .sk-info-t small { font-size: 14px; opacity: .78; line-height: 1.45; }
 .sk-info .sk-actions { margin: 12px 0 0; }
 .sk-inv .sk-more-info { margin-top: 14px; }

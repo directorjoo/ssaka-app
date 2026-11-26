@@ -97,6 +97,8 @@
       if (mode === 'rest') { rest.push(line); return; }
       if (mode === 'pre' && line.replace(/\s+/g, '') === title) return; // 제목을 본문에 또 쓴 줄은 한 번만
       if (mode === 'pre' && /^\d{1,2}[:：.]\d{2}/.test(line)) { rest.push(line); return; }
+      // 11-27 모임 공지: 인사말은 따로 칸이 있으니, 내용 칸('그 밖에 알릴 말')의 줄은 짧아도 빼지 않고 아래 안내로
+      if (card.meet && mode !== 'greet') { if (!invDup(card.title, line)) rest.push(line); return; }
       greet.push(line);
     });
     info = info.filter(function (r) { return r.v || r.sub; }).map(function (r) { if (!r.v && r.sub) { r.v = r.sub; r.sub = ''; } return { k: r.k, v: r.v, sub: r.sub || '' }; });
@@ -301,18 +303,25 @@
     }
     var bodyAll = card.body || [], docAll = bodyAll.some(function (l) { return /^■/.test(l); });
     // 11-26 대표님: 초대·모임 카드는 사진 → 인사말 → 언제·어디서(길찾기·전화) → 참석 여부·참석자 명단 → 프로그램 등 자세한 안내 순서
-    var inv = !card.sos && !longGal && !!(card.roster || /초대|모십|함께해|invit/i.test(card.kick || ''));
+    var cInfo = (Array.isArray(card.info) ? card.info : []).filter(function (r) { return r && r.k && String(r.v || '').trim(); }).slice(0, 8);
+    var inv = !card.sos && !longGal && !!(card.roster || cInfo.length || card.meet || /초대|모십|함께해|invit/i.test(card.kick || ''));
     if (inv) {
       var P = splitInv(bodyAll, card);
       var bodyBox = el('div', 'sk-body sk-inv');
       if (P.greet.length) { var gl = mkList(P.greet, false); gl.classList.add('sk-greet'); Array.prototype.forEach.call(gl.children, function (li) { li.className = 'sk-p'; }); bodyBox.appendChild(gl); }
       var rows = P.info.slice();
       var hasK = function (re) { return rows.some(function (r) { return re.test(r.k); }); };
-      if (!hasK(/일시|날짜|시간/) && /\d/.test(card.subtitle || '')) rows.unshift({ k: '일시', v: String(card.subtitle) });
+      // 11-27 모임 공지: 따로 적은 칸(회비·준비물·특별당부)이 본문에서 읽은 같은 항목을 대신함 — 안 적은 칸은 아예 안 나옴
+      cInfo.forEach(function (c) {
+        var k = String(c.k), vv = String(c.v).trim(), i = -1;
+        rows.forEach(function (r, n) { if (i < 0 && r.k === k) i = n; });
+        if (i >= 0) rows[i] = { k: k, v: vv, sub: '' }; else rows.push({ k: k, v: vv, sub: '' });
+      });
+      if (!hasK(/일시|날짜|시간/) && (card.meet ? String(card.subtitle || '').trim() : /\d/.test(card.subtitle || ''))) rows.unshift({ k: '일시', v: String(card.subtitle) });
       if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '' });
       var info = el('section', 'sk-info'); info.setAttribute('aria-label', '언제 어디서');
       // 11-27 대표님: '📍 언제 · 어디서' 제목은 뺌 — 일시·장소·회비 항목만으로 충분
-      var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔' };
+      var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔', '특별당부': '📢' };
       rows.forEach(function (r) {
         var row = el('div', 'sk-info-r');
         row.appendChild(el('span', 'sk-info-i', IC[r.k] || '•'));

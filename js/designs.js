@@ -262,15 +262,15 @@
       res: { label: '객실 예약', word: '객실' },
       ex: { title: '오션뷰 펜션 싸바', subtitle: '체크인 15:00 · 체크아웃 11:00', name: '펜션 싸바', body: '전 객실 바다 전망\n바비큐 · 개별 스파', copyLabel: '예약 링크', copyValue: 'https://example.com', place: '여수 돌산', menu: '오션 스탠다드 (1박) 120000\n오션 스위트 (1박) 180000\n바비큐 세트 30000', account: 'OO은행 000-0000-0000 펜션 싸바' } },
     // form: 입력 화면에 그 모임에 필요한 칸만 나오게 — hide(감출 칸) · gisu(기수 받기 기본) · kick(맨 위 한마디 고르기) · copy(복사 단추 안내) · roster(명단 안내)
-    { id: 'club', label: '산악회·동호회', emoji: '⛰️', type: 'club', styles: ['ticket', 'poster', 'sticker'],
+    { id: 'club', legacy: true, label: '산악회·동호회', emoji: '⛰️', type: 'club', styles: ['ticket', 'poster', 'sticker'],
       form: { hide: ['find'], gisu: true, kick: ['정기산행', '함께 가요', '모십니다', '없음'],
         roster: ['🙋 참석 명단 받기', '받는 사람이 이름·기수·탑승지·동반 인원을 고르면 "01.홍길동28 교대"처럼 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       ex: { title: '재경순천중·고 동문산악회 제229차 오대산 선재길', subtitle: '11월 14일(토) 오전 7시 출발', name: '산악회 총무', body: '코스: A 선재길 트레킹 / B 전나무숲길·동피골 (편도 약 9km, 3시간 30분)\n차량: 뉴그랜드관광 (월정사 주차장 하차)\n점심: 선재길 식당\n회비: 5만원 (가족 3만원)', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 산악회', place: '당산역 8번 출구', stops: '07:00 당산역 8번 출구\n07:20 교대역 14번 출구' } },
-    { id: 'alumni', label: '동문회·향우회', emoji: '🎓', type: 'club', styles: ['ticket', 'magazine', 'cinema'],
+    { id: 'alumni', legacy: true, label: '동문회·향우회', emoji: '🎓', type: 'club', styles: ['ticket', 'magazine', 'cinema'],
       form: { hide: ['find', 'stops'], gisu: true, kick: ['모십니다', '반가운 얼굴', '함께해요', '없음'],
         roster: ['🙋 참석 명단 받기', '받는 사람이 이름·기수·동반 인원을 적으면 "01.홍길동28"처럼 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       ex: { title: '순천중고 동창회 송년회', subtitle: '12월 20일(토) 저녁 7시', name: '이정민', body: '회비 3만원 (현장 납부 가능)\n2차 노래방 예정', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고동창회', place: '압구정 순천만', phone: '02-541-2125' } },
-    { id: 'party', label: '송년회·신년회', emoji: '🥂', type: 'club', styles: ['ticket', 'glass', 'cinema'], season: 'yearend',
+    { id: 'party', legacy: true, label: '송년회·신년회', emoji: '🥂', type: 'club', styles: ['ticket', 'glass', 'cinema'], season: 'yearend',
       form: { hide: ['find', 'stops', 'gisu'], kick: ['함께해요', '모십니다', '초대합니다', '없음'],
         roster: ['🙋 참석 명단 받기', '받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.'] },
       L: { title: '모임 이름', subtitle: '날짜 · 시간', body: '회비 · 순서 · 드레스코드 (한 줄에 하나씩)' },
@@ -295,7 +295,7 @@
       form: { gal: true, kick: ['이번 주 소식', '이달의 소식', '알려 드려요', '없음'],
         copy: ['🔗 자세히 보기 링크 (선택)', '누르면 적은 링크가 복사돼요. 원문 기사·블로그 주소를 넣어 두세요.', '원문 보기', '링크', 'https://…'] },
       ex: { title: '순천중고 동창회 11월 소식', subtitle: '2026년 11월 · 제12호', name: '순천중고 동창회', body: '■ 송년회: 12월 20일(토) 저녁 7시, 압구정 순천만\n■ 산악회 229차 오대산 선재길 잘 다녀왔어요 (42명)\n■ 회원 소식: 28회 박싸바 동문 장남 결혼\n■ 회비 납부 현황은 총무에게 물어보세요', copyLabel: '원문 보기', copyValue: 'https://sava.kr' } },
-    { id: 'event', label: '행사·초대', emoji: '🎉', type: 'club', styles: ['ticket', 'glass', 'sticker'],
+    { id: 'event', legacy: true, label: '행사·초대', emoji: '🎉', type: 'club', styles: ['ticket', 'glass', 'sticker'],
       form: { hide: ['find', 'stops', 'gisu'], kick: ['초대합니다', '모십니다', "You're Invited", '없음'],
         copy: ['💰 마음 전하실 곳 (선택)', '누르면 은행·계좌번호·이름이 한 번에 복사돼요.', '마음 전하실 곳', '은행 · 계좌번호 · 이름', '예: 국민은행 123456-01-123456 홍길동'],
         roster: ['🙋 참석 여부 받기', '받는 사람이 이름·동반 인원을 적고 참석·불참을 고르면 명단이 만들어져요.'] },
@@ -303,7 +303,14 @@
     { id: 'kid', label: '어린이 안심', emoji: '🐥', type: 'safe', styles: ['safe'], count: 6, offset: 3,
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', phone: '010-0000-0000', body: '집 주소: ○○시 ○○동', sosLabel: '엄마한테 전화', locMsg: '나 지금 여기야!' } },
     { id: 'senior', label: '어르신 안심', emoji: '👵', type: 'safe', styles: ['safe'], count: 6,
-      ex: { title: '어르신 안심 카드', subtitle: '도움이 필요하면 큰 버튼을 누르세요', name: '아들', phone: '010-0000-0000', body: '주소: ○○시 ○○동 ○○아파트\n복용 약: 가방 앞주머니', sosLabel: '아들에게 전화', locMsg: '아버지 지금 여기 계세요' } }
+      ex: { title: '어르신 안심 카드', subtitle: '도움이 필요하면 큰 버튼을 누르세요', name: '아들', phone: '010-0000-0000', body: '주소: ○○시 ○○동 ○○아파트\n복용 약: 가방 앞주머니', sosLabel: '아들에게 전화', locMsg: '아버지 지금 여기 계세요' } },
+    // 11-27 대표님: 신년회·송년회·동문회·산악회·골프 등 모든 모임 = '모임 공지' 카드 하나 (산악회·동문회·송년회·행사는 예전 카드 고치기용으로만 남김 — legacy)
+    //   칸: 제목·인사말·📅 일시·📍 장소·💰 회비·🎒 준비물·📢 특별당부 — 안 적은 칸은 카드에 아예 안 나옴. 기수·탑승지는 '더 넣기'에 접어 둠
+    { id: 'meet', label: '모임 공지', emoji: '🥂', type: 'club', styles: ['ticket', 'glass', 'poster'], gallery: true,
+      form: { hide: ['find'], gisu: false, more: true, kick: ['함께해요', '모십니다', '초대합니다', '정기 모임', '없음'],
+        roster: ['🙋 참석 명단 받기', '받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 바로 이어져 보여요. 기수·탑승지가 필요하면 아래 ‘더 넣기’를 누르세요.'] },
+      L: { title: '모임 이름', subtitle: '📅 일시 (날짜 · 시간)', contact: '모임 연 사람', name: '이름 (회장·총무)', phone: '연락받을 전화번호', body: '그 밖에 알릴 말 (선택 · 한 줄에 하나씩)' },
+      ex: { title: '순천중고 동창회 송년회', subtitle: '12월 20일(토) 저녁 7시', name: '총무 이싸바', greet: '한 해 동안 고마웠습니다.\n올해를 함께 마무리하는 자리에 꼭 오세요.', mFee: '3만원 (현장 납부 가능)', mBring: '', mNote: '2차 노래방 예정이에요', copyLabel: '회비 계좌', copyValue: 'OO은행 000-0000-0000 순천중고동창회', place: '압구정 순천만' } }
   ];
 
   // ---------- 색 계산 (WCAG 대비) ----------
@@ -395,7 +402,7 @@
   var BADGE = { restaurant: '오늘의\n맛', cafe: '오늘의\n디저트', beauty: '이달의\n스타일', fitness: '오늘도\n운동', flower: '오늘의\n꽃', stay: '오늘의\n바다',
     realty: '추천\n매물', toefl: '이번 달\n특강', bigacademy: '신규생\n모집', academy: '시험\n대비', entrance: '합격\n전략', tutor: '첫 수업\n상담', arts: '체험\n수업',
     actor: 'NEW\nFACE', director: 'NEW\nWORK', freelancer: '강의\n문의', insurance: '무료\n상담', newcar: '이달\n혜택', usedcar: '오늘의\n차', sales: '상담\n환영',
-    club: '함께\n가요', alumni: '반가운\n얼굴', party: '함께\n해요', greeting: '고마운\n마음', event: '초대\n합니다', wedding: '결혼\n합니다', funeral: '', news: '이번\n소식', product: '추천\n상품' };
+    meet: '함께\n해요', club: '함께\n가요', alumni: '반가운\n얼굴', party: '함께\n해요', greeting: '고마운\n마음', event: '초대\n합니다', wedding: '결혼\n합니다', funeral: '', news: '이번\n소식', product: '추천\n상품' };
   var BY_ID = {}, BY_INDUSTRY = {}, FAMILY_OF = {};
   INDUSTRIES.forEach(function (ind, n) {
     var list = BY_INDUSTRY[ind.id] = [];
@@ -481,7 +488,7 @@
 
   // 업종 묶음 (11-22 대표님: 성격·종류별로 더 잘게 나눠 알아보기 쉽게) — 홈·만들기 화면에서 묶어서 보여줌
   var GROUPS = [
-    { id: 'meet', label: '모임·행사', emoji: '🥂', ids: ['party', 'club', 'alumni', 'event'] },
+    { id: 'meet', label: '모임', emoji: '🥂', ids: ['meet'] },
     { id: 'life', label: '경조사·인사', emoji: '💌', ids: ['wedding', 'funeral', 'greeting'] },
     { id: 'care', label: '소식·안심', emoji: '🛡️', ids: ['news', 'kid', 'senior'] },
     { id: 'food', label: '음식·카페', emoji: '🍽️', ids: ['restaurant', 'cafe'] },
@@ -493,7 +500,7 @@
   ];
   // ── 1차 공개: 모임·행사·안부 + 음식점만 보여 줌 (사업자 등록 전 안전하게) ──
   // 감독님 폰에서 전부 보기: 주소 뒤에 ?all=1 (한 번이면 기억) / 다시 1차만: ?all=0
-  var OPEN = ['restaurant', 'product', 'actor', 'party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting'];
+  var OPEN = ['restaurant', 'product', 'actor', 'meet', 'party', 'club', 'alumni', 'event', 'wedding', 'funeral', 'news', 'greeting'];
   // 11-21 대표님: 싸바에서 하기로 한 업종은 모두 보여 줌 (1차 공개 제한 풂). 1차만 보려면 ?all=0 (한 번이면 기억) / 되돌리기 ?all=1
   var showAll = true;
   try {

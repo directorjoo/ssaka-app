@@ -1150,6 +1150,7 @@
     <div class="done-head" id="doneHead">🎉 카드가 완성됐어요!</div>
     <p class="done-sub" id="doneSub">이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
     <div class="done-card" id="doneCard" hidden><div class="dc-phone"><iframe id="doneFrame" title="완성 카드 미리보기"></iframe></div><small class="dc-tip">👆 받는 사람에게 이렇게 보여요 · 위아래로 밀어 보세요</small></div>
+    <button type="button" class="pv-pre" id="donePre" hidden>💬 카톡에서 이미 받은 참석자 명단 붙여넣기<small>카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요</small></button>
     <button type="button" class="ghost big dc-fix" id="doneFix">✏️ 수정하기 <small>미리보기에서 바로 고쳐요</small></button>
     <div class="done-sns" id="doneSns" hidden>
       <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
@@ -2107,8 +2108,8 @@
       try {
         var preP = document.querySelector('#rosterBox [data-part="pre"]'), rosFs = document.querySelector('fieldset[data-part="roster"]');
         var preOk = type === 'club' && !destSns() && preP && !preP.hidden && rosFs && !rosFs.hidden;
-        $('pvPreGo').hidden = !preOk;
-        if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; }
+        $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk;
+        if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; var dps = $('donePre').querySelector('small'); if (dps) dps.textContent = $('pvPreN').textContent; }
       } catch (e) {}
       // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
       var url = new URL('../c/', location.href).href + '?d=' + SsakaCodec.encode(r.card);
@@ -2601,6 +2602,7 @@
   }
   $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
+  $('donePre').addEventListener('click', function () { fixNow(); setTimeout(function () { $('pvPreGo').click(); }, 350); });
   $('pvPreGo').addEventListener('click', function () {
     if (!$('rosterOn').checked) { $('rosterOn').checked = true; $('rosterBox').hidden = false; $('rosterOn').dispatchEvent(new Event('change', { bubbles: true })); }
     peOpen('pre');

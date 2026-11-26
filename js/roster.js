@@ -57,7 +57,7 @@
     var myLine = el('p', 'sk-ro-mine'); myLine.hidden = true; box.appendChild(myLine);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
     // 11-27 대표님: 카드엔 '📋 참석자 명단 보기' 탭만 — 누르면 명단만 모두 보이는 화면 (길어도 끝까지)
-    var openL = el('button', 'sk-ro-open', ''); openL.type = 'button'; box.appendChild(openL);
+    var openL = el('button', 'sk-ro-open', '📋 참석자 명단 보기 ›'); openL.type = 'button'; box.appendChild(openL);
     var lsh = el('div', 'sk-sheet sk-ro-sheet'), lbx = el('div', 'sk-sheet-box'), lhd = el('div', 'sk-sheet-head'), lx = el('button', 'sk-x', '닫기'); lx.type = 'button';
     var olT = el('strong', 'sk-ro-ttl', ''); lhd.appendChild(olT); lhd.appendChild(lx); lbx.appendChild(lhd);
     var ol = el('ol', 'sk-ro-list'); lbx.appendChild(ol);
@@ -181,8 +181,9 @@
       ol.style.display = seeAll() ? '' : 'none';
       var lcnt = Y.length + '명' + (people(Y) > Y.length ? ' (동반 포함 ' + people(Y) + '명)' : '');
       olT.textContent = '📋 참석자 ' + lcnt;
-      openL.style.display = seeAll() && (Y.length || N.length || M.length) ? '' : 'none';
+      openL.style.display = seeAll() ? '' : 'none'; // 11-27: 아직 아무도 없어도 탭은 늘 보임
       openL.textContent = '📋 참석자 명단 보기 (' + Y.length + '명) ›';
+      if (!Y.length && !ol.querySelector('.sk-ro-none')) { ol.innerHTML = ''; ol.appendChild(el('li', 'sk-ro-sep sk-ro-none', '아직 신청한 분이 없어요 · 카드에서 [🙋 참석할게요]를 누르면 여기에 번호대로 올라와요')); }
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
     function take(j) { isOwner = !!j.owner || (!live && !!hk); if (j.pub != null && !j.fresh) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림

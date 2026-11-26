@@ -44,7 +44,9 @@ function rewrite(res, og) {
 const IMG = 'https://sava.kr/img/';
 export async function onRequest({ request, env }) {
   const res = await env.ASSETS.fetch(request);
-  const d = new URL(request.url).searchParams.get('d');
+  const sp = new URL(request.url).searchParams, d = sp.get('d');
+  // 11-26 대표님: 메시지 없이 주소만 보내도(sava.kr/eodiya, …/?give=1) 카톡에 주소만 뜨지 말고 '어디야 앱' 말풍선이 뜨게
+  if (!d && !sp.get('s')) return rewrite(res, { title: '📍 어디야', desc: '안부 묻고, 위치로 답장받아요 · 눌러서 열기', image: IMG + 'eodiya-app.png?v=1', w: 1000, h: 600 });
   const c = d && decodeCard(d);
   if (!c) return res;
   if (isBad(c)) return new Response('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>볼 수 없는 메시지 · 싸바</title><body style="font-family:sans-serif;text-align:center;padding:60px 20px;color:#333"><div style="font-size:48px">🍒</div><h2>이 메시지는 볼 수 없어요</h2><p>싸바 이용 규칙에 맞지 않는 내용이에요.</p><p><a href="/app/" style="color:#B3142B;font-weight:800">싸바로 가기</a></p></body>', { status: 451, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });

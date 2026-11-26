@@ -30,6 +30,17 @@
       '.sv-admin{margin-top:6px;padding:4px 12px;border-radius:14px;background:#fff6d9;border:1.5px solid #f5d46b}';
     document.head.appendChild(st);
   }
+  // 카카오 공유 SDK (share.js와 같은 키) — 관리자 '앱 보내기'에서만 불러옴
+  var kakaoP = null;
+  function kakaoSdk() {
+    if (kakaoP) return kakaoP;
+    kakaoP = new Promise(function (ok, no) {
+      if (window.Kakao) return ok(window.Kakao);
+      var sc = document.createElement('script'); sc.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js'; sc.crossOrigin = 'anonymous';
+      sc.onload = function () { ok(window.Kakao); }; sc.onerror = function (e) { kakaoP = null; no(e); }; document.head.appendChild(sc);
+    }).then(function (K) { if (!K.isInitialized()) K.init(window.SsakaKakaoKey || '3a133064daebee3be143bc4a1a940c47'); return K; });
+    return kakaoP;
+  }
   function open() {
     css();
     var bg = el('div', 'sv-set-bg'), box = el('div', 'sv-set'); bg.appendChild(box);
@@ -75,14 +86,27 @@
       if (j && j.admin) {
         admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
         // 11-26 대표님: 사람마다 맞는 앱만 보내기 — 이 링크로 연 사람 폰의 '내 싸바'에 그 앱만 생김
-        admin.appendChild(el('h3', '', '📨 보낼 링크 (누르면 복사)'));
-        [['📍 어디야', 'eodiya'], ['💌 싸바카드', 'make'], ['☀️ 싸바 브리핑', 'today'], ['👑 싸바비앙', 'savabien']].forEach(function (r) {
-          var u = 'https://sava.kr/' + r[1] + '/?give=1', b = el('button', 'sv-row', r[0]); b.type = 'button'; b.appendChild(el('span', '', 'sava.kr/' + r[1] + '/?give=1'));
-          b.addEventListener('click', function () {
-            var ok = function () { b.lastChild.textContent = '복사했어요 ✓ 카톡에 붙여 넣기'; };
+        //   [💬 카톡] = 주소 대신 그 앱 그림 말풍선으로 보냄 · [복사] = 주소만
+        admin.appendChild(el('h3', '', '📨 앱 보내기 (그 앱만 열려요)'));
+        [['📍 어디야', 'eodiya', 'eodiya', '📍 어디야', '안부 묻고, 위치로 답장받아요'], ['💌 싸바카드', 'make', 'card', '💌 싸바카드', '한마디를 엽서로 보내요'], ['☀️ 싸바 브리핑', 'today', 'brief', '☀️ 싸바 브리핑', '뉴스·날씨·혜택을 한 화면에'], ['👑 싸바비앙', 'savabien', 'bien', '👑 싸바비앙', '식품명인의 손맛을 한자리에']].forEach(function (r) {
+          var u = 'https://sava.kr/' + r[1] + '/?give=1';
+          var row = el('div', 'sv-row'); row.style.cssText = 'gap:8px';
+          row.appendChild(el('b', '', r[0])).style.cssText = 'flex:1;font-weight:700';
+          var kk = el('button', '', '💬 카톡'), cp = el('button', '', '복사');
+          kk.type = cp.type = 'button';
+          kk.style.cssText = 'border:0;border-radius:999px;padding:9px 14px;background:#FEE500;color:#3A1D1D;font:inherit;font-size:15px;font-weight:800';
+          cp.style.cssText = 'border:1px solid #E0D6CC;border-radius:999px;padding:9px 12px;background:#fff;color:#6B5A4A;font:inherit;font-size:14px;font-weight:700';
+          kk.addEventListener('click', function () {
+            kakaoSdk().then(function (K) {
+              K.Share.sendDefault({ objectType: 'feed', content: { title: r[3], description: r[4], imageUrl: 'https://sava.kr/img/' + r[2] + '-app.png?v=1', imageWidth: 1000, imageHeight: 600, link: { mobileWebUrl: u, webUrl: u } },
+                buttons: [{ title: r[3].replace(/^\S+\s/, '') + ' 열기', link: { mobileWebUrl: u, webUrl: u } }] });
+            }).catch(function () { window.prompt('카톡을 못 열었어요. 복사해서 보내세요', u); });
+          });
+          cp.addEventListener('click', function () {
+            var ok = function () { cp.textContent = '복사됨 ✓'; };
             try { navigator.clipboard.writeText(u).then(ok, function () { window.prompt('복사해서 보내세요', u); }); } catch (e) { window.prompt('복사해서 보내세요', u); }
           });
-          admin.appendChild(b);
+          row.appendChild(kk); row.appendChild(cp); admin.appendChild(row);
         });
         [['🍒 싸바 전체 홈', '/app/', '네 가지 다 보이는 홈 · 관리자만'], ['🔑 싸바 관리자 화면', '/admin/', '경영·디자인·Claude 요청'], ['💡 의견 관리', '/idea/admin/', '채택·쿠폰'], ['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
           var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); admin.appendChild(a);

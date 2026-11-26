@@ -102,7 +102,21 @@
   // 명단 한 줄 ↔ 글
   function preText(list) { return (list || []).map(function (x) { return x.n + (x.g || '') + (x.fam ? '(가족)' : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + x.s : ''); }).join('\n'); }
   // 참석자 칸: 번호가 이미 붙어 있으면(카톡 이어가기 그대로) 번호를 떼고 다시 매김, 머리말·빈 번호 줄은 건너뜀
-  function preParse(text) { var i = 0; return parse('참석자명단\n' + String(text || '').split('\n').map(function (l) { l = l.trim().replace(/^\d{1,3}\s*[.)]\s*/, ''); return l ? (++i) + '.' + l : ''; }).join('\n')).pre; }
+  // 11-27: 붙여 넣은 명단 — "1. 홍길동" · "1 홍길동" · 번호 없이 한 줄에 한 명 · "홍길동, 김철수" 한 줄에 여러 명 모두.
+  //   번호 없는 머리말 줄(…참석자·명단·이어가기·현황)은 건너뛰고, '불참'·'못 가요' 머리말이 나오면 그 아래는 넣지 않음
+  function preParse(text) {
+    var rows = [], stop = false;
+    String(text || '').split('\n').forEach(function (l) {
+      l = l.trim(); if (!l || stop) return;
+      var numbered = /^\d{1,3}\s*[.)]?\s*[가-힣]/.test(l);
+      if (!numbered && /불참|못\s*가|미참/.test(l) && !/[,，、]/.test(l)) { stop = true; return; }
+      if (!numbered && /참석|참가|명단|이어가기|현황|신청|공지|일시|장소|회비/.test(l)) return;
+      l = l.replace(/^\d{1,3}\s*[.)]?\s*/, '');
+      if (/[,，、/]/.test(l)) l.split(/[,，、/]+/).forEach(function (x) { x = x.trim(); if (x) rows.push(x); });
+      else rows.push(l);
+    });
+    return parse('참석자명단\n' + rows.map(function (l, i) { return (i + 1) + '.' + l; }).join('\n')).pre;
+  }
 
   var api = { parse: parse, preText: preText, preParse: preParse };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

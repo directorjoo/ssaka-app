@@ -39,7 +39,9 @@
     var pre = (R.pre || []).slice(0, 200).map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, fam: x.fam, pre: 1, a: 'y' }; });
     function seeAll() { return isOwner || pub === 2; }
     function merge(srv) {
-      if (!seeAll()) return srv.filter(function (x) { return x.me; }); // 남의 이름은 주최자만 (공개가 아니면 내 것만)
+      // 11-27 대표님: 카톡에서 이미 받은 명단은 단톡방에 벌써 올라온 이름 — 공개 방식과 상관없이 누구에게나 보이고 인원에도 들어감
+      //   (싸바로 새로 신청한 남의 이름만 공개 방식대로: 공개가 아니면 내 것만)
+      if (!seeAll()) srv = srv.filter(function (x) { return x.me; });
       var used = {}, outL = pre.map(function (x) {
         for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; srv[k].pre = 1; return srv[k]; }
         return x;
@@ -92,11 +94,17 @@
 
     function draw() {
       var mine = list.filter(function (x) { return x.me; })[0], Y = yes(), N = list.filter(function (x) { return x.a === 'n'; }), M = list.filter(function (x) { return x.a === 'm'; });
-      var nP = people(Y), cN = Y.length, cNo = N.length, cM = M.length;
-      if (!seeAll()) { cN = st.count + pre.length; nP = st.people + people(pre); cNo = st.no; cM = st.maybe; } // 11-27: 카톡에서 받은 명단도 인원에 넣음
+      var nP = people(Y), cN = Y.length, cNo = N.length, cM = M.length, hid = 0;
+      if (!seeAll()) {
+        // 11-27: 서버 인원(싸바 신청) + 카톡 명단 — 내 이름이 카톡 명단에도 있으면 한 번만
+        var dup = mine && mine.pre ? 1 : 0, dupP = dup ? 1 + (mine.p || 0) : 0;
+        cN = st.count + pre.length - dup; nP = st.people + people(pre) - dupP; cNo = st.no; cM = st.maybe;
+        hid = Math.max(0, cN - Y.length);
+      }
+      var showNames = seeAll() || pre.length > 0;
       box.classList.toggle('host', isOwner);
       box.classList.toggle('pub', pub > 0);
-      var showStat = isOwner || pub > 0;
+      var showStat = isOwner || pub > 0 || pre.length > 0;
       if (isOwner) {
         ttl.textContent = pub === 2 ? '🌐 참석 명단 · 단톡방 모두 보여요' : pub === 1 ? '🔢 참석 명단 · 인원만 공개' : '🔒 참석 명단 · 나만 보여요';
         fine.textContent = (pub === 0 ? '받는 사람에겐 [참석할게요] [못 가요] 단추만 보여요. ' : '고치거나 취소하면 단톡방 싸바 공지에 바로 반영돼요. ') + '이름을 누르면 답을 바꾸거나 지울 수 있어요. 전화번호는 모임 연 분만 봐요.';
@@ -154,7 +162,7 @@
       });
       ol.innerHTML = '';
       var hasPre = Y.some(function (x) { return x.pre; });
-      if (seeAll()) Y.forEach(function (x, i) {
+      if (showNames) Y.forEach(function (x, i) {
         // 11-27: 카톡에서 이미 받은 명단 다음, 싸바로 새로 신청한 분 시작 자리에 작은 구분 줄
         if (hasPre && i === 0 && x.pre) ol.appendChild(el('li', 'sk-ro-sep', '💬 카톡에서 먼저 신청한 분'));
         if (hasPre && i > 0 && Y[i - 1].pre && !x.pre) ol.appendChild(el('li', 'sk-ro-sep', '🍒 싸바로 새로 신청한 분'));
@@ -178,12 +186,13 @@
       btns.style.display = isOwner || (st.closed && !mine) ? 'none' : '';
       join.disabled = !going && !!full; if (join.disabled) join.textContent = '🈵 정원이 다 찼어요';
       if (st.closed && !isOwner && !mine) { cnt.textContent = '응답이 마감됐어요'; }
-      ol.style.display = seeAll() ? '' : 'none';
-      var lcnt = Y.length + '명' + (people(Y) > Y.length ? ' (동반 포함 ' + people(Y) + '명)' : '');
+      if (hid) ol.appendChild(el('li', 'sk-ro-sep', '🔒 싸바로 신청한 다른 ' + hid + '명 · 이름은 모임 연 분만 봐요'));
+      ol.style.display = showNames ? '' : 'none';
+      var lcnt = cN + '명' + (nP > cN ? ' (동반 포함 ' + nP + '명)' : '');
       olT.textContent = '📋 참석자 ' + lcnt;
-      openL.style.display = seeAll() ? '' : 'none'; // 11-27: 아직 아무도 없어도 탭은 늘 보임
-      openL.textContent = '📋 참석자 명단 보기 (' + Y.length + '명) ›';
-      if (!Y.length && !ol.querySelector('.sk-ro-none')) { ol.innerHTML = ''; ol.appendChild(el('li', 'sk-ro-sep sk-ro-none', '아직 신청한 분이 없어요 · 카드에서 [🙋 참석할게요]를 누르면 여기에 번호대로 올라와요')); }
+      openL.style.display = showNames ? '' : 'none'; // 11-27: 아직 아무도 없어도 탭은 늘 보임
+      openL.textContent = '📋 참석자 명단 보기 (' + cN + '명) ›';
+      if (!Y.length && !hid && !ol.querySelector('.sk-ro-none')) { ol.innerHTML = ''; ol.appendChild(el('li', 'sk-ro-sep sk-ro-none', '아직 신청한 분이 없어요 · 카드에서 [🙋 참석할게요]를 누르면 여기에 번호대로 올라와요')); }
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
     function take(j) { isOwner = !!j.owner || (!live && !!hk); if (j.pub != null && !j.fresh) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림

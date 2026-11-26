@@ -306,6 +306,12 @@
       lrow.appendChild(a);
     });
     if (lrow.children.length) wrap.appendChild(lrow);
+    // 📅 네이버 예약 (11-26 대표님: 싸바는 아직 예약·결제가 없으니 네이버 예약으로) — 큰 초록 단추
+    if (lks.nb && /^https:\/\//.test(lks.nb)) {
+      var nb = el(live ? 'a' : 'span', 'sk-lk sk-nbook', '📅 네이버로 예약하기');
+      if (live) { nb.href = lks.nb; nb.target = '_blank'; nb.rel = 'noopener nofollow'; }
+      wrap.insertBefore(nb, lrow.parentNode ? lrow : null);
+    }
 
     var share = el('button', 'sk-share');
     share.type = 'button';

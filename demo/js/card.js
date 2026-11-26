@@ -650,7 +650,7 @@
       f3.appendChild(ip3); pan.appendChild(f3);
       // 🔗 링크: 당근·네이버·카톡 채널·인스타
       pan.appendChild(h('h4', { class: 'sk-edsec', text: '🔗 링크' }));
-      [['dg', '🥕 당근 비즈프로필', 'https://www.daangn.com/…'], ['nv', '🟢 네이버 플레이스·예약', 'https://naver.me/…'], ['kc', '💬 카카오톡 채널', 'https://pf.kakao.com/…'], ['ig', '📷 인스타그램', 'https://instagram.com/…']].forEach(function (x) {
+      [['dg', '🥕 당근 비즈프로필', 'https://www.daangn.com/…'], ['nv', '🟢 네이버 플레이스', 'https://naver.me/…'], ['nb', '📅 네이버 예약', 'https://naver.me/…'], ['kc', '💬 카카오톡 채널', 'https://pf.kakao.com/…'], ['ig', '📷 인스타그램', 'https://instagram.com/…']].forEach(function (x) {
         var f = h('label', { class: 'sk-edfld' }, [h('span', { text: x[1] })]);
         var ip = h('input', { type: 'url', inputmode: 'url', maxlength: '300', placeholder: x[2] }); ip.value = W.links[x[0]] || '';
         ip.addEventListener('change', function () {

@@ -515,6 +515,7 @@
 .sk-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .sk-lk { flex: 1 1 calc(50% - 8px); display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 14px; background: var(--paper, #fff); color: var(--ink, #222); border: 1.5px solid var(--line-ink, rgba(0,0,0,.12)); font-size: 15px; font-weight: 800; text-decoration: none; }
 .sk-lk-dg { color: #E8610B; } .sk-lk-nv { color: #03A94D; }
+.sk-nbook { display: flex; width: 100%; margin: 10px 0 0; min-height: 54px; background: #03C75A; border-color: #03C75A; color: #fff; font-size: 18px; font-weight: 900; box-shadow: 0 3px 0 #02923F; }
 
 /* 복사 칸 (회비 계좌 등): 내용이 다 보이고 누르면 복사 */
 .sk-copybox { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px; padding: 12px 12px 12px 16px; border: 0; border-radius: 18px; background: rgba(255,255,255,.94); color: #1A1A1A; text-align: left; font: inherit; cursor: pointer; box-shadow: 0 6px 18px -10px rgba(0,0,0,.45), inset 0 0 0 1.5px rgba(0,0,0,.06); }

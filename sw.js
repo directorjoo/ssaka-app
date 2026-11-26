@@ -1,5 +1,5 @@
 /* 싸바 서비스워커 — 새 파일을 먼저 받고(network-first), 인터넷이 약하면 저장해 둔 화면을 보여줌 */
-var CACHE = 'sava-v486';
+var CACHE = 'sava-v487';
 var SHELL = ['./', './app/', './eodiya/', './lucky/', './shoot/', './fly/', './pool/', './match/', './rps/', './updown/', './mole/', './chosung/', './eye/', './react/', './omok/', './baduk/', './alkkagi/', './pang/', './grow/', './emo/', './make/', './c/', './my/', './star/', './star/manifest.webmanifest', './eodiya/manifest.webmanifest', './make/manifest.webmanifest', './today/manifest.webmanifest', './savabien/manifest.webmanifest', './css/brand.css', './css/sk.css', './css/sk-world.css',
   './js/codec.js', './js/store.js', './js/designs.js', './js/render.js', './js/roster.js', './js/album.js', './js/dues.js', './js/notice.js', './js/share.js', './js/msgimg.js', './js/install.js', './js/sound.js',
   './img/icon-192.png?v=4', './img/cherry.webp', './img/cherry-dance-anim.svg', './manifest.webmanifest'];

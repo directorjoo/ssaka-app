@@ -60,6 +60,16 @@
     .ft .pic .tag span { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.95); color: #B3132B; font-size: 15px; font-weight: 800; }
     .ft .go { display: inline-flex; align-items: center; gap: 4px; margin: 16px 22px 0; padding: 12px 20px; border-radius: 999px; background: #fff; border: 2px solid #B3132B; color: #B3132B; font-size: 17px; font-weight: 800; text-decoration: none; }
     .ft .go:active { transform: scale(.97); }
+    /* 11-26 구경하기 · 써 보기 탭 (기능마다) */
+    .ft .try { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 18px 0; }
+    .ft .try.one { grid-template-columns: 1fr; }
+    .ft .try .go { justify-content: center; margin: 0; min-height: 54px; padding: 10px 8px; font-size: 18px; }
+    .ft .try .go.see { color: #fff !important; background: #B3132B; border-color: #B3132B; }
+    .ft.mk .try .go.see { background: #17573F; border-color: #17573F; }
+    .ft.td .try .go.see { background: #2E5FA8; border-color: #2E5FA8; }
+    .ft.sv .try .go.see { background: #8A6A1E; border-color: #8A6A1E; }
+    .ft .try-s { margin: 10px 22px 0; font-size: 15px; line-height: 1.5; color: #6B5D52; word-break: keep-all; }
+    .ft .try-s a { white-space: nowrap; color: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
     .ft.eo .eb { color: #B3132B; } .ft.mk .eb { color: #17573F; } .ft.mk .go { border-color: #17573F; color: #17573F; }
     .ft.td .eb { color: #2E5FA8; } .ft.td .go { border-color: #2E5FA8; color: #2E5FA8; }
     .ft.sv .eb { color: #8A6A1E; } .ft.sv .go { border-color: #8A6A1E; color: #6E4C1E; }
@@ -214,7 +224,8 @@
       <p>싸바?로 안부를 묻고, 여기야!로 내 위치를 보내고, 놀자!로 친구를 불러요. 받은 사람은 단추 하나로 답장해요.</p>
     </div>
     <a class="pic" href="eodiya/#ask" style="background-image:url(img/eodiya-cherry12.jpg)" aria-label="어디야 열기"><span class="tag"><span>싸바?</span><span>여기야!</span><span>놀자!</span></span></a>
-    <a class="go" href="eodiya/#ask">어디야 보내 보기 ›</a>
+    <div class="try"><a class="go see" data-ex="eodiya" href="eodiya/#ask">👀 구경하기</a><a class="go" href="eodiya/#ask">✍️ 써 보기</a></div>
+    <p class="try-s">구경하기: 어디야를 받으면 이렇게 떠요 · 가입 없이</p>
   </section>
 
   <section class="ft mk">
@@ -223,8 +234,9 @@
       <h2>우리 모임 소식도,<br>우리 가게 자랑도</h2>
       <p>모임공지 · 초대장 · 가게홍보 · 프로필 · 인사. 사진 넣고 글만 쓰면 카톡 · 인스타 · 블로그에 올릴 카드가 나와요.</p>
     </div>
-    <a class="pic" href="app/#alim" style="background-image:url(img/ex/party-cheers.jpg)" aria-label="싸바카드 열기"><span class="tag"><span>가게홍보</span><span>모임공지</span><span>초대장</span></span></a>
-    <a class="go" href="app/#alim">1분에 만들기 ›</a>
+    <a class="pic" href="make/" style="background-image:url(img/ex/party-cheers.jpg)" aria-label="싸바카드 열기"><span class="tag"><span>가게홍보</span><span>모임공지</span><span>초대장</span></span></a>
+    <div class="try"><a class="go see" data-ex="shop" href="make/">👀 구경하기</a><a class="go" href="make/">✍️ 써 보기</a></div>
+    <p class="try-s">예시 카드: 가게 홍보(압구정 순천만) · <a data-ex="club" href="make/">⛰️ 모임 공지도 보기</a></p>
   </section>
 
   <section class="ft td">
@@ -234,7 +246,8 @@
       <p>뉴스 요약 · 날씨 · 주식·환율 · 정부 혜택 · 라디오를 한 화면에. 매일 아침 💌 오늘도 싸바?로 새로 모아 드려요.</p>
     </div>
     <a class="pic" href="today/" style="background-image:url(img/today-tower.jpg)" aria-label="싸바 브리핑 열기"><span class="tag"><span>뉴스</span><span>날씨</span><span>혜택</span></span></a>
-    <a class="go" href="today/">싸바 브리핑 보기 ›</a>
+    <div class="try one"><a class="go see" href="today/">👀 구경하기</a></div>
+    <p class="try-s">오늘 아침 소식이 그대로 떠요 · 가입 없이</p>
   </section>
 
   <section class="ft sv">
@@ -244,7 +257,7 @@
       <p>전국 장인 · 명인이 만든 명품만 모은 명품관이에요. 지금 입점을 준비하고 있어요.</p>
     </div>
     <a class="pic" href="savabien/" style="background-image:url(img/savabien-dome.jpg)" aria-label="싸바비앙 열기"></a>
-    <a class="go" href="savabien/">싸바비앙 구경하기 ›</a>
+    <div class="try one"><a class="go see" href="savabien/">👀 구경하기</a></div>
   </section>
 
   <section class="easy">
@@ -320,11 +333,31 @@ document.getElementById('share').addEventListener('click', function () {
 // 자주 묻는 질문: 하나 열면 다른 건 접힘
 document.querySelectorAll('.faq details').forEach(function(d){d.addEventListener('toggle',function(){if(!d.open)return;document.querySelectorAll('.faq details').forEach(function(o){if(o!==d)o.open=false;});});});
 </script>
+<script src="js/codec.js"></script>
+<script>
+// 11-26 싸바이야기 '👀 구경하기' — 받는 사람이 보는 화면을 예시로 (로그인 없이)
+(function () {
+  if (!window.SsakaCodec) return;
+  var E = SsakaCodec.encode;
+  var EX = {
+    eodiya: '/eodiya/?d=' + E({ m: 'ask', from: '싸바', q: ['싸바? 잘 지내?'], k: 'hi', t: Date.now() }),
+    shop: '/c/?d=' + E({ template: 'shop', theme: 'light', title: '압구정 순천만 — 오늘의 메뉴', subtitle: '11:30 – 22:00 (15–17시 쉬는 시간) · 일·공휴일 휴무',
+      body: ['인기: 짱뚱어탕 · 홍어삼합 · 생선찜', '점심: 짱뚱어탕 15,000원 · 굴국밥 · 매생이 굴떡국 12,000원', '점심 생선구이: 고등어 · 갈치 13,000원', '배달은 하지 않아요'],
+      contact: { name: '압구정 순천만', phone: '02-541-2125' }, place: { name: '압구정 순천만' },
+      copy: { label: '주소 복사', value: '서울 강남구 신사동 609-1 지하1층' }, buttons: ['call', 'map', 'save', 'copy'] }),
+    club: '/c/?d=' + E({ template: 'club', theme: 'light', kick: '함께 가요', title: '재경순천중·고 동문산악회 12월 송년 산행', subtitle: '12월 14일(일) 오전 9시 (예시)',
+      body: ['코스: 우이역 → 백운대 (약 5시간)', '준비물: 도시락, 물, 아이젠', '회비: 2만원 (뒤풀이 포함)'],
+      contact: { name: '총무 김싸바', phone: '010-0000-0000' }, place: { name: '북한산 우이역 2번 출구' },
+      copy: { label: '회비 계좌', value: 'OO은행 000-0000-0000 (예시)' }, buttons: ['call', 'map', 'copy'] })
+  };
+  document.querySelectorAll('[data-ex]').forEach(function (a) { var u = EX[a.dataset.ex]; if (u) a.href = u; });
+})();
+</script>
 <script src="/js/share.js?v=3" defer></script>
 <script src="js/install.js?v=3"></script>
 <script>
 // 앱 안에서 '싸바가 뭐지?'로 왔으면(?story=1) 맨 위 왼쪽에 '← 이전'
-(function(){if(!/[?&]story=1/.test(location.search))return;document.documentElement.classList.add("story-mode");document.getElementById("storyBack").addEventListener("click",function(){if(history.length>1)history.back();else location.href="app/";});})();
+(function(){if(!/[?&]story=1/.test(location.search))return;document.documentElement.classList.add("story-mode");document.getElementById("storyBack").addEventListener("click",function(){if(history.length>1)history.back();else location.href="/my/";});})();
 </script>
 </body>
 </html>

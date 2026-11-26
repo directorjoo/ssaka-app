@@ -104,6 +104,14 @@
     .repick h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 0 0 10px; font-size: 19px; font-weight: 900; letter-spacing: -.03em; }
     .repick h2 small { font-size: 14.5px; font-weight: 700; color: #8a7f78; }
     html.bigtxt .pick span { font-size: 15px; }
+    /* 11-26 대표님: 바꾸기 누르면 바로 아래에 지역(내 위치·서울…) 칸 — 예전엔 업종 목록 밑에 묻혀 안 보였음 */
+    .area { margin: 8px 0 0; padding: 10px; border-radius: 16px; background: #fff; border: 2px solid #B3132B; box-shadow: 0 4px 14px rgba(179,19,43,.12); }
+    .area h3 { margin: 0 0 8px; font-size: 16.5px; font-weight: 900; color: #3a2a22; }
+    .area .cities { margin: 0; padding: 0; border: 0; }
+    .me-loc { display: block; width: 100%; min-height: 46px; margin: 0 0 6px; border-radius: 12px; border: 1.5px solid #B3132B; background: #FFF1F3; color: #B3132B; font: inherit; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .me-loc[aria-pressed="true"] { background: #B3132B; color: #fff; }
+    .area .more { display: block; width: 100%; margin: 8px 0 0; min-height: 42px; border: 0; border-radius: 12px; background: #F3ECE6; color: #5a4a42; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .rcv .area { display: none !important; }
     /* 11-23 대표님: 누구에게 아래 모든 업종 — 업종 표준 색(묶음 머리 띠·연한 바탕·테두리, docs/STATUS.md 2장) */
     .indh { margin: 14px 2px 6px; font-size: 16px; font-weight: 900; color: #3a2a22; }
     .indh small { margin-left: 6px; font-size: 13.5px; font-weight: 700; color: #8a7f78; }
@@ -126,6 +134,7 @@
   <h1>💌 오늘도 싸바?</h1>
   <p class="sub">오늘 바로 쓸 수 있는 것만. 단톡방에 한 번 눌러 보내세요.</p>
   <div class="pick" id="pick"><span id="pickT"></span><button type="button" id="pickC">🔄 바꾸기</button><button type="button" class="k" id="send2">💬 보내기</button></div>
+  <div class="area" id="area" hidden><h3>📍 어느 지역 날씨·소식으로 보낼까요?</h3><div class="cities" id="cities2"></div><button type="button" class="more" id="moreWho">👥 받는 분·업종도 바꾸기 ↓</button></div>
   <div class="sv" id="svTop" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a></div>
   <article class="paper writing" id="paper"><div class="msg">카드를 만드는 중이에요…</div></article>
   <div class="sv" id="svBot" hidden><a class="hm" href="/">🏠 싸바 홈</a><a class="wh" href="/?story=1">🍒 싸바가 뭐지?</a><a class="mk" id="svMake" href="/make/">✨ 싸바에서 내 카드 만들어 보세요</a></div>
@@ -194,15 +203,42 @@
     $('cityN').textContent = 2 - off; $('sendN').hidden = true;
     var wh = WHO.filter(function (w) { return w[0] === k; })[0];
     $('pickT').textContent = wh[1] + (k === 'actor' ? '' : ' · ' + city) + ' 소식';
+    cityGrid(c, false); cityGrid($('cities2'), true);
+  }
+  // 지역 칸: 📍 내 위치 + 17개 시·도 (위 바꾸기 칸과 아래 다른 소식 고르기 칸에 똑같이)
+  function cityGrid(c, top) {
+    c.innerHTML = '';
+    var me = document.createElement('button'); me.type = 'button'; me.className = 'me-loc';
+    me.textContent = myLoc ? '📍 내 위치 (' + myLoc + ')' + (myLoc === city ? ' ✓' : '') : '📍 지금 내 위치로';
+    me.setAttribute('aria-pressed', myLoc && myLoc === city ? 'true' : 'false');
+    me.addEventListener('click', function () { locate(me, top); });
+    c.appendChild(me);
     GROUPS.forEach(function (g) {
       var row = document.createElement('div'); row.className = 'row';
       var lb = document.createElement('span'); lb.textContent = g[0]; row.appendChild(lb);
-      g[1].forEach(function (n) { var b = document.createElement('button'); b.type = 'button'; b.textContent = n; b.setAttribute('aria-pressed', n === city ? 'true' : 'false'); b.addEventListener('click', function () { city = n; go(); toTop(); }); row.appendChild(b); });
+      g[1].forEach(function (n) { var b = document.createElement('button'); b.type = 'button'; b.textContent = n; b.setAttribute('aria-pressed', n === city ? 'true' : 'false'); b.addEventListener('click', function () { city = n; if (top) $('area').hidden = true; go(); toTop(); }); row.appendChild(b); });
       c.appendChild(row);
     });
   }
+  // 내 위치 → 가장 가까운 시·도 (키 없이, 시·도청 자리 기준)
+  var SXY = { 서울: [37.5665, 126.978], 경기: [37.275, 127.009], 인천: [37.4563, 126.7052], 강원: [37.8854, 127.7298], 대전: [36.3504, 127.3845], 세종: [36.48, 127.289], 충북: [36.6357, 127.4917], 충남: [36.6588, 126.6728], 광주: [35.1595, 126.8526], 전북: [35.8203, 127.1088], 전남: [34.8161, 126.4629], 제주: [33.4996, 126.5312], 부산: [35.1796, 129.0756], 대구: [35.8714, 128.6014], 울산: [35.5384, 129.3114], 경북: [36.576, 128.5056], 경남: [35.2383, 128.6924] };
+  var myLoc = null; try { myLoc = localStorage.getItem('sava-letter-me'); } catch (e) {}
+  function locate(btn, top) {
+    if (!navigator.geolocation) { btn.textContent = '이 폰은 위치를 못 써요 · 아래에서 골라 주세요'; return; }
+    btn.textContent = '📍 위치 찾는 중…';
+    navigator.geolocation.getCurrentPosition(function (p) {
+      var la = p.coords.latitude, lo = p.coords.longitude, best = null, bd = 1e9;
+      Object.keys(SXY).forEach(function (n) { var d = Math.pow(SXY[n][0] - la, 2) + Math.pow((SXY[n][1] - lo) * .8, 2); if (d < bd) { bd = d; best = n; } });
+      myLoc = best; city = best; try { localStorage.setItem('sava-letter-me', best); } catch (e) {}
+      if (top) $('area').hidden = true; go(); toTop();
+    }, function () { btn.textContent = '위치를 쓸 수 없어요 · 아래에서 골라 주세요'; }, { timeout: 8000, maximumAge: 600000 });
+  }
   function toTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  $('pickC').addEventListener('click', function () { $('repick').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  $('pickC').addEventListener('click', function () {
+    if (k === 'actor') { $('repick').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    var a = $('area'); a.hidden = !a.hidden;
+  });
+  $('moreWho').addEventListener('click', function () { $('area').hidden = true; $('repick').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   $('send2').addEventListener('click', function () { $('send').click(); });
   var moreDone = false;
   // 요약을 한 문장씩 줄로 (4줄)

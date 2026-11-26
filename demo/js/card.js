@@ -194,6 +194,25 @@
     if (card.dues && window.SsakaDues) { try { SsakaDues.mount(card, root, toast); } catch (e) {} }
     // 모임 사진첩 (11-23): 모임 뒤 단톡방 사람들이 사진을 한 곳에
     if (card.album && window.SsakaAlbum) { try { SsakaAlbum.mount(card, root, toast); } catch (e) {} }
+    // 11-27 대표님: 수정하기에서 칸마다 ✕ 빼기 (만들기 화면 미리보기 안에서만)
+    try {
+      var PEx = window.self !== window.top && window.parent.SavaPreviewEdit;
+      if (PEx) {
+        var XS = [['.sk-album', 'album', '사진첩'], ['.sk-dues', 'dues', '회비'], ['.sk-roster', 'roster', '참석 명단'], ['.sk-greet', 'greet', '인사말'], ['.sk-info', 'info', '일시·장소'], ['.sk-gal', 'gal', '사진들'], ['.sk-sched', 'sched', '일정'], ['.sk-more-info', 'more', '자세한 안내'], ['.sk-links', 'links', '바로가기 링크'], ['.sk-cap', 'cap', '사진 설명'], ['.sk-video', 'video', '영상'], ['.sk-copybox', 'copy', '복사 칸']];
+        var addX = function () {
+          XS.forEach(function (x) {
+            Array.prototype.forEach.call(root.querySelectorAll(x[0]), function (n) {
+              if (n.querySelector(':scope > .sk-x')) return;
+              var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-x'; b.textContent = '✕ ' + x[2] + ' 빼기';
+              b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); PEx('hide', -1, x[1], ''); }, true);
+              n.classList.add('sk-xable'); n.appendChild(b);
+            });
+          });
+        };
+        addX();
+        var xT = null; new MutationObserver(function () { clearTimeout(xT); xT = setTimeout(addX, 60); }).observe(root, { childList: true, subtree: true });
+      }
+    } catch (e) {}
     // ---------- 손님 반응 숫자: 열람·버튼 '횟수'만 보냄 (만든 사람 본인 화면은 빼고) ----------
     var statKey = (function () { var q = new URLSearchParams(location.search); return q.get('s') ? { s: q.get('s') } : (q.get('d') || window.__ssakaD) ? { d: q.get('d') || window.__ssakaD } : null; })();
     function isMine() {

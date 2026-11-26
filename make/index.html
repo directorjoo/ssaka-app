@@ -24,7 +24,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=103">
+  <link rel="stylesheet" href="../css/sk.css?v=104">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -1103,11 +1103,13 @@
     </section>
   </div>
 </div>
+<input id="hideList" type="hidden">
 <div class="pe-bar" id="peBar" hidden role="toolbar" aria-label="수정 도구">
   <button type="button" data-pe="photo">📷 사진</button>
   <button type="button" data-pe="zoom" id="peZoomBtn">🔍 크기</button>
   <button type="button" data-pe="fs">🔠 글씨</button>
   <button type="button" data-pe="pre" id="pePreBtn">🙋 참석자</button>
+  <button type="button" id="peUnhide" hidden>↺ 되살리기</button>
   <button type="button" class="done" id="peDone">✓ 끝</button>
 </div>
 <div class="pe-sheet" id="peSheet" hidden><div class="pe-h"><b id="peSheetT"></b><button type="button" id="peSheetOk">✓ 됐어요</button></div><div id="peSheetBody"></div></div>
@@ -1261,7 +1263,7 @@
 <script src="../js/mkask.js?v=2"></script>
 <script src="../js/indfind.js?v=2"></script>
 <script src="../js/notice.js?v=5"></script>
-<script src="../js/render.js?v=91"></script>
+<script src="../js/render.js?v=92"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1299,7 +1301,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'hideList', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -1992,6 +1994,7 @@
       subtitle: g('subtitle'),
       greet: type === 'club' ? (g('greet').split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 20)) : undefined,
       image: g('image'),
+      hide: v('hideList') ? $('hideList').value.split(',').filter(Boolean) : undefined,
       video: g('video'),
       body: g('body').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
       contact: {
@@ -2373,6 +2376,17 @@
   // ---------- 미리보기에서 글자 눌러 바로 고치기 (c/ 미리보기가 불러 줌) ----------
   window.SavaPreviewEdit = function (key, idx, part, text) {
     remember();
+    if (key === 'hide') {
+      // 11-27: 미리보기 칸의 ✕ 빼기 — 사진첩·회비·참석 명단은 켜기 칸을 끄고, 나머지는 hideList에
+      var off = function (id, box) { $(id).checked = false; if (box) $(box).hidden = true; $(id).dispatchEvent(new Event('change', { bubbles: true })); };
+      if (part === 'album') off('albumOn');
+      else if (part === 'dues') off('duesOn', 'duesBox');
+      else if (part === 'roster') off('rosterOn', 'rosterBox');
+      else { var hl = v('hideList') ? $('hideList').value.split(',') : []; if (hl.indexOf(part) < 0) hl.push(part); $('hideList').value = hl.join(','); }
+      keepPv = true; update(); peBarShow($('goEdit').classList.contains('on'));
+      toast('✕ 뺐어요 · 아래 ↺ 되살리기로 다시 넣을 수 있어요');
+      return;
+    }
     if (key === 'kick') {
       $('kick').value = text.slice(0, 20) || '없음';
     } else if (key === 'title' || key === 'subtitle') {
@@ -2550,6 +2564,7 @@
     $('peBar').hidden = !on || !!destSns();
     var pre = PE_SRC.pre();
     $('peZoomBtn').hidden = !$('image').value;
+    $('peUnhide').hidden = !v('hideList');
     $('pePreBtn').hidden = !(type === 'club' && $('rosterOn').checked && pre && !pre.closest('[hidden]'));
   }
   function peOpen(k) {
@@ -2569,6 +2584,7 @@
     $('peSheet').hidden = true;
     if ($('goEdit').classList.contains('on')) $('peBar').hidden = !!destSns();
   }
+  $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = true; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
   $('peSheetOk').addEventListener('click', function () { peClose(); update(); toast('✏️ 고쳤어요'); });
   $('peDone').addEventListener('click', function () { $('goEdit').click(); });
@@ -3500,7 +3516,7 @@
     FIELDS.forEach(function (f) { if ($(f) && ['resvMin', 'resvRate', 'sound', 'season'].indexOf(f) < 0) $(f).value = ''; });
     var ci = c.contact || {};
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
-    set('title', c.title); set('subtitle', c.subtitle); set('greet', (c.greet || []).join('\n')); set('image', c.image); set('video', c.video);
+    set('title', c.title); set('subtitle', c.subtitle); set('greet', (c.greet || []).join('\n')); set('hideList', (c.hide || []).join(',')); set('image', c.image); set('video', c.video);
     IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
     set('galUrls', (c.gallery || []).join('\n')); set('galCaps', (c.caps || []).join('\n')); set('cap', c.cap || ''); set('fsz', Array.isArray(c.fs) ? c.fs.join(',') : ''); set('season', c.season || ''); set('motion', c.motion || ''); set('clip', c.clip || ''); if (window.__clipUi) __clipUi();
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);

@@ -125,6 +125,9 @@
     return { greet: (card.greet || []).concat(g2), info: info, rest: rest };
   }
 
+  // 뺄 수 있는 칸 (수정하기에서 ✕) — 참석 명단·회비·사진첩은 만들기 칸의 켜기/끄기로
+  var HIDE = { greet: '.sk-greet', info: '.sk-info', gal: '.sk-gal', sched: '.sk-sched', more: '.sk-more-info', links: '.sk-links, .sk-nbook', cap: '.sk-cap', video: '.sk-video', copy: '.sk-copybox', acts: '.sk-actions', sms: '.sk-sms, .sk-more', make: '.sk-make' };
+
   function build(card, design, ctx) {
     var live = !!ctx;
     var c = card.contact || {};
@@ -308,7 +311,7 @@
       if (!hasK(/일시|날짜|시간/) && /\d/.test(card.subtitle || '')) rows.unshift({ k: '일시', v: String(card.subtitle) });
       if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '' });
       var info = el('section', 'sk-info'); info.setAttribute('aria-label', '언제 어디서');
-      info.appendChild(el('h3', 'sk-info-h', '📍 언제 · 어디서'));
+      // 11-27 대표님: '📍 언제 · 어디서' 제목은 뺌 — 일시·장소·회비 항목만으로 충분
       var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔' };
       rows.forEach(function (r) {
         var row = el('div', 'sk-info-r');
@@ -452,6 +455,11 @@
     }
 
     root.appendChild(wrap);
+    // 11-27 대표님: 만든 사람이 빼고 싶은 칸은 뺄 수 있게 — card.hide = ['greet','info','gal',…]
+    (Array.isArray(card.hide) ? card.hide : []).forEach(function (k) {
+      var sel = HIDE[k]; if (!sel) return;
+      Array.prototype.forEach.call(root.querySelectorAll(sel), function (n) { n.remove(); });
+    });
     return root;
   }
 
@@ -485,5 +493,5 @@
     setTimeout(function () { x.focus(); }, 30);
   }
 
-  global.SsakaRender = { splitInv: splitInv,  build: build };
+  global.SsakaRender = { HIDE: HIDE, splitInv: splitInv,  build: build };
 })(typeof window !== 'undefined' ? window : globalThis);

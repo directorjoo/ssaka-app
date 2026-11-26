@@ -13,7 +13,9 @@ export async function onRequestGet({ request, env }) {
   const kkey = env.KAKAO_REST_KEY && String(env.KAKAO_REST_KEY).trim();
   const out = []; let from = '';
   if (nid && nsec) {
-    const r = await fetch('https://openapi.naver.com/v1/search/local.json?display=5&sort=random&query=' + encodeURIComponent(q), { headers: { 'X-Naver-Client-Id': nid, 'X-Naver-Client-Secret': nsec } }).catch(() => null);
+    // 새 키(NAVER API HUB, 2026-07-31부터 신규 발급은 여기만) 먼저 → 안 되면 예전 개발자센터 주소
+    let r = await fetch('https://naverapihub.apigw.ntruss.com/search/v1/local?display=5&sort=random&query=' + encodeURIComponent(q), { headers: { 'X-NCP-APIGW-API-KEY-ID': nid, 'X-NCP-APIGW-API-KEY': nsec } }).catch(() => null);
+    if (!r || !r.ok) r = await fetch('https://openapi.naver.com/v1/search/local.json?display=5&sort=random&query=' + encodeURIComponent(q), { headers: { 'X-Naver-Client-Id': nid, 'X-Naver-Client-Secret': nsec } }).catch(() => null);
     if (r && r.ok) {
       const j = await r.json().catch(() => ({}));
       (j.items || []).forEach(it => {

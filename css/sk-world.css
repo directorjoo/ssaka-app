@@ -572,3 +572,11 @@
 @keyframes skTreeSway { 0%, 100% { transform: rotate(-.8deg); } 50% { transform: rotate(.8deg); } }
 @media (prefers-reduced-motion: reduce) { .sk[data-style="tree"] .sk-titles::before { animation: none; } }
 
+
+/* =========================================================
+   11-27 대표님: 대표 사진은 바탕색과 분리 — 어떤 디자인이든 사진을 바탕색으로 흐리게 덮지 않음
+   (사진 아래가 바탕색으로 녹아드는 가림막·마스크·색 거르개를 끄고, 제목은 사진 아래로, 나무 그림 등 꾸밈도 사진 위로 안 올라옴)
+   ========================================================= */
+.sk .sk-photo:not(.sk-nophoto):not(.sk-phhold) { z-index: 2; -webkit-mask-image: none !important; mask-image: none !important; filter: none !important; }
+.sk .sk-photo:not(.sk-nophoto):not(.sk-phhold)::after { display: none !important; }
+.sk[data-style] .sk-photo:not(.sk-nophoto):not(.sk-phhold) + .sk-titles { margin-top: 18px !important; }

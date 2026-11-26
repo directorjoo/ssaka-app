@@ -13,6 +13,9 @@
 .sched-add{display:flex;gap:8px;flex-wrap:wrap}.sched-add .mini{flex:1;min-height:44px;font-weight:800}
   .prebox { background: #FFF8E1; border: 2px solid #F2C94C; border-radius: 14px; padding: 12px; margin: 4px 0 12px; }
   .prebox label { font-weight: 800; }
+  .pv-pre { display: block; width: 100%; margin: 12px 0 4px; padding: 14px 12px; border: 2px solid #F2C94C; border-radius: 16px; background: #FFF8E1; color: #1A1A1A; font: inherit; font-size: 17px; font-weight: 900; text-align: center; cursor: pointer; }
+  .pv-pre small { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; opacity: .8; }
+  .pv-pre[hidden] { display: none; }
 </style>
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>싸바 만들기</title>
@@ -1096,6 +1099,7 @@
       <div class="pvdest" id="pvDest" hidden></div>
       <div class="pv-up">👆 <b><span id="pvUpName">가게 정보</span>·사진·동영상 넣는 칸은 이 미리보기 위에 있어요.</b> 화면을 위로 올려 차례로 입력하세요. 다 쓰고 ✅ 완성을 누르면 다른 디자인과 비교해 볼 수 있어요.<button type="button" id="pvUpGo">✏️ 입력하러 가기</button></div>
       <div class="phone"><iframe id="frame" title="카드 미리보기"></iframe></div>
+      <button type="button" class="pv-pre" id="pvPreGo" hidden>💬 카톡에서 이미 받은 참석자 명단 붙여넣기<small id="pvPreN">카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요</small></button>
       <div class="snspv" id="snsPv" hidden><img id="snsPvImg" alt="올릴 사진 미리보기"><span class="snsld" id="snsPvLd"></span></div>
       <div class="done">
         <button type="button" class="kakao" id="send">💬 카톡으로 보내기</button>
@@ -2099,6 +2103,13 @@
     clearTimeout(timer);
     timer = setTimeout(function () {
       var r = buildCard();
+      // 11-27: 미리보기 바로 아래 '카톡에서 이미 받은 참석자 붙여넣기' 단추 — 모임 카드(참석 명단 칸이 있는 것)만
+      try {
+        var preP = document.querySelector('#rosterBox [data-part="pre"]'), rosFs = document.querySelector('fieldset[data-part="roster"]');
+        var preOk = type === 'club' && !destSns() && preP && !preP.hidden && rosFs && !rosFs.hidden;
+        $('pvPreGo').hidden = !preOk;
+        if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; }
+      } catch (e) {}
       // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
       var url = new URL('../c/', location.href).href + '?d=' + SsakaCodec.encode(r.card);
       if (url !== lastSrc && keepPv) { lastSrc = url; keepPv = false; } // 미리보기에서 직접 고친 건 이미 화면에 있음 → 새로 안 불러옴
@@ -2568,10 +2579,11 @@
     var pre = PE_SRC.pre();
     $('peZoomBtn').hidden = !$('image').value;
     $('peUnhide').hidden = !v('hideList');
-    $('pePreBtn').hidden = !(type === 'club' && $('rosterOn').checked && pre && !pre.closest('[hidden]'));
+    $('pePreBtn').hidden = !(type === 'club' && pre && !pre.hidden);
   }
   function peOpen(k) {
     peClose();
+    if (k === 'pre' && !$('rosterOn').checked) { $('rosterOn').checked = true; $('rosterBox').hidden = false; $('rosterOn').dispatchEvent(new Event('change', { bubbles: true })); }
     var n = PE_SRC[k] && PE_SRC[k]();
     if (!n) { toast(k === 'zoom' ? '먼저 📷 사진을 넣어 주세요' : '이 카드에는 없는 칸이에요'); return; }
     peHome = document.createComment('pe'); n.parentNode.insertBefore(peHome, n); peNode = n;
@@ -2589,6 +2601,10 @@
   }
   $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
+  $('pvPreGo').addEventListener('click', function () {
+    if (!$('rosterOn').checked) { $('rosterOn').checked = true; $('rosterBox').hidden = false; $('rosterOn').dispatchEvent(new Event('change', { bubbles: true })); }
+    peOpen('pre');
+  });
   $('peSheetOk').addEventListener('click', function () { peClose(); update(); toast('✏️ 고쳤어요'); });
   $('peDone').addEventListener('click', function () { $('goEdit').click(); });
   // 제목·한 줄 소개 칸: 줄바꿈 넣으면 칸 높이가 따라 늘어남

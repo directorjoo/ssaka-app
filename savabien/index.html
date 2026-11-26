@@ -9,6 +9,11 @@
   <meta property="og:title" content="👑 싸바비앙 — 명품 콜렉션">
   <meta property="og:description" content="나라가 지정한 대한민국식품명인 10인을 먼저 소개합니다. 곧 카톡 한 번으로 선물하세요.">
   <link rel="icon" href="../img/favicon.png?v=4">
+  <link rel="manifest" href="/savabien/manifest.webmanifest?v=1">
+  <link rel="apple-touch-icon" href="/img/bien-apple-touch.png?v=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="싸바비앙">
+  <meta name="application-name" content="싸바비앙">
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; color: #3B2A12; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; word-break: keep-all; }
@@ -78,6 +83,7 @@
 </header>
 <div class="lead"><p>나라가 인정한 명인의 손맛을 한자리에.<br>먼저 대한민국식품명인 열 분을 소개합니다.</p></div>
 <main class="w">
+  <div id="appInst"></div><style>#appInst:empty{display:none}#appInst .si-chip{margin:0 0 16px;border-color:#E7CF8F;background:#FFFCF4}</style>
   <div class="sec"><b>명인 열 분의 작품</b><span>농림축산식품부 지정</span></div>
   <div class="grid">
     <a class="mt" href="https://www.maesil.co.kr" target="_blank" rel="noopener" aria-label="홍쌍리 명인 매실농축액 — 명인 농원 누리집">
@@ -198,6 +204,17 @@
     명인 제품이 궁금하면 <a href="https://kfgm.co.kr" target="_blank" rel="noopener">대한민국식품명인 누리집</a>에서 보실 수 있어요.
   </div>
 </main>
-<script src="/js/home.js?v=16" defer></script>
+<script src="/js/launch.js?v=3"></script>
+<script src="/js/install.js?v=4" data-name="싸바비앙" data-mark="👑" data-icon="/img/bien-icon-192.png?v=1" data-url="sava.kr/savabien"></script>
+<script>
+  // 11-26 단독 앱: 홈 화면 앱으로 열리면 body.is-app, 아니면 '👑 싸바비앙 앱으로 쓰기' 띠 (조용한 공개 중엔 install.js가 알아서 숨김)
+  (function () {
+    var I = window.SsakaInstall; if (!I) return;
+    if (I.standalone()) { document.body.classList.add('is-app'); return; }
+    var c = I.chip(document.getElementById('appInst'), '👑 싸바비앙 앱으로 쓰기');
+    if (c) c.querySelector('span').textContent = '홈 화면에 아이콘 하나 · 앱스토어 없이 3초';
+  })();
+</script>
+<script src="/js/home.js?v=17" defer data-home="/savabien/"></script>
 </body>
 </html>

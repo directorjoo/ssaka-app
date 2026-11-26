@@ -3,6 +3,7 @@
 #   어디야  : 체리 빨강 바탕 + 흰 위치핀(안에 체리) + 작은 말풍선 '?'
 #   싸바카드: 미색 바탕 + 살짝 기운 옛날 엽서(체리 우표·소인·글줄)
 #   브리핑  : 황금 바탕(황금체리나무 색) + 흰 신문 + 떠오르는 해
+#   싸바비앙: 체리 진홍 바탕 + 금빛 왕관 + 작은 체리 (11-26)
 import math, sys
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -155,7 +156,33 @@ def brief(S, scale=1.0):
     return im.resize((S, S), Image.LANCZOS)
 
 
-for name, fn in [('eodiya', eodiya), ('card', card), ('brief', brief)]:
+# ── 싸바비앙 (명품 콜렉션 — 왕관) ────────────────────────
+def bien(S, scale=1.0):
+    W = S * 4; im = grad(W, (208, 35, 63), (120, 10, 28)); c = W / 2
+    glow(im, [c - W * .42, c - W * .4, c + W * .42, c + W * .4], (255, 214, 120), 70, W * .09)
+    GOLD, GOLD2 = (247, 207, 78), (201, 138, 18)
+    w, h = W * 0.56 * scale, W * 0.36 * scale; x0, y0 = c - w / 2, c - h / 2 - W * 0.03 * scale
+    x1, y1 = x0 + w, y0 + h
+    pts = [(x0, y1), (x0, y0 + h * .18), (x0 + w * .25, y0 + h * .55), (c, y0 - h * .05), (x1 - w * .25, y0 + h * .55), (x1, y0 + h * .18), (x1, y1)]
+
+    def crown(d, o):
+        d.polygon([(px, py + o) for px, py in pts], fill=255)
+        d.rounded_rectangle([x0 - w * .03, y1 - h * .02 + o, x1 + w * .03, y1 + h * .24 + o], int(h * .06), fill=255)
+    shadow(im, crown, W * 0.022, W * 0.02, 120, (60, 0, 10))
+    d = ImageDraw.Draw(im)
+    d.polygon(pts, fill=GOLD)
+    d.polygon([(x0, y1), (x0, y0 + h * .18), (x0 + w * .25, y0 + h * .55), (c, y0 - h * .05), (c, y1)], fill=(255, 222, 110))
+    d.rounded_rectangle([x0 - w * .03, y1 - h * .02, x1 + w * .03, y1 + h * .24], int(h * .06), fill=GOLD2)
+    for px, py in [(x0, y0 + h * .18), (c, y0 - h * .05), (x1, y0 + h * .18)]:
+        r = w * 0.055; d.ellipse([px - r, py - r, px + r, py + r], fill=(255, 245, 210))
+    for k, col in [(-0.28, (255, 245, 210)), (0, (200, 20, 45)), (0.28, (255, 245, 210))]:
+        r = h * 0.06; cx, cy = c + w * k, y1 + h * .11
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=col)
+    cherry(d, c - h * 0.13, y0 + h * 0.62, h * 0.11)
+    return im.resize((S, S), Image.LANCZOS)
+
+
+for name, fn in [('eodiya', eodiya), ('card', card), ('brief', brief), ('bien', bien)]:
     fn(512).save(f'{out}/{name}-icon-512.png', optimize=True)
     fn(192).save(f'{out}/{name}-icon-192.png', optimize=True)
     fn(180).save(f'{out}/{name}-apple-touch.png', optimize=True)

@@ -1362,7 +1362,7 @@
     n.innerHTML = '<button type="button" aria-label="이전 화면으로">‹ 이전</button><button type="button" aria-label="싸바 홈으로">🏠 홈</button>';
     var bs = n.querySelectorAll('button');
     bs[0].addEventListener('click', function () { if (window.SavaNav) SavaNav.back(); else history.back(); });
-    bs[1].addEventListener('click', function () { if (window.SavaNav) SavaNav.home(); else location.href = '../app/'; });
+    bs[1].addEventListener('click', function () { if (window.SavaNav) SavaNav.home(); else location.href = '/eodiya/'; });
     if (prepend) where.insertBefore(n, where.firstChild); else where.appendChild(n);
   }
   topNav(document.querySelector('#maker .topbar'), true);
@@ -2115,7 +2115,7 @@
   $('sendSms').addEventListener('click', function () { var b = build(); if (b) shareSms(b.title, b.desc, b.url); });
   function cancelOut() {
     var fromHere = document.referrer && document.referrer.indexOf(location.origin) === 0;
-    if (fromHere && history.length > 1) history.back(); else location.href = '../app/';
+    if (fromHere && history.length > 1) history.back(); else location.href = '/eodiya/';
   }
   $('cancelTop').addEventListener('click', cancelOut);
   $('cancelBottom').addEventListener('click', cancelOut);
@@ -2124,7 +2124,7 @@
   if (window.SsakaInstall) SsakaInstall.chip(document.querySelector('.send').parentNode, '📍 어디야 앱으로 쓰기');
 })();
 </script>
-<script src="/js/home.js?v=16" defer></script>
+<script src="/js/home.js?v=17" defer data-home="/eodiya/"></script>
 <script src="/js/voice.js?v=5" defer></script>
 </body>
 </html>

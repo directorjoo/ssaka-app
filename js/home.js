@@ -119,6 +119,8 @@
 (function () {
   if (window.self !== window.top) return; // 미리보기 안에서는 숨김
   var s = document.currentScript || {}, ds = s.dataset || {};
+  // 11-26 단독 앱 분리: data-home="/today/" 처럼 주면 🍒 홈·되돌아갈 곳이 그 앱 첫 화면 (안 주면 싸바 홈 /app/)
+  var HOME = ds.home || '/app/';
   var DOCK = 60; // 아래 단추 높이(px)
 
   function tip(t) {
@@ -137,10 +139,10 @@
     leave(function () {
       var same = false;
       try { same = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
-      if (same && history.length > 1) history.back(); else location.href = '/app/';
+      if (same && history.length > 1) history.back(); else location.href = HOME;
     });
   }
-  function goHome() { leave(function () { location.href = '/app/'; }); }
+  function goHome() { leave(function () { location.href = HOME; }); }
   // 카톡 대화창으로: 카톡 안에서 열었으면 창 닫고 대화방으로, 밖이면 카톡 앱 열기
   function goKakao() {
     leave(function () {
@@ -203,7 +205,7 @@
     var n = document.createElement('nav');
     n.className = 'sava-dock'; n.setAttribute('aria-label', '이동');
     n.innerHTML = '<div class="sava-dock-in"><button type="button" class="p" aria-label="이전 화면으로"><b aria-hidden="true">‹</b>이전</button>' +
-      '<button type="button" class="h" aria-label="싸바 홈으로"><b aria-hidden="true">🍒</b>홈</button>' +
+      '<button type="button" class="h" aria-label="' + (ds.home ? '이 앱 첫 화면으로' : '싸바 홈으로') + '"><b aria-hidden="true">🍒</b>홈</button>' +
       '<button type="button" class="k" aria-label="카카오톡 대화방으로 돌아가기 (보내기 아님)"><b aria-hidden="true">↩</b>카톡방</button>' +
       // 11-25 대표님: 어느 기능을 단독으로 보내든 '싸바가 뭐지?'는 늘 맨 아래 탭으로
       '<button type="button" class="w" aria-label="싸바가 뭐지? 싸바 이야기 보기">싸바가 뭐지?</button></div>';

@@ -52,6 +52,14 @@
     return k;
   }
   function invClean(v) { v = String(v || '').replace(/\s+/g, ' ').trim(); if ((v.match(/\)/g) || []).length > (v.match(/\(/g) || []).length) v = v.replace(/\)\s*$/, ''); return v.replace(/^[-·•:：]\s*/, '').trim(); }
+  function invNorm(s) { return String(s || '').replace(/(\d+)\s*년/g, '$1').replace(/(^|\D)20(\d\d)(?=\D|$)/g, '$1$2').replace(/[^가-힣a-zA-Z0-9]/g, '').toLowerCase(); }
+  function invDup(a, b) {
+    var x = invNorm(a), y = invNorm(b);
+    if (x.length < 2 || y.length < 2) return false;
+    if (x === y) return true;
+    var s = x.length < y.length ? x : y, l = x.length < y.length ? y : x;
+    return s.length >= 4 && l.indexOf(s) >= 0 && s.length >= l.length * 0.6;
+  }
   function splitInv(lines, card) {
     var greet = [], info = [], rest = [], mode = 'pre', cur = null, curN = 0, title = String(card.title || '').replace(/\s+/g, '');
     lines.forEach(function (raw) {
@@ -69,9 +77,16 @@
         var lab = invLabel(km[1]), val = invClean(km[2]);
         // '(주소 …)' 는 바로 앞 장소 줄 아래 작은 글씨로
         if (lab === '주소' && info.length) { cur = info[info.length - 1]; cur._addr = true; cur.sub = val; curN = 0; return; }
+        // '회비 5만 한 해 마무리하는 …' 처럼 값 뒤에 문장이 붙으면: 앞 낱말만 값, 나머지는 인사말로
+        if (val.length > 24) {
+          var mm = lab === '회비' ? /^([\d,.]+\s*(?:만\s*원?|천\s*원?|원)?)(?:\s+|$)(.*)$/.exec(val) : /^(.{4,40}?[.。!]|.{4,24}?)(?:\s+)(.*)$/.exec(val);
+          if (mm && mm[2]) { val = mm[1].replace(/[.。]$/, ''); greet.push(mm[2]); }
+        }
         cur = { k: lab, v: val }; info.push(cur); curN = 0; return;
       }
-      if (cur && curN < 3 && mode !== 'greet') {
+      // 이어지는 줄: 값이 비었거나(‘-행사장소’ 다음 줄), 짧은 이름·주소 줄일 때만 (문장은 인사말로)
+      var sentence = /(니다|니까|어요|아요|해요|세요|네요|군요|에요|해요|요|다)[.!?~]*$/.test(line) || line.length > 40;
+      if (cur && mode !== 'greet' && (cur._addr ? !cur.sub || (curN < 2 && !sentence) : !cur.v || (curN < 2 && !sentence))) {
         curN++;
         var vv = invClean(line);
         if (cur._addr) cur.sub = invClean((cur.sub ? cur.sub + ' ' : '') + vv);
@@ -85,7 +100,25 @@
       greet.push(line);
     });
     info = info.filter(function (r) { return r.v || r.sub; }).map(function (r) { if (!r.v && r.sub) { r.v = r.sub; r.sub = ''; } return { k: r.k, v: r.v, sub: r.sub || '' }; });
-    return { greet: greet, info: info, rest: rest };
+    // 11-27 대표님: 같은 말이 두 번 나오면 안 됨 — 제목·날짜·장소·인사말 칸과 겹치는 줄은 저절로 걸러냄
+    var has = function (re) { return info.some(function (r) { return re.test(r.k); }); };
+    var sub = String(card.subtitle || ''), place = card.place && card.place.name || '';
+    var seen = [String(card.title || ''), String(card.kick || '')].concat(card.greet || []);
+    var g2 = [];
+    greet.forEach(function (line) {
+      if (seen.some(function (x) { return invDup(x, line); })) return;
+      var bare = line.replace(/[.。!~\s]+$/, '');
+      if (place && invDup(place, bare)) return;
+      if (info.some(function (r) { return invDup(r.v, bare) || invDup(r.sub, bare); })) return;
+      if (bare.length <= 40 && /\d{1,2}\s*월\s*\d{1,2}\s*일|\d{1,2}\s*[:시]\s*\d{0,2}/.test(bare) && !/(니다|세요|어요|해요)$/.test(bare)) {
+        var md = /(\d{1,2})\s*월\s*(\d{1,2})\s*일/.exec(bare), sd = /(\d{1,2})\s*월\s*(\d{1,2})\s*일/.exec(sub);
+        if (md && sd && +md[1] === +sd[1] && +md[2] === +sd[2]) return; // 한 줄 소개에 이미 있는 날짜
+        if (!has(/일시|날짜/)) { info.unshift({ k: '일시', v: bare, sub: '' }); return; }
+      }
+      seen.push(line); g2.push(line);
+    });
+    if (!has(/^장소/) && place) g2 = g2.filter(function (l) { return !invDup(place, l.replace(/[.。!\s]+$/, '')); });
+    return { greet: (card.greet || []).concat(g2), info: info, rest: rest };
   }
 
   function build(card, design, ctx) {
@@ -182,7 +215,8 @@
     // 대표 사진 설명 (11-22)
     if (card.cap && card.image && !card.sos) hero.appendChild(el('p', 'sk-cap', String(card.cap).slice(0, 80)));
     var titles = el('div', 'sk-titles');
-    if (card.kick) titles.appendChild(el('p', 'sk-kick', card.kick));
+    // 머리말이 제목과 같은 말이면 한 번만 (11-27)
+    if (card.kick && !invDup(card.kick, card.title)) titles.appendChild(el('p', 'sk-kick', card.kick));
     var h1 = el('h1', 'sk-title', card.title || '');
     // 영어처럼 띄어쓰기 없는 긴 낱말이 있으면 글자를 줄여 낱말 중간에서 줄이 끊기지 않게
     var longW = Math.max.apply(0, String(card.title || '').split(/\s+/).map(function (w) { return w.length; }));
@@ -198,7 +232,7 @@
     hero.appendChild(titles);
     if (card.season && SEASON[card.season]) {
       var rib = el('div', 'sk-ribbon', SEASON[card.season]);
-      hero.insertBefore(rib, titles);
+      titles.insertBefore(rib, titles.firstChild); // 제목 묶음 안 맨 위 — 사진 위에 제목이 겹치는 디자인에서도 글씨와 안 겹침
     }
     main.appendChild(hero);
 
@@ -264,7 +298,7 @@
     if (inv) {
       var P = splitInv(bodyAll, card);
       var bodyBox = el('div', 'sk-body sk-inv');
-      if (P.greet.length) { var gl = mkList(P.greet, false); gl.classList.add('sk-greet'); bodyBox.appendChild(gl); }
+      if (P.greet.length) { var gl = mkList(P.greet, false); gl.classList.add('sk-greet'); Array.prototype.forEach.call(gl.children, function (li) { li.className = 'sk-p'; }); bodyBox.appendChild(gl); }
       var rows = P.info.slice();
       var hasK = function (re) { return rows.some(function (r) { return re.test(r.k); }); };
       if (!hasK(/일시|날짜|시간/) && /\d/.test(card.subtitle || '')) rows.unshift({ k: '일시', v: String(card.subtitle) });

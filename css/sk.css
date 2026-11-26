@@ -845,3 +845,5 @@
 .sk-info-t small { font-size: 14px; opacity: .78; line-height: 1.45; }
 .sk-info .sk-actions { margin: 12px 0 0; }
 .sk-inv .sk-more-info { margin-top: 14px; }
+.sk-titles .sk-ribbon { margin: 0 0 10px; }
+.sk-inv .sk-greet li + li { border-top: 0; }

@@ -24,7 +24,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=102">
+  <link rel="stylesheet" href="../css/sk.css?v=103">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -766,6 +766,11 @@
         <textarea id="title" class="oneln" rows="1" maxlength="40"></textarea>
         <label for="subtitle" data-l="subtitle">한 줄 소개</label>
         <textarea id="subtitle" class="oneln" rows="1" maxlength="60"></textarea>
+        <div data-for="club" data-part="greetmsg">
+          <label for="greet">인사말 (선택) · 큰 제목 바로 아래에 나와요</label>
+          <textarea id="greet" rows="4" maxlength="1200" placeholder="예: 한 해 동안 고마웠습니다. 올해를 함께 마무리하는 자리에 꼭 오세요."></textarea>
+          <div class="hint">날짜·장소·회비는 아래 칸에 쓰면 '언제·어디서' 상자로 따로 정리돼요. 같은 말을 두 번 써도 한 번만 나와요.</div>
+        </div>
       </fieldset>
 
       <fieldset data-tab="basic">
@@ -1253,7 +1258,7 @@
 <script src="../js/mkask.js?v=2"></script>
 <script src="../js/indfind.js?v=2"></script>
 <script src="../js/notice.js?v=5"></script>
-<script src="../js/render.js?v=89"></script>
+<script src="../js/render.js?v=90"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1291,7 +1296,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -1982,6 +1987,7 @@
       kick: type === 'club' || type === 'greet' ? (v('kick') === '없음' ? '' : (v('kick') || ({ event: '초대합니다', wedding: '결혼합니다', funeral: '부고' }[industry] || ''))) : undefined,
       title: g('title'),
       subtitle: g('subtitle'),
+      greet: type === 'club' ? (g('greet').split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 20)) : undefined,
       image: g('image'),
       video: g('video'),
       body: g('body').split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
@@ -3488,7 +3494,7 @@
     FIELDS.forEach(function (f) { if ($(f) && ['resvMin', 'resvRate', 'sound', 'season'].indexOf(f) < 0) $(f).value = ''; });
     var ci = c.contact || {};
     var set = function (id, val) { if ($(id) && val != null) $(id).value = val; };
-    set('title', c.title); set('subtitle', c.subtitle); set('image', c.image); set('video', c.video);
+    set('title', c.title); set('subtitle', c.subtitle); set('greet', (c.greet || []).join('\n')); set('image', c.image); set('video', c.video);
     IP = Array.isArray(c.ip) ? { z: +c.ip[0] || 100, x: +c.ip[1], y: +c.ip[2], f: c.ip[3] ? 1 : 0 } : { z: 100, x: 50, y: 50, f: 0 }; if (isNaN(IP.x)) IP.x = 50; if (isNaN(IP.y)) IP.y = 50; autoFit = false;
     set('galUrls', (c.gallery || []).join('\n')); set('galCaps', (c.caps || []).join('\n')); set('cap', c.cap || ''); set('fsz', Array.isArray(c.fs) ? c.fs.join(',') : ''); set('season', c.season || ''); set('motion', c.motion || ''); set('clip', c.clip || ''); if (window.__clipUi) __clipUi();
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);

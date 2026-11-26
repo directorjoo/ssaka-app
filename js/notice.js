@@ -10,7 +10,10 @@
 
   function parse(raw) {
     var text = String(raw || '').replace(/\r/g, '');
-    var cut = text.search(/참석\s*자?\s*명\s*단|참가\s*자?\s*명\s*단|신청\s*자?\s*명\s*단/);
+    // 11-26: 카톡 '참석자 이어가기'·'참석 현황' 같은 머리말도 명단 시작으로
+    var cut = text.search(/참석\s*자?\s*명\s*단|참가\s*자?\s*명\s*단|신청\s*자?\s*명\s*단|(?:참석|참가|신청)\s*자?\s*(?:이어\s*가기|이어\s*쓰기|현황|확인|체크)|이어\s*가기/);
+    // 머리말이 없어도 '1. 홍길동' 같은 번호 줄이 3줄 이상 이어지면 그 첫 줄부터 명단
+    if (cut < 0) { var nm = text.match(/(?:^|\n)(\s*\d{1,3}\s*[.)]\s*[가-힣]{2,5}[^\n]*\n){2,}\s*\d{1,3}\s*[.)]\s*[가-힣]{2,5}/); if (nm) cut = text.indexOf(nm[0]) + (nm[0].charAt(0) === '\n' ? 1 : 0); if (cut >= 0) text = text.slice(0, cut) + '참석자명단\n' + text.slice(cut); }
     var head = cut >= 0 ? text.slice(0, cut) : text, tail = cut >= 0 ? text.slice(cut).replace(/^[^\n]*\n?/, '') : '';
     var lines = head.split('\n').map(sq).filter(Boolean);
     var flat = sq(head);
@@ -60,10 +63,12 @@
     // 이미 올라온 참석자 명단: "01.정병회34 교대", "17.이병록27 +1 당산", "18.유충남31(가족) 교대"
     var seen = {};
     tail.split('\n').forEach(function (l) {
-      var r = sq(l).match(/^\d{1,3}\s*[.)]\s*([가-힣]{2,5})\s*(\d{1,3})?\s*(\(\s*가족\s*\))?\s*(?:\+\s*(\d))?\s*([가-힣]{1,6})?/);
-      if (!r || seen[r[1]]) return;
+      // 11-26: "홍길동 32회", "김철수(35기) +1", "박영희 부부"도 (기·회·학번 글자는 기수로, 부부는 +1)
+      var r = sq(l).match(/^\d{1,3}\s*[.)]\s*([가-힣]{2,5})\s*(?:\(\s*(\d{1,3})\s*(?:기|회|학번)?\s*\)|(\d{1,3})\s*(?:기|회|학번)?)?\s*(\(\s*가족\s*\)|가족|부부)?\s*(?:\+\s*(\d))?\s*([가-힣]{1,6})?/);
+      if (!r || seen[r[1]] || /^(일시|장소|회비|코스|준비물|집결|시간|계좌|문의|점심|중식|참석자?|참가자?|신청자?|명단|불참자?)$/.test(r[1])) return;
       seen[r[1]] = 1;
-      out.pre.push({ n: r[1], g: r[2] || '', p: +(r[4] || 0), s: r[5] || '', fam: r[3] ? 1 : 0 });
+      var cp = +(r[5] || 0); if (!cp && r[4] === '부부') cp = 1;
+      out.pre.push({ n: r[1], g: r[2] || r[3] || '', p: cp, s: r[6] || '', fam: r[4] && r[4] !== '부부' ? 1 : 0 });
     });
     // ---- 초대장·행사 안내 형식 (행사명 / 일시 / 장소 / 주최 …) ----
     var KV = {}, kre = /^(행사명|모임명|제목|일시|날짜|일정|시간|장소|위치|주소|주최|주관|참가비|회비|문의|연락처|드레스\s*코드|준비물|프로그램|참여\s*감독|참석|대상|파트너|후원)\s*[:：]?\s*(.+)$/;
@@ -96,7 +101,8 @@
   }
   // 명단 한 줄 ↔ 글
   function preText(list) { return (list || []).map(function (x) { return x.n + (x.g || '') + (x.fam ? '(가족)' : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + x.s : ''); }).join('\n'); }
-  function preParse(text) { return parse('참석자명단\n' + String(text || '').split('\n').map(function (l, i) { return l.trim() ? (i + 1) + '.' + l.trim() : ''; }).join('\n')).pre; }
+  // 참석자 칸: 번호가 이미 붙어 있으면(카톡 이어가기 그대로) 번호를 떼고 다시 매김, 머리말·빈 번호 줄은 건너뜀
+  function preParse(text) { var i = 0; return parse('참석자명단\n' + String(text || '').split('\n').map(function (l) { l = l.trim().replace(/^\d{1,3}\s*[.)]\s*/, ''); return l ? (++i) + '.' + l : ''; }).join('\n')).pre; }
 
   var api = { parse: parse, preText: preText, preParse: preParse };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

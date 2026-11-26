@@ -269,8 +269,21 @@
           e.preventDefault(); e.stopPropagation();
           t.contentEditable = 'true'; t.focus();
           try { var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); } catch (x) {}
-          t.addEventListener('keydown', function (k) { if (k.key === 'Enter') { k.preventDefault(); t.blur(); } });
-          t.addEventListener('blur', function () { t.contentEditable = 'false'; PE(key, idx, part, t.textContent.replace(/\s+/g, ' ').trim()); }, { once: true });
+          // 11-26: 제목·부제목은 Enter = 줄바꿈 (다 고치면 ✓ 단추나 바깥 누르기), 다른 곳은 Enter = 끝
+          var multi = key === 'title' || key === 'subtitle';
+          var okB = null;
+          if (multi) { okB = h('button', { type: 'button', class: 'sk-edok', text: '✓ 다 고쳤어요' }); t.insertAdjacentElement('afterend', okB); okB.addEventListener('mousedown', function (x) { x.preventDefault(); t.blur(); }); }
+          t.addEventListener('keydown', function (k) {
+            if (k.key !== 'Enter') return;
+            k.preventDefault();
+            if (multi) { try { document.execCommand('insertLineBreak'); } catch (x) {} } else t.blur();
+          });
+          t.addEventListener('blur', function () {
+            if (okB) okB.remove();
+            t.contentEditable = 'false';
+            var txt = multi ? (t.innerText || '').replace(/[ \t\u00a0]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{2,}/g, '\n').trim() : t.textContent.replace(/\s+/g, ' ').trim();
+            PE(key, idx, part, txt);
+          }, { once: true });
         }, true);
       }
     } catch (e) {}

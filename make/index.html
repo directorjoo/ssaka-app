@@ -24,7 +24,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=100">
+  <link rel="stylesheet" href="../css/sk.css?v=101">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -275,6 +275,19 @@
       background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px;
     }
     textarea { min-height: 92px; resize: vertical; }
+    textarea.oneln { min-height: 0; resize: none; overflow: hidden; line-height: 1.4; }
+    /* 11-26 수정하기 도구 띠: 사진·글씨 크기·참석자 — 기존 입력 칸을 잠깐 빌려 와 아래 시트에 보여 줌 */
+    .pe-bar { position: fixed; left: 10px; right: 10px; bottom: calc(236px + env(safe-area-inset-bottom)); z-index: 60; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; padding: 6px; border-radius: 18px; background: rgba(26,26,26,.88); box-shadow: 0 10px 26px -10px rgba(0,0,0,.6); max-width: 520px; margin: 0 auto; }
+    .pe-bar[hidden] { display: none; }
+    .pe-bar button { border: 0; border-radius: 13px; background: #fff; color: #1A1A1A; font: inherit; font-size: 15px; font-weight: 800; padding: 10px 4px; white-space: nowrap; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .pe-bar button[hidden] { display: none; }
+    .pe-bar button.done { background: #B3132B; color: #fff; }
+    .pe-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9995; max-height: 62vh; overflow: auto; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 -12px 30px -12px rgba(0,0,0,.45); padding: 10px 14px calc(16px + env(safe-area-inset-bottom)); }
+    .pe-sheet[hidden] { display: none; }
+    .pe-sheet .pe-h { display: flex; align-items: center; justify-content: space-between; position: sticky; top: -10px; background: #fff; padding: 6px 0 8px; z-index: 2; }
+    .pe-sheet .pe-h b { font-size: 18px; }
+    .pe-sheet .pe-h button { border: 0; border-radius: 12px; background: #B3132B; color: #fff; font: inherit; font-size: 16px; font-weight: 800; padding: 10px 16px; }
+    .pe-sheet fieldset, .pe-sheet [data-part="pre"] { display: block !important; margin: 0; border: 0; padding: 0; }
     input:focus, textarea:focus { outline: 2px solid var(--text); outline-offset: 1px; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; clear: both; }
     .row > div { min-width: 0; }
@@ -750,9 +763,9 @@
           <div class="moods" id="kickPick" style="margin-top:6px"><button type="button">초대합니다</button><button type="button">모십니다</button><button type="button">함께해요</button><button type="button">You're Invited</button><button type="button">없음</button></div>
         </div>
         <label for="title" class="req" data-l="title">제목</label>
-        <input id="title" maxlength="40">
+        <textarea id="title" class="oneln" rows="1" maxlength="40"></textarea>
         <label for="subtitle" data-l="subtitle">한 줄 소개</label>
-        <input id="subtitle" maxlength="60">
+        <textarea id="subtitle" class="oneln" rows="1" maxlength="60"></textarea>
       </fieldset>
 
       <fieldset data-tab="basic">
@@ -1083,6 +1096,13 @@
     </section>
   </div>
 </div>
+<div class="pe-bar" id="peBar" hidden role="toolbar" aria-label="수정 도구">
+  <button type="button" data-pe="photo">📷 사진</button>
+  <button type="button" data-pe="fs">🔠 글씨</button>
+  <button type="button" data-pe="pre" id="pePreBtn">🙋 참석자</button>
+  <button type="button" class="done" id="peDone">✓ 끝</button>
+</div>
+<div class="pe-sheet" id="peSheet" hidden><div class="pe-h"><b id="peSheetT"></b><button type="button" id="peSheetOk">✓ 됐어요</button></div><div id="peSheetBody"></div></div>
 <div class="bar" id="bar">
   <div class="bar-in">
     <div class="prog"><b id="progText">필수 0/3</b><span class="track"><i id="progFill"></i></span></div>
@@ -2003,7 +2023,7 @@
     if (FORM.noRsvp) card.buttons = card.buttons.filter(function (b) { return b !== 'rsvp'; });
     if (type === 'club' && $('rosterOn').checked && (FORM.hide || []).indexOf('roster') < 0) {
       // 같은 제목이면 같은 명단(고쳐서 다시 보내도 신청자가 그대로), 제목이 바뀌면 새 명단
-      var rkey = 'sava-roster-ids', rmap = {}, rt = (card.title || '').trim() || '모임';
+      var rkey = 'sava-roster-ids', rmap = {}, rt = (card.title || '').replace(/\s+/g, ' ').trim() || '모임';
       try { rmap = JSON.parse(localStorage.getItem(rkey) || '{}'); } catch (e) {}
       if (!rmap[rt]) { var ra = 'abcdefghjkmnpqrstuvwxyz23456789', rb = crypto.getRandomValues(new Uint8Array(10)), rs = ''; for (var ri = 0; ri < 10; ri++) rs += ra[rb[ri] % ra.length]; rmap[rt] = rs; if (!isEmpty) try { localStorage.setItem(rkey, JSON.stringify(rmap)); } catch (e) {} }
       card.roster = { id: rmap[rt], st: g('stops').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8), g: $('gisuOn').checked && (FORM.hide || []).indexOf('gisu') < 0 ? 1 : 0 };
@@ -2504,8 +2524,44 @@
   function editMode(on) {
     $('goEdit').classList.toggle('on', on);
     $('goEdit').textContent = on ? '✓ 수정 끝' : '✏️ 수정';
+    peBarShow(on);
     try { var w = $('frame').contentWindow; if (w && w.SavaPreviewMode) w.SavaPreviewMode(on); } catch (e) {}
   }
+  // 11-26 대표님: 수정하기에서 글씨만 고쳐짐 → 사진·글씨 크기·참석자 이름도. 원래 입력 칸(같은 기능)을 시트로 잠깐 빌려 옴
+  var PE_SRC = {
+    photo: function () { return document.querySelector('#form fieldset[data-part="photo"]'); },
+    fs: function () { return $('fsFs'); },
+    pre: function () { return document.querySelector('#rosterBox [data-part="pre"]'); }
+  };
+  var PE_T = { photo: '📷 사진 바꾸기·더 넣기', fs: '🔠 글씨 크기', pre: '🙋 이미 참석한 분 넣기' };
+  var peHome = null, peNode = null;
+  function peBarShow(on) {
+    if (!on) peClose();
+    $('peBar').hidden = !on || !!destSns();
+    var pre = PE_SRC.pre();
+    $('pePreBtn').hidden = !(type === 'club' && $('rosterOn').checked && pre && !pre.closest('[hidden]'));
+  }
+  function peOpen(k) {
+    peClose();
+    var n = PE_SRC[k] && PE_SRC[k]();
+    if (!n) { toast('이 카드에는 없는 칸이에요'); return; }
+    peHome = document.createComment('pe'); n.parentNode.insertBefore(peHome, n); peNode = n;
+    $('peSheetBody').appendChild(n);
+    $('peSheetT').textContent = PE_T[k];
+    $('peSheet').hidden = false; $('peBar').hidden = true;
+    if (k === 'pre') setTimeout(function () { try { $('pre').focus(); } catch (e) {} }, 200);
+  }
+  function peClose() {
+    if (peNode && peHome && peHome.parentNode) { peHome.parentNode.insertBefore(peNode, peHome); peHome.remove(); }
+    peNode = peHome = null;
+    $('peSheet').hidden = true;
+    if ($('goEdit').classList.contains('on')) $('peBar').hidden = !!destSns();
+  }
+  document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
+  $('peSheetOk').addEventListener('click', function () { peClose(); update(); toast('✏️ 고쳤어요'); });
+  $('peDone').addEventListener('click', function () { $('goEdit').click(); });
+  // 제목·한 줄 소개 칸: 줄바꿈 넣으면 칸 높이가 따라 늘어남
+  ['title', 'subtitle'].forEach(function (id) { var t = $(id), fit = function () { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }; t.addEventListener('input', fit); setTimeout(fit, 300); });
   window.SavaEditOn = function () { return $('goEdit').classList.contains('on'); };
   $('goEdit').addEventListener('click', function () {
     if (destSns()) { var hh = document.querySelector('#form .sec-h[data-sec="basic"]'); if (hh) hh.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('입력 칸에서 고치면 사진에 바로 들어가요'); return; }

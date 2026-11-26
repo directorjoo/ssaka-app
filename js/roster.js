@@ -228,7 +228,11 @@
     });
     function load() {
       return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
-        .catch(function () { cnt.textContent = '명단을 불러오지 못했어요'; });
+        .catch(function () {
+          // 11-26: 서버를 못 불러와도(만들기 미리보기 등) 붙여넣은 참석자는 보이게
+          if (pre.length) { try { take({ pub: pub, list: [] }); return; } catch (e) {} }
+          cnt.textContent = '명단을 불러오지 못했어요';
+        });
     }
     function send(o) {
       if (!live) { toast('미리보기에선 신청되지 않아요'); return Promise.resolve(); }

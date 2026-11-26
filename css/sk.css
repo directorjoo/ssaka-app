@@ -17,6 +17,7 @@
 .sk-photo { position: relative; overflow: hidden; }
 .sk-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sk-mono { font-family: var(--f-title); line-height: 1; }
+.sk-title, .sk-sub { white-space: pre-line; }
 .sk-title { font-family: var(--f-title); font-weight: 800; margin: 0; line-height: 1.15; letter-spacing: -0.01em; word-break: keep-all; overflow-wrap: anywhere; }
 .sk-sub { margin: 10px 0 0; font-size: 15px; line-height: 1.55; word-break: keep-all; color: var(--sub-bg); }
 .sk-list { list-style: none; margin: 0; padding: 0; }

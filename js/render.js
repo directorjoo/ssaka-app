@@ -72,7 +72,7 @@
         else { mode = 'rest'; rest.push(line); }
         return;
       }
-      var km = INV_KEY.exec(line);
+      var km = INV_KEY.exec(line.replace(/^[^\-·•(\[<\s0-9A-Za-z가-힣]+\s*/, ''));
       if (km && !/^\d/.test(line)) {
         var lab = invLabel(km[1]), val = invClean(km[2]);
         // '(주소 …)' 는 바로 앞 장소 줄 아래 작은 글씨로
@@ -86,7 +86,9 @@
       }
       // 이어지는 줄: 값이 비었거나(‘-행사장소’ 다음 줄), 짧은 이름·주소 줄일 때만 (문장은 인사말로)
       var sentence = /(니다|니까|어요|아요|해요|세요|네요|군요|에요|해요|요|다)[.!?~]*$/.test(line) || line.length > 40;
-      if (cur && mode !== 'greet' && (cur._addr ? !cur.sub || (curN < 2 && !sentence) : !cur.v || (curN < 2 && !sentence))) {
+      // 11-27: 값이 이미 있으면 장소·집결·뒷풀이의 주소 같은 줄만 이어 붙임 (회비·일시 뒤 '2차 노래방'·'참석자 이어가기'가 빨려 들어가던 것)
+      var addrLike = /(로|길|동|읍|면|리|층|호|번지|역|출구|빌딩|타워|센터|홀|관)(\s|$|\d)/.test(line) && !/^\d{1,3}\s*[.)]/.test(line);
+      if (cur && mode !== 'greet' && (cur._addr ? !cur.sub || (curN < 2 && !sentence && addrLike) : !cur.v || (curN < 2 && !sentence && addrLike && /장소|집결|뒷풀이|오시는/.test(cur.k)))) {
         curN++;
         var vv = invClean(line);
         if (cur._addr) cur.sub = invClean((cur.sub ? cur.sub + ' ' : '') + vv);
@@ -124,6 +126,23 @@
       seen.push(line); g2.push(line);
     });
     if (!has(/^장소/) && place) g2 = g2.filter(function (l) { return !invDup(place, l.replace(/[.。!\s]+$/, '')); });
+    // 11-27 대표님: 모임 공지 아래 안내에 위(제목·일시·장소·회비·인사말)와 같은 말, 붙여 넣은 참석자 명단 줄이 또 나오면 안 됨
+    if (card.meet) {
+      var R = card.roster || {}, preN = {}; (R.pre || []).forEach(function (x) { if (x && x.n) preN[x.n] = 1; });
+      var cI = (Array.isArray(card.info) ? card.info : []).map(function (r) { return r && r.v; });
+      var above = [card.title, card.subtitle, card.kick, place].concat(card.greet || [], g2, cI, info.map(function (r) { return r.v; }), info.map(function (r) { return r.sub; }));
+      var inList = false;
+      rest = rest.filter(function (l) {
+        var bare = l.replace(/^[^\-·•(\[<\s0-9A-Za-z가-힣■]+\s*/, '').replace(/[.。!~\s]+$/, '');
+        if (/^(참석|참가|신청)\S*\s*(자|명단|현황|이어가기)|^(참석자?|참가자?|불참자?|명단)\s*[:：]?$|이어\s*가기/.test(bare.replace(/^[\[(【]|[\])】]$/g, ''))) { inList = true; return false; }
+        var nm = /^\d{1,3}\s*[.)]?\s*([가-힣]{2,5})/.exec(bare);
+        if (nm && (preN[nm[1]] || inList)) return false;          // 붙여 넣은 명단 줄 (명단은 '참석자 명단 보기'에서)
+        if (/^\d{1,3}\s*[.)]?\s*$/.test(bare)) return false;      // 빈 번호 줄
+        inList = false;
+        if (/[:：]/.test(bare)) { var kv = bare.split(/[:：]/); if (kv[1] && above.some(function (x) { return invDup(x, kv.slice(1).join(':')); })) return false; }
+        return !above.some(function (x) { return invDup(x, bare); });
+      });
+    }
     return { greet: (card.greet || []).concat(g2), info: info, rest: rest };
   }
 

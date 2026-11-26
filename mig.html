@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>싸바</title></head>
+<body><p style="font:17px sans-serif;padding:28px;color:#555">🍒 싸바 기록을 옮기는 중…</p>
+<script>
+// 11-26 www.sava.kr 에 저장돼 있던 싸바 기록을 sava.kr 로 옮겨 담고(이미 있는 건 그대로, 목록은 합침) 원래 보던 화면으로
+(function () {
+  var h = location.hash.slice(1), bar = h.lastIndexOf('|'), to = 'https://sava.kr/';
+  try {
+    var o = JSON.parse(decodeURIComponent(h.slice(0, bar)));
+    to = decodeURIComponent(h.slice(bar + 1));
+    Object.keys(o).forEach(function (k) {
+      var cur = localStorage.getItem(k);
+      if (cur == null) { localStorage.setItem(k, o[k]); return; }
+      try {
+        var a = JSON.parse(cur), b = JSON.parse(o[k]);
+        if (Array.isArray(a) && Array.isArray(b)) {
+          var seen = {}, all = [];
+          a.concat(b).forEach(function (x) { var s = JSON.stringify(x); if (!seen[s]) { seen[s] = 1; all.push(x); } });
+          localStorage.setItem(k, JSON.stringify(all));
+        } else if (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a)) {
+          Object.keys(b).forEach(function (kk) { if (!(kk in a)) a[kk] = b[kk]; });
+          localStorage.setItem(k, JSON.stringify(a));
+        }
+      } catch (e) {}
+    });
+  } catch (e) {}
+  if (!/^https:\/\/sava\.kr\//.test(to)) to = 'https://sava.kr/';
+  location.replace(to);
+})();
+</script></body></html>

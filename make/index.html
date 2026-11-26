@@ -569,6 +569,13 @@
   #pvModal .snspv.r-story { height: min(70dvh, 640px); }
   #pvModal .pv-sns { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: start center; }
   .done-sns { display: grid; gap: 8px; }
+  /* 11-26 완성 화면 미리보기 + 수정하기 */
+  .done-card { display: grid; gap: 6px; justify-items: center; margin: 4px 0 10px; }
+  .done-card .dc-phone { width: 100%; max-width: 340px; height: min(58vh, 540px); border-radius: 18px; overflow: hidden; border: 2px solid #eee; background: #fff; }
+  .done-card iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .done-card .dc-tip { font-size: 15px; color: #6B5D52; }
+  .dc-fix { width: 100%; margin: 0 0 14px; font-size: 18px; font-weight: 800; }
+  .dc-fix small { font-size: 15px; font-weight: 600; opacity: .75; margin-left: 4px; }
   .done-sns .snspv { max-width: 300px; } .done-sns .snspv.r-story { height: min(52vh, 480px); }
   .slides { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; margin: 0 auto; width: 100%; }
   .slides .sl { position: relative; padding: 0; border: 2px solid #eee; border-radius: 8px; overflow: hidden; background: #f4f4f4; aspect-ratio: 4 / 5; }
@@ -1094,16 +1101,18 @@
 </div>
 <div class="modal pv-modal" id="pvModal" hidden>
   <div class="modal-box pv-box">
-    <div class="cmp-head">👀 <b>마지막으로 확인해 보세요</b><small id="pvModalSub">위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]</small></div>
+    <div class="cmp-head">👀 <b>마지막으로 확인해 보세요</b><small id="pvModalSub">위아래로 밀어 보고, 고칠 게 있으면 [✏️ 수정하기]</small></div>
     <div class="pv-phone"><iframe id="pvFrame" title="완성 카드 확인"></iframe></div>
     <div class="pv-sns" id="pvSnsBox" hidden><div class="snspv" id="pvSns"><img id="pvSnsImg" alt="완성 사진 확인"><span class="snsld" id="pvSnsLd"></span></div></div>
-    <div class="cmp-row"><button type="button" class="ghost" id="pvFix">✏️ 다시 고치기</button><button type="button" class="kakao" id="pvOk">👍 OK, 완성!</button></div>
+    <div class="cmp-row"><button type="button" class="ghost" id="pvFix">✏️ 수정하기</button><button type="button" class="kakao" id="pvOk">👍 OK, 완성!</button></div>
   </div>
 </div>
 <div class="modal" id="doneModal" hidden>
   <div class="modal-box done-box">
     <div class="done-head" id="doneHead">🎉 카드가 완성됐어요!</div>
     <p class="done-sub" id="doneSub">이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.</p>
+    <div class="done-card" id="doneCard" hidden><div class="dc-phone"><iframe id="doneFrame" title="완성 카드 미리보기"></iframe></div><small class="dc-tip">👆 받는 사람에게 이렇게 보여요 · 위아래로 밀어 보세요</small></div>
+    <button type="button" class="ghost big dc-fix" id="doneFix">✏️ 수정하기 <small>미리보기에서 바로 고쳐요</small></button>
     <div class="done-sns" id="doneSns" hidden>
       <div class="snspv" id="doneSnsPv"><img id="doneSnsImg" alt="완성 사진"><span class="snsld" id="doneSnsLd"></span></div>
       <div class="slides" id="doneSlides" role="group" aria-label="넘겨 보기 묶음" hidden></div>
@@ -2182,6 +2191,9 @@
       $('doneHead').textContent = '🎉 카드가 완성됐어요!';
       $('doneSub').textContent = '이제 보내기만 하면 돼요. 받는 사람은 앱 없이 카톡에서 바로 열어요.';
     }
+    // 11-26 대표님: 완성 뒤에도 카드 미리보기 + [✏️ 수정하기]로 바로 고치기
+    $('doneCard').hidden = !!dd;
+    $('doneFrame').src = dd ? 'about:blank' : viewer + '?d=' + SsakaCodec.encode(buildCard().card);
     renderMoreDests();
   }
   function renderMoreDests() {
@@ -2431,10 +2443,10 @@
     document.querySelector('#pvModal .pv-phone').hidden = !!dd;
     $('pvSnsBox').hidden = !dd;
     if (dd) {
-      $('pvModalSub').textContent = ds.b + '(' + ds.s + ')에 이대로 올라가요.' + (r.card.image ? '' : ' ⚠️ 대표 사진이 없어 빈 무늬로 나와요.') + ' 고칠 게 있으면 [다시 고치기]';
+      $('pvModalSub').textContent = ds.b + '(' + ds.s + ')에 이대로 올라가요.' + (r.card.image ? '' : ' ⚠️ 대표 사진이 없어 빈 무늬로 나와요.') + ' 고칠 게 있으면 [✏️ 수정하기]';
       showSnsIn($('pvSns'), $('pvSnsImg'), $('pvSnsLd'), r.card);
     } else {
-      $('pvModalSub').textContent = (r.card.image ? '' : '⚠️ 대표 사진이 없어 빈 그림으로 나와요. ') + '위아래로 밀어 보고, 고칠 게 있으면 [다시 고치기]';
+      $('pvModalSub').textContent = (r.card.image ? '' : '⚠️ 대표 사진이 없어 빈 그림으로 나와요. ') + '위아래로 밀어 보고, 고칠 게 있으면 [✏️ 수정하기]';
       $('pvFrame').src = viewer + '?d=' + SsakaCodec.encode(r.card);
     }
     $('pvModal').hidden = false;
@@ -2445,7 +2457,18 @@
     fixing = on;
     $('finish').textContent = on ? '👀 고친 것 미리보기' : '✅ 완성';
   }
-  $('pvFix').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; setFixing(true); var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('고친 뒤 아래 [👀 고친 것 미리보기]를 누르세요'); });
+  // 11-26 대표님: 미리보기·완성 화면의 [✏️ 수정하기] → 카드 미리보기에서 글자·사진을 바로 눌러 고치기
+  function fixNow() {
+    $('pvModal').hidden = true; $('pvFrame').src = 'about:blank';
+    $('doneModal').hidden = true; $('doneFrame').src = 'about:blank';
+    setFixing(true);
+    if (destSns()) { var h = document.querySelector('#form .sec-h[data-sec="basic"]'); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('입력 칸에서 고치면 사진에 바로 들어가요. 다 고치면 [👀 고친 것 미리보기]'); return; }
+    editMode(true);
+    document.querySelector('.preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('카드에서 고칠 글자·사진을 바로 누르세요. 다 고치면 [✓ 수정 끝]');
+  }
+  $('pvFix').addEventListener('click', fixNow);
+  $('doneFix').addEventListener('click', fixNow);
   $('pvOk').addEventListener('click', function () { $('pvModal').hidden = true; $('pvFrame').src = 'about:blank'; setFixing(false); openDone(); });
   $('cmpModal').addEventListener('click', function (e) { if (e.target === this) closeCompare(); });
   // ---------- ✏️ 수정하기: 미리보기 카드에서 바로 고치는 모드 ----------
@@ -2466,8 +2489,8 @@
   $('goPreview').addEventListener('click', function () {
     document.querySelector('.preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('keepEdit').addEventListener('click', function () { $('doneModal').hidden = true; setFixing(true); toast('고친 뒤 아래 [👀 고친 것 미리보기]를 누르세요'); });
-  $('doneModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+  $('keepEdit').addEventListener('click', fixNow);
+  $('doneModal').addEventListener('click', function (e) { if (e.target === this) { this.hidden = true; $('doneFrame').src = 'about:blank'; } });
   $('send2').addEventListener('click', function () { $('send').click(); });
   $('copy2').addEventListener('click', function () { $('copy').click(); });
 

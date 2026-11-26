@@ -74,7 +74,17 @@
       if (j && !j.admin && !seen) { var gk = el('a', 'sv-row', '🔐 관리자 확인'); gk.href = '/admin/'; gk.appendChild(el('span', '', '대표 전용')); box.appendChild(gk); }
       if (j && j.admin) {
         admin.hidden = false; admin.appendChild(el('h3', '', '🔑 관리자'));
-        [['🔑 싸바 관리자 화면', '/admin/', '경영·디자인·Claude 요청'], ['💡 의견 관리', '/idea/admin/', '채택·쿠폰'], ['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
+        // 11-26 대표님: 사람마다 맞는 앱만 보내기 — 이 링크로 연 사람 폰의 '내 싸바'에 그 앱만 생김
+        admin.appendChild(el('h3', '', '📨 보낼 링크 (누르면 복사)'));
+        [['📍 어디야', 'eodiya'], ['💌 싸바카드', 'make'], ['☀️ 싸바 브리핑', 'today'], ['👑 싸바비앙', 'savabien']].forEach(function (r) {
+          var u = 'https://sava.kr/' + r[1] + '/?give=1', b = el('button', 'sv-row', r[0]); b.type = 'button'; b.appendChild(el('span', '', 'sava.kr/' + r[1] + '/?give=1'));
+          b.addEventListener('click', function () {
+            var ok = function () { b.lastChild.textContent = '복사했어요 ✓ 카톡에 붙여 넣기'; };
+            try { navigator.clipboard.writeText(u).then(ok, function () { window.prompt('복사해서 보내세요', u); }); } catch (e) { window.prompt('복사해서 보내세요', u); }
+          });
+          admin.appendChild(b);
+        });
+        [['🍒 싸바 전체 홈', '/app/', '네 가지 다 보이는 홈 · 관리자만'], ['🔑 싸바 관리자 화면', '/admin/', '경영·디자인·Claude 요청'], ['💡 의견 관리', '/idea/admin/', '채택·쿠폰'], ['🥬 김치 주문 관리', '/app/orders/?admin=1', '주문·입금·발송']].forEach(function (r) {
           var a = el('a', 'sv-row', r[0]); a.href = r[1]; a.appendChild(el('span', '', r[2])); admin.appendChild(a);
         });
       }

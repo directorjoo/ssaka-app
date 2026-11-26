@@ -344,7 +344,10 @@
         }).catch(function () { st.textContent = '📊 손님 반응은 잠시 뒤에 볼 수 있어요'; });
         var mk = new URL('../make/', location.href).href;
         var e0 = document.createElement('a'); e0.href = '#'; e0.textContent = '✏️ 수정하기';
-        e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
+        // 11-27 대표님: 모임 카드(모임 공지·예전 송년회·산악회·동문회·행사)는 질문 순서(제목·인사말·일시·장소·회비·계좌·참석·명단)대로 적는 화면에서 고침
+        var indOf = String(card.design || '').split('-')[0], meetLike = !!card.meet || ['meet', 'club', 'alumni', 'party', 'event'].indexOf(indOf) >= 0;
+        if (meetLike) e0.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : '');
+        else e0.addEventListener('click', function (ev) { ev.preventDefault(); startEdit(pristine, card, design, ctx, root, bar, st); });
         var e1 = document.createElement('a'); e1.href = mk + '?edit=' + encodeURIComponent(dq) + (new URLSearchParams(location.search).get('s') ? '&s=' + encodeURIComponent(new URLSearchParams(location.search).get('s')) : ''); e1.textContent = '📝 입력칸';
         var e2 = document.createElement('a'); e2.href = mk + '?copy=' + encodeURIComponent(dq); e2.textContent = '📄 복사';
         bar.appendChild(e0); bar.appendChild(e2);

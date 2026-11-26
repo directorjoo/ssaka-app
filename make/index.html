@@ -3840,7 +3840,29 @@
   // 11-27: 예전 모임 업종(산악회·동문회·송년회·행사)은 모두 '모임 공지'로 — 예전 카드 고치기는 그대로
   var LEGACY_MEET = ['club', 'alumni', 'party', 'event'];
   if (qInd && LEGACY_MEET.indexOf(qInd) >= 0) qInd = 'meet';
-  if (!editCard && LEGACY_MEET.indexOf(industry) >= 0) { industry = 'meet'; design = D.list('meet')[0].id; }
+  if (LEGACY_MEET.indexOf(industry) >= 0) {
+    // 예전 모임 카드를 고칠 때도 '모임 공지'로 — 같은 모양(체리나무 등)이 있으면 그대로, 내용 속 일시·장소·회비·계좌·준비물 줄은 제 칸으로
+    var dm = String(design || '').replace(/^(club|alumni|party|event)-/, 'meet-');
+    industry = 'meet'; design = D.get(dm) ? dm : D.list('meet')[0].id;
+    if (editCard) {
+      var KEYF = { '일시': 'subtitle', '날짜': 'subtitle', '장소': 'place', '회비': 'mFee', '계좌': 'mAcct', '회비계좌': 'mAcct', '입금계좌': 'mAcct', '준비물': 'mBring' };
+      var keep = [];
+      String($('body').value || '').split('\n').forEach(function (l) {
+        var m = /^[^가-힣A-Za-z0-9]*\s*(일\s*시|날\s*짜|장\s*소|회\s*비\s*계\s*좌|입\s*금\s*계\s*좌|회\s*비|계\s*좌|준\s*비\s*물)\s*[:：]?\s*(.+)$/.exec(l.trim());
+        var f = m && KEYF[m[1].replace(/\s+/g, '')];
+        if (f && $(f) && !$(f).value.trim()) { $(f).value = m[2].trim(); return; }
+        if (f && $(f) && $(f).value.trim()) return; // 이미 칸에 있는 같은 항목 줄은 빼기 (중복)
+        keep.push(l);
+      });
+      // 인사말 칸이 비어 있으면 문장(…니다·…요)은 인사말로
+      if (!$('greet').value.trim()) {
+        var sent = function (l) { return /(니다|니까|어요|아요|해요|세요|네요|에요|요|다)[.!~♡^]*\s*$/.test(l.trim()); };
+        $('greet').value = keep.filter(sent).join('\n');
+        keep = keep.filter(function (l) { return !sent(l); });
+      }
+      $('body').value = keep.join('\n');
+    }
+  }
   if (qInd && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { if (industry !== qInd) design = D.list(qInd)[0].id; industry = qInd; }
   else if (qInd && D.isOpen && !D.isOpen(qInd)) setTimeout(function () { toast((D.industry(qInd) || {}).label + ' 카드는 곧 열려요!'); }, 600);
   // 1차 공개에 없는 업종이 남아 있으면(예전 초안) 첫 공개 업종으로 (단, 고치기 중인 카드는 그대로)

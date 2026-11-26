@@ -340,7 +340,7 @@
       if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '' });
       var info = el('section', 'sk-info'); info.setAttribute('aria-label', '언제 어디서');
       // 11-27 대표님: '📍 언제 · 어디서' 제목은 뺌 — 일시·장소·회비 항목만으로 충분
-      var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔', '특별당부': '📢' };
+      var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔', '특별당부': '📢', '계좌': '🏦' };
       rows.forEach(function (r) {
         var row = el('div', 'sk-info-r');
         row.appendChild(el('span', 'sk-info-i', IC[r.k] || '•'));
@@ -348,7 +348,14 @@
         tx.appendChild(el('b', '', r.k));
         tx.appendChild(el('span', 'sk-info-v', r.v));
         if (r.sub) tx.appendChild(el('small', '', r.sub));
-        row.appendChild(tx); info.appendChild(row);
+        row.appendChild(tx);
+        // 11-27 모임 공지: 회비 계좌는 회비 바로 아래, 누르면 복사
+        if (r.k === '계좌' && live) {
+          var cpb = el('button', 'sk-info-cp', '📋 복사'); cpb.type = 'button'; row.appendChild(cpb);
+          on(cpb, function (e) { e.stopPropagation(); var t = String(r.v).replace(/\s+/g, ' ').trim(), ok = function () { cpb.textContent = '✔ 복사됨'; setTimeout(function () { cpb.textContent = '📋 복사'; }, 2200); };
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, function () { prompt('복사하세요', t); }); else prompt('복사하세요', t); });
+        }
+        info.appendChild(row);
       });
       bodyBox.appendChild(info);
       bodyBox.appendChild(el('div', 'sk-ro-slot'));

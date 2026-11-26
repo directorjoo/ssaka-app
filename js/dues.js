@@ -22,7 +22,9 @@
     var box = el('section', 'sk-dues'); box.setAttribute('aria-label', '모임 회비');
     var head = el('div', 'sk-du-head'); head.appendChild(el('b', '', '💰 회비')); head.appendChild(el('span', 'sk-du-amt', amt ? won(amt) + (rid ? ' · 1인' : '') : '')); box.appendChild(head);
     if (D.memo) box.appendChild(el('p', 'sk-du-memo', D.memo));
-    if (D.acct) {
+    // 11-27 모임 공지: 계좌가 위 일시·장소·회비 상자에 이미 있으면 여기선 안 보여 줌 (중복 빼기)
+    var acctUp = card.meet && (card.info || []).some(function (r) { return r && r.k === '계좌' && String(r.v).replace(/\s+/g, '') === String(D.acct || '').replace(/\s+/g, ''); });
+    if (D.acct && !acctUp) {
       var ac = el('div', 'sk-du-acct'); ac.appendChild(el('span', '', D.acct));
       var cp = el('button', '', '📋 계좌 복사'); cp.type = 'button'; ac.appendChild(cp); box.appendChild(ac);
       cp.addEventListener('click', function () {

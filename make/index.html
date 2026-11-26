@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=109">
+  <link rel="stylesheet" href="../css/sk.css?v=110">
   <link rel="stylesheet" href="../css/sk-world.css?v=11">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -860,14 +860,19 @@
         <div class="hint">받는 사람이 누르면 카카오맵·네이버지도·구글지도에서 이 이름으로 찾아줘요.</div>
       </fieldset>
       <fieldset data-for="club" data-tab="basic" id="meetFs" hidden>
-        <legend>📋 모임 안내 <small style="font-weight:600;opacity:.7">적은 칸만 카드에 나와요</small></legend>
+        <legend>💰 회비 <small style="font-weight:600;opacity:.7">적은 칸만 카드에 나와요</small></legend>
         <label for="mFee">💰 회비 (선택)</label>
         <input id="mFee" maxlength="60" placeholder="예: 3만원 (현장 납부 가능)">
+        <label for="mAcct">🏦 회비 계좌 (선택 · 카드에서 누르면 복사돼요)</label>
+        <input id="mAcct" maxlength="60" placeholder="예: 국민은행 123456-01-123456 홍길동">
+      </fieldset>
+      <fieldset data-for="club" data-tab="basic" id="meetFs2" hidden>
+        <legend>📋 그 밖의 안내 <small style="font-weight:600;opacity:.7">선택 · 적은 칸만 나와요</small></legend>
         <label for="mBring">🎒 준비물 (선택)</label>
         <input id="mBring" maxlength="80" placeholder="예: 등산화 · 물 · 우비">
         <label for="mNote">📢 특별당부 (선택)</label>
         <textarea id="mNote" rows="2" maxlength="300" placeholder="예: 주차가 어려우니 대중교통을 이용해 주세요"></textarea>
-        <div class="hint">계좌를 넣고 누가 냈는지 체크하려면 아래 ‘💰 회비 받기’를 켜세요.</div>
+        <div class="hint">누가 회비를 냈는지 체크하려면 아래 ‘💰 회비 받기’를 켜세요.</div>
       </fieldset>
 
       <fieldset data-for="shop profile" data-tab="basic" data-part="links" data-snsoff>
@@ -1309,7 +1314,7 @@
 <script src="../js/mkask.js?v=3"></script>
 <script src="../js/indfind.js?v=3"></script>
 <script src="../js/notice.js?v=6"></script>
-<script src="../js/render.js?v=94"></script>
+<script src="../js/render.js?v=95"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1347,7 +1352,7 @@
       ex: { title: '엄마! 나 지금 여기야!', subtitle: '버튼을 누르면 엄마에게 바로 연결돼요', name: '엄마', body: '집 주소: ○○시 ○○동', sosLabel: '📞 엄마한테 전화', locMsg: '나 지금 여기야!' }
     }
   };
-  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'hideList', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'mFee', 'mBring', 'mNote', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
+  var FIELDS = ['kick', 'title', 'subtitle', 'greet', 'hideList', 'image', 'galUrls', 'season', 'motion', 'clip', 'name', 'phone', 'org', 'email', 'zip', 'addr1', 'addr2', 'sosLabel', 'locMsg', 'place', 'body', 'video', 'copyLabel', 'copyValue', 'menu', 'stops', 'pre', 'mFee', 'mAcct', 'mBring', 'mNote', 'account', 'resvMin', 'resvRate', 'sound', 'lkDg', 'lkNv', 'lkNb', 'lkKc', 'lkIg', 'cap', 'galCaps', 'fsz'];
   var $ = function (id) { return document.getElementById(id); };
   var type = 'profile';
   var industry = 'actor';
@@ -1875,6 +1880,29 @@
     }
   }
 
+  // 11-27 대표님: 모임 공지 질문 순서 = 제목 → 인사말 → 일시 → 장소 → 회비 → 회비 계좌 → 참석·불참 받기 → 참석자 명단(붙여넣기) → 그 밖에
+  //   다른 카드로 바꾸면 원래 자리로 되돌림 (자리표 주석을 남겨 둠)
+  var MO_HOME = [];
+  function moMove(n, ref, before) {
+    if (!n || !ref) return;
+    if (!n._moHome) { n._moHome = document.createComment('mo'); n.parentNode.insertBefore(n._moHome, n); MO_HOME.push(n); }
+    if (before) ref.parentNode.insertBefore(n, ref); else ref.parentNode.insertBefore(n, ref.nextSibling);
+  }
+  function meetOrder(on) {
+    var front = $('title').closest('fieldset'), greetD = document.querySelector('[data-part="greetmsg"]'), subL = document.querySelector('label[for="subtitle"]');
+    var placeF = document.querySelector('fieldset[data-part="place"]'), rosF = document.querySelector('fieldset[data-part="roster"]'), preB = document.querySelector('#rosterBox [data-part="pre"]');
+    if (!on) {
+      MO_HOME.splice(0).forEach(function (n) { if (n._moHome && n._moHome.parentNode) { n._moHome.parentNode.insertBefore(n, n._moHome); n._moHome.remove(); } n._moHome = null; });
+      return;
+    }
+    if (MO_HOME.length) return; // 이미 모임 공지 순서
+    moMove(greetD, subL, true);                 // 제목 → 인사말 → 일시
+    moMove(placeF, front);                      // → 장소
+    moMove($('meetFs'), placeF);                // → 회비 · 계좌
+    moMove(rosF, $('meetFs'));                  // → 참석·불참 받기
+    moMove(preB, $('rosterBox').lastElementChild); // → 맨 끝에 참석자 명단 붙여넣기
+    moMove($('meetFs2'), rosF);                 // → 준비물 · 특별당부
+  }
   var BASE_L = {};
   document.querySelectorAll('[data-l]').forEach(function (el) { BASE_L[el.dataset.l] = el.textContent; });
   function applyIndustry(ind) {
@@ -1913,7 +1941,8 @@
     if (!pubTouched && PUBH) setPub(F.pub != null ? F.pub : 2);
     if (type === 'club') $('gisuOn').checked = !!F.gisu;
     // 11-27 모임 공지: 회비·준비물·특별당부 칸 · 기수·탑승지는 '더 넣기'에 접어 둠 (예전 산악회·동문회 카드를 고칠 땐 펼쳐 둠)
-    $('meetFs').hidden = ind.id !== 'meet';
+    $('meetFs').hidden = $('meetFs2').hidden = ind.id !== 'meet';
+    meetOrder(ind.id === 'meet');
     var ma = $('moreAdd'), maKids = ma.querySelectorAll('[data-part]');
     ma.hidden = Array.prototype.every.call(maKids, function (k) { return k.hidden; });
     ma.open = !F.more && !ma.hidden;
@@ -2089,7 +2118,7 @@
     // 11-27 모임 공지: 회비·준비물·특별당부는 따로 적은 칸 — 안 적은 칸은 카드에 아예 안 나옴
     if (industry === 'meet') {
       card.meet = 1;
-      var mi = [['회비', g('mFee')], ['준비물', g('mBring')], ['특별당부', g('mNote')]].filter(function (x) { return String(x[1] || '').trim(); }).map(function (x) { return { k: x[0], v: String(x[1]).trim() }; });
+      var mi = [['회비', g('mFee')], ['계좌', g('mAcct')], ['준비물', g('mBring')], ['특별당부', g('mNote')]].filter(function (x) { return String(x[1] || '').trim(); }).map(function (x) { return { k: x[0], v: String(x[1]).trim() }; });
       if (mi.length) card.info = mi;
     }
     // 당근·네이버·카톡 채널·인스타 (https 주소만)
@@ -2137,6 +2166,7 @@
     // 모임 회비 (11-23): card.dues = {amt, memo, acct, pay} — 입금 체크는 참석 명단 줄에 (미납 알림 없음)
     if (type === 'club' && $('duesOn').checked && (FORM.hide || []).indexOf('dues') < 0) {
       var du = { amt: Math.max(0, Math.min(10000000, parseInt($('dAmt').value, 10) || 0)) || undefined, memo: v('dMemo') || undefined, acct: v('dAcct') || undefined, pay: /^https:\/\/(qr\.kakaopay\.com|link\.kakaopay\.com|toss\.me)\//.test(v('dPay')) ? v('dPay') : undefined };
+      if (!du.acct && industry === 'meet' && v('mAcct')) du.acct = v('mAcct');
       if (du.amt || du.acct || du.pay) card.dues = du;
     }
     // 모임 사진첩 (11-23): 참석 명단이 있으면 같은 번호, 없으면 같은 제목끼리 같은 번호 → card.album
@@ -2186,7 +2216,7 @@
       try {
         var preP = document.querySelector('#rosterBox [data-part="pre"]'), rosFs = document.querySelector('fieldset[data-part="roster"]');
         var preOk = type === 'club' && !destSns() && preP && !preP.hidden && rosFs && !rosFs.hidden;
-        $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk; $('topPreGo').hidden = !preOk;
+        $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk; $('topPreGo').hidden = !preOk || industry === 'meet';
         if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; var dps = $('donePre').querySelector('small'); if (dps) dps.textContent = $('pvPreN').textContent; $('topPreN').textContent = $('pvPreN').textContent; }
       } catch (e) {}
       // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
@@ -3622,7 +3652,7 @@
     set('name', ci.name); set('phone', ci.phone); set('org', ci.org); set('email', ci.email);
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));
-    (Array.isArray(c.info) ? c.info : []).forEach(function (r) { var id = { '회비': 'mFee', '준비물': 'mBring', '특별당부': 'mNote' }[r && r.k]; if (id) set(id, r.v); });
+    (Array.isArray(c.info) ? c.info : []).forEach(function (r) { var id = { '회비': 'mFee', '계좌': 'mAcct', '준비물': 'mBring', '특별당부': 'mNote' }[r && r.k]; if (id) set(id, r.v); });
     var lk = c.links || {}; set('lkDg', lk.dg); set('lkNv', lk.nv); set('lkNb', lk.nb); set('lkKc', lk.kc); set('lkIg', lk.ig);
     if (c.copy) { set('copyLabel', c.copy.label); set('copyValue', c.copy.value); }
     set('sosLabel', c.sosLabel); set('locMsg', c.locationMessage);

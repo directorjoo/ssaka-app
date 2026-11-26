@@ -73,6 +73,7 @@
     var join = el('button', 'sk-ro-join', '🙋 참석할게요'); join.type = 'button'; btns.appendChild(join);
     var nogo = el('button', 'sk-ro-no', '🙅 못 가요'); nogo.type = 'button'; btns.appendChild(nogo);
     box.appendChild(btns);
+    box.appendChild(openL); // 11-27 대표님: 참석·불참 단추 다음에 '📋 참석자 명단 보기' 탭
     // 주최자 도구: 카톡 안 하는 분 — 문자로 공지 보내기 · 전화로 받은 답 대신 적기 (11-23)
     var tools = el('div', 'sk-ro-tools');
     var addFor = el('button', 'sk-ro-copy', '✍️ 대신 적기 (카톡 안 하는 분·전화로 받은 답)'); addFor.type = 'button'; tools.appendChild(addFor);

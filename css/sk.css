@@ -857,3 +857,6 @@
 .sk-hidex { display: none; }
 .sk-pe-on .sk-xable { position: relative; outline: 2px dashed rgba(179,19,43,.55); outline-offset: 3px; }
 .sk-pe-on .sk-hidex { display: inline-flex; position: absolute; top: -12px; right: 6px; z-index: 5; align-items: center; padding: 6px 11px; border: 0; border-radius: 999px; background: #1A1A1A; color: #fff; font: 800 13px/1.1 inherit; font-family: inherit; box-shadow: 0 4px 12px -4px rgba(0,0,0,.5); cursor: pointer; }
+/* 11-27 모임 공지: 회비 계좌 복사 단추 (일시·장소·회비 상자 안) */
+.sk-info-r .sk-info-t { flex: 1; min-width: 0; }
+.sk-info-cp { flex: 0 0 auto; align-self: center; padding: 8px 12px; border: 0; border-radius: 999px; background: var(--accent, #B3132B); color: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }

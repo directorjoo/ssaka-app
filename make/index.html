@@ -565,8 +565,14 @@
   .shop-more-btn { display: none; width: 100%; margin: 18px 0 6px; padding: 14px 16px; border: 2px dashed #E3C2BA; border-radius: 16px; background: #FFFDF9; color: #8E0A1C; font: inherit; font-size: 18px; font-weight: 900; text-align: left; cursor: pointer; }
   .shop-more-btn small { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; color: #6b5d55; line-height: 1.45; word-break: keep-all; }
   body.shop-lite:not(.dest-sns) .shop-more-btn { display: block; }
+  .rv-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 12px; }
+  .rv-tabs button { min-height: 58px; padding: 8px 6px; border-radius: 14px; border: 2px solid #E3C2BA; background: #fff; color: #5a4a44; font: inherit; font-size: 17px; font-weight: 900; line-height: 1.25; word-break: keep-all; cursor: pointer; }
+  .rv-tabs button small { display: block; margin-top: 2px; font-size: 13.5px; font-weight: 800; }
+  .rv-tabs button[data-rv="sava"][aria-selected="true"] { border-color: #B3132B; background: #B3132B; color: #fff; }
+  .rv-tabs button[data-rv="naver"][aria-selected="true"] { border-color: #03A94D; background: #03A94D; color: #fff; }
+  body.dest-sns #rvSava { display: block !important; }
   .nb-tip { display: none; margin: 0 0 8px !important; padding: 10px 12px; border-radius: 12px; background: #EAF8EF; color: #145A2E; }
-  body.shop-lite .nb-tip { display: block; }
+  #resvFs .nb-tip { display: block; }
   @media (max-width: 859px) { .mk-s1 .preview, .mk-s2 .preview { display: none !important; } }
   /* 11-23 대표님: 용도를 고르면 바로 쓰기 — 고른 용도는 한 줄로 접고, 디자인은 옆으로 넘기는 작은 띠로 한눈에, 그 아래 바로 쓰는 칸 */
   .usesum { display: none; align-items: center; gap: 8px; margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: #fff; border: 1.5px solid #E9E2D8; font-size: 15.5px; font-weight: 800; }
@@ -885,15 +891,12 @@
       <fieldset data-for="shop profile" data-tab="basic" data-part="links" data-snsoff>
         <legend id="lkLeg">우리 가게 다른 곳 (선택)</legend>
         <div class="hint" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
-        <div class="hint nb-tip" id="nbTip">💡 싸바는 아직 결제가 안 돼요. <b>네이버 예약</b> 주소를 넣으면 손님이 카드에서 네이버로 예약하고, 예약금·결제도 네이버페이로 해요 (네이버 스마트플레이스에서 예약·결제를 켜 둔 가게).</div>
         <div data-part="lk-dg" data-lite><label for="lkDg">🥕 당근 비즈프로필</label>
         <input id="lkDg" type="url" inputmode="url" placeholder="https://www.daangn.com/…"></div>
         <div data-part="lk-nv"><label for="lkNv" id="lkNvLab">🟢 네이버 플레이스·예약</label>
         <input id="lkNv" type="url" inputmode="url" placeholder="https://naver.me/…"></div>
-        <div data-part="lk-nb"><label for="lkNb">📅 네이버 예약 <small style="font-weight:700;color:#8a7f78">(카드에 큰 예약 단추로 나와요)</small></label>
-        <input id="lkNb" type="url" inputmode="url" placeholder="https://naver.me/… 또는 https://m.booking.naver.com/…"></div>
         <button type="button" class="mini" id="nvFind" style="margin-top:8px;width:100%;border-color:#03A94D;color:#03A94D">🟢 네이버에서 우리 가게 찾기 → 링크 복사해 오기</button>
-        <div class="hint" id="nvHow" hidden>네이버 지도에서 우리 가게 → <b>공유</b> → <b>링크 복사</b> → 돌아와서 위 '네이버 플레이스' 칸에 붙여 넣기. 예약이 있으면 <b>예약</b> 화면에서 같은 방법으로 '네이버 예약' 칸에.</div>
+        <div class="hint" id="nvHow" hidden>네이버 지도에서 우리 가게 → <b>공유</b> → <b>링크 복사</b> → 돌아와서 위 '네이버 플레이스' 칸에 붙여 넣기. 예약은 아래 '📅 예약 받기 → 🟢 네이버 예약' 칸에.</div>
         <div data-part="lk-kc" data-lite><label for="lkKc">💬 카카오톡 채널</label>
         <input id="lkKc" type="url" inputmode="url" placeholder="https://pf.kakao.com/…"></div>
         <div data-part="lk-ig" data-lite><label for="lkIg">📷 인스타그램</label>
@@ -989,7 +992,46 @@
         </div>
       </fieldset>
 
-      <button type="button" class="shop-more-btn" id="shopMoreBtn" aria-expanded="false">➕ 더 넣기 <small>싸바 예약 받기 · 당근·카톡채널·인스타 링크 · 동영상 · 복사 단추 · 글씨 크기 · 움직임 · 시즌 · 소리</small></button>
+      <fieldset data-for="shop" data-tab="content" data-part="resv" id="resvFs">
+        <legend><span class="kk-only">📅 예약 받기 (선택)</span><span class="sns-only">메뉴와 가격</span></legend>
+        <div class="hint sns-only">📷 사진에 들어갈 메뉴예요. "메뉴 이름 가격" 순서로 한 줄에 하나씩. 많이 적어도 올릴 곳 크기에 맞게 앞에서부터 넣어요.</div>
+        <div class="rv-tabs kk-only" role="tablist" aria-label="예약 받는 방법">
+          <button type="button" role="tab" data-rv="sava" aria-selected="true">🍒 싸바 직접 예약<small id="rvSavaSt"></small></button>
+          <button type="button" role="tab" data-rv="naver" aria-selected="false">🟢 네이버 예약<small id="rvNbSt"></small></button>
+        </div>
+        <div class="rv-pane kk-only" id="rvNaver" hidden>
+          <div class="hint nb-tip" id="nbTip">💡 싸바는 아직 결제가 안 돼요. <b>네이버 예약</b> 주소를 넣으면 손님이 카드에서 네이버로 예약하고, 예약금·결제도 네이버페이로 해요 (네이버 스마트플레이스에서 예약·결제를 켜 둔 가게).</div>
+          <div data-part="lk-nb"><label for="lkNb">📅 네이버 예약 <small style="font-weight:700;color:#8a7f78">(카드에 큰 예약 단추로 나와요)</small></label>
+        <input id="lkNb" type="url" inputmode="url" placeholder="https://naver.me/… 또는 https://m.booking.naver.com/…"></div>
+          <button type="button" class="mini" id="nbFind" style="margin-top:8px;width:100%;border-color:#03A94D;color:#03A94D">🟢 네이버에서 우리 가게 예약 화면 찾기</button>
+          <div class="hint">네이버 지도에서 우리 가게 → <b>예약</b> → <b>공유</b> → <b>링크 복사</b> → 돌아와서 위 칸에 붙여 넣기.</div>
+        </div>
+        <div class="rv-pane" id="rvSava">
+        <label class="switch kk-only"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
+        <div id="resvBox" hidden>
+          <label for="menu" data-l="menu" class="kk-only">메뉴와 가격 (한 줄에 하나, 선택)</label>
+          <textarea id="menu" maxlength="800" placeholder="갓김치 삼겹살 15000&#10;점심 백반 9000"></textarea>
+          <div class="hint kk-only" data-l="menuHint">"메뉴 이름 가격" 순서로 적으면 손님이 수량을 고르고 예상 금액이 계산돼요.</div>
+          <div id="depBox" class="kk-only">
+          <label for="account">예약금 받을 계좌</label>
+          <input id="account" maxlength="60" placeholder="OO은행 000-0000-0000 예금주">
+          <div class="row">
+            <div>
+              <label for="resvMin">예약금 받는 인원</label>
+              <select id="resvMin"><option value="2">2명 이상</option><option value="3">3명 이상</option><option value="4" selected>4명 이상</option><option value="6">6명 이상</option><option value="10">10명 이상</option></select>
+            </div>
+            <div>
+              <label for="resvRate">예약금 비율</label>
+              <select id="resvRate"><option value="0.1">예상 금액의 10%</option><option value="0.2" selected>예상 금액의 20%</option><option value="0.3">예상 금액의 30%</option><option value="0.5">예상 금액의 50%</option></select>
+            </div>
+          </div>
+          </div>
+          <div class="hint kk-only">손님이 예약하면 날짜·시간·인원·메뉴·예약금이 정리된 문자가 위 전화번호로 와요. 취소도 예약번호가 담긴 문자로 와요.</div>
+        </div>
+        </div>
+      </fieldset>
+
+      <button type="button" class="shop-more-btn" id="shopMoreBtn" aria-expanded="false">➕ 더 넣기 <small>당근·카톡채널·인스타 링크 · 동영상 · 복사 단추 · 글씨 크기 · 움직임 · 시즌 · 소리</small></button>
       <fieldset data-tab="content" id="fsFs" data-snsoff data-lite>
         <legend>🔠 글씨 크기</legend>
         <div class="hint" style="margin:0 0 8px">바꿀 곳을 고르고 크기를 누르세요. 위 미리보기에 바로 보여요.</div>
@@ -1011,32 +1053,6 @@
             <label for="copyValue" id="copyValLab">복사될 내용</label>
             <input id="copyValue" maxlength="120">
           </div>
-        </div>
-      </fieldset>
-
-      <fieldset data-for="shop" data-tab="content" data-part="resv" id="resvFs" data-lite>
-        <legend><span class="kk-only">예약 받기</span><span class="sns-only">메뉴와 가격</span></legend>
-        <div class="hint sns-only">📷 사진에 들어갈 메뉴예요. "메뉴 이름 가격" 순서로 한 줄에 하나씩. 많이 적어도 올릴 곳 크기에 맞게 앞에서부터 넣어요.</div>
-        <label class="switch kk-only"><input type="checkbox" id="resvOn"> <span data-l="resv">손님이 카드에서 바로 예약할 수 있게 하기</span></label>
-        <div id="resvBox" hidden>
-          <label for="menu" data-l="menu" class="kk-only">메뉴와 가격 (한 줄에 하나, 선택)</label>
-          <textarea id="menu" maxlength="800" placeholder="갓김치 삼겹살 15000&#10;점심 백반 9000"></textarea>
-          <div class="hint kk-only" data-l="menuHint">"메뉴 이름 가격" 순서로 적으면 손님이 수량을 고르고 예상 금액이 계산돼요.</div>
-          <div id="depBox" class="kk-only">
-          <label for="account">예약금 받을 계좌</label>
-          <input id="account" maxlength="60" placeholder="OO은행 000-0000-0000 예금주">
-          <div class="row">
-            <div>
-              <label for="resvMin">예약금 받는 인원</label>
-              <select id="resvMin"><option value="2">2명 이상</option><option value="3">3명 이상</option><option value="4" selected>4명 이상</option><option value="6">6명 이상</option><option value="10">10명 이상</option></select>
-            </div>
-            <div>
-              <label for="resvRate">예약금 비율</label>
-              <select id="resvRate"><option value="0.1">예상 금액의 10%</option><option value="0.2" selected>예상 금액의 20%</option><option value="0.3">예상 금액의 30%</option><option value="0.5">예상 금액의 50%</option></select>
-            </div>
-          </div>
-          </div>
-          <div class="hint kk-only">손님이 예약하면 날짜·시간·인원·메뉴·예약금이 정리된 문자가 위 전화번호로 와요. 취소도 예약번호가 담긴 문자로 와요.</div>
         </div>
       </fieldset>
 
@@ -1913,7 +1929,7 @@
     moMove($('meetFs2'), rosF);                 // → 준비물 · 특별당부
   }
   // 11-27 B-2: 영업장 카드 '더 넣기' — 이미 그런 칸을 쓴 카드(고치기·초안)는 펼쳐 둠
-  function shopMoreUsed() { return ['clip', 'copyValue', 'lkDg', 'lkKc', 'lkIg', 'motion'].some(function (f) { return $(f) && $(f).value; }) || ($('resvOn') && $('resvOn').checked && !!editCard); }
+  function shopMoreUsed() { return ['clip', 'copyValue', 'lkDg', 'lkKc', 'lkIg', 'motion'].some(function (f) { return $(f) && $(f).value; }); }
   function shopMoreSet(on) { document.body.classList.toggle('shop-more', on); var b = $('shopMoreBtn'); if (b) { b.setAttribute('aria-expanded', on ? 'true' : 'false'); b.firstChild.nodeValue = on ? '➖ 접기 ' : '➕ 더 넣기 '; } }
   function shopLite(on) {
     document.body.classList.toggle('shop-lite', on);
@@ -3610,6 +3626,22 @@
   function nvOpen(q) { window.open('https://map.naver.com/p/search/' + encodeURIComponent(q || '우리 가게'), '_blank', 'noopener'); }
   if ($('bizNv')) $('bizNv').addEventListener('click', function () { var q = $('bizQ').value.trim(); nvOpen(q); $('bizModal').hidden = true; if ($('nvHow')) $('nvHow').hidden = false; });
   if ($('nvFind')) $('nvFind').addEventListener('click', function () { var q = ($('title').value || $('name').value || '').trim(); $('nvHow').hidden = false; nvOpen(q); });
+  // 11-27 대표님: 예약 받기 = [🍒 싸바 직접 예약][🟢 네이버 예약] 두 탭 나란히 (둘 다 써도 됨, 카드엔 넣은 것만)
+  function rvStat() {
+    var sv = $('rvSavaSt'), nb = $('rvNbSt'); if (!sv || !nb) return;
+    sv.textContent = $('resvOn').checked ? '✓ 켜짐' : '';
+    nb.textContent = /^https:\/\/\S+$/.test(($('lkNb').value || '').trim()) ? '✓ 넣음' : '';
+  }
+  function rvShow(k) {
+    document.querySelectorAll('.rv-tabs button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.rv === k ? 'true' : 'false'); });
+    $('rvSava').hidden = k !== 'sava'; $('rvNaver').hidden = k !== 'naver'; rvStat();
+  }
+  function rvAuto() { rvShow(($('lkNb').value || '').trim() && !$('resvOn').checked ? 'naver' : 'sava'); }
+  document.querySelectorAll('.rv-tabs button').forEach(function (b) { b.addEventListener('click', function () { rvShow(b.dataset.rv); }); });
+  $('lkNb').addEventListener('input', rvStat);
+  $('resvOn').addEventListener('change', rvStat);
+  if ($('nbFind')) $('nbFind').addEventListener('click', function () { nvOpen(($('title').value || $('name').value || '').trim()); });
+  setTimeout(rvAuto, 0);
   function applyBiz(p) {
     var cat = (p.category_name || '').split(' > ').slice(-1)[0];
     var addr = p.road_address_name || p.address_name || '';
@@ -3674,7 +3706,7 @@
     if (ci.address) { set('zip', ci.address.zip); set('addr1', ci.address.street); }
     set('place', c.place && c.place.name); set('body', (c.body || []).join('\n'));
     (Array.isArray(c.info) ? c.info : []).forEach(function (r) { var id = { '회비': 'mFee', '계좌': 'mAcct', '준비물': 'mBring', '특별당부': 'mNote' }[r && r.k]; if (id) set(id, r.v); });
-    var lk = c.links || {}; set('lkDg', lk.dg); set('lkNv', lk.nv); set('lkNb', lk.nb); set('lkKc', lk.kc); set('lkIg', lk.ig);
+    var lk = c.links || {}; set('lkDg', lk.dg); set('lkNv', lk.nv); set('lkNb', lk.nb); set('lkKc', lk.kc); set('lkIg', lk.ig); try { setTimeout(rvAuto, 0); } catch (e) {}
     if (c.copy) { set('copyLabel', c.copy.label); set('copyValue', c.copy.value); }
     set('sosLabel', c.sosLabel); set('locMsg', c.locationMessage);
     if (c.sound) { set('sound', c.sound); soundTouched = true; }

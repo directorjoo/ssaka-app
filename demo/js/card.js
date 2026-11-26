@@ -7,6 +7,13 @@
   var toastEl = document.getElementById('toast');
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+  // 11-26 초대 카드: 본문을 다시 그려도 참석 명단(회비·사진첩) 자리는 그대로 옮겨 둠
+  function keepSlot(from, to) {
+    var ns = to && to.querySelector && to.querySelector('.sk-ro-slot');
+    if (!from || !ns) return;
+    while (from.firstChild) ns.appendChild(from.firstChild);
+  }
+
   function h(tag, attrs, children) {
     var el = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
@@ -235,13 +242,14 @@
         window.SavaPreviewMode = function (on) { root.classList.toggle('sk-pe-on', !!on); };
         try { if (window.parent.SavaEditOn && window.parent.SavaEditOn()) root.classList.add('sk-pe-on'); } catch (e) {}
         root.addEventListener('click', function (e) {
-          var t = e.target.closest('.sk-kick, .sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li');
+          var t = e.target.closest('.sk-kick, .sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li, .sk-info-r');
           if (!t || t.isContentEditable) return;
-          var li = t.closest('.sk-list li'), key, idx = -1, part = 'all';
+          var li = t.closest('.sk-list li, .sk-info-r'), key, idx = -1, part = 'all';
           if (li) {
             // 내용은 한 칸에서 여러 줄을 한꺼번에 고침 (줄 추가·삭제·이어서 고치기)
             e.preventDefault(); e.stopPropagation();
-            var ul = li.parentNode, ta = document.createElement('textarea'); ta.className = 'sk-edta';
+            var ul = li.closest('.sk-body') || li.parentNode, ta = document.createElement('textarea'); ta.className = 'sk-edta';
+            ta._slot = ul.querySelector('.sk-ro-slot');
             ta.value = (pristine.body || []).join('\n');
             ul.replaceWith(ta);
             var fit = function () { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 4) + 'px'; };
@@ -255,8 +263,8 @@
               // 미리보기를 새로 불러오지 않고 그 자리에서 다시 그림 → 화면이 위로 튀지 않음
               pristine.body = lines;
               var tmp = SsakaRender.build(Object.assign({}, card, { body: lines }), design, ctx);
-              var nl = tmp.querySelector('.sk-list') || el2('ul', 'sk-list');
-              ta.replaceWith(nl);
+              var nl = tmp.querySelector('.sk-body') || tmp.querySelector('.sk-list') || el2('ul', 'sk-list');
+              keepSlot(ta._slot, nl); ta.replaceWith(nl);
               PE('bodyAll', -1, 'all', lines.join('\n'));
             }, { once: true });
             return;
@@ -436,8 +444,8 @@
     function push() { var x = snapE(); if (HIST[HIST.length - 1] !== x) HIST.push(x); bUn.disabled = HIST.length < 2; }
     function redrawList() {
       var tmp = SsakaRender.build(Object.assign({}, card, { body: lines.concat(addr) }), design, ctx);
-      var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' }), ol = root.querySelector('.sk-list');
-      if (ol) ol.replaceWith(nl);
+      var nl = tmp.querySelector('.sk-body') || tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' }), ol = root.querySelector('.sk-body') || root.querySelector('.sk-list');
+      if (ol) { keepSlot(ol.querySelector('.sk-ro-slot'), nl); ol.replaceWith(nl); }
     }
     // ---------- 사진·전화·주소도 이 화면에서 한 번에 (입력칸으로 갈 필요 없음) ----------
     var oc = orig.contact || {};
@@ -723,9 +731,11 @@
       e.addEventListener('blur', push);
     });
     // 내용: 누르면 줄 단위로 고치는 칸으로 바뀜
-    function list() { return root.querySelector('.sk-list'); }
+    function list() { return root.querySelector('.sk-body') || root.querySelector('.sk-list'); }
     function openBody(ev) {
       var ul = list(); if (!ul || ev && !ul.contains(ev.target)) return;
+      if (ev && ev.target.closest && ev.target.closest('.sk-ro-slot, .sk-actions')) return; // 참석·길찾기 단추는 그대로 눌리게
+      var slotKeep = ul.querySelector('.sk-ro-slot');
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
       var ta = document.createElement('textarea'); ta.className = 'sk-edta'; ta.value = lines.join('\n');
       ul.replaceWith(ta);
@@ -735,8 +745,8 @@
       ta.addEventListener('blur', function () {
         lines = ta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
         var tmp = SsakaRender.build(Object.assign({}, card, { body: lines.concat(addr) }), design, ctx);
-        var nl = tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' });
-        ta.replaceWith(nl);
+        var nl = tmp.querySelector('.sk-body') || tmp.querySelector('.sk-list') || h('ul', { class: 'sk-list' });
+        keepSlot(slotKeep, nl); ta.replaceWith(nl);
         tip.style.opacity = '0';
         push();
       }, { once: true });

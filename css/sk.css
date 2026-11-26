@@ -830,3 +830,18 @@
 .sk-du-list li.on i { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
 .sk-du-list .tell { flex: none; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,.06); font-size: 12.5px; font-weight: 800; }
 .sk-dues .sk-fine { margin: 10px 0 0; font-size: 14px; color: var(--sub); }
+
+/* 11-26 초대·모임 카드: 사진 → 인사말 → 📍 언제·어디서(길찾기·전화) → 참석 여부·명단 → 자세한 안내 */
+.sk-inv .sk-greet { margin-top: 18px; }
+.sk-inv .sk-greet li { margin: 0 0 10px; line-height: 1.75; }
+.sk-info { margin: 18px 0 6px; padding: 16px 16px 12px; border-radius: 18px; background: color-mix(in srgb, var(--paper) 94%, var(--accent)); color: var(--ink); border: 1.5px solid color-mix(in srgb, var(--accent) 26%, transparent); font-family: var(--f-body); text-align: left; }
+.sk .sk-info-h { margin: 0 0 10px; font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.sk-info-r { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; }
+.sk-info-r + .sk-info-r { border-top: 1px solid var(--line-ink, rgba(0,0,0,.1)); }
+.sk-info-i { flex: none; width: 24px; text-align: center; font-size: 18px; line-height: 1.4; }
+.sk-info-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; word-break: keep-all; overflow-wrap: anywhere; }
+.sk-info-t b { font-size: 13px; font-weight: 800; color: var(--accent); }
+.sk-info-v { font-size: 16.5px; font-weight: 700; line-height: 1.45; }
+.sk-info-t small { font-size: 14px; opacity: .78; line-height: 1.45; }
+.sk-info .sk-actions { margin: 12px 0 0; }
+.sk-inv .sk-more-info { margin-top: 14px; }

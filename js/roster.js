@@ -372,8 +372,9 @@
       sheet.appendChild(bx); root.appendChild(sheet);
     }
 
-    var anchor = root.querySelector('.sk-actions') || root.querySelector('.sk-wrap') || root;
-    if (anchor === root || anchor.classList.contains('sk-wrap')) anchor.appendChild(box); else anchor.insertAdjacentElement('afterend', box);
+    var slot = root.querySelector('.sk-ro-slot'); // 11-26 초대 카드: 언제·어디서 바로 아래
+    var anchor = slot || root.querySelector('.sk-actions') || root.querySelector('.sk-wrap') || root;
+    if (slot || anchor === root || anchor.classList.contains('sk-wrap')) anchor.appendChild(box); else anchor.insertAdjacentElement('afterend', box);
     // 주인 폰이면(열쇠 있음) 주인 확인 — 처음이면 카드에서 고른 공개 방식으로 정함
     if (hk && live) fetch(API + R.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'claim', hk: hk, tok: tok, pub: R.pub != null ? R.pub | 0 : undefined }) }).then(function (r) { return r.json(); }).then(function (j) { if (j.list) take(j); else load(); }, load); else load();
     // 다른 사람이 신청한 것도 보이게, 화면을 다시 볼 때마다 새로 불러옴

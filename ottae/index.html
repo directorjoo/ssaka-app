@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🛒 이거 어때? · 싸바</title>
+<meta property="og:title" content="🛒 이거 어때?">
+<meta property="og:description" content="쿠팡에서 본 물건, 한마디 붙여 보내 보세요 · 눌러서 열기">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://sava.kr/img/ssaka-square.png?v=1">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="800">
+<meta name="theme-color" content="#B3132B">
+<style>
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;word-break:keep-all}
+  body{margin:0;background:linear-gradient(180deg,#FFF8EE 0%,#FFFFFF 38%,#FFF9F2 100%);color:#2a211c;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;min-height:100dvh}
+  .wrap{max-width:520px;margin:0 auto;padding:14px 16px 40px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .top a{color:#B3132B;font-weight:800;text-decoration:none;font-size:16px}
+  h1{font-size:30px;margin:6px 0 4px;letter-spacing:-1px}
+  .lead{font-size:17px;color:#6b5f57;margin:0 0 14px;line-height:1.55}
+  .stp{background:#fff;border:1px solid #f0e3d6;border-radius:18px;padding:14px 14px 16px;margin:12px 0;box-shadow:0 4px 14px -10px rgba(110,60,20,.35)}
+  .stp-h{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:900;margin:0 0 10px}
+  .stp-h b{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#B3132B;color:#fff;font-size:15px}
+  .stp-h small{font-weight:600;color:#9a8c81;font-size:15px}
+  textarea,input[type=text]{width:100%;font:inherit;font-size:17px;padding:12px 13px;border:1.5px solid #e6d8ca;border-radius:12px;background:#fffdfa;color:#2a211c}
+  textarea:focus,input:focus{outline:none;border-color:#B3132B}
+  .hint{font-size:15px;color:#8a7d73;margin:8px 2px 0;line-height:1.5}
+  .btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:54px;border:0;border-radius:14px;font:inherit;font-size:19px;font-weight:900;cursor:pointer;text-decoration:none}
+  .btn.cherry{background:linear-gradient(180deg,#C8243C,#B3132B);color:#fff;box-shadow:0 6px 14px -8px rgba(120,10,30,.7)}
+  .btn.kakao{background:#FEE500;color:#191919}
+  .btn.ghost{background:#f6efe8;color:#5a4a3f;min-height:46px;font-size:16px}
+  .btn:disabled{opacity:.45}
+  .row{display:flex;gap:8px}.row>*{flex:1}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid #ecdccd;background:#fff;border-radius:999px;padding:10px 14px;font:inherit;font-size:17px;font-weight:800;color:#3a2d25;cursor:pointer}
+  .chip.on{background:#B3132B;border-color:#B3132B;color:#fff}
+  /* 상품 미리보기 */
+  .prod{display:flex;gap:12px;align-items:center;background:#fffaf4;border:1px solid #f0e3d6;border-radius:14px;padding:10px;margin-top:10px}
+  .prod img{width:84px;height:84px;object-fit:cover;border-radius:10px;background:#f3e9df;flex:none}
+  .prod .pn{font-size:16px;font-weight:800;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .prod .pp{font-size:17px;font-weight:900;color:#B3132B;margin-top:3px}
+  .loading{font-size:15px;color:#8a7d73;margin-top:8px}
+  .shot{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .shot label{flex:1}
+  /* 받는 화면 — 엽서 */
+  .card{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 14px 34px -18px rgba(90,30,20,.55);border:1px solid #f1e2d4;margin-top:6px}
+  .bub{margin:18px 16px 0;padding:16px 18px;border-radius:20px 20px 20px 6px;background:linear-gradient(160deg,#FFE9EC,#FFFFFF);border:1px solid #f6d5da;animation:tuk .5s cubic-bezier(.2,1.6,.4,1) both}
+  .bub .who{font-size:15px;color:#9a6b70;font-weight:800}
+  .bub .q{font-size:28px;font-weight:900;letter-spacing:-.8px;margin-top:4px;line-height:1.3}
+  .bub .w{font-size:18px;line-height:1.55;margin-top:6px;white-space:pre-line}
+  @keyframes tuk{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.bub{animation:none}}
+  .pic{display:block;width:calc(100% - 32px);margin:14px 16px 0;aspect-ratio:1/1;object-fit:contain;background:#faf5ef;border-radius:16px}
+  .pinfo{padding:12px 18px 0}
+  .pinfo .pn{font-size:19px;font-weight:800;line-height:1.45}
+  .pinfo .pp{font-size:22px;font-weight:900;color:#B3132B;margin-top:4px}
+  .go{margin:14px 16px 18px;width:calc(100% - 32px)}
+  .prev{font-size:15px;color:#7a6d63;background:#f3eee8;border-radius:14px 14px 14px 4px;padding:9px 12px;margin:12px 16px 0;display:inline-block}
+  .rbox{margin-top:16px;background:linear-gradient(180deg,#FFFDF7,#FFF6EA);border:1px solid #f0e0cb;border-radius:20px;padding:22px 14px 16px;position:relative}
+  .rbox .tag{position:absolute;top:-14px;left:16px;background:linear-gradient(180deg,#C8243C,#B3132B);color:#fff;font-size:15px;font-weight:900;padding:6px 14px;border-radius:999px}
+  .rbox textarea{margin-top:12px;background:repeating-linear-gradient(#fffdfa 0 33px,#efe3d6 33px 34px);line-height:34px;padding-top:2px}
+  .sv-wtab{display:flex;align-items:center;justify-content:center;gap:6px;margin:40px auto 6px;max-width:320px;min-height:50px;border-radius:999px;background:linear-gradient(180deg,#C8243C,#B3132B);color:#fff;font-size:17px;font-weight:900;text-decoration:none}
+  .note{font-size:14px;color:#9a8c81;text-align:center;margin-top:14px;line-height:1.5}
+  .toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(30,20,15,.9);color:#fff;padding:12px 18px;border-radius:14px;font-size:16px;font-weight:700;z-index:99;max-width:90vw;text-align:center}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ✍️ 보내는 화면 -->
+<section id="viewSend" hidden>
+  <div class="top"><span></span><a href="/?story=1">🍒 싸바</a></div>
+  <h1>🛒 이거 어때?</h1>
+  <p class="lead">쿠팡에서 본 물건, 한마디 붙여서 보내 보세요.</p>
+
+  <div class="stp">
+    <div class="stp-h"><b>1</b>쿠팡 주소 붙여넣기</div>
+    <textarea id="inUrl" rows="3" placeholder="쿠팡 앱 → 상품 → 공유 → 복사 후 여기에 붙여 넣기"></textarea>
+    <div id="pLoad" class="loading" hidden>상품 정보 가져오는 중… 🍒</div>
+    <div id="pBox" class="prod" hidden><img id="pImg" alt=""><div style="flex:1;min-width:0"><div class="pn" id="pName"></div><div class="pp" id="pPrice"></div></div></div>
+    <div id="pMore" hidden>
+      <input type="text" id="inName" placeholder="상품 이름 (예: 무선 청소기)" style="margin-top:10px">
+      <input type="text" id="inPrice" inputmode="numeric" placeholder="가격 (선택, 예: 129000)" style="margin-top:8px">
+      <div class="shot">
+        <label class="btn ghost" for="inShot">📷 상품 화면 캡처 올리기</label>
+        <input type="file" id="inShot" accept="image/*" hidden>
+      </div>
+      <p class="hint" id="shotHint">쿠팡이 사진을 안 보여 줄 때가 있어요. 상품 화면을 캡처해 올리면 카드에 사진이 들어가요.</p>
+    </div>
+  </div>
+
+  <div class="stp">
+    <div class="stp-h"><b>2</b>어떤 말로 보낼까요?</div>
+    <div class="chips" id="qChips"></div>
+    <textarea id="inWord" rows="2" placeholder="한마디 더 (선택) — 예: 거실에 딱일 것 같아" style="margin-top:10px"></textarea>
+  </div>
+
+  <div class="stp">
+    <div class="stp-h"><b>3</b>보내는 사람 <small>(선택)</small></div>
+    <input type="text" id="inFrom" maxlength="12" placeholder="받는 분이 알아볼 이름 (예: 여보, 형)">
+  </div>
+
+  <button class="btn kakao" id="goSend" disabled>💬 카톡으로 보내기</button>
+  <p class="note">받는 분은 눌러서 바로 쿠팡에서 볼 수 있어요.<br>싸바는 이 링크로 수수료를 받지 않아요.</p>
+</section>
+
+<!-- 📬 받는 화면 (물어본 것 · 답장 모두) -->
+<section id="viewGet" hidden>
+  <div class="card">
+    <div id="gPrev" class="prev" hidden></div>
+    <div class="bub"><div class="who" id="gWho"></div><div class="q" id="gQ"></div><div class="w" id="gW" hidden></div></div>
+    <img id="gImg" class="pic" alt="" hidden>
+    <div class="pinfo"><div class="pn" id="gName"></div><div class="pp" id="gPrice"></div></div>
+    <a id="gGo" class="btn cherry go" target="_blank" rel="noopener nofollow">🛒 쿠팡에서 보기</a>
+  </div>
+
+  <div class="rbox">
+    <span class="tag">💬 답장하기</span>
+    <div class="chips" id="rChips"></div>
+    <textarea id="rText" rows="2" placeholder="하고 싶은 말 (선택)"></textarea>
+    <input type="text" id="rFrom" maxlength="12" placeholder="내 이름 (선택)" style="margin-top:8px">
+    <button class="btn kakao" id="rSend" style="margin-top:12px" disabled>💬 카톡으로 답장 보내기</button>
+  </div>
+  <a class="sv-wtab" href="/?story=1"><b>🍒</b>싸바가 뭐지?</a>
+</section>
+
+</div>
+<script src="/js/codec.js"></script>
+<script src="/js/share.js?v=20"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var BASE = 'https://sava.kr/ottae/';
+  var DEF_IMG = 'https://sava.kr/img/ssaka-square.png?v=1';
+  function toast(m) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600); }
+  window.SsakaToast = toast;
+  var won = function (n) { n = String(n || '').replace(/[^\d]/g, ''); return n ? Number(n).toLocaleString('ko-KR') + '원' : ''; };
+  var okUrl = function (u) { try { var x = new URL(u); return /^https?:$/.test(x.protocol) && /(^|\.)coupang\.com$|(^|\.)coupa\.ng$/i.test(x.hostname); } catch (e) { return false; } };
+  function chips(box, list, cur, on) {
+    box.innerHTML = '';
+    list.forEach(function (s) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (s === cur ? ' on' : ''); b.textContent = s;
+      b.onclick = function () { [].forEach.call(box.children, function (x) { x.classList.remove('on'); }); b.classList.add('on'); on(s); };
+      box.appendChild(b);
+    });
+  }
+  function upImg(file) {
+    return window.SsakaKakao().then(function (K) {
+      var list; try { var dt = new DataTransfer(); dt.items.add(file); list = dt.files; } catch (e) { list = [file]; }
+      return K.Share.uploadImage({ file: list });
+    }).then(function (res) { var info = (res && (res.infos || res)) || {}, u = info.original && info.original.url; if (!u) throw new Error('no url'); return u.replace(/^http:/, 'https:'); });
+  }
+  function send(card, title, desc) {
+    var url = BASE + '?d=' + SsakaCodec.encode(card);
+    var img = card.i || DEF_IMG;
+    window.SsakaShare({ url: url, title: title, description: desc, imageUrl: img, imageWidth: 800, imageHeight: 800, noButtons: true, buttonTitle: card.m === 're' ? '💬 답장 보기' : '👀 보러 가기' });
+  }
+
+  var d = new URLSearchParams(location.search).get('d');
+  var c = d && SsakaCodec.decode(d);
+
+  /* ---------- 받는 화면 ---------- */
+  if (c && c.u) {
+    $('viewGet').hidden = false;
+    var isRe = c.m === 're';
+    $('gWho').textContent = c.f ? c.f + (isRe ? '님의 답장' : '님이 물어봐요') : (isRe ? '답장이 왔어요' : '누가 물어봐요');
+    $('gQ').textContent = c.q || '이거 어때?';
+    if (c.w) { $('gW').hidden = false; $('gW').textContent = c.w; }
+    if (c.p) { $('gPrev').hidden = false; $('gPrev').textContent = '내가 보낸 말: ' + c.p; }
+    if (c.i) { $('gImg').src = c.i; $('gImg').hidden = false; }
+    $('gName').textContent = c.t || '';
+    $('gPrice').textContent = won(c.pr);
+    if (okUrl(c.u)) $('gGo').href = c.u; else $('gGo').hidden = true;
+    document.title = (c.q || '이거 어때?') + ' · 싸바';
+    var REPLY = isRe
+      ? ['그래, 그걸로 하자 👍', '다른 것도 볼래 🔍', '내가 살게 🎁', '좀 더 생각해 보자 🤔', '고마워 💕']
+      : ['좋아! 👍', '음… 별로 🤔', '내가 사 줄게 🎁', '다른 것도 보자 🔍', '비싸다 😅', '우리 집에 딱이네 🏠'];
+    var pick = '';
+    var check = function () { $('rSend').disabled = !(pick || $('rText').value.trim()); };
+    chips($('rChips'), REPLY, '', function (s) { pick = s; check(); });
+    $('rText').oninput = check;
+    try { $('rFrom').value = localStorage.getItem('sava-ottae-from') || ''; } catch (e) {}
+    $('rSend').onclick = function () {
+      var me = $('rFrom').value.trim();
+      try { if (me) localStorage.setItem('sava-ottae-from', me); } catch (e) {}
+      var said = [c.q, c.w].filter(Boolean).join(' ');
+      var r = { v: 1, m: 're', u: c.u, t: c.t, i: c.i, pr: c.pr, q: pick || $('rText').value.trim().split('\n')[0], w: pick ? $('rText').value.trim() : $('rText').value.trim().split('\n').slice(1).join('\n'), f: me, p: said.slice(0, 80) };
+      send(r, r.q, (me ? me + '님의 답장 · ' : '') + (c.t || '쿠팡 상품'));
+    };
+    return;
+  }
+
+  /* ---------- 보내는 화면 ---------- */
+  $('viewSend').hidden = false;
+  var Q = ['이거 어때? 👀', '이거 사 줄까? 🎁', '우리 이거 살까? 🛒', '이거 갖고 싶어 🥹', '선물로 어때? 💝', '이거 좋아 보이지? ✨'];
+  var st = { q: Q[0], u: '', t: '', i: '', pr: '' };
+  chips($('qChips'), Q, st.q, function (s) { st.q = s; });
+  try { $('inFrom').value = localStorage.getItem('sava-ottae-from') || ''; } catch (e) {}
+
+  function show() {
+    var has = st.t || st.i;
+    $('pBox').hidden = !has;
+    if (st.i) { $('pImg').src = st.i; $('pImg').hidden = false; } else $('pImg').hidden = true;
+    $('pName').textContent = st.t || '상품 이름을 적어 주세요';
+    $('pPrice').textContent = won(st.pr);
+    $('goSend').disabled = !st.u;
+  }
+  var last = '';
+  function readPaste() {
+    var raw = $('inUrl').value, m = raw.match(/https?:\/\/[^\s]+/);
+    if (!m) { st.u = ''; $('pMore').hidden = true; show(); return; }
+    var u = m[0].replace(/[)\]>.,]+$/, '');
+    if (!okUrl(u)) { toast('쿠팡 주소만 넣을 수 있어요'); st.u = ''; show(); return; }
+    st.u = u; $('pMore').hidden = false;
+    // 쿠팡 앱 공유 글에 들어 있는 상품 이름 쓰기
+    var name = raw.replace(m[0], '').split('\n').map(function (s) { return s.replace(/^\[?쿠팡\]?\s*[:!]?|쿠팡을 추천합니다!?/g, '').replace(/^[\[\(]|[\]\)]$/g, '').trim(); }).filter(function (s) { return s.length > 1; })[0];
+    if (name && !$('inName').value) { $('inName').value = name.slice(0, 80); st.t = $('inName').value; }
+    show();
+    if (u === last) return; last = u;
+    $('pLoad').hidden = false;
+    fetch('/api/shopinfo?u=' + encodeURIComponent(u)).then(function (r) { return r.json(); }).then(function (j) {
+      $('pLoad').hidden = true;
+      if (!j || !j.ok) { $('shotHint').textContent = '쿠팡이 상품 정보를 안 보여 줬어요. 이름을 적고, 상품 화면을 캡처해 올려 주세요.'; return; }
+      if (j.title && !$('inName').value) { $('inName').value = j.title; st.t = j.title; }
+      if (j.image && !st.i) st.i = j.image;
+      if (j.price && !$('inPrice').value) { $('inPrice').value = j.price; st.pr = j.price; }
+      show();
+    }).catch(function () { $('pLoad').hidden = true; });
+  }
+  $('inUrl').addEventListener('input', readPaste);
+  $('inUrl').addEventListener('paste', function () { setTimeout(readPaste, 30); });
+  $('inName').oninput = function () { st.t = this.value.trim(); show(); };
+  $('inPrice').oninput = function () { st.pr = this.value; show(); };
+  $('inShot').onchange = function () {
+    var f = this.files && this.files[0]; this.value = '';
+    if (!f || !/^image\//.test(f.type)) return;
+    st.i = URL.createObjectURL(f); show(); $('goSend').disabled = true; toast('사진 올리는 중… 🍒');
+    upImg(f).then(function (u) { st.i = u; show(); toast('사진 들어갔어요 ✓'); }).catch(function () { st.i = ''; show(); toast('사진을 못 올렸어요. 다시 해 주세요'); });
+  };
+  $('goSend').onclick = function () {
+    if (!st.u) return;
+    if (/^blob:/.test(st.i)) { toast('사진 올리는 중이에요. 잠시만요'); return; }
+    var from = $('inFrom').value.trim();
+    try { if (from) localStorage.setItem('sava-ottae-from', from); } catch (e) {}
+    var card = { v: 1, m: 'ask', u: st.u, t: st.t, i: st.i, pr: String(st.pr || '').replace(/[^\d]/g, ''), q: st.q, w: $('inWord').value.trim(), f: from };
+    send(card, st.q, (from ? from + '님이 보냈어요 · ' : '') + (st.t || '쿠팡 상품'));
+  };
+  show();
+})();
+</script>
+<script src="/js/home.js?v=18" defer data-home="/ottae/" data-bar="0"></script>
+</body>
+</html>

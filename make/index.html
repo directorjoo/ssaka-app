@@ -2045,18 +2045,34 @@
   }
 
   var timer = null, lastSrc = '', keepPv = false;
+  // 11-26 대표님 폰에서 미리보기가 빈칸 → 3초 뒤에도 카드가 안 그려졌으면 한 번 더 불러오고, 그래도 안 되면 오류를 미리보기 안에 적음
+  function pvWatch(fr, url) {
+    clearTimeout(fr._w);
+    fr._w = setTimeout(function () {
+      var d = null, w = null; try { d = fr.contentDocument; w = fr.contentWindow; } catch (e) {}
+      var app = d && d.getElementById('app');
+      var ok = app && app.children.length && !app.querySelector('.loading');
+      if (ok) { fr._tries = 0; return; }
+      fr._tries = (fr._tries || 0) + 1;
+      if (fr._tries <= 1) { fr.src = url + '&r=' + Date.now(); return; }
+      var why = (w && w.__savaErr && w.__savaErr.join(' / ')) || (d ? (d.body ? '화면이 비어 있음 (' + (d.body.innerText || '').slice(0, 40) + ')' : '문서 없음') : '열 수 없음(막힘)');
+      toast('미리보기를 못 그렸어요: ' + why.slice(0, 120));
+      try { console.warn('preview', why); } catch (e) {}
+    }, 3000);
+  }
   function update() {
     clearTimeout(timer);
     timer = setTimeout(function () {
       var r = buildCard();
-      var url = viewer + '?d=' + SsakaCodec.encode(r.card);
+      // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
+      var url = new URL('../c/', location.href).href + '?d=' + SsakaCodec.encode(r.card);
       if (url !== lastSrc && keepPv) { lastSrc = url; keepPv = false; } // 미리보기에서 직접 고친 건 이미 화면에 있음 → 새로 안 불러옴
       if (url !== lastSrc) {
         // 미리보기를 다시 그려도 보던 자리 그대로 (고치다가 맨 위로 튀지 않게)
         var fr = $('frame'), y = 0;
         try { y = fr.contentWindow.scrollY || 0; } catch (e) {}
-        fr.onload = function () { if (!y) return; var go = function () { try { fr.contentWindow.scrollTo(0, y); } catch (e) {} }; go(); setTimeout(go, 120); setTimeout(go, 400); };
-        fr.src = url; lastSrc = url;
+        fr.onload = function () { pvWatch(fr, url); if (!y) return; var go = function () { try { fr.contentWindow.scrollTo(0, y); } catch (e) {} }; go(); setTimeout(go, 120); setTimeout(go, 400); };
+        fr.src = url; lastSrc = url; pvWatch(fr, url);
       }
       // 긴 링크는 화면에 보이지 않게 (보낼 때·열어 볼 때 짧은 링크로 바뀜)
       $('link').textContent = r.isExample ? '예시 카드예요. 내용을 적으면 내 카드 링크가 생겨요.' : '🔗 보낼 때 sava.kr 짧은 링크로 바뀌어요';

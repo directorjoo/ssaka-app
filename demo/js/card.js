@@ -901,7 +901,8 @@
     }
     if (data) {
       var card = window.SsakaCodec && SsakaCodec.decode(data);
-      if (card) render(card); else fail('카드 링크가 잘렸거나 잘못됐어요');
+      if (!card) { fail('카드 링크가 잘렸거나 잘못됐어요'); return; }
+      try { render(card); } catch (e) { (window.__savaErr || []).push(String(e && e.stack || e)); if (!app.children.length || app.querySelector('.loading')) fail('카드를 그리다 멈췄어요 🍒 ' + (e && e.message || e)); else throw e; }
       return;
     }
     var base = window.SSAKA_CARDS || 'cards/';

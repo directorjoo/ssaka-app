@@ -28,6 +28,18 @@
   </main>
   <div id="toast" class="toast" role="status"></div>
   <script>window.SSAKA_CARDS = '../demo/cards/';</script>
+  <script>
+  // 11-26 미리보기 빈칸 찾기: 카드를 그리다 멈추면 무슨 오류인지 화면에 적어 둠 (대표님 캡처로 원인 확인)
+  window.__savaErr = [];
+  window.addEventListener('error', function (e) {
+    var m = (e.message || 'error') + (e.filename ? ' @' + String(e.filename).split('/').pop() + ':' + e.lineno : '');
+    window.__savaErr.push(m);
+    setTimeout(function () {
+      var app = document.getElementById('app');
+      if (app && (!app.children.length || app.querySelector('.loading'))) app.innerHTML = '<p class="error" style="font:16px sans-serif;padding:24px;color:#B3132B;word-break:break-all">카드를 그리다 멈췄어요 🍒<br><small style="color:#555">' + m.replace(/</g, '&lt;') + '</small></p>';
+    }, 0);
+  });
+  </script>
   <script src="../js/codec.js"></script>
   <script src="../js/inapp.js"></script>
   <script src="../js/designs.js?v=95"></script>
@@ -39,7 +51,7 @@
   <script src="../js/dues.js?v=1"></script>
   <script src="../js/album.js?v=2"></script>
   <script src="../demo/js/vcard.js"></script>
-  <script src="../demo/js/card.js?v=97"></script>
+  <script src="../demo/js/card.js?v=98"></script>
   <script src="../js/share.js"></script>
 <script src="../js/kback.js?v=45"></script>
 <script src="/js/translate.js?v=1" defer></script>

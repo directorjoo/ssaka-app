@@ -41,7 +41,7 @@
     function merge(srv) {
       if (!seeAll()) return srv.filter(function (x) { return x.me; }); // 남의 이름은 주최자만 (공개가 아니면 내 것만)
       var used = {}, outL = pre.map(function (x) {
-        for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; return srv[k]; }
+        for (var k = 0; k < srv.length; k++) if (!used[k] && srv[k].n === x.n) { used[k] = 1; srv[k].pre = 1; return srv[k]; }
         return x;
       });
       srv.forEach(function (x, k) { if (!used[k]) outL.push(x); });
@@ -67,7 +67,8 @@
     var addFor = el('button', 'sk-ro-copy', '✍️ 대신 적기 (카톡 안 하는 분·전화로 받은 답)'); addFor.type = 'button'; tools.appendChild(addFor);
     var smsAll = el('button', 'sk-ro-copy', '📱 문자로 공지 보내기 (카톡 안 하는 분께)'); smsAll.type = 'button'; tools.appendChild(smsAll);
     box.appendChild(tools);
-    var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button'; box.appendChild(copy);
+    // 11-27 대표님: '카톡방에 붙여넣을 명단 복사'는 필요 없음 — 명단은 카드 안에서 이어짐 (단추는 만들되 붙이지 않음)
+    var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button';
     var fine = el('p', 'sk-fine', ''); box.appendChild(fine);
     MODES.forEach(function (m) {
       var b = el('button', '', m[1]); b.type = 'button'; b.dataset.p = m[0];
@@ -143,7 +144,11 @@
         byStop.appendChild(el('span', '', shortStop(s) + ' ' + n + '명'));
       });
       ol.innerHTML = '';
+      var hasPre = Y.some(function (x) { return x.pre; });
       if (seeAll()) Y.forEach(function (x, i) {
+        // 11-27: 카톡에서 이미 받은 명단 다음, 싸바로 새로 신청한 분 시작 자리에 작은 구분 줄
+        if (hasPre && i === 0 && x.pre) ol.appendChild(el('li', 'sk-ro-sep', '💬 카톡에서 먼저 신청한 분'));
+        if (hasPre && i > 0 && Y[i - 1].pre && !x.pre) ol.appendChild(el('li', 'sk-ro-sep', '🍒 싸바로 새로 신청한 분'));
         var li = el('li', x.me ? 'me' : '', line(x, i));
         if (x.w) li.appendChild(el('small', 'sk-ro-w', ' 💬 ' + x.w));
         if (isOwner && x.k && x.k.charAt(0) === 'h') li.appendChild(el('small', 'sk-ro-w', ' ✍️대신 적음'));
@@ -159,7 +164,7 @@
         if (isOwner) g[0].forEach(function (x) { if (x.ph) { var a = el('a', 'sk-ro-ph', ' ' + x.n + ' ☎'); a.href = 'tel:' + String(x.ph).replace(/[^\d+]/g, ''); p.appendChild(a); } if (x.k) { var e2 = el('button', 'sk-ro-ed', '✏️' + x.n); e2.type = 'button'; hostEdit(e2, x, 1); p.appendChild(e2); } });
         nos.appendChild(p);
       });
-      copy.style.display = seeAll() && Y.length ? '' : 'none';
+      copy.style.display = 'none';
       tools.style.display = isOwner ? '' : 'none';
       btns.style.display = isOwner || (st.closed && !mine) ? 'none' : '';
       join.disabled = !going && !!full; if (join.disabled) join.textContent = '🈵 정원이 다 찼어요';

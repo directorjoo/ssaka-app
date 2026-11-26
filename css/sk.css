@@ -551,6 +551,7 @@
 .sk-ro-stops span { padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, var(--paper)); font-size: 13.5px; font-weight: 700; }
 .sk-ro-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 2px; max-height: 360px; overflow-y: auto; font-size: 16.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .sk-ro-list li { padding: 6px 4px; border-bottom: 1px dashed var(--line-ink, rgba(0,0,0,.12)); }
+.sk-ro-list li.sk-ro-sep { border-bottom: 0; padding: 10px 4px 2px; font-size: 15px; font-weight: 800; opacity: .7; letter-spacing: -.01em; }
 .sk-ro-list li.me { color: var(--accent); font-weight: 800; }
 .sk-ro-list li.me::after { content: ' ← 나'; font-size: 13px; }
 .sk-ro-join, .sk-ro-copy { display: block; width: 100%; min-height: 54px; margin-top: 12px; border-radius: 14px; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }

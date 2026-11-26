@@ -11,6 +11,8 @@
 .sched-row.day input{font-weight:800;background:#FFF4F5;border-color:#E9B8C0}
 .sched-row .x{min-height:46px;border:0;border-radius:12px;background:#F3EEEE;font-size:18px;color:#7a5560;cursor:pointer}
 .sched-add{display:flex;gap:8px;flex-wrap:wrap}.sched-add .mini{flex:1;min-height:44px;font-weight:800}
+  .prebox { background: #FFF8E1; border: 2px solid #F2C94C; border-radius: 14px; padding: 12px; margin: 4px 0 12px; }
+  .prebox label { font-weight: 800; }
 </style>
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>싸바 만들기</title>
@@ -24,7 +26,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=104">
+  <link rel="stylesheet" href="../css/sk.css?v=105">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -1001,6 +1003,12 @@
         <legend id="rosterLeg">🙋 참석 명단 받기</legend>
         <label class="switch"><input type="checkbox" id="rosterOn" checked> <span>카드에서 참석 신청 받고, 번호 매긴 명단 자동으로 만들기</span></label>
         <div id="rosterBox">
+          <div data-part="pre" class="prebox">
+          <label for="pre">💬 카톡에서 이미 받은 참석자 명단 이어 붙이기 <small>(선택)</small></label>
+          <div class="hint" style="margin:2px 0 6px">카톡 글로 먼저 공지해서 받은 '참석자 이어가기' 명단을 그대로 복사해 붙여 넣으세요. 이분들이 새 카드 명단 맨 앞에 먼저 보이고, 이 카드로 새로 신청한 분은 그 뒤로 번호가 이어져요.</div>
+          <textarea id="pre" maxlength="3000" placeholder="👉 길게 눌러 [붙여넣기]&#10;참석자 이어가기&#10;1. 홍길동 32회&#10;2. 김싸바(35기) +1&#10;3. 이싸바 부부"></textarea>
+          <div class="hint">번호·머리말이 붙은 채로 붙여도 이름·기수·동반 인원을 알아서 골라요. 위 '공지 글 붙여넣기'에 명단까지 통째로 붙여도 여기로 들어와요.</div>
+          </div>
           <div data-part="stops">
           <label for="stops">탑승지·집결지 (한 줄에 하나, 선택)</label>
           <textarea id="stops" maxlength="300" placeholder="07:00 당산역 8번 출구&#10;07:20 교대역 14번 출구"></textarea>
@@ -1020,12 +1028,7 @@
             </div>
             <div class="hint" id="pubHint">단톡방에서 신청·고치기·취소하면 공지에 바로 보여요. 전화번호는 언제나 모임 연 분만 봐요.</div>
           </div>
-          <div data-part="pre">
-          <label for="pre">📋 이미 참석한 분 — 카톡 '참석자 이어가기' 명단 그대로 붙여넣기 (선택)</label>
-          <textarea id="pre" maxlength="3000" placeholder="👉 길게 눌러 [붙여넣기]&#10;참석자 이어가기&#10;1. 홍길동 32회&#10;2. 김싸바(35기) +1&#10;3. 이싸바 부부"></textarea>
-          <div class="hint">번호·머리말이 붙은 채로 붙여넣어도 이름·기수·동반 인원을 알아서 골라요. 이분들이 명단 맨 앞에 먼저 들어가고, 싸바로 신청한 사람이 그 뒤로 번호가 이어져요. 위 '공지 글 붙여넣기'에 명단까지 통째로 붙여도 여기로 들어와요.</div>
-          </div>
-          <div class="hint" id="rosterHint">받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 보여요. 명단은 카톡방에 붙여넣게 한 번에 복사돼요.</div>
+          <div class="hint" id="rosterHint">받는 사람이 이름·동반 인원을 적으면 번호가 붙은 명단이 카드에 바로 이어져 보여요.</div>
         </div>
       </fieldset>
 

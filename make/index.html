@@ -851,6 +851,7 @@
       <fieldset data-tab="photo" data-part="photo">
         <legend id="phLeg">📷 대표 사진 · 사진첩</legend>
         <div data-for="profile club shop greet">
+          <div id="ipWrap">
           <label class="ptile" for="photoFile" id="ptile">
             <img id="thumbBlur" alt="" hidden>
             <img id="thumb" alt="" hidden>
@@ -865,6 +866,7 @@
             <div class="seg" role="group" aria-label="사진 맞추기"><button type="button" id="fitCover" aria-pressed="true">꽉 채우기</button><button type="button" id="fitAll" aria-pressed="false">전체 보이기</button></div>
             <div class="zrow"><b>크기</b><button type="button" id="zMinus" aria-label="작게">−</button><input type="range" id="zoom" min="100" max="300" step="5" value="100" aria-label="사진 크기"><button type="button" id="zPlus" aria-label="크게">＋</button></div>
             <div class="arow"><small>사진을 손가락으로 끌어서 위치를 맞추세요</small><button type="button" id="ipReset">처음대로</button></div>
+          </div>
           </div>
           <div class="photo-row">
             <span class="hint" id="photoStatus">사진은 크기를 줄여서 카카오 서버에 올려요.</span>
@@ -1103,6 +1105,7 @@
 </div>
 <div class="pe-bar" id="peBar" hidden role="toolbar" aria-label="수정 도구">
   <button type="button" data-pe="photo">📷 사진</button>
+  <button type="button" data-pe="zoom" id="peZoomBtn">🔍 크기</button>
   <button type="button" data-pe="fs">🔠 글씨</button>
   <button type="button" data-pe="pre" id="pePreBtn">🙋 참석자</button>
   <button type="button" class="done" id="peDone">✓ 끝</button>
@@ -2536,25 +2539,28 @@
   // 11-26 대표님: 수정하기에서 글씨만 고쳐짐 → 사진·글씨 크기·참석자 이름도. 원래 입력 칸(같은 기능)을 시트로 잠깐 빌려 옴
   var PE_SRC = {
     photo: function () { return document.querySelector('#form fieldset[data-part="photo"]'); },
+    zoom: function () { return $('image').value ? $('ipWrap') : null; },
     fs: function () { return $('fsFs'); },
     pre: function () { return document.querySelector('#rosterBox [data-part="pre"]'); }
   };
-  var PE_T = { photo: '📷 사진 바꾸기·더 넣기', fs: '🔠 글씨 크기', pre: '🙋 이미 참석한 분 넣기' };
+  var PE_T = { zoom: '🔍 사진 키우기·줄이기 · 끌어서 위치 맞추기', photo: '📷 사진 바꾸기·더 넣기', fs: '🔠 글씨 크기', pre: '🙋 이미 참석한 분 넣기' };
   var peHome = null, peNode = null;
   function peBarShow(on) {
     if (!on) peClose();
     $('peBar').hidden = !on || !!destSns();
     var pre = PE_SRC.pre();
+    $('peZoomBtn').hidden = !$('image').value;
     $('pePreBtn').hidden = !(type === 'club' && $('rosterOn').checked && pre && !pre.closest('[hidden]'));
   }
   function peOpen(k) {
     peClose();
     var n = PE_SRC[k] && PE_SRC[k]();
-    if (!n) { toast('이 카드에는 없는 칸이에요'); return; }
+    if (!n) { toast(k === 'zoom' ? '먼저 📷 사진을 넣어 주세요' : '이 카드에는 없는 칸이에요'); return; }
     peHome = document.createComment('pe'); n.parentNode.insertBefore(peHome, n); peNode = n;
     $('peSheetBody').appendChild(n);
     $('peSheetT').textContent = PE_T[k];
     $('peSheet').hidden = false; $('peBar').hidden = true;
+    if (k === 'zoom') { try { showThumb($('image').value); } catch (e) {} }
     if (k === 'pre') setTimeout(function () { try { $('pre').focus(); } catch (e) {} }, 200);
   }
   function peClose() {

@@ -549,7 +549,8 @@
 .sk-ro-stops { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .sk-ro-stops:empty { display: none; }
 .sk-ro-stops span { padding: 5px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, var(--paper)); font-size: 13.5px; font-weight: 700; }
-.sk-ro-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 2px; max-height: 360px; overflow-y: auto; font-size: 16.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sk-ro-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; /* 11-27 대표님: 길어져도 명단 전체를 다 보여 줌 (안쪽 스크롤 없음) */ font-size: 16.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sk-ro-ttl { margin: 14px 0 0; padding: 8px 4px 6px; border-bottom: 2px solid var(--line-ink, rgba(0,0,0,.18)); font-size: 17px; font-weight: 900; }
 .sk-ro-list li { padding: 6px 4px; border-bottom: 1px dashed var(--line-ink, rgba(0,0,0,.12)); }
 .sk-ro-list li.sk-ro-sep { border-bottom: 0; padding: 10px 4px 2px; font-size: 15px; font-weight: 800; opacity: .7; letter-spacing: -.01em; }
 .sk-ro-list li.me { color: var(--accent); font-weight: 800; }

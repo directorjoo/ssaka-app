@@ -18,7 +18,7 @@
     var m = s.match(/^([가-힣A-Za-z0-9]+?)(역|터미널|정류장|주차장|광장)/);
     return m ? m[1] : s.split(/\s+/)[0] || '';
   }
-  function line(x, i) { return pad(i) + '.' + x.n + (x.g ? x.g : '') + (x.fam ? '(가족)' : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + shortStop(x.s) : ''); }
+  function line(x, i) { return pad(i) + '. ' + x.n + (x.g ? ' ' + x.g : '') + (x.fam ? '(가족)' : '') + (x.p ? '+' + x.p : '') + (x.s ? ' ' + shortStop(x.s) : ''); }
   function smsHref(phone, body) {
     var ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
     return 'sms:' + String(phone).replace(/[^\d+]/g, '') + (ios ? '&' : '?') + 'body=' + encodeURIComponent(body);
@@ -56,6 +56,7 @@
     var mode = el('div', 'sk-ro-mode'); mode.setAttribute('role', 'group'); mode.setAttribute('aria-label', '참석자 공개 방식'); box.appendChild(mode);
     var myLine = el('p', 'sk-ro-mine'); myLine.hidden = true; box.appendChild(myLine);
     var byStop = el('div', 'sk-ro-stops'); box.appendChild(byStop);
+    var olT = el('p', 'sk-ro-ttl', ''); box.appendChild(olT); // 11-27: '참석자 명단 전체' 제목
     var ol = el('ol', 'sk-ro-list'); box.appendChild(ol);
     var nos = el('div', 'sk-ro-nos'); box.appendChild(nos);
     var btns = el('div', 'sk-ro-btns');
@@ -170,6 +171,8 @@
       join.disabled = !going && !!full; if (join.disabled) join.textContent = '🈵 정원이 다 찼어요';
       if (st.closed && !isOwner && !mine) { cnt.textContent = '응답이 마감됐어요'; }
       ol.style.display = seeAll() ? '' : 'none';
+      olT.style.display = seeAll() && Y.length ? '' : 'none';
+      olT.textContent = '📋 참석자 명단 전체 · ' + Y.length + '명' + (people(Y) > Y.length ? ' (동반 포함 ' + people(Y) + '명)' : '');
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
     function take(j) { isOwner = !!j.owner || (!live && !!hk); if (j.pub != null && !j.fresh) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림

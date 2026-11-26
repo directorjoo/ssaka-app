@@ -24,8 +24,9 @@
   if (ds.app && /[?&]give=/.test(location.search)) add(ds.app);
 
   // 싸바 홈: 관리자 아니면 숨김
+  // 11-26 23:35 대표님 폰(관리자)도 로그인 기록이 없으면 홈이 막힘 → 관리자가 보낸 앱을 받은 폰만 /my/로, 나머지는 전체 홈
   if (ds.hub) {
-    if (full()) return;
+    if (full() || !list().length) return;
     var h = document.documentElement; h.style.visibility = 'hidden';
     var done = false;
     function go() { if (done) return; done = true; location.replace('/my/'); }

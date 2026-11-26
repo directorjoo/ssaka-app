@@ -202,9 +202,14 @@
         var addX = function () {
           XS.forEach(function (x) {
             Array.prototype.forEach.call(root.querySelectorAll(x[0]), function (n) {
-              if (n.querySelector(':scope > .sk-x')) return;
-              var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-x'; b.textContent = '✕ ' + x[2] + ' 빼기';
-              b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); PEx('hide', -1, x[1], ''); }, true);
+              if (n.querySelector(':scope > .sk-hidex')) return;
+              var b = document.createElement('button'); b.type = 'button'; b.className = 'sk-hidex'; b.textContent = '✕ ' + x[2] + ' 빼기';
+              b.addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation(); PEx('hide', -1, x[1], '');
+                // 11-27: 미리보기에서도 바로 사라지게 (새로 안 그려도)
+                var sel = (window.SsakaRender && SsakaRender.HIDE && SsakaRender.HIDE[x[1]]) || x[0];
+                Array.prototype.forEach.call(root.querySelectorAll(sel + ',' + x[0]), function (m) { m.remove(); });
+              }, true);
               n.classList.add('sk-xable'); n.appendChild(b);
             });
           });

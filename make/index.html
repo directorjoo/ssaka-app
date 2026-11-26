@@ -26,7 +26,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=105">
+  <link rel="stylesheet" href="../css/sk.css?v=106">
   <link rel="stylesheet" href="../css/sk-world.css?v=10">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -2587,7 +2587,7 @@
     $('peSheet').hidden = true;
     if ($('goEdit').classList.contains('on')) $('peBar').hidden = !!destSns();
   }
-  $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = true; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
+  $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
   $('peSheetOk').addEventListener('click', function () { peClose(); update(); toast('✏️ 고쳤어요'); });
   $('peDone').addEventListener('click', function () { $('goEdit').click(); });

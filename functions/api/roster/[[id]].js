@@ -44,6 +44,8 @@ async function list(db, request, id, tok, hk) {
   // 주최자에겐 줄마다 k(고치기·지우기용 열쇠)도 — 카톡 안 하는 분을 대신 적거나 전화로 받은 답을 바꿀 때
   if (h.host) return Object.assign({ pub: h.pub, owner: 1, list: all.map(function (x, i) { return Object.assign({ k: r.results[i].tok }, x); }) }, stat);
   const mine = all.filter(function (x) { return x.me; });
+  // 11-27: 아직 주인이 안 정해진 명단(보내기 전 미리보기 등) — 카드에 정한 공개 방식을 그대로 쓰게
+  if (!h.meta) return Object.assign({ fresh: 1, list: mine }, stat);
   if (h.pub === 2) return Object.assign({ pub: 2, list: all.map(function (x) { return { n: x.n, g: x.g, s: x.s, p: x.p, t: x.t, a: x.a, w: x.w, me: x.me, d: x.me ? x.d : undefined }; }) }, stat);
   if (h.pub === 1) return Object.assign({ pub: 1, list: mine }, stat);
   return { pub: 0, priv: 1, list: mine };

@@ -84,7 +84,7 @@
     function draw() {
       var mine = list.filter(function (x) { return x.me; })[0], Y = yes(), N = list.filter(function (x) { return x.a === 'n'; }), M = list.filter(function (x) { return x.a === 'm'; });
       var nP = people(Y), cN = Y.length, cNo = N.length, cM = M.length;
-      if (!seeAll()) { cN = st.count; nP = st.people; cNo = st.no; cM = st.maybe; }
+      if (!seeAll()) { cN = st.count + pre.length; nP = st.people + people(pre); cNo = st.no; cM = st.maybe; } // 11-27: 카톡에서 받은 명단도 인원에 넣음
       box.classList.toggle('host', isOwner);
       box.classList.toggle('pub', pub > 0);
       var showStat = isOwner || pub > 0;
@@ -172,7 +172,7 @@
       ol.style.display = seeAll() ? '' : 'none';
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }
-    function take(j) { isOwner = !!j.owner; if (j.pub != null) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림
+    function take(j) { isOwner = !!j.owner || (!live && !!hk); if (j.pub != null && !j.fresh) pub = j.pub | 0; st = { count: j.count || 0, people: j.people || 0, no: j.no || 0, maybe: j.maybe || 0, cap: j.cap || 0, dl: j.dl || 0, closed: !!j.closed }; list = merge(j.list || []); draw(); try { root.dispatchEvent(new CustomEvent('sava-roster', { detail: j })); } catch (e) {} } // 회비 상자(dues.js)도 같은 명단으로 그림
     var ERRS = { cap: '정원이 다 찼어요. 모임 연 분께 물어보세요', closed: '응답이 마감됐어요. 모임 연 분께 직접 알려 주세요', name: '이름을 적어 주세요', host: '모임 연 분만 할 수 있어요' };
     function errT(e) { toast(ERRS[e && e.message] || '잠시 뒤 다시 눌러 주세요'); }
     function hostOp(o) { return send(Object.assign({ hk: hk }, o)); }
@@ -235,7 +235,7 @@
       return fetch(API + R.id + '?tok=' + tok + (hk ? '&hk=' + hk : '')).then(function (r) { return r.json(); }).then(take)
         .catch(function () {
           // 11-26: 서버를 못 불러와도(만들기 미리보기 등) 붙여넣은 참석자는 보이게
-          if (pre.length) { try { take({ pub: pub, list: [] }); return; } catch (e) {} }
+          if (pre.length) { try { take({ pub: pub, fresh: 1, list: [] }); return; } catch (e) {} }
           cnt.textContent = '명단을 불러오지 못했어요';
         });
     }

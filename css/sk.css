@@ -849,6 +849,6 @@
 .sk-titles .sk-ribbon { margin: 0 0 10px; }
 .sk-inv .sk-greet li + li { border-top: 0; }
 /* 11-27 수정하기: 칸마다 ✕ 빼기 (만들기 미리보기에서 수정하기 켰을 때만) */
-.sk-x { display: none; }
+.sk-hidex { display: none; }
 .sk-pe-on .sk-xable { position: relative; outline: 2px dashed rgba(179,19,43,.55); outline-offset: 3px; }
-.sk-pe-on .sk-x { display: inline-flex; position: absolute; top: -12px; right: 6px; z-index: 5; align-items: center; padding: 6px 11px; border: 0; border-radius: 999px; background: #1A1A1A; color: #fff; font: 800 13px/1.1 inherit; font-family: inherit; box-shadow: 0 4px 12px -4px rgba(0,0,0,.5); cursor: pointer; }
+.sk-pe-on .sk-hidex { display: inline-flex; position: absolute; top: -12px; right: 6px; z-index: 5; align-items: center; padding: 6px 11px; border: 0; border-radius: 999px; background: #1A1A1A; color: #fff; font: 800 13px/1.1 inherit; font-family: inherit; box-shadow: 0 4px 12px -4px rgba(0,0,0,.5); cursor: pointer; }

@@ -104,7 +104,8 @@
     var has = function (re) { return info.some(function (r) { return re.test(r.k); }); };
     var sub = String(card.subtitle || ''), place = card.place && card.place.name || '';
     var seen = [String(card.title || ''), String(card.kick || '')].concat(card.greet || []);
-    var g2 = [];
+    var g2 = [], tN = invNorm(card.title);
+    var simTitle = function (l) { var n = invNorm(l), k = 0; if (n.length < 3 || !tN) return false; for (var i = 0; i < n.length; i++) if (tN.indexOf(n.charAt(i)) >= 0) k++; return k >= n.length * 0.7; };
     greet.forEach(function (line) {
       if (seen.some(function (x) { return invDup(x, line); })) return;
       var bare = line.replace(/[.。!~\s]+$/, '');
@@ -115,6 +116,9 @@
         if (md && sd && +md[1] === +sd[1] && +md[2] === +sd[2]) return; // 한 줄 소개에 이미 있는 날짜
         if (!has(/일시|날짜/)) { info.unshift({ k: '일시', v: bare, sub: '' }); return; }
       }
+      // 11-27 대표님: 언제·어디서 상자에 일시·장소·회비가 있으니, 그 앞(인사말)에는 문장만 — 짧은 안내 줄(제목·날짜·장소 같은 것)은 뺌
+      var isSent = /(니다|니까|어요|아요|해요|세요|네요|군요|에요|지요|죠|요|다)[.!?~♡♥^ㅎㅋ]*$/.test(bare) || bare.length > 30;
+      if (!isSent && (/\d/.test(bare) || bare.length <= 16 || simTitle(bare))) return;
       seen.push(line); g2.push(line);
     });
     if (!has(/^장소/) && place) g2 = g2.filter(function (l) { return !invDup(place, l.replace(/[.。!\s]+$/, '')); });

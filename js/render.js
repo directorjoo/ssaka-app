@@ -362,7 +362,12 @@
       if (P.rest.length) { var rl = mkList(P.rest, true); rl.classList.add('sk-more-info'); bodyBox.appendChild(rl); }
       if (rows.length || P.greet.length || P.rest.length) main.appendChild(bodyBox);
       else { info.remove(); main.appendChild(bodyBox); }
-    } else if (bodyAll.length) main.appendChild(mkList(bodyAll, docAll));
+    } else {
+      // 11-27 영업장 카드도 가게 이름 바로 아래 인사말·가게 소개 (인사말 칸)
+      var gOnly = (Array.isArray(card.greet) ? card.greet : []).map(function (x) { return String(x || '').trim(); }).filter(Boolean).slice(0, 12);
+      if (gOnly.length) { var gb = mkList(gOnly, false); gb.classList.add('sk-greet', 'sk-greet-solo'); Array.prototype.forEach.call(gb.children, function (li) { li.className = 'sk-p'; }); main.appendChild(gb); }
+      if (bodyAll.length) main.appendChild(mkList(bodyAll, docAll));
+    }
     // 모임 일정표 (11-23): card.sched = [{d:'1일차'} | {t:'08:50', w:'제주공항 집결'}]
     var sch = (Array.isArray(card.sched) ? card.sched : []).slice(0, 24);
     if (sch.some(function (x) { return x && x.w; })) {

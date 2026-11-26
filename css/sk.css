@@ -860,3 +860,8 @@
 /* 11-27 모임 공지: 회비 계좌 복사 단추 (일시·장소·회비 상자 안) */
 .sk-info-r .sk-info-t { flex: 1; min-width: 0; }
 .sk-info-cp { flex: 0 0 auto; align-self: center; padding: 8px 12px; border: 0; border-radius: 999px; background: var(--accent, #B3132B); color: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+/* 11-27 영업장 카드 인사말·가게 소개 — 가게 이름 아래 글머리 없는 문단 */
+.sk-greet-solo { margin: 16px 0 6px; }
+.sk-greet-solo li { margin: 0 0 8px; line-height: 1.75; font-size: 16.5px; }
+.sk-greet-solo li + li { border-top: 0; }
+.sk-greet-solo li::before { display: none !important; }

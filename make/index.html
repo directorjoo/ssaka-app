@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=110">
+  <link rel="stylesheet" href="../css/sk.css?v=111">
   <link rel="stylesheet" href="../css/sk-world.css?v=12">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -565,6 +565,31 @@
   .shop-more-btn { display: none; width: 100%; margin: 18px 0 6px; padding: 14px 16px; border: 2px dashed #E3C2BA; border-radius: 16px; background: #FFFDF9; color: #8E0A1C; font: inherit; font-size: 18px; font-weight: 900; text-align: left; cursor: pointer; }
   .shop-more-btn small { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; color: #6b5d55; line-height: 1.45; word-break: keep-all; }
   body.shop-lite:not(.dest-sns) .shop-more-btn { display: block; }
+  /* 11-27 06:40 대표님: 영업장 카드 = 질문 하나하나 크고 또렷하게, 번호·색으로 구분, 올릴 곳마다 필요한 질문만 (body.shop-q) */
+  body.shop-q #form { counter-reset: sq; }
+  body.shop-q #form legend:not(.sq), body.shop-q #lkIntro, body.shop-q #findPlace, body.shop-q fieldset[data-part="place"] > .hint, body.shop-q [data-part="tidy"], body.shop-q .sq-off, body.shop-q .sec-h span { display: none !important; }
+  body.shop-q .sec-h { grid-template-columns: 1fr; }
+  body.shop-q #form > fieldset { padding: 4px 2px 10px; background: transparent; }
+  body.shop-q .row:has(> .sq-off) { display: block; }
+  body.shop-q .sq { counter-increment: sq; display: flex; align-items: flex-start; gap: 12px; float: none; width: auto; margin: 22px 0 10px; padding: 14px 14px 14px 12px; border-radius: 18px;
+    background: linear-gradient(100deg, var(--sqb, #FFE6E0) 0%, #FFFAF8 92%); border: 1.5px solid var(--sqc, #F3C9BE); color: #24130F; font-size: 20px; font-weight: 900; line-height: 1.3; word-break: keep-all; }
+  body.shop-q .sq::before { content: counter(sq); flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--sqn, #D2462F); color: #fff; font-size: 18px; font-weight: 900; box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); }
+  body.shop-q .sq > span { flex: 1; min-width: 0; }
+  body.shop-q .sq small { display: block; margin-top: 4px; font-size: 15.5px; font-weight: 600; line-height: 1.45; color: #5E4E47; }
+  body.shop-q #form legend.sq { display: block !important; position: relative; box-sizing: border-box; width: 100%; padding-left: 58px; font-size: 20px; color: #24130F; letter-spacing: 0; }
+  body.shop-q #form legend.sq::after { display: none !important; }
+  body.shop-q legend.sq::before { position: absolute; left: 12px; top: 14px; }
+  body.shop-q .sq[data-g="p"] { --sqb: #FFF0CF; --sqc: #F0D59A; --sqn: #D99A12; }
+  body.shop-q .sq[data-g="m"] { --sqb: #FBE3E7; --sqc: #EDBDC6; --sqn: #B3132B; }
+  body.shop-q label.sq.req::after { content: "필수"; flex: none; align-self: center; padding: 3px 8px; border-radius: 999px; background: #fff; border: 1.5px solid #E03131; color: #E03131; font-size: 13px; font-weight: 800; }
+  body.shop-q #form input, body.shop-q #form textarea { font-size: 18px; }
+  body.shop-q #findBiz { min-height: 52px; font-size: 16.5px; font-weight: 800; border-color: #03A94D; color: #027A38; background: #F1FBF4; }
+  .mp-box { margin-top: 10px; padding: 12px; border-radius: 16px; background: #FFF8EC; border: 1.5px dashed #E8C887; }
+  .mp-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mp-btns button { min-height: 64px; padding: 8px; border-radius: 14px; border: 2px solid #D99A12; background: #fff; color: #6B4600; font: inherit; font-size: 16px; font-weight: 900; line-height: 1.3; cursor: pointer; }
+  .mp-btns button:first-child { background: #D99A12; color: #fff; }
+  .mp-tip { margin-top: 8px; font-size: 15px; line-height: 1.5; color: #6B5A3A; word-break: keep-all; }
+  .mp-st { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #fff; font-size: 15.5px; font-weight: 800; color: #8E0A1C; }
   .rv-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 12px; }
   .rv-tabs button { min-height: 58px; padding: 8px 6px; border-radius: 14px; border: 2px solid #E3C2BA; background: #fff; color: #5a4a44; font: inherit; font-size: 17px; font-weight: 900; line-height: 1.25; word-break: keep-all; cursor: pointer; }
   .rv-tabs button small { display: block; margin-top: 2px; font-size: 13.5px; font-weight: 800; }
@@ -807,13 +832,13 @@
         </div>
         <label for="title" class="req" data-l="title">제목</label>
         <textarea id="title" class="oneln" rows="1" maxlength="40"></textarea>
+        <div data-for="club shop" data-part="greetmsg">
+          <label for="greet" id="greetLab">인사말 (선택) · 큰 제목 바로 아래에 나와요</label>
+          <textarea id="greet" rows="4" maxlength="1200" placeholder="예: 한 해 동안 고마웠습니다. 올해를 함께 마무리하는 자리에 꼭 오세요."></textarea>
+          <div class="hint" id="greetHint">날짜·장소·회비는 아래 칸에 쓰면 '언제·어디서' 상자로 따로 정리돼요. 같은 말을 두 번 써도 한 번만 나와요.</div>
+        </div>
         <label for="subtitle" data-l="subtitle">한 줄 소개</label>
         <textarea id="subtitle" class="oneln" rows="1" maxlength="60"></textarea>
-        <div data-for="club" data-part="greetmsg">
-          <label for="greet">인사말 (선택) · 큰 제목 바로 아래에 나와요</label>
-          <textarea id="greet" rows="4" maxlength="1200" placeholder="예: 한 해 동안 고마웠습니다. 올해를 함께 마무리하는 자리에 꼭 오세요."></textarea>
-          <div class="hint">날짜·장소·회비는 아래 칸에 쓰면 '언제·어디서' 상자로 따로 정리돼요. 같은 말을 두 번 써도 한 번만 나와요.</div>
-        </div>
       </fieldset>
 
       <fieldset data-tab="basic">
@@ -862,7 +887,7 @@
         </div>
       </fieldset>
 
-      <fieldset data-for="club shop" data-tab="basic" data-part="place" data-lite>
+      <fieldset data-for="club shop" data-tab="basic" data-part="place">
         <legend id="placeLeg">장소</legend>
         <label for="place">장소 이름 또는 주소</label>
         <div class="addr">
@@ -890,13 +915,13 @@
 
       <fieldset data-for="shop profile" data-tab="basic" data-part="links" data-snsoff>
         <legend id="lkLeg">우리 가게 다른 곳 (선택)</legend>
-        <div class="hint" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
+        <div class="hint" id="lkIntro" style="margin:0 0 6px">이미 있는 곳만 주소를 붙여 넣으세요. 넣은 것만 카드에 단추로 나와요.</div>
         <div data-part="lk-dg" data-lite><label for="lkDg">🥕 당근 비즈프로필</label>
         <input id="lkDg" type="url" inputmode="url" placeholder="https://www.daangn.com/…"></div>
         <div data-part="lk-nv"><label for="lkNv" id="lkNvLab">🟢 네이버 플레이스·예약</label>
         <input id="lkNv" type="url" inputmode="url" placeholder="https://naver.me/…"></div>
         <button type="button" class="mini" id="nvFind" style="margin-top:8px;width:100%;border-color:#03A94D;color:#03A94D">🟢 네이버에서 우리 가게 찾기 → 링크 복사해 오기</button>
-        <div class="hint" id="nvHow" hidden>네이버 지도에서 우리 가게 → <b>공유</b> → <b>링크 복사</b> → 돌아와서 위 '네이버 플레이스' 칸에 붙여 넣기. 예약은 아래 '📅 예약 받기 → 🟢 네이버 예약' 칸에.</div>
+        <div class="hint" id="nvHow" hidden>네이버에서 우리 가게를 눌러 → <b>공유</b> → <b>링크 복사</b> → 돌아와서 위 '네이버 플레이스' 칸에 붙여 넣기. 예약은 아래 '📅 예약 받기 → 🟢 네이버 예약' 칸에.</div>
         <div data-part="lk-kc" data-lite><label for="lkKc">💬 카카오톡 채널</label>
         <input id="lkKc" type="url" inputmode="url" placeholder="https://pf.kakao.com/…"></div>
         <div data-part="lk-ig" data-lite><label for="lkIg">📷 인스타그램</label>
@@ -972,6 +997,15 @@
         </div>
         <div class="bchips" id="bodyChips" hidden></div>
         <textarea id="body" maxlength="8000"></textarea>
+        <div id="mpBox" class="mp-box" hidden>
+          <div class="mp-btns">
+            <button type="button" id="mpPhoto">📷 메뉴판 사진으로<br>자동 채우기</button>
+            <button type="button" id="mpPaste">📋 복사한 글<br>붙여넣기</button>
+          </div>
+          <input id="mpFile" type="file" accept="image/*" hidden>
+          <div class="mp-tip">메뉴판·칠판 사진을 고르면 AI가 메뉴 이름과 가격을 읽어 위 칸에 넣어요. 폰 사진에서 글씨를 길게 눌러 복사한 뒤 [붙여넣기]를 눌러도 돼요.</div>
+          <div class="mp-st" id="mpSt" hidden></div>
+        </div>
         <div data-part="tidy"><button type="button" class="mini" id="tidyBtn" style="width:100%;margin-top:8px;font-weight:800">✨ 붙여 넣은 글 AI로 정리하기</button>
         <div class="hint">포스터·보도자료·카톡 공지를 위 칸에 그대로 붙여 넣고 누르세요. 겹친 말은 빼고, 일시·장소·프로그램·주최를 나눠 정리해 줘요. 넣기 전에 먼저 보여 드려요.</div></div>
         <div id="tidyBox" hidden style="position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center">
@@ -1318,10 +1352,13 @@
   <div class="modal-box done-box">
     <div class="modal-head"><b id="bizHead">이름으로 찾기</b><button type="button" class="mini" id="bizClose">닫기</button></div>
     <p class="done-sub" id="bizSub">이름을 적으면 카카오맵에 등록된 주소와 전화번호를 찾아 채워 드려요.</p>
-    <button type="button" class="mini" id="bizNv" style="width:100%;margin:0 0 8px;border-color:#03A94D;color:#03A94D">🟢 네이버 지도에서 찾기 (새 창)</button>
-    <div class="addr"><input id="bizQ" maxlength="40" placeholder="예: 여수 온기식당, 싸바생명 여수지점" enterkeyhint="search"><button type="button" class="mini" id="bizGo">찾기</button></div>
+    <div class="addr"><input id="bizQ" maxlength="40" placeholder="예: 여수 온기식당, 싸바생명 여수지점" enterkeyhint="search"><button type="button" class="mini" id="bizGo" style="min-width:76px;font-size:17px;font-weight:900;background:#B3132B;color:#fff;border-color:#B3132B">찾기</button></div>
+    <p class="hint" id="bizMsg" style="font-size:16px;font-weight:700"></p>
     <ul class="biz-list" id="bizList"></ul>
-    <p class="hint" id="bizMsg"></p>
+    <div id="bizMore" style="display:grid;gap:8px;margin-top:10px">
+      <button type="button" class="mini" id="bizNv" style="width:100%;min-height:50px;font-size:16px;font-weight:800;border-color:#03A94D;color:#027A38;background:#F1FBF4">🟢 네이버에서 찾아보기 (새 창)</button>
+      <button type="button" class="mini" id="bizAddr" style="width:100%;min-height:50px;font-size:16px;font-weight:800">📍 주소로 직접 넣기</button>
+    </div>
   </div>
 </div>
 <div id="toast" class="toast" role="status"></div>
@@ -1339,12 +1376,12 @@
 <script src="../js/mkask.js?v=3"></script>
 <script src="../js/indfind.js?v=3"></script>
 <script src="../js/notice.js?v=6"></script>
-<script src="../js/render.js?v=95"></script>
+<script src="../js/render.js?v=96"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
 <script src="../js/share.js"></script>
-<script src="../js/export.js?v=94"></script>
+<script src="../js/export.js?v=95"></script>
 <script src="../js/pack.js?v=5"></script>
 <script src="../js/links.js"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
@@ -1687,6 +1724,7 @@
   function paintSnsPv() {
     var dd = destSns(), ds = (typeof DEST_BY === 'object' && DEST_BY[dest]) || null;
     document.body.classList.toggle('dest-sns', !!dd);
+    try { if (type === 'shop') shopQ(); } catch (e) {}
     if (!dd) $('snsFit').hidden = true;
     $('snsPv').hidden = !dd; $('pvDest').hidden = !dd;
     $('pvSmall').textContent = dd ? '· 실제로 올라갈 사진 모양 그대로예요' : '· 글자를 누르면 바로 고쳐요';
@@ -1934,8 +1972,162 @@
   function shopLite(on) {
     document.body.classList.toggle('shop-lite', on);
     if (!on) shopMoreSet(false); else if (shopMoreUsed()) shopMoreSet(true);
+    try { shopQ(); } catch (e) {}
     try { renderTabs(); } catch (e) {}
   }
+
+  // ---------- 11-27 06:40 대표님: 영업장 카드 질문지 — 크고 또렷한 번호 질문, 올릴 곳(용도)마다 필요한 질문만, 같은 질문 두 번 없음 ----------
+  //   가게 이름은 한 번만 묻고(연락처 '가게 이름' 칸은 숨기고 같은 값으로), 인사말·가게 소개 칸 추가, 메뉴판 사진·붙여넣기로 메뉴 채우기
+  var SQ_SEL = {
+    name: function () { return document.querySelector('label[for="title"]'); },
+    greet: function () { return $('greetLab'); },
+    hours: function () { return document.querySelector('label[for="subtitle"]'); },
+    phone: function () { return document.querySelector('label[for="phone"]'); },
+    addr: function () { return document.querySelector('label[for="place"]'); },
+    naver: function () { return $('lkNvLab'); },
+    photo: function () { return $('phLeg'); },
+    body: function () { return document.querySelector('label[for="body"]'); },
+    resv: function () { return document.querySelector('#resvFs > legend'); }
+  };
+  // 그 질문을 끌 때 같이 숨길 칸
+  var SQ_BOX = {
+    name: function () { return [$('title')]; },
+    greet: function () { return [document.querySelector('[data-part="greetmsg"]')]; },
+    hours: function () { return [$('subtitle')]; },
+    phone: function () { return [$('phone').parentNode]; },
+    addr: function () { return [document.querySelector('fieldset[data-part="place"]')]; },
+    naver: function () { return [document.querySelector('[data-part="lk-nv"]'), $('nvFind'), $('nvHow')]; },
+    photo: function () { return [document.querySelector('fieldset[data-part="photo"]')]; },
+    body: function () { return [$('body').closest('fieldset')]; },
+    resv: function () { return [$('resvFs')]; }
+  };
+  function sqText(k, sns, ds) {
+    var store = /restaurant|cafe|bakery|bar|food/.test(industry || '') ? '가게' : '우리 영업장';
+    var T = {
+      name: ['🏪 ' + store + ' 이름은 무엇인가요?', '카드 맨 위에 가장 크게 나와요. 아래 초록 단추로 찾으면 주소·전화가 한 번에 채워져요.', 'i'],
+      greet: sns ? ['👋 ' + (dest === 'print' ? '전단' : '사진') + '에 넣을 한마디', '짧을수록 잘 보여요. 예: 갯벌에서 온 짱뚱어로 끓였어요', 'i'] : ['👋 손님께 드리는 인사말 · ' + store + ' 소개', '가게 이름 바로 아래에 나와요. 예: 순천만 짱뚱어로 정성껏 끓입니다. 편하게 들러 주세요.', 'i'],
+      hours: ['⏰ 영업시간 · 쉬는 날', '예: 11:30–22:00 (15–17시 쉬는 시간) · 일요일 휴무', 'i'],
+      phone: ['📞 예약 · 문의 전화번호', '손님이 카드에서 바로 전화를 걸어요', 'i'],
+      addr: ['📍 ' + store + ' 주소', '[🔍 주소 찾기]를 누르면 쉽게 넣어요. 손님이 카드에서 길찾기를 눌러요.', 'i'],
+      naver: ['🟢 네이버 플레이스 주소 (있으면)', '리뷰·길찾기·예약을 손님이 네이버에서 바로 봐요', 'i'],
+      photo: ['📷 ' + store + ' · 대표 메뉴 사진', sns ? '이 사진이 ' + (ds ? ds.b : 'SNS') + '용 그림의 바탕이 돼요' : '맨 위 큰 사진 1장 + 아래 [사진 추가]로 10장까지', 'p'],
+      body: sns ? ['💬 그 밖에 알릴 말 (선택)', '예: 주차 가능 · 단체석 있어요 · 포장 돼요', 'm'] : ['🍽️ 메뉴 · 오늘의 소식', '한 줄에 하나씩. 아래 메뉴판 사진으로 자동 채우기도 돼요.', 'm'],
+      resv: sns ? ['🍽️ 메뉴와 가격', '"메뉴 이름 가격" 한 줄에 하나씩. 아래 메뉴판 사진으로 자동 채우기도 돼요.', 'm'] : ['📅 예약은 어떻게 받을까요? (선택)', '싸바 직접 예약과 네이버 예약 중 편한 걸로 — 둘 다 써도 돼요', 'm']
+    };
+    return T[k];
+  }
+  // 올릴 곳(용도)마다 묻는 질문 — 사진·인쇄엔 링크 단추가 안 들어가니 네이버 플레이스는 카톡 카드에서만
+  var SQ_DEST = {
+    kakao: ['name', 'greet', 'hours', 'phone', 'addr', 'naver', 'photo', 'body', 'resv'],
+    kch: ['name', 'greet', 'hours', 'phone', 'addr', 'photo', 'body', 'resv'],
+    feed: ['name', 'greet', 'hours', 'phone', 'photo', 'body', 'resv'],
+    square: ['name', 'greet', 'hours', 'phone', 'addr', 'photo', 'body', 'resv'],
+    story: ['name', 'greet', 'hours', 'phone', 'photo', 'body', 'resv'],
+    print: ['name', 'greet', 'hours', 'phone', 'addr', 'photo', 'body', 'resv']
+  };
+  var sqFindHome = null;
+  function shopQ() {
+    var on = type === 'shop';
+    document.body.classList.toggle('shop-q', on);
+    var nameDiv = $('name').parentNode;
+    Object.keys(SQ_SEL).forEach(function (k) {
+      var l = SQ_SEL[k](); if (!l) return;
+      if (!on) {
+        if (l.dataset.sq0 != null) { l.innerHTML = l.dataset.sq0; delete l.dataset.sq0; }
+        l.classList.remove('sq'); delete l.dataset.g;
+        SQ_BOX[k]().forEach(function (b) { if (b) b.classList.remove('sq-off'); });
+      }
+    });
+    nameDiv.classList.toggle('sq-off', on);
+    var fb = document.querySelector('[data-part="find"]');
+    if (!on) {
+      if (sqFindHome && fb) { sqFindHome.parentNode.insertBefore(fb, sqFindHome); sqFindHome.remove(); sqFindHome = null; }
+      if ($('mpBox')) $('mpBox').hidden = true;
+      var rf0 = $('resvFs'); if (rf0._sqHome) { rf0._sqHome.parentNode.insertBefore(rf0, rf0._sqHome); rf0._sqHome.remove(); rf0._sqHome = null; }
+      if ($('place').dataset.ph0 != null) { $('place').placeholder = $('place').dataset.ph0; delete $('place').dataset.ph0; }
+      return;
+    }
+    if (fb && !sqFindHome) { sqFindHome = document.createComment('sqfind'); fb.parentNode.insertBefore(sqFindHome, fb); $('title').parentNode.insertBefore(fb, $('title').nextSibling); }
+    var sns = !!destSns(), ds = (typeof DEST_BY === 'object' && DEST_BY[dest]) || null, want = SQ_DEST[dest] || SQ_DEST.kakao;
+    Object.keys(SQ_SEL).forEach(function (k) {
+      var l = SQ_SEL[k](); if (!l) return;
+      var t = sqText(k, sns, ds), use = want.indexOf(k) >= 0;
+      if (l.dataset.sq0 == null) l.dataset.sq0 = l.innerHTML;
+      l.innerHTML = '<span>' + t[0] + '<small>' + t[1] + '</small></span>';
+      l.classList.add('sq'); l.dataset.g = t[2];
+      SQ_BOX[k]().forEach(function (b) { if (b) b.classList.toggle('sq-off', !use); });
+    });
+    if ($('greetHint')) $('greetHint').hidden = true;
+    if ($('place').dataset.ph0 == null) $('place').dataset.ph0 = $('place').placeholder;
+    $('place').placeholder = '예: 서울 강남구 신사동 609-1 지하1층';
+    $('greet').placeholder = sns ? '예: 갯벌에서 온 짱뚱어로 끓였어요' : '예: 순천만 갯벌 짱뚱어로 정성껏 끓입니다.\n편하게 들러 주세요.';
+    // 사진(SNS)·인쇄용은 '메뉴와 가격'을 '그 밖에 알릴 말'보다 먼저
+    var rf = $('resvFs'), bf = $('body').closest('fieldset');
+    if (sns && !rf._sqHome) { rf._sqHome = document.createComment('sqresv'); rf.parentNode.insertBefore(rf._sqHome, rf); bf.parentNode.insertBefore(rf, bf); }
+    else if (!sns && rf._sqHome) { rf._sqHome.parentNode.insertBefore(rf, rf._sqHome); rf._sqHome.remove(); rf._sqHome = null; }
+    // 메뉴판 사진 도구: 카톡 카드는 메뉴·소식 칸 아래, 사진(SNS)용은 메뉴와 가격 칸 아래
+    var mp = $('mpBox'), tgt = sns ? $('menu') : $('body');
+    if (mp && tgt && mp.previousElementSibling !== tgt) tgt.parentNode.insertBefore(mp, tgt.nextSibling);
+    if (mp) mp.hidden = false;
+    sqName();
+  }
+  // 가게 이름은 한 번만: 제목(가게 이름)을 연락처 이름에도 같이 (' — 오늘의 메뉴' 같은 뒷말은 뺌)
+  function sqName() {
+    if (type !== 'shop') return;
+    var t = ($('title').value || '').split(/\s+[—–\-|·]\s+/)[0].replace(/\s+/g, ' ').trim().slice(0, 30);
+    if (t) { $('name').value = t; $('name').classList.remove('missing'); }
+  }
+  $('title').addEventListener('input', sqName);
+  // 메뉴판 사진 → AI가 메뉴·가격 읽기 (/api/menuread) · 복사한 글 붙여넣기
+  function mpTarget() { return destSns() ? $('menu') : $('body'); }
+  function mpPut(lines) {
+    var t = mpTarget(), sns = !!destSns();
+    if (!lines.length) return 0;
+    var txt = lines.map(function (m) {
+      var n = String(m.n || m).trim(), p = m.p ? String(m.p).replace(/[^\d]/g, '') : '';
+      return sns ? (n + (p ? ' ' + p : '')) : (n + (p ? ' ' + (+p).toLocaleString() + '원' : ''));
+    }).join('\n');
+    t.value = (t.value.trim() ? t.value.replace(/\s+$/, '') + '\n' : '') + txt;
+    t.dispatchEvent(new Event('input', { bubbles: true }));
+    try { update(); refreshProgress(); } catch (e) {}
+    return lines.length;
+  }
+  function mpSt(msg) { var st = $('mpSt'); st.hidden = !msg; st.textContent = msg || ''; }
+  $('mpPhoto').addEventListener('click', function () { $('mpFile').click(); });
+  $('mpFile').addEventListener('change', function () {
+    var f = this.files && this.files[0]; this.value = '';
+    if (!f || !/^image\//.test(f.type)) return;
+    mpSt('📷 메뉴판을 읽는 중… (10초쯤 걸려요)');
+    resize(f, 1500).then(function (small) {
+      return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = no; r.readAsDataURL(small); });
+    }).then(function (data) {
+      return fetch(new URL('../api/menuread', location.href).href, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image: data }) });
+    }).then(function (r) { return r.json().catch(function () { return { error: 'http' + r.status }; }); }).then(function (j) {
+      if (!j || j.error || !Array.isArray(j.menu)) { mpSt(j && j.error === 'no-ai' ? '지금은 AI 읽기가 꺼져 있어요. 사진 속 글씨를 길게 눌러 복사한 뒤 [붙여넣기]를 눌러 주세요.' : '메뉴를 못 읽었어요. 글씨가 크게 나오게 다시 찍어 보시거나, 글씨를 복사해 [붙여넣기]를 눌러 주세요.'); return; }
+      var n = mpPut(j.menu);
+      if (j.hours && !$('subtitle').value) { $('subtitle').value = j.hours; }
+      mpSt(n ? '✓ 메뉴 ' + n + '개를 넣었어요. 틀린 글자가 있으면 고쳐 주세요.' : '메뉴를 찾지 못했어요. 메뉴판이 크게 나오게 다시 찍어 주세요.');
+    }).catch(function () { mpSt('인터넷이 약해서 못 읽었어요. 잠시 뒤 다시 해 주세요.'); });
+  });
+  $('mpPaste').addEventListener('click', function () {
+    var t = mpTarget();
+    var put = function (txt) {
+      txt = String(txt || '').replace(/\r/g, '').trim();
+      if (!txt) { mpSt('복사한 글이 없어요. 사진 속 글씨를 길게 눌러 [복사]한 뒤 다시 눌러 주세요.'); return; }
+      var lines = txt.split('\n').map(function (l) { return l.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
+      // "메뉴 15,000" / "메뉴 ··· 15000원" 모양은 메뉴·가격으로 나눠서, 나머지는 그대로
+      var out = lines.map(function (l) { var m = l.match(/^(.*?)[\s.·…:\-]*([\d]{1,3}(?:,\d{3})+|\d{4,7})\s*원?$/); return m && m[1].trim() ? { n: m[1].trim(), p: m[2] } : { n: l }; });
+      mpSt('✓ ' + mpPut(out) + '줄을 넣었어요. 고칠 곳이 있으면 위 칸에서 바로 고쳐요.');
+    };
+    if (navigator.clipboard && navigator.clipboard.readText && window.isSecureContext) navigator.clipboard.readText().then(put, function () { t.focus(); mpSt('위 칸을 길게 눌러 [붙여넣기]를 골라 주세요.'); });
+    else { t.focus(); mpSt('위 칸을 길게 눌러 [붙여넣기]를 골라 주세요.'); }
+  });
+  // 싸바 직접 예약을 켜면 메뉴·가격을 또 묻지 않게 — 메뉴·소식 칸에 가격 있는 줄을 그대로 옮겨 둠
+  $('resvOn').addEventListener('change', function () {
+    if (!this.checked || $('menu').value.trim() || destSns()) return;
+    var ls = ($('body').value || '').split('\n').map(function (l) { var m = l.trim().match(/^(.*?)[\s.·…:\-]*([\d]{1,3}(?:,\d{3})+|\d{4,7})\s*원?$/); return m && m[1].trim() ? m[1].trim() + ' ' + m[2].replace(/,/g, '') : ''; }).filter(Boolean);
+    if (ls.length) { $('menu').value = ls.join('\n'); toast('메뉴·소식 칸의 메뉴 ' + ls.length + '개를 예약 메뉴로 넣었어요'); }
+  });
   var shopMoreTouched = false;
   $('shopMoreBtn').addEventListener('click', function () { shopMoreTouched = true; var on = !document.body.classList.contains('shop-more'); shopMoreSet(on); try { renderTabs(); } catch (e) {} if (on) this.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   var BASE_L = {};
@@ -2137,7 +2329,7 @@
       kick: type === 'club' || type === 'greet' ? (v('kick') === '없음' ? '' : (v('kick') || ({ event: '초대합니다', wedding: '결혼합니다', funeral: '부고' }[industry] || ''))) : undefined,
       title: g('title'),
       subtitle: g('subtitle'),
-      greet: type === 'club' ? (g('greet').split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 20)) : undefined,
+      greet: (type === 'club' || type === 'shop') ? (g('greet').split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 20)) : undefined,
       image: g('image'),
       hide: v('hideList') ? $('hideList').value.split(',').filter(Boolean) : undefined,
       video: g('video'),
@@ -3596,35 +3788,54 @@
     mapsP.catch(function () { mapsP = null; });
     return mapsP;
   }
+  // 11-27 대표님: 가게 이름 찾기가 안 됨 → ① 싸바 서버(/api/place: 네이버 지역 검색·카카오 로컬) ② 안 되면 카카오맵(브라우저) ③ 그래도 안 되면 네이버에서 찾아보기·주소로 넣기 단추
+  //   (예전엔 실패하면 말없이 주소 찾기 창으로 넘겨서, 가게 이름을 넣어도 '결과 없음'만 떴음)
+  function bizShow(list, from) {
+    $('bizList').innerHTML = '';
+    if (!list.length) { $('bizMsg').textContent = '찾지 못했어요. 동네 이름을 같이 적어 보세요 (예: 신사동 순천만). 아래 네이버에서 찾아보셔도 돼요.'; return; }
+    $('bizMsg').textContent = '✅ 맞는 곳을 누르세요. 주소·전화가 한 번에 채워져요.';
+    list.slice(0, 10).forEach(function (p) {
+      var li = document.createElement('li'), b = document.createElement('button'); b.type = 'button';
+      var t = document.createElement('b'); t.textContent = p.place_name;
+      var a = document.createElement('span'); a.textContent = (p.road_address_name || p.address_name || '') + (p.phone ? ' · ' + p.phone : '');
+      var c = document.createElement('span'); c.textContent = (p.category_name || '').split(' > ').slice(-1)[0];
+      b.appendChild(t); b.appendChild(a); b.appendChild(c);
+      b.addEventListener('click', function () { applyBiz(p); });
+      li.appendChild(b); $('bizList').appendChild(li);
+    });
+  }
+  function bizKakao(q) {
+    return loadMaps().then(function () {
+      return new Promise(function (ok, no) {
+        new kakao.maps.services.Places().keywordSearch(q, function (data, status) {
+          if (status === kakao.maps.services.Status.ERROR) { mapsP = null; no(new Error('kakao')); return; }
+          ok(status === kakao.maps.services.Status.OK ? data : []);
+        });
+      });
+    });
+  }
   function bizSearch() {
     var q = $('bizQ').value.trim();
     if (!q) { $('bizQ').focus(); return; }
-    $('bizList').innerHTML = ''; $('bizMsg').textContent = '찾는 중…';
-    loadMaps().then(function () {
-      new kakao.maps.services.Places().keywordSearch(q, function (data, status) {
-        if (status === kakao.maps.services.Status.ERROR) { mapsP = null; $('bizModal').hidden = true; toast('가게 이름 검색이 잠시 안 돼요 · 주소로 찾아 주세요'); openPostcode(bizMode === 'place' ? 'place' : 'contact'); return; }
-        if (status !== kakao.maps.services.Status.OK || !data.length) { $('bizMsg').textContent = '찾지 못했어요. 지역 이름을 함께 적어 보세요. (예: 여수 온기식당)'; return; }
-        $('bizMsg').textContent = '맞는 곳을 누르세요.';
-        data.slice(0, 10).forEach(function (p) {
-          var li = document.createElement('li'), b = document.createElement('button'); b.type = 'button';
-          var t = document.createElement('b'); t.textContent = p.place_name;
-          var a = document.createElement('span'); a.textContent = (p.road_address_name || p.address_name) + (p.phone ? ' · ' + p.phone : '');
-          var c = document.createElement('span'); c.textContent = (p.category_name || '').split(' > ').slice(-1)[0];
-          b.appendChild(t); b.appendChild(a); b.appendChild(c);
-          b.addEventListener('click', function () { applyBiz(p); });
-          li.appendChild(b); $('bizList').appendChild(li);
-        });
-      });
+    $('bizList').innerHTML = ''; $('bizMsg').textContent = '🔍 찾는 중…';
+    fetch(new URL('../api/place?q=' + encodeURIComponent(q), location.href).href).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j || !Array.isArray(j.list)) throw new Error(j && j.error || 'x');
+      bizShow(j.list.map(function (x) { return { place_name: x.name, road_address_name: x.road, address_name: x.addr, phone: x.phone, category_name: x.cat, nv: x.url }; }), j.from);
     }).catch(function () {
-      // 카카오맵 검색이 안 되면 → 도로명·건물명 주소 검색으로 바로 넘김
-      $('bizModal').hidden = true;
-      toast('가게 이름 검색이 잠시 안 돼요 · 주소로 찾아 주세요');
-      openPostcode(bizMode === 'place' ? 'place' : 'contact');
+      return bizKakao(q).then(function (data) { bizShow(data, 'kakao-js'); });
+    }).catch(function () {
+      $('bizMsg').textContent = '지금은 싸바에서 가게 이름을 찾을 수 없어요. 아래 [네이버에서 찾아보기]나 [주소로 직접 넣기]를 눌러 주세요.';
     });
   }
+  $('bizAddr').addEventListener('click', function () { $('bizModal').hidden = true; openPostcode(bizMode === 'place' ? 'place' : 'contact'); });
   // 11-26 대표님: 네이버에서 가게 이름 → 네이버 플레이스(예약까지). 키 없이 네이버 지도 검색을 새 창으로 열고 링크를 복사해 오게
-  function nvOpen(q) { window.open('https://map.naver.com/p/search/' + encodeURIComponent(q || '우리 가게'), '_blank', 'noopener'); }
-  if ($('bizNv')) $('bizNv').addEventListener('click', function () { var q = $('bizQ').value.trim(); nvOpen(q); $('bizModal').hidden = true; if ($('nvHow')) $('nvHow').hidden = false; });
+  // 11-27: 폰에선 네이버 모바일 검색(가게 카드가 바로 뜨고 [공유 → 링크 복사]가 쉬움), 컴퓨터는 네이버 지도
+  function nvOpen(q) {
+    q = (q || '').trim() || '우리 가게';
+    var mob = /iPhone|iPad|Android|Mobile|KAKAOTALK/i.test(navigator.userAgent || '');
+    window.open(mob ? 'https://m.search.naver.com/search.naver?where=m&query=' + encodeURIComponent(q) : 'https://map.naver.com/p/search/' + encodeURIComponent(q), '_blank', 'noopener');
+  }
+  if ($('bizNv')) $('bizNv').addEventListener('click', function () { var q = $('bizQ').value.trim() || $('title').value.trim(); nvOpen(q); $('bizModal').hidden = true; if ($('nvHow')) $('nvHow').hidden = false; });
   if ($('nvFind')) $('nvFind').addEventListener('click', function () { var q = ($('title').value || $('name').value || '').trim(); $('nvHow').hidden = false; nvOpen(q); });
   // 11-27 대표님: 예약 받기 = [🍒 싸바 직접 예약][🟢 네이버 예약] 두 탭 나란히 (둘 다 써도 됨, 카드엔 넣은 것만)
   function rvStat() {
@@ -3659,6 +3870,7 @@
     if (p.phone && !$('phone').value) $('phone').value = p.phone;
     if ($('place') && (type === 'shop' || type === 'club')) $('place').value = p.place_name + (addr ? ' (' + addr + ')' : '');
     if (addr) { $('addr1').value = addr; }
+    if (p.nv && $('lkNv') && !$('lkNv').value && type === 'shop') $('lkNv').value = p.nv;
     $('bizModal').hidden = true;
     ['title', 'name', 'phone'].forEach(function (f) { $(f).classList.remove('missing'); });
     update(); refreshProgress();
@@ -3668,7 +3880,7 @@
   function openBiz(mode) {
     bizMode = mode;
     $('bizHead').textContent = mode === 'place' ? '📍 모일 장소 찾기' : '🔍 ' + (bizWord || '가게') + ' 이름으로 찾기';
-    $('bizSub').textContent = mode === 'place' ? '식당·카페·역·산 입구 이름을 적으면 카카오맵에서 찾아 장소 칸에 채워 드려요.' : (bizWord || '가게') + ' 이름을 적으면 카카오맵에 등록된 주소와 전화번호를 찾아 채워 드려요.';
+    $('bizSub').textContent = mode === 'place' ? '식당·카페·역·산 입구 이름을 적으면 카카오맵에서 찾아 장소 칸에 채워 드려요.' : (bizWord || '가게') + ' 이름을 적으면 네이버·카카오에 등록된 주소와 전화번호를 찾아 채워 드려요.';
     $('bizQ').placeholder = mode === 'place' ? '예: 압구정 순천만, 북한산 우이역' : '예: 여수 ' + (bizWord === '회사·사무실' ? '○○보험' : '온기식당');
   }
   $('findPlace').addEventListener('click', function () { openBiz('place'); $('bizModal').hidden = false; $('bizMsg').textContent = ''; $('bizList').innerHTML = ''; $('bizQ').value = ($('place').value || '').replace(/\s*\(.*$/, ''); setTimeout(function () { $('bizQ').focus(); }, 50); loadMaps().catch(function () {}); });

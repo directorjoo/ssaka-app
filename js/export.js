@@ -256,7 +256,7 @@
     var ts = fitFont(ctx, title, 900, story ? 150 : 140, 900, SERIF);
     ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 24;
     y = centerText(ctx, title, y, ts, sc.cream, 900, SERIF) + 6; ctx.restore();
-    var line = pick(card, /^(한 ?줄|소개)\s*[:：]/) || card.subtitle || '';
+    var line = pick(card, /^(한 ?줄|소개)\s*[:：]/) || (Array.isArray(card.greet) && card.greet[0]) || card.subtitle || '';
     if (line) y = centerText(ctx, line, y, story ? 40 : 36, sc.cream, 700, FONT, 940) + 8;
     var pop = pick(card, /^인기\s*[:：]/) || pick(card, /한정\s*[:：]/);
     if (pop) centerText(ctx, pop, y + 6, story ? 32 : 28, sc.mute, 500, FONT, 940);

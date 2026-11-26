@@ -44,12 +44,14 @@
   <p class="lead" id="lead">받은 앱을 눌러서 여세요.</p>
   <div id="apps"></div>
   <div class="adm" id="adm" hidden>🔑 관리자 폰이에요. 네 가지가 다 보이는 <a href="/app/">싸바 전체 홈 ›</a></div>
+  <p class="admin-in" id="admIn"><a href="/admin/">🔑 관리자</a></p>
 </main>
+<style>.admin-in{margin:28px 0 0;text-align:center;font-size:12px}.admin-in a{color:#9a8c80;text-decoration:none}</style>
 <script>
   (function () {
     var G = window.SavaGate, box = document.getElementById('apps');
     var ids = G.full() ? Object.keys(G.APPS) : G.list();
-    if (G.full()) document.getElementById('adm').hidden = false;
+    if (G.full()) { document.getElementById('adm').hidden = false; document.getElementById('admIn').hidden = true; }
     if (!ids.length) {
       document.getElementById('lead').textContent = '';
       box.innerHTML = '<div class="empty">아직 받은 앱이 없어요.<small>카톡으로 받은 싸바 링크를 눌러 주세요.</small></div>';

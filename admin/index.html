@@ -171,6 +171,7 @@
       <div class="links">
         <a href="/idea/admin/">💡 의견 관리<small id="lkIdea">채택 · 쿠폰</small></a>
         <a href="/app/orders/?admin=1">🥬 김치 주문<small id="lkKim">주문·입금·발송</small></a>
+        <a href="/app/">🍒 싸바 전체 홈<small>네 가지 다 보기</small></a>
         <a href="/?all=1">👀 전체보기<small>감춘 메뉴까지</small></a>
         <a href="/app/manage/">🗂️ 내 작업 관리<small>회원 화면 미리보기</small></a>
         <a href="/today/">☀️ 싸바 브리핑<small>생활 채널</small></a>
@@ -211,7 +212,7 @@
         if (KEY) { KEY = ''; try { sessionStorage.removeItem('sava-adm'); } catch (e) {} }
         return;
       }
-      D = j; $('gate').hidden = true; $('main').hidden = false; $('reload').hidden = false;
+      D = j; try { localStorage.setItem('sava-full', '1'); } catch (e) {} $('gate').hidden = true; $('main').hidden = false; $('reload').hidden = false;
       $('hello').textContent = (j.nick ? j.nick + ' 대표님' : '대표님') + ' · ' + (j.by === 'key' ? '비밀번호로 열림' : '카카오 로그인');
       paint();
     }).catch(function () { toast('인터넷 연결을 확인해 주세요'); });

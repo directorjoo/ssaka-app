@@ -1423,7 +1423,7 @@
 <script src="../js/mkask.js?v=3"></script>
 <script src="../js/indfind.js?v=3"></script>
 <script src="../js/notice.js?v=7"></script>
-<script src="../js/render.js?v=97"></script>
+<script src="../js/render.js?v=98"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -2273,6 +2273,7 @@
     // 11-27 모임 공지: 회비·준비물·특별당부 칸 · 기수·탑승지는 '더 넣기'에 접어 둠 (예전 산악회·동문회 카드를 고칠 땐 펼쳐 둠)
     $('meetFs').hidden = $('meetFs2').hidden = ind.id !== 'meet';
     meetOrder(ind.id === 'meet');
+    if (ind.id === 'meet') { try { meetTidyGreet(true); } catch (e) {} } // 예전에 인사말 칸에 다 적어 둔 카드·초안도 제 칸으로
     shopLite(type === 'shop');
     var ma = $('moreAdd'), maKids = ma.querySelectorAll('[data-part]');
     ma.hidden = Array.prototype.every.call(maKids, function (k) { return k.hidden; });
@@ -2877,7 +2878,7 @@
       update(); toast(text ? '✏️ 고쳤어요' : '🗑 그 줄을 뺐어요'); return;
     }
     if (key === 'greet') {
-      $('greet').value = text; keepPv = true; update(); toast('✏️ 고쳤어요'); return;
+      $('greet').value = text; var tg = meetTidyGreet(true); keepPv = false; update(); toast(tg ? '✏️ 고쳤어요 · 일시·장소·회비 줄은 제 칸으로 옮겼어요' : '✏️ 고쳤어요'); return; // 인사말은 줄을 걸러 아래 일시·장소로 옮기기도 하니 카드를 새로 그림
     }
     if (key === 'kick') {
       $('kick').value = text.slice(0, 20) || '없음';
@@ -3080,6 +3081,34 @@
   }
   $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
+  // 11-27 13:04 대표님(캡처): 인사말 칸에 제목·일시·장소·회비까지 한꺼번에 적으면 → 그 줄들을 제 칸(3 일시 · 4 장소 · 5 회비)으로 옮기고 인사말엔 문장만
+  function meetTidyGreet(quiet) {
+    if (industry !== 'meet' || !$('greet').value.trim()) return 0;
+    var n = function (x) { return String(x || '').replace(/(\d+)\s*년/g, '$1').replace(/(^|\D)20(\d\d)(?=\D|$)/g, '$1$2').replace(/[^가-힣a-zA-Z0-9]/g, ''); };
+    var same = function (a, b) { a = n(a); b = n(b); return a.length >= 3 && b.length >= 3 && (a === b || (Math.min(a.length, b.length) >= 4 && (a.indexOf(b) >= 0 || b.indexOf(a) >= 0))); };
+    var sentRe = /(니다|니까|어요|아요|해요|세요|네요|군요|에요|지요|죠|요|다)[.!?~♡♥^ㅎㅋ]*$/;
+    var keep = [], moved = [];
+    var put = function (id, val, what) { if (!v(id)) { $(id).value = val; $(id).classList.remove('missing'); } moved.push(what); };
+    $('greet').value.split('\n').forEach(function (raw) {
+      var line = raw.trim(); if (!line) { keep.push(''); return; }
+      var bare = line.replace(/^[.。·•\-\s]+/, '').replace(/[.。!~\s]+$/, '');
+      if (!bare || sentRe.test(bare) || bare.length > 30) { keep.push(raw); return; }
+      var m;
+      if (same(bare, v('title'))) { moved.push('제목 겹친 줄'); return; }
+      if ((m = /^회\s*비\s*[:：]?\s*(.+)$/.exec(bare))) { put('mFee', m[1].trim(), '회비'); return; }
+      if ((m = /^(?:모임\s*)?장\s*소\s*[:：]?\s*(.+)$/.exec(bare))) { put('place', m[1].trim(), '장소'); return; }
+      if ((m = /^(?:일\s*시|날\s*짜)\s*[:：]?\s*(.+)$/.exec(bare))) { put('subtitle', m[1].trim(), '일시'); return; }
+      if ((m = /^(?:준비물)\s*[:：]?\s*(.+)$/.exec(bare))) { put('mBring', m[1].trim(), '준비물'); return; }
+      if (/\d{1,2}\s*월\s*\d{1,2}\s*일|\d{1,2}\s*[:시]/.test(bare)) { if (!v('subtitle') || same(bare, v('subtitle'))) put('subtitle', bare, '일시'); else keep.push(raw); return; }
+      if (bare.length <= 20 && !/\d/.test(bare) && (!v('place') || same(bare, v('place')))) { put('place', bare, '장소'); return; }
+      keep.push(raw);
+    });
+    if (!moved.length) return 0;
+    $('greet').value = keep.join('\n').replace(/^\n+|\n+$/g, '');
+    if (!quiet) toast('인사말 칸의 ' + moved.filter(function (x, i) { return moved.indexOf(x) === i; }).join('·') + ' 줄은 제 칸으로 옮겼어요');
+    return moved.length;
+  }
+  $('greet').addEventListener('change', function () { if (meetTidyGreet()) { keepPv = false; update(); } });
   // 11-27: 명단을 붙이자마자 몇 명이 들어갔는지, 못 읽은 줄은 무엇인지 바로 보여 줌
   function preStatus() {
     var st = $('preSt'); if (!st) return;

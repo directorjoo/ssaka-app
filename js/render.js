@@ -143,7 +143,32 @@
         return !above.some(function (x) { return invDup(x, bare); });
       });
     }
-    return { greet: (card.greet || []).concat(g2), info: info, rest: rest };
+    // 11-27 13:04 대표님(캡처): 인사말 칸에 제목·일시·장소·회비 줄까지 같이 적으면 그 순서 그대로 나와 인사말 문장이 맨 뒤로 밀렸음
+    //   → 인사말 칸(card.greet)도 걸러냄: 제목과 같은 줄은 빼고, '회비 : 5만'·날짜 줄·짧은 장소 줄은 아래 일시·장소·회비 줄로 옮기고, 인사말 칸엔 문장만
+    var G = [], sentRe = /(니다|니까|어요|아요|해요|세요|네요|군요|에요|지요|죠|요|다)[.!?~♡♥^ㅎㅋ]*$/;
+    (card.greet || []).forEach(function (raw) {
+      var line = String(raw || '').trim(); if (!line) return;
+      var bare = line.replace(/^[.。·•\-\s]+/, '').replace(/[.。!~\s]+$/, '');
+      if (!bare) return;
+      var sent = sentRe.test(bare) || bare.length > 30;
+      if (!sent && (invDup(card.title, bare) || simTitle(bare))) return;                 // 제목과 같은 줄
+      var km = INV_KEY.exec(bare);
+      if (km && !/^\d/.test(bare) && !sent) {                                          // '회비 : 5만' · '장소: …' · '일시 …'
+        var lab = invLabel(km[1]), val = invClean(km[2]);
+        if (val && !info.some(function (r) { return r.k === lab; })) info.push({ k: lab, v: val, sub: '' });
+        return;
+      }
+      if (!sent && bare.length <= 40 && /\d{1,2}\s*월\s*\d{1,2}\s*일|\d{1,2}\s*[:시]\s*\d{0,2}/.test(bare)) { // 날짜 줄
+        if (!String(card.subtitle || '').trim() && !has(/일시|날짜/)) info.unshift({ k: '일시', v: bare, sub: '' });
+        return;
+      }
+      if (!sent && bare.length <= 20 && !/\d/.test(bare)) {                              // 짧은 장소 줄 ('압구정 순천만.')
+        if (place && invDup(place, bare)) return;
+        if (card.meet && !place && !has(/^장소/)) { info.push({ k: '장소', v: bare, sub: '' }); return; }
+      }
+      G.push(line);
+    });
+    return { greet: G.concat(g2), info: info, rest: rest };
   }
 
   // 뺄 수 있는 칸 (수정하기에서 ✕) — 참석 명단·회비·사진첩은 만들기 칸의 켜기/끄기로
@@ -339,6 +364,8 @@
       });
       if (!hasK(/일시|날짜|시간/) && (card.meet ? String(card.subtitle || '').trim() : /\d/.test(card.subtitle || ''))) rows.unshift({ k: '일시', v: String(card.subtitle), own: 1 });
       if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '', own: 1 });
+      // 11-27 모임 공지 줄 순서 고정: 일시 → 장소 → 회비 → 계좌 → 준비물 → 특별당부 → 그 밖에
+      if (card.meet) { var ORD = ['일시', '날짜', '시간', '장소', '회비', '계좌', '준비물', '특별당부']; rows = rows.map(function (r, i) { return [r, i]; }).sort(function (a, b) { var x = ORD.indexOf(a[0].k), y = ORD.indexOf(b[0].k); x = x < 0 ? 99 : x; y = y < 0 ? 99 : y; return x - y || a[1] - b[1]; }).map(function (z) { return z[0]; }); }
       var info = el('section', 'sk-info'); info.setAttribute('aria-label', '언제 어디서');
       // 11-27 대표님: '📍 언제 · 어디서' 제목은 뺌 — 일시·장소·회비 항목만으로 충분
       var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔', '특별당부': '📢', '계좌': '🏦' };
@@ -448,7 +475,13 @@
     var nAct = acts.children.length;
     if (nAct >= 2 && nAct <= 5) { acts.classList.add('sk-row'); acts.style.setProperty('--n', nAct); }
     else if (nAct % 2 === 1) acts.lastChild.classList.add('sk-wide');
-    if (acts.children.length) { var infoBox = inv && main.querySelector('.sk-info'); if (infoBox) infoBox.appendChild(acts); else wrap.appendChild(acts); }
+    if (acts.children.length) {
+      var infoBox = inv && main.querySelector('.sk-info');
+      // 11-27 모임 공지: 길찾기·통화 단추는 장소 줄 바로 아래 — 회비 다음엔 곧바로 참석·불참이 오게
+      var plRow = card.meet && infoBox && infoBox.querySelector('.sk-info-r[data-k="장소"]');
+      if (plRow) plRow.insertAdjacentElement('afterend', acts);
+      else if (infoBox) infoBox.appendChild(acts); else wrap.appendChild(acts);
+    }
     // 복사 칸: 단추 동그라미 대신 내용이 다 보이는 큰 칸 (계좌번호·이름을 눈으로 보고 누르면 복사)
     if ((card.buttons || []).indexOf('copy') >= 0 && card.copy && card.copy.value) {
       var cbx = el(live ? 'button' : 'div', 'sk-copybox');

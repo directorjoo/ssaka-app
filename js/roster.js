@@ -82,6 +82,10 @@
     // 11-27 대표님: '카톡방에 붙여넣을 명단 복사'는 필요 없음 — 명단은 카드 안에서 이어짐 (단추는 만들되 붙이지 않음)
     var copy = el('button', 'sk-ro-copy', '📋 카톡방에 붙여넣을 명단 복사 (전화번호 빼고)'); copy.type = 'button';
     var fine = el('p', 'sk-fine', ''); box.appendChild(fine);
+    // 11-27 13:04 대표님 확정 순서: 회비 바로 아래 [🙋 참석할게요][🙅 못 가요] → [📋 참석자 명단 보기 · 참석 N명 · 불참 N ›](누르면 열림)
+    //   그 위에 있던 제목줄·숫자줄은 없앰(숫자는 명단 보기 단추 안에), 모임 연 분 도구(공개 방식·대신 적기·문자 공지)는 맨 아래
+    head.style.display = 'none';
+    [btns, myLine, openL, stat, bar, byStop, mode, tools, fine].forEach(function (n) { box.appendChild(n); });
     MODES.forEach(function (m) {
       var b = el('button', '', m[1]); b.type = 'button'; b.dataset.p = m[0];
       b.addEventListener('click', function () {
@@ -121,8 +125,8 @@
       }
       cnt.textContent = showStat && !cN && !cNo && !cM ? '아직 신청한 사람이 없어요' : '';
       stat.innerHTML = '';
-      stat.style.display = showStat && (cN || cNo || cM) ? '' : 'none';
-      if (showStat) {
+      stat.style.display = showStat && !showNames && (cN || cNo || cM) ? '' : 'none';
+      if (showStat && !showNames) { // 이름을 못 보는 분(인원만 공개)에게만 숫자줄 — 나머지는 명단 보기 단추 안에 숫자
         stat.appendChild(el('span', 'y', '🙋 참석 ' + cN + '명' + (nP > cN ? ' · 총 ' + nP + '명' : '')));
         stat.appendChild(el('span', 'n', '🙅 불참 ' + cNo));
         if (cM) stat.appendChild(el('span', 'm', '🤔 미정 ' + cM));
@@ -184,7 +188,7 @@
       });
       copy.style.display = 'none';
       tools.style.display = isOwner ? '' : 'none';
-      btns.style.display = isOwner || (st.closed && !mine) ? 'none' : '';
+      btns.style.display = st.closed && !mine && !isOwner ? 'none' : ''; // 11-27: 모임 연 분 폰에도 참석·불참 단추 (회장님도 참석·받는 사람과 같은 화면 확인)
       join.disabled = !going && !!full; if (join.disabled) join.textContent = '🈵 정원이 다 찼어요';
       if (st.closed && !isOwner && !mine) { cnt.textContent = '응답이 마감됐어요'; }
       if (hid) ol.appendChild(el('li', 'sk-ro-sep', '🔒 싸바로 신청한 다른 ' + hid + '명 · 이름은 모임 연 분만 봐요'));
@@ -192,7 +196,7 @@
       var lcnt = cN + '명' + (nP > cN ? ' (동반 포함 ' + nP + '명)' : '');
       olT.textContent = '📋 참석자 ' + lcnt;
       openL.style.display = showNames ? '' : 'none'; // 11-27: 아직 아무도 없어도 탭은 늘 보임
-      openL.textContent = '📋 참석자 명단 보기 (' + cN + '명) ›';
+      openL.textContent = '📋 참석자 명단 보기 · 참석 ' + cN + '명' + (nP > cN ? ' (동반 포함 ' + nP + '명)' : '') + (cNo ? ' · 불참 ' + cNo + '명' : '') + ' ›';
       if (!Y.length && !hid && !ol.querySelector('.sk-ro-none')) { ol.innerHTML = ''; ol.appendChild(el('li', 'sk-ro-sep sk-ro-none', '아직 신청한 분이 없어요 · 카드에서 [🙋 참석할게요]를 누르면 여기에 번호대로 올라와요')); }
       myLine.style.display = mine && !isOwner ? '' : 'none';
     }

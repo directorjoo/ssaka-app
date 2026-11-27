@@ -329,6 +329,8 @@
               gdone.remove(); if (gfb) gfb.remove();
               var gls = gta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
               pristine.greet = gls;
+              // 11-27 13:04 🐛 원위치 고침: 예전 인사말 상자를 다시 붙이던 것 → 고친 글로 새로 그림 (만들기 화면이 카드도 새로 그려 줌)
+              gl0.innerHTML = ''; gls.forEach(function (l) { var li = document.createElement('li'); li.className = 'sk-p'; li.textContent = l; gl0.appendChild(li); });
               gta.replaceWith(gl0);
               PE('greet', -1, 'all', gls.join('\n'));
             }, { once: true });

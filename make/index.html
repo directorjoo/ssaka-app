@@ -29,7 +29,7 @@
   <meta name="apple-mobile-web-app-title" content="싸바카드">
   <meta name="application-name" content="싸바카드">
   <link rel="stylesheet" href="../css/brand.css?v=2">
-  <link rel="stylesheet" href="../css/sk.css?v=111">
+  <link rel="stylesheet" href="../css/sk.css?v=112">
   <link rel="stylesheet" href="../css/sk-world.css?v=12">
   <link rel="stylesheet" href="../css/cherry.css?v=2">
   <link rel="stylesheet" href="../css/steps.css?v=6">
@@ -552,6 +552,18 @@
   .dests button[aria-pressed="true"] i { background: #fff; }
   .dests button[aria-pressed="true"]::after { content: '✓'; position: absolute; top: -8px; right: -6px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #B3132B; font-size: 16px; font-weight: 900; box-shadow: 0 0 0 2.5px #B3132B; }
   .use-go { margin: 6px 0 2px; font-size: 15px; font-weight: 700; color: #8E0A1C; }
+  .pre-st { margin: 8px 0 4px; padding: 10px 12px; border-radius: 12px; background: #EAF7EE; color: #11632E; font-size: 16px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
+  .pre-st .bad { display: block; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #9CCBAA; color: #8E0A1C; font-weight: 700; font-size: 15px; }
+  .pre-st .bad i { font-style: normal; display: inline-block; margin: 3px 4px 0 0; padding: 1px 8px; border-radius: 8px; background: #fff; border: 1px solid #F3B7AE; }
+  .na { position: fixed; inset: 0; z-index: 2147483100; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+  .na[hidden] { display: none; }
+  .na-in { width: 100%; max-width: 560px; background: #fff; border-radius: 22px 22px 0 0; padding: 20px 18px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 10px; }
+  .na-in > b { font-size: 20px; font-weight: 900; }
+  .na-in > p { margin: 0 0 4px; font-size: 16px; color: #5a4a42; word-break: keep-all; }
+  .na-in button { min-height: 60px; border-radius: 16px; font: inherit; font-size: 18px; font-weight: 900; border: 2px solid #E9E2D8; background: #fff; color: #1A1A1A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .na-in button small { font-size: 14px; font-weight: 600; color: #6b5d55; }
+  .na-in #naNew { background: #B3132B; border-color: #B3132B; color: #fff; }
+  .na-in #naNew small { color: #FFE3E8; }
   #resumeBtn { display: block; width: 100%; min-height: 48px; margin: 4px 0 6px; border-radius: 14px; border: 1.5px dashed #B3132B; background: #fff; color: #8E0A1C; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
   #d2next { display: none; width: 100%; min-height: 56px; margin-top: 12px; border: 0; border-radius: 16px; background: #B3132B; color: #fff; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; box-shadow: 0 8px 18px -10px rgba(179,19,43,.8); }
   .mk-s2 #d2next { display: block; }
@@ -565,6 +577,32 @@
   .shop-more-btn { display: none; width: 100%; margin: 18px 0 6px; padding: 14px 16px; border: 2px dashed #E3C2BA; border-radius: 16px; background: #FFFDF9; color: #8E0A1C; font: inherit; font-size: 18px; font-weight: 900; text-align: left; cursor: pointer; }
   .shop-more-btn small { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; color: #6b5d55; line-height: 1.45; word-break: keep-all; }
   body.shop-lite:not(.dest-sns) .shop-more-btn { display: block; }
+  /* 11-27 12:27 대표님: 모임 공지 질문지 11개 (body.meet-q) — 번호 동그라미 · 큰 질문 · 칸마다 글씨 크기 · 나머지는 '더 넣기' */
+  body.meet-q #form > .sec-h:not([data-sec="basic"]), body.meet-q #form legend, body.meet-q label[for="title"], body.meet-q #greetLab, body.meet-q #greetHint,
+  body.meet-q label[for="subtitle"], body.meet-q label[for="place"], body.meet-q label[for="mFee"], body.meet-q label[for="mAcct"], body.meet-q label[for="pre"],
+  body.meet-q #meetFs2 > .hint, body.meet-q #rosterHint, body.meet-q #moreAdd, body.meet-q #copyFs, body.meet-q #fsFs, body.meet-q #topPreGo,
+  body.meet-q #duesBox .caprow, body.meet-q label[for="dAcct"], body.meet-q #dAcct, body.meet-q #name ~ [data-part="find"], body.meet-q [data-part="find"], body.meet-q #pePreFs { display: none !important; }
+  body.meet-q #form > fieldset { padding: 2px 2px 8px; background: transparent; border: 0; box-shadow: none; }
+  body.meet-q #form > fieldset[data-part="notice"] { padding: 12px; border: 1.5px dashed #E3C2BA; border-radius: 16px; background: #FFFCF8; }
+  body.meet-q #form > fieldset[data-part="notice"] legend { display: block !important; }
+  body.meet-q fieldset[data-part="dues"] { margin-top: -6px; }
+  .mq { display: flex; align-items: flex-start; gap: 12px; margin: 22px 0 10px; padding: 14px 14px 14px 12px; border-radius: 18px; background: linear-gradient(100deg, #FFE7CF 0%, #FFFAF4 92%); border: 1.5px solid #F6C79A; color: #24130F; word-break: keep-all; }
+  .mq > i { font-style: normal; flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #E8740C; color: #fff; font-size: 18px; font-weight: 900; box-shadow: 0 4px 10px -4px rgba(0,0,0,.4); }
+  .mq > span { flex: 1; min-width: 0; }
+  .mq b { display: block; font-size: 20px; font-weight: 900; line-height: 1.3; }
+  .mq small { display: block; margin-top: 4px; font-size: 15.5px; font-weight: 600; line-height: 1.45; color: #5E4E47; }
+  body.meet-q #form input, body.meet-q #form textarea { font-size: 18px; }
+  .fsrow { display: flex; align-items: center; gap: 5px; margin: 8px 0 2px; }
+  .fsrow > b { flex: none; font-size: 14px; font-weight: 800; color: #6b5d55; margin-right: 2px; }
+  .fsrow button { flex: 1; min-height: 40px; padding: 2px 0; border-radius: 10px; border: 1.5px solid #E9E2D8; background: #fff; font: inherit; font-size: 12.5px; font-weight: 700; color: #5a4a42; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05; }
+  .fsrow button span { font-weight: 900; color: #222; }
+  .fsrow button[aria-pressed="true"] { border-color: #B3132B; background: #FFE8EB; color: #B3132B; }
+  .meet-more { margin: 26px 0 8px; border: 2px dashed #E3C2BA; border-radius: 18px; background: #FFFDF9; padding: 4px 12px 10px; }
+  .meet-more > summary { list-style: none; cursor: pointer; padding: 12px 2px; font-size: 19px; font-weight: 900; color: #8E0A1C; }
+  .meet-more > summary::-webkit-details-marker { display: none; }
+  .meet-more > summary small { display: block; margin-top: 4px; font-size: 14.5px; font-weight: 600; color: #6b5d55; line-height: 1.4; }
+  .meet-more fieldset { border: 0; padding: 6px 0; margin: 6px 0; background: transparent; }
+  body.meet-q #form .meet-more legend { display: block !important; font-size: 17px; font-weight: 900; }
   /* 11-27 06:40 대표님: 영업장 카드 = 질문 하나하나 크고 또렷하게, 번호·색으로 구분, 올릴 곳마다 필요한 질문만 (body.shop-q) */
   body.shop-q #form { counter-reset: sq; }
   body.shop-q #form legend:not(.sq), body.shop-q #lkIntro, body.shop-q #findPlace, body.shop-q fieldset[data-part="place"] > .hint, body.shop-q [data-part="tidy"], body.shop-q .sq-off, body.shop-q .sec-h span { display: none !important; }
@@ -782,6 +820,14 @@
       <div class="tp" data-tab="design">
       <div class="step" id="d1step">1. 용도 고르기 <span class="bt-hide">어디에 올리고, 무엇을 알릴지</span></div>
       <button type="button" id="resumeBtn" hidden></button>
+      <div id="newAsk" class="na" hidden role="dialog" aria-modal="true" aria-labelledby="naH">
+        <div class="na-in">
+          <b id="naH">쓰다 만 카드가 있어요</b>
+          <p id="naT"></p>
+          <button type="button" id="naNew">✨ 새로 쓰기 <small>빈 칸에서 시작해요</small></button>
+          <button type="button" id="naGo">✏️ 이어 쓰기 <small>쓰던 내용 그대로</small></button>
+        </div>
+      </div>
       <section class="stp s1"><h3 class="stp-h"><span class="stp-n">1</span>어디에 쓸까요? <small>나중에 다른 곳 크기로도 만들 수 있어요</small></h3>
       <div class="dest-groups" id="dests" role="group" aria-label="올릴 곳"></div></section>
       <section class="stp s2"><h3 class="stp-h"><span class="stp-n">2</span>무엇을 알릴까요? <small>하는 일을 한 단어로 써 주세요 · 맞는 카드를 찾아 드려요</small></h3>
@@ -1109,6 +1155,7 @@
           <label for="pre">💬 카톡에서 이미 받은 참석자 명단 이어 붙이기 <small>(선택)</small></label>
           <div class="hint" style="margin:2px 0 6px">카톡 글로 먼저 공지해서 받은 '참석자 이어가기' 명단을 그대로 복사해 붙여 넣으세요. 이분들이 새 카드 명단 맨 앞에 먼저 보이고, 이 카드로 새로 신청한 분은 그 뒤로 번호가 이어져요.</div>
           <textarea id="pre" maxlength="3000" placeholder="👉 길게 눌러 [붙여넣기]&#10;참석자 이어가기&#10;1. 홍길동 32회&#10;2. 김싸바(35기) +1&#10;3. 이싸바 부부"></textarea>
+          <div class="pre-st" id="preSt" hidden role="status"></div>
           <div class="hint">번호·머리말이 붙은 채로 붙여도 이름·기수·동반 인원을 알아서 골라요. 위 '공지 글 붙여넣기'에 명단까지 통째로 붙여도 여기로 들어와요.</div>
           </div>
           <details class="more-add" id="moreAdd">
@@ -1375,8 +1422,8 @@
 <script src="../js/mkfun.js?v=1"></script>
 <script src="../js/mkask.js?v=3"></script>
 <script src="../js/indfind.js?v=3"></script>
-<script src="../js/notice.js?v=6"></script>
-<script src="../js/render.js?v=96"></script>
+<script src="../js/notice.js?v=7"></script>
+<script src="../js/render.js?v=97"></script>
 <script src="../js/reserve.js"></script>
 <script src="../js/sound.js"></script>
 <script src="../js/store.js?v=3"></script>
@@ -1471,7 +1518,7 @@
         /* 한 화면 2~3색 원칙: 동그라미는 모두 같은 바탕, 고른 것만 체리 */
         b.appendChild(i); b.appendChild(document.createTextNode(ind.label));
         b.setAttribute('aria-pressed', ind.id === industry ? 'true' : 'false');
-        b.addEventListener('click', function () { setIndustry(ind.id, true); afterUse(); });
+        b.addEventListener('click', function () { pickNew(ind.id); });
         grid.appendChild(b);
       });
       wrap.appendChild(grid);
@@ -1486,7 +1533,7 @@
     b.type = 'button'; b.dataset.ind = id; if (cls) b.className = cls;
     b.setAttribute('aria-pressed', id === industry ? 'true' : 'false');
     b.textContent = ind.emoji + ' ' + ind.label;
-    b.addEventListener('click', function () { setIndustry(id, true); afterUse(); });
+    b.addEventListener('click', function () { pickNew(id); });
     return b;
   }
   function indSearch(box) {
@@ -1500,14 +1547,14 @@
     };
     var bMeet = big('m-meet', '🥂', '모임 공지', '신년회 · 송년회 · 동문회 · 산악회 · 골프 · 돌잔치 모두');
     bMeet.dataset.ind = 'meet';
-    bMeet.addEventListener('click', function () { setIndustry('meet', true); afterUse(); });
+    bMeet.addEventListener('click', function () { pickNew('meet'); });
     var bLife = big('m-life', '💌', '경조사', '청첩장 · 부고'); bLife.setAttribute('aria-expanded', 'false');
     var life = document.createElement('div'); life.className = 'mk3-sub'; life.hidden = true;
     [['wedding', '💍 청첩장'], ['funeral', '🕯️ 부고']].forEach(function (x) {
       if (!D.industry(x[0]) || (D.isOpen && !D.isOpen(x[0]))) return;
       var b = document.createElement('button'); b.type = 'button'; b.dataset.ind = x[0]; b.textContent = x[1];
       b.setAttribute('aria-pressed', x[0] === industry ? 'true' : 'false');
-      b.addEventListener('click', function () { setIndustry(x[0], true); afterUse(); });
+      b.addEventListener('click', function () { pickNew(x[0]); });
       life.appendChild(b);
     });
     bLife.addEventListener('click', function () { life.hidden = !life.hidden; bLife.setAttribute('aria-expanded', life.hidden ? 'false' : 'true'); });
@@ -1546,7 +1593,7 @@
       go.querySelector('i').textContent = top.emoji;
       go.querySelector('small').textContent = '‘' + t + '’ → 이 카드로 만들어요';
       go.querySelector('b').textContent = top.label;
-      go.addEventListener('click', function () { setIndustry(top.id, true); afterUse(); });
+      go.addEventListener('click', function () { pickNew(top.id); });
       res.appendChild(go);
       var rest = m.slice(1, 3);
       if (rest.length) {
@@ -1951,20 +1998,76 @@
     if (!n._moHome) { n._moHome = document.createComment('mo'); n.parentNode.insertBefore(n._moHome, n); MO_HOME.push(n); }
     if (before) ref.parentNode.insertBefore(n, ref); else ref.parentNode.insertBefore(n, ref.nextSibling);
   }
+  // 11-27 12:27 대표님 확정 — 모임 공지 질문지 11개 (번호 동그라미 + 큰 질문 + 칸마다 글씨 크기)
+  //   1 모임 이름 · 2 인사말 · 3 일시 · 4 장소 · 5 회비 · 6 회비 계좌(+입금 체크) · 7 참석·불참 받기 · 8 카톡 명단 붙여넣기
+  //   9 준비물·특별당부 · 10 대표 사진 · 11 모임 연 분 — 나머지는 맨 아래 '➕ 더 넣기' 하나에 접어 둠
+  var MQ_ADDED = [];
+  function mqHead(n, t, help, fx) {
+    var d = document.createElement('div'); d.className = 'mq';
+    var i = document.createElement('i'); i.textContent = n; d.appendChild(i);
+    var sp = document.createElement('span'), b = document.createElement('b'); b.textContent = t; sp.appendChild(b);
+    if (help) { var sm = document.createElement('small'); sm.textContent = help; sp.appendChild(sm); }
+    d.appendChild(sp);
+    MQ_ADDED.push(d);
+    return d;
+  }
+  function mqFs(fx, after) { if (!after) return; var r = fsRow(fx); after.parentNode.insertBefore(r, after.nextSibling); MQ_ADDED.push(r); }
   function meetOrder(on) {
-    var front = $('title').closest('fieldset'), greetD = document.querySelector('[data-part="greetmsg"]'), subL = document.querySelector('label[for="subtitle"]');
+    var front = $('title').closest('fieldset'), contactF = $('name').closest('fieldset');
     var placeF = document.querySelector('fieldset[data-part="place"]'), rosF = document.querySelector('fieldset[data-part="roster"]'), preB = document.querySelector('#rosterBox [data-part="pre"]');
+    var duesF = document.querySelector('fieldset[data-part="dues"]'), photoF = document.querySelector('fieldset[data-part="photo"]');
     if (!on) {
+      document.body.classList.remove('meet-q');
+      MQ_ADDED.splice(0).forEach(function (n) { n.remove(); });
       MO_HOME.splice(0).forEach(function (n) { if (n._moHome && n._moHome.parentNode) { n._moHome.parentNode.insertBefore(n, n._moHome); n._moHome.remove(); } n._moHome = null; });
+      var mm0 = $('meetMore'); if (mm0) mm0.remove();
+      var dl = document.querySelector('#duesOn + span'); if (dl && dl.dataset.t0) { dl.textContent = dl.dataset.t0; delete dl.dataset.t0; }
       return;
     }
-    if (MO_HOME.length) return; // 이미 모임 공지 순서
-    moMove(greetD, subL, true);                 // 제목 → 인사말 → 일시
-    moMove(placeF, front);                      // → 장소
-    moMove($('meetFs'), placeF);                // → 회비 · 계좌
-    moMove(rosF, $('meetFs'));                  // → 참석·불참 받기
-    moMove(preB, $('rosterBox').lastElementChild); // → 맨 끝에 참석자 명단 붙여넣기
-    moMove($('meetFs2'), rosF);                 // → 준비물 · 특별당부
+    if (MO_HOME.length) { fsRowsPaint(); return; } // 이미 모임 공지 순서
+    document.body.classList.add('meet-q');
+    // 순서대로 놓기
+    moMove(placeF, front);                 // 4 장소
+    moMove($('meetFs'), placeF);           // 5·6 회비·계좌
+    moMove(duesF, $('meetFs'));            //   └ 입금 체크
+    moMove(rosF, duesF);                   // 7·8 참석 받기 · 명단 붙여넣기
+    moMove(preB, document.querySelector('#rosterBox .pubpick')); //   명단 붙여넣기는 공개 방식 바로 아래
+    moMove($('meetFs2'), rosF);            // 9 준비물·특별당부
+    moMove(photoF, $('meetFs2'));          // 10 대표 사진
+    moMove(contactF, photoF);              // 11 모임 연 분
+    // ➕ 더 넣기 (접힘)
+    var mm = document.createElement('details'); mm.id = 'meetMore'; mm.className = 'meet-more';
+    mm.innerHTML = '<summary>➕ 더 넣기 <small>맨 위 한마디 · 기수 · 탑승지 · 정원·마감 · 일정표 · 사진첩 · 동영상 · 그 밖에 알릴 말 · 움직임 · 시즌 · 소리</small></summary>';
+    contactF.parentNode.insertBefore(mm, contactF.nextSibling);
+    var into = function (n) { if (!n) return; if (!n._moHome) { n._moHome = document.createComment('mo'); n.parentNode.insertBefore(n._moHome, n); MO_HOME.push(n); } mm.appendChild(n); };
+    into(document.querySelector('[data-part="kick"]'));
+    into(document.querySelector('#moreAdd [data-part="gisu"]'));
+    into(document.querySelector('#moreAdd [data-part="stops"]'));
+    into(document.querySelector('#rosterBox .caprow'));
+    into(document.querySelector('fieldset[data-part="sched"]'));
+    into(document.querySelector('fieldset[data-part="album"]'));
+    into($('clip').closest('fieldset'));
+    into($('body').closest('fieldset'));
+    into(document.querySelector('fieldset[data-part="motion"]'));
+    into(document.querySelector('fieldset[data-part="season"]'));
+    into($('sound').closest('fieldset'));
+    // 쓴 칸이 있으면 펼쳐 둠 (고치기·이어 쓰기)
+    mm.open = ['kick', 'stops', 'rCap', 'rDl', 'clip', 'body', 'motion'].some(function (f) { return $(f) && $(f).value && $(f).value !== '없음'; }) || $('albumOn').checked;
+    // 번호 질문
+    var put = function (head, before) { if (before) before.parentNode.insertBefore(head, before); };
+    put(mqHead(1, '🥂 모임 이름은 무엇인가요?', '카드 맨 위에 가장 크게 나와요. 예: 순천중고 동창회 송년회'), $('title')); mqFs(0, $('title'));
+    put(mqHead(2, '👋 인사말 (선택)', '모임 이름 바로 아래에 나와요. 예: 한 해 동안 고마웠습니다. 꼭 오세요.'), $('greet')); mqFs(3, $('greet'));
+    put(mqHead(3, '📅 언제 모이나요?', '예: 12월 20일(토) 저녁 7시'), $('subtitle')); mqFs(1, $('subtitle'));
+    put(mqHead(4, '📍 어디서 모이나요?', '장소 이름이나 주소 · 받는 분이 카드에서 길찾기를 눌러요'), placeF.querySelector('.addr')); mqFs(5, placeF.querySelector('.hint'));
+    put(mqHead(5, '💰 회비 (선택)', '예: 3만원 (현장 납부 가능) · 안 적으면 카드에 안 나와요'), $('mFee')); mqFs(6, $('mFee'));
+    put(mqHead(6, '🏦 회비 계좌 (선택)', '받는 분이 카드에서 누르면 계좌가 복사돼요'), $('mAcct')); mqFs(7, $('mAcct'));
+    put(mqHead(7, '🙋 참석·불참 받기', '카드에 [참석할게요] [못 가요] 단추가 생기고, 번호 매긴 명단이 저절로 만들어져요'), $('rosterOn').closest('label'));
+    put(mqHead(8, '💬 카톡에서 이미 받은 참석자 명단 (선택)', "카톡 '참석자 이어가기' 글을 그대로 붙여 넣으세요. 이분들이 명단 맨 앞에, 싸바로 새로 신청한 분은 뒤에 이어져요"), $('pre'));
+    put(mqHead(9, '🎒 준비물 · 📢 특별당부 (선택)', '적은 것만 카드에 나와요'), document.querySelector('label[for="mBring"]')); mqFs(8, $('mBring')); mqFs(9, $('mNote'));
+    put(mqHead(10, '📷 대표 사진 (선택)', '카드 맨 위에 크게 나와요 · 지난 모임 단체 사진이나 장소 사진이 좋아요'), photoF.firstElementChild.nextElementSibling);
+    put(mqHead(11, '📞 모임 연 분 (회장·총무)', '받는 분이 카드에서 바로 전화를 걸어요'), contactF.querySelector('.row'));
+    var dl2 = document.querySelector('#duesOn + span'); if (dl2 && !dl2.dataset.t0) { dl2.dataset.t0 = dl2.textContent; dl2.textContent = '✅ 누가 입금했는지 체크하기 (모임 연 분과 본인만 봐요)'; }
+    fsRowsPaint();
   }
   // 11-27 B-2: 영업장 카드 '더 넣기' — 이미 그런 칸을 쓴 카드(고치기·초안)는 펼쳐 둠
   function shopMoreUsed() { return ['clip', 'copyValue', 'lkDg', 'lkKc', 'lkIg', 'motion'].some(function (f) { return $(f) && $(f).value; }); }
@@ -2305,13 +2408,30 @@
   }
   // 글씨 크기 (11-22) — fsz = "제목,부제목,본문" (-1 작게 · 0 보통 · 1 크게 · 2 아주 크게)
   var fsK = 0, FS_NAME = { '-1': '작게', '0': '보통', '1': '크게', '2': '아주 크게' };
-  function fsGet() { var a = ($('fsz').value || '').split(',').map(function (x) { var n = parseInt(x, 10); return n >= -1 && n <= 2 ? n : 0; }); while (a.length < 3) a.push(0); return a.slice(0, 3); }
+  function fsGet() { var a = ($('fsz').value || '').split(',').map(function (x) { var n = parseInt(x, 10); return n >= -1 && n <= 2 ? n : 0; }); while (a.length < 10) a.push(0); return a.slice(0, 10); }
   function fsPaint() {
     var a = fsGet();
     document.querySelectorAll('.fs-tabs button').forEach(function (b) { b.setAttribute('aria-selected', +b.dataset.k === fsK ? 'true' : 'false'); });
     document.querySelectorAll('.fs-sizes button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.v === a[fsK] ? 'true' : 'false'); });
     $('fsNow').textContent = '제목 ' + FS_NAME[a[0]] + ' · 부제목 ' + FS_NAME[a[1]] + ' · 본문 ' + FS_NAME[a[2]];
+    try { fsRowsPaint(); } catch (e) {}
   }
+  // 11-27 대표님: 칸마다 글씨 크기 탭 — 질문 바로 아래 [작게·보통·크게·아주 크게], 고른 크기는 카드의 그 줄에만
+  //   fsz 자리: 0 제목 · 1 일시(부제목) · 2 그 밖에 알릴 말 · 3 인사말 · 5 장소 · 6 회비 · 7 계좌 · 8 준비물 · 9 특별당부
+  function fsRow(ix) {
+    var w = document.createElement('div'); w.className = 'fsrow'; w.dataset.fx = ix;
+    w.setAttribute('role', 'group'); w.setAttribute('aria-label', '글씨 크기');
+    var h = document.createElement('b'); h.textContent = '글씨'; w.appendChild(h);
+    [[-1, '작게', 13], [0, '보통', 16], [1, '크게', 19], [2, '아주 크게', 22]].forEach(function (x) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.v = x[0];
+      b.innerHTML = '<span style="font-size:' + x[2] + 'px">가</span>' + x[1];
+      b.addEventListener('click', function () { fsSet(ix, x[0]); });
+      w.appendChild(b);
+    });
+    return w;
+  }
+  function fsSet(ix, val) { var a = fsGet(); a[ix] = Math.max(-1, Math.min(2, val)); $('fsz').value = a.join(','); fsPaint(); keepPv = false; update(); }
+  function fsRowsPaint() { var a = fsGet(); document.querySelectorAll('.fsrow').forEach(function (w) { var cur = a[+w.dataset.fx] || 0; w.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.v === cur ? 'true' : 'false'); }); }); }
   document.querySelectorAll('.fs-tabs button').forEach(function (b) { b.addEventListener('click', function () { fsK = +b.dataset.k; fsPaint(); }); });
   document.querySelectorAll('.fs-sizes button').forEach(function (b) { b.addEventListener('click', function () { var a = fsGet(); a[fsK] = +b.dataset.v; $('fsz').value = a.join(','); fsPaint(); update(); }); });
 
@@ -2356,7 +2476,7 @@
     else if (galList().length) { card.gallery = galList(); var gc = galCaps().slice(0, card.gallery.length); if (gc.some(Boolean)) card.caps = gc; }
     else if (isEmpty && exFill.galUrls) card.gallery = exFill.galUrls.split('\n').filter(Boolean);
     if (v('cap') && card.image) card.cap = v('cap');
-    var fsv = fsGet(); if (fsv.some(function (x) { return x; })) card.fs = fsv;
+    var fsv = fsGet(); if (fsv.some(function (x) { return x; })) { while (fsv.length > 3 && !fsv[fsv.length - 1]) fsv.pop(); card.fs = fsv; }
     if (v('season')) card.season = v('season');
     if (v('motion')) card.motion = v('motion');
     if (v('clip') && MEDIA_NO_VIDEO.indexOf(industry) < 0) card.clip = v('clip');
@@ -2395,6 +2515,8 @@
     if (type === 'club' && $('duesOn').checked && (FORM.hide || []).indexOf('dues') < 0) {
       var du = { amt: Math.max(0, Math.min(10000000, parseInt($('dAmt').value, 10) || 0)) || undefined, memo: v('dMemo') || undefined, acct: v('dAcct') || undefined, pay: /^https:\/\/(qr\.kakaopay\.com|link\.kakaopay\.com|toss\.me)\//.test(v('dPay')) ? v('dPay') : undefined };
       if (!du.acct && industry === 'meet' && v('mAcct')) du.acct = v('mAcct');
+      // 11-27: 모임 공지는 회비를 5번 칸 한 곳에서만 — '3만원'·'30,000원'·'5만' 을 금액으로
+      if (!du.amt && industry === 'meet' && v('mFee')) { var fm = /(\d[\d,]*)\s*(만)?/.exec(v('mFee')); if (fm) { var fa = parseInt(fm[1].replace(/,/g, ''), 10) * (fm[2] ? 10000 : 1); if (fa > 0 && fa <= 10000000) du.amt = fa; } }
       if (du.amt || du.acct || du.pay) card.dues = du;
     }
     // 모임 사진첩 (11-23): 참석 명단이 있으면 같은 번호, 없으면 같은 제목끼리 같은 번호 → card.album
@@ -2445,6 +2567,7 @@
       try {
         var preP = document.querySelector('#rosterBox [data-part="pre"]'), rosFs = document.querySelector('fieldset[data-part="roster"]');
         var preOk = type === 'club' && !destSns() && preP && !preP.hidden && rosFs && !rosFs.hidden;
+        try { preStatus(); } catch (e) {}
         $('pvPreGo').hidden = !preOk; $('donePre').hidden = !preOk; $('topPreGo').hidden = !preOk || industry === 'meet';
         if (preOk) { var nPre = v('pre') && window.SsakaNotice ? SsakaNotice.preParse(v('pre')).length : 0; $('pvPreN').textContent = nPre ? '✓ ' + nPre + '명 들어갔어요 · 눌러서 고치기' : '카톡 공지로 먼저 받은 분을 이 카드 명단 맨 앞에 넣어요'; var dps = $('donePre').querySelector('small'); if (dps) dps.textContent = $('pvPreN').textContent; $('topPreN').textContent = $('pvPreN').textContent; }
       } catch (e) {}
@@ -2739,6 +2862,23 @@
       toast('✕ 뺐어요 · 아래 ↺ 되살리기로 다시 넣을 수 있어요');
       return;
     }
+    // 11-27: 미리보기에서 모임 공지 줄(일시·장소·회비·계좌·준비물·특별당부)·인사말을 바로 고침 · 글씨 −/＋ · 사진 누르면 사진 창
+    if (key === 'pe') { try { peOpen(part); } catch (e) {} return; }
+    if (key === 'fs') {
+      var fa = fsGet(); fa[idx] = Math.max(-1, Math.min(2, (fa[idx] || 0) + (+part || 0))); $('fsz').value = fa.join(','); fsPaint();
+      keepPv = true; update(); return;
+    }
+    if (key === 'info') {
+      var IF = { '일시': 'subtitle', '날짜': 'subtitle', '시간': 'subtitle', '장소': 'place', '회비': 'mFee', '계좌': 'mAcct', '준비물': 'mBring', '특별당부': 'mNote' }, fid = IF[part];
+      if (!fid || !$(fid)) return;
+      if ($(fid).value.replace(/\s+/g, ' ').trim() === text) return;
+      $(fid).value = text.slice(0, +$(fid).maxLength > 0 ? +$(fid).maxLength : 120);
+      keepPv = !!text; // 지운 줄은 미리보기를 다시 그려 그 줄을 없앰
+      update(); toast(text ? '✏️ 고쳤어요' : '🗑 그 줄을 뺐어요'); return;
+    }
+    if (key === 'greet') {
+      $('greet').value = text; keepPv = true; update(); toast('✏️ 고쳤어요'); return;
+    }
     if (key === 'kick') {
       $('kick').value = text.slice(0, 20) || '없음';
     } else if (key === 'title' || key === 'subtitle') {
@@ -2918,6 +3058,7 @@
     $('peZoomBtn').hidden = !$('image').value;
     $('peUnhide').hidden = !v('hideList');
     $('pePreBtn').hidden = !(type === 'club' && pre && !pre.hidden);
+    var fsb = document.querySelector('#peBar [data-pe="fs"]'); if (fsb) fsb.hidden = industry === 'meet'; // 모임 공지는 줄을 누르면 글씨 −/＋
   }
   function peOpen(k) {
     peClose();
@@ -2939,6 +3080,23 @@
   }
   $('peUnhide').addEventListener('click', function () { $('hideList').value = ''; keepPv = false; update(); peBarShow(true); toast('↺ 뺀 칸을 다시 넣었어요 (사진첩·회비·참석 명단은 아래 칸에서 다시 켜요)'); });
   document.querySelectorAll('#peBar [data-pe]').forEach(function (b) { b.addEventListener('click', function () { peOpen(b.dataset.pe); }); });
+  // 11-27: 명단을 붙이자마자 몇 명이 들어갔는지, 못 읽은 줄은 무엇인지 바로 보여 줌
+  function preStatus() {
+    var st = $('preSt'); if (!st) return;
+    var t = v('pre');
+    if (!t || !window.SsakaNotice || !SsakaNotice.preCheck) { st.hidden = true; st.textContent = ''; return; }
+    var r = SsakaNotice.preCheck(t), fam = r.list.reduce(function (s, x) { return s + (x.p || 0); }, 0);
+    st.hidden = false; st.textContent = '';
+    st.appendChild(document.createTextNode(r.list.length ? '✓ ' + r.list.length + '명 들어갔어요' + (fam ? ' (동반 포함 ' + (r.list.length + fam) + '명)' : '') + ' · 카드 명단 맨 앞에 나와요' : '이름을 못 찾았어요. 한 줄에 한 명씩 붙여 주세요.'));
+    if (r.bad.length) {
+      var b = document.createElement('span'); b.className = 'bad';
+      b.appendChild(document.createTextNode('⚠️ 이름으로 못 읽은 줄 ' + r.bad.length + '개 — 위 칸에서 고쳐 주세요: '));
+      r.bad.slice(0, 12).forEach(function (x) { var i = document.createElement('i'); i.textContent = x.slice(0, 20); b.appendChild(i); });
+      st.appendChild(b);
+    }
+  }
+  $('pre').addEventListener('input', preStatus);
+  setTimeout(preStatus, 0);
   $('donePre').addEventListener('click', function () { fixNow(); setTimeout(function () { $('pvPreGo').click(); }, 350); });
   $('topPreGo').addEventListener('click', function () { $('pvPreGo').click(); });
   $('pvPreGo').addEventListener('click', function () {
@@ -4076,6 +4234,42 @@
     setTimeout(fitGal, 0);
     setTimeout(function () { var el = $('useSum'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
   }
+  // ---------- 11-27 대표님: 새로 만들기는 늘 빈 칸에서 ----------
+  //   지난 카드의 글·사진·올릴 곳이 새 카드에 넘어오지 않게. 같은 종류를 쓰다 만 게 있을 때만 [새로 쓰기 / 이어 쓰기]를 물음.
+  //   모임 공지·경조사(참석 받는 카드)는 늘 '카톡으로 보내기'로 시작 (사진 카드엔 참석 신청이 못 들어가서)
+  function clearForNew() {
+    FIELDS.forEach(function (f) { if ($(f) && KEEP_ALL.indexOf(f) < 0) { $(f).value = ''; $(f).classList.remove('missing'); } });
+    ['noticeIn', 'rCap', 'rDl', 'dAmt', 'dMemo', 'dAcct', 'dPay'].forEach(function (f) { if ($(f)) $(f).value = ''; });
+    IP = { z: 100, x: 50, y: 50, f: 0 };
+    $('rosterOn').checked = true; $('rosterBox').hidden = false;
+    $('duesOn').checked = false; $('duesBox').hidden = true;
+    $('albumOn').checked = false;
+    $('resvOn').checked = false; $('resvBox').hidden = true;
+    try { schedSet([]); } catch (e) {}
+    try { showThumb(''); renderGal(); } catch (e) {}
+    try { if (typeof fillMe === 'function') fillMe(); } catch (e) {}
+    try { preStatus(); } catch (e) {}
+  }
+  function askNew(title, go) {
+    $('naT').textContent = '‘' + title + '’ — 이어서 쓸까요, 빈 칸에서 새로 쓸까요?';
+    $('newAsk').hidden = false;
+    $('naNew').onclick = function () { $('newAsk').hidden = true; go(true); };
+    $('naGo').onclick = function () { $('newAsk').hidden = true; go(false); };
+  }
+  function startUse(id, fresh) {
+    var ind = D.industry(id) || {};
+    if (ind.type === 'club' && dest !== 'kakao') setDest('kakao');
+    if (fresh) pubTouched = false;
+    if (industry !== id || type !== ind.type) setIndustry(id, true); else applyIndustry(ind);
+    if (fresh) { clearForNew(); applyIndustry(ind); }
+    update(); afterUse();
+  }
+  function pickNew(id) {
+    if (editCard) { setIndustry(id, true); afterUse(); return; }
+    var saved = industry === id ? v('title') : String((byType[id] || {}).title || '').trim();
+    if (saved) askNew(saved, function (fresh) { startUse(id, fresh); });
+    else startUse(id, true);
+  }
   // 디자인을 정하면 → 그 카드에 필요한 질문만
   $('d2next').addEventListener('click', function () {
     goStage(3, again ? '.preview' : '#form .sec-h[data-sec="basic"]');
@@ -4088,6 +4282,7 @@
   try { hadDraft = !!localStorage.getItem(DRAFT); } catch (e) {}
   try { MkFun.hero(); } catch (e) {}
   industry = loadDraft();
+  var draftInd = industry; // 11-27: 쓰다 만 초안이 어느 종류였는지 (다른 종류 초안은 새 카드에 안 넘어가게)
   if (editCard) {
     loadCard(editCard); type = null;
     if (editCard.design && D.get(editCard.design)) { design = editCard.design; var indId = D.get(editCard.design).industry; if (D.industry(indId)) industry = indId; }
@@ -4149,7 +4344,13 @@
     var dt = v('title');
     if (hadDraft && dt) { $('resumeBtn').hidden = false; $('resumeBtn').textContent = '✏️ 쓰던 카드 이어서 쓰기 — ' + dt; }
     if (!hadDraft) document.querySelectorAll('.inds button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-  } else if (qInd && !editCard && !jump && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) { afterUse(); }
+  } else if (qInd && !editCard && !jump && D.industry(qInd) && (!D.isOpen || D.isOpen(qInd))) {
+    // 11-27: 바로가기(?ind=)로 들어와도 새 카드는 빈 칸에서 — 같은 종류를 쓰다 만 게 있으면 물어봄
+    var qt = hadDraft && draftInd === qInd ? v('title') : '';
+    // 다른 종류 초안(예: 영업장 카드)은 지우지 않고 그 종류 자리에 보관 — 나중에 그 카드를 고르면 '이어 쓰기'로 물어봄
+    if (hadDraft && draftInd !== qInd && v('title')) { var keepD = {}; FIELDS.forEach(function (f) { if ($(f) && KEEP_ALL.indexOf(f) < 0) keepD[f] = $(f).value; }); byType[draftInd] = keepD; }
+    if (qt) { afterUse(); askNew(qt, function (f) { startUse(qInd, f); }); } else startUse(qInd, true);
+  }
   else goStage(3);
   if (jump) setTimeout(function () { jump.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
 })();

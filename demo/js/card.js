@@ -265,9 +265,75 @@
         var el2 = function (t, c) { var x = document.createElement(t); x.className = c; return x; };
         window.SavaPreviewMode = function (on) { root.classList.toggle('sk-pe-on', !!on); };
         try { if (window.parent.SavaEditOn && window.parent.SavaEditOn()) root.classList.add('sk-pe-on'); } catch (e) {}
+        // 11-27 대표님: 수정하기는 미리보기에서 바로 — 고르는 줄 위에 글씨 −/＋ 가 뜸 (그 줄만 커지고 작아짐)
+        //   글씨 자리: 0 제목 · 1 일시(부제목) · 2 그 밖에 알릴 말 · 3 인사말 · 5 장소 · 6 회비 · 7 계좌 · 8 준비물 · 9 특별당부
+        var FIX = { '일시': 1, '날짜': 1, '시간': 1, '장소': 5, '회비': 6, '계좌': 7, '준비물': 8, '특별당부': 9 };
+        var fsBar = function (anchor, ix, nodes) {
+          if (ix == null) return null;
+          var bar = h('div', { class: 'sk-fsbar' });
+          bar.appendChild(h('b', { text: '글씨' }));
+          [['−', -1], ['＋', 1]].forEach(function (x) {
+            var bt = h('button', { type: 'button', text: x[0] });
+            bt.addEventListener('mousedown', function (m) { m.preventDefault(); });
+            bt.addEventListener('click', function (m) {
+              m.preventDefault(); m.stopPropagation();
+              nodes.forEach(function (n) { var px = parseFloat(getComputedStyle(n).fontSize); if (px) n.style.fontSize = Math.max(10, Math.min(64, px * (x[1] > 0 ? 1.12 : 0.89))).toFixed(1) + 'px'; });
+              PE('fs', ix, String(x[1]), '');
+            });
+            bar.appendChild(bt);
+          });
+          anchor.insertAdjacentElement('beforebegin', bar);
+          return bar;
+        };
+        // 사진: 누르면 만들기 화면의 사진 바꾸기·키우기 창
+        root.addEventListener('click', function (e) {
+          var ph = e.target.closest('.sk-photo');
+          if (!ph || e.target.closest('.sk-hidex')) return;
+          e.preventDefault(); e.stopPropagation(); PE('pe', -1, 'photo', '');
+        }, true);
         root.addEventListener('click', function (e) {
           var t = e.target.closest('.sk-kick, .sk-title, .sk-sub, .sk-list li > span:last-child, .sk-list li, .sk-info-r');
           if (!t || t.isContentEditable) return;
+          // 모임 공지: 일시·장소·회비·계좌·준비물·특별당부 줄은 그 칸 하나만 그 자리에서 고침 (내용 칸 전체가 열리지 않게)
+          var own = t.closest('.sk-info-r[data-own]');
+          if (own) {
+            e.preventDefault(); e.stopPropagation();
+            var vv = own.querySelector('.sk-info-v'); if (!vv || vv.isContentEditable) return;
+            var k = own.dataset.k, sz = Array.prototype.slice.call(own.querySelectorAll('.sk-info-t > b, .sk-info-v, .sk-info-t > small'));
+            var fb = fsBar(own, FIX[k], sz);
+            vv.contentEditable = 'true'; vv.focus();
+            try { var rg0 = document.createRange(); rg0.selectNodeContents(vv); rg0.collapse(false); var sl0 = getSelection(); sl0.removeAllRanges(); sl0.addRange(rg0); } catch (x) {}
+            vv.addEventListener('keydown', function (k2) { if (k2.key === 'Enter') { k2.preventDefault(); vv.blur(); } });
+            vv.addEventListener('blur', function () {
+              if (fb) fb.remove();
+              vv.contentEditable = 'false';
+              PE('info', -1, k, vv.textContent.replace(/\s+/g, ' ').trim());
+            }, { once: true });
+            return;
+          }
+          // 모임 공지 인사말: 인사말 칸만 고침
+          var gl0 = card.meet && t.closest('.sk-greet');
+          if (gl0) {
+            e.preventDefault(); e.stopPropagation();
+            var gta = document.createElement('textarea'); gta.className = 'sk-edta';
+            gta.value = (pristine.greet || []).join('\n');
+            var gsz = Array.prototype.slice.call(gl0.querySelectorAll('li'));
+            gl0.replaceWith(gta);
+            var gfit = function () { gta.style.height = 'auto'; gta.style.height = (gta.scrollHeight + 4) + 'px'; };
+            gta.addEventListener('input', gfit); gfit(); gta.focus({ preventScroll: true });
+            var gfb = fsBar(gta, 3, [gta].concat(gsz));
+            var gdone = h('button', { type: 'button', class: 'sk-edok', text: '✓ 다 고쳤어요' });
+            gta.insertAdjacentElement('afterend', gdone);
+            gdone.addEventListener('mousedown', function (x) { x.preventDefault(); gta.blur(); });
+            gta.addEventListener('blur', function () {
+              gdone.remove(); if (gfb) gfb.remove();
+              var gls = gta.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+              pristine.greet = gls;
+              gta.replaceWith(gl0);
+              PE('greet', -1, 'all', gls.join('\n'));
+            }, { once: true });
+            return;
+          }
           var li = t.closest('.sk-list li, .sk-info-r'), key, idx = -1, part = 'all';
           if (li) {
             // 내용은 한 칸에서 여러 줄을 한꺼번에 고침 (줄 추가·삭제·이어서 고치기)
@@ -299,6 +365,7 @@
             if (t !== li) part = 'val';
           } else key = t.classList.contains('sk-title') ? 'title' : t.classList.contains('sk-kick') ? 'kick' : 'subtitle';
           e.preventDefault(); e.stopPropagation();
+          var tfb = key === 'title' ? fsBar(t, 0, [t]) : key === 'subtitle' ? fsBar(t, 1, [t]) : null;
           t.contentEditable = 'true'; t.focus();
           try { var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(rg); } catch (x) {}
           // 11-26: 제목·부제목은 Enter = 줄바꿈 (다 고치면 ✓ 단추나 바깥 누르기), 다른 곳은 Enter = 끝
@@ -312,6 +379,7 @@
           });
           t.addEventListener('blur', function () {
             if (okB) okB.remove();
+            if (tfb) tfb.remove();
             t.contentEditable = 'false';
             var txt = multi ? (t.innerText || '').replace(/[ \t\u00a0]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{2,}/g, '\n').trim() : t.textContent.replace(/\s+/g, ' ').trim();
             PE(key, idx, part, txt);

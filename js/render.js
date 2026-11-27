@@ -250,7 +250,8 @@
     var longW = Math.max.apply(0, String(card.title || '').split(/\s+/).map(function (w) { return w.length; }));
     if (longW >= 9) h1.classList.add(longW >= 12 ? 'sk-t-xl' : 'sk-t-l');
     titles.appendChild(h1);
-    if (card.subtitle) {
+    // 11-27 모임 공지: 일시는 아래 일시·장소 상자에만 (제목 아래에 또 나오면 중복)
+    if (card.subtitle && !card.meet) {
       // '12:00–18:00' 같은 시간은 중간에서 줄이 끊기지 않게 한 덩어리로
       var sub = el('p', 'sk-sub'), rest = String(card.subtitle), tm, re = /\d{1,2}[:：]\d{2}(?:\s*[~\-–—]\s*\d{1,2}[:：]\d{2})?/g, at = 0;
       while ((tm = re.exec(rest))) { sub.appendChild(document.createTextNode(rest.slice(at, tm.index))); sub.appendChild(el('span', 'sk-nw', tm[0])); at = tm.index + tm[0].length; }
@@ -334,15 +335,15 @@
       cInfo.forEach(function (c) {
         var k = String(c.k), vv = String(c.v).trim(), i = -1;
         rows.forEach(function (r, n) { if (i < 0 && r.k === k) i = n; });
-        if (i >= 0) rows[i] = { k: k, v: vv, sub: '' }; else rows.push({ k: k, v: vv, sub: '' });
+        if (i >= 0) rows[i] = { k: k, v: vv, sub: '', own: 1 }; else rows.push({ k: k, v: vv, sub: '', own: 1 });
       });
-      if (!hasK(/일시|날짜|시간/) && (card.meet ? String(card.subtitle || '').trim() : /\d/.test(card.subtitle || ''))) rows.unshift({ k: '일시', v: String(card.subtitle) });
-      if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '' });
+      if (!hasK(/일시|날짜|시간/) && (card.meet ? String(card.subtitle || '').trim() : /\d/.test(card.subtitle || ''))) rows.unshift({ k: '일시', v: String(card.subtitle), own: 1 });
+      if (!hasK(/^장소/) && card.place && card.place.name) rows.splice(hasK(/일시|날짜|시간/) ? 1 : 0, 0, { k: '장소', v: card.place.name, sub: card.place.addr || '', own: 1 });
       var info = el('section', 'sk-info'); info.setAttribute('aria-label', '언제 어디서');
       // 11-27 대표님: '📍 언제 · 어디서' 제목은 뺌 — 일시·장소·회비 항목만으로 충분
       var IC = { '일시': '🗓', '날짜': '🗓', '시간': '⏰', '장소': '📍', '뒷풀이': '🍻', '주소': '🏠', '집결': '🚩', '오시는 길': '🚇', '준비물': '🎒', '회비': '💰', '문의': '📞', '드레스코드': '👔', '특별당부': '📢', '계좌': '🏦' };
       rows.forEach(function (r) {
-        var row = el('div', 'sk-info-r');
+        var row = el('div', 'sk-info-r'); row.dataset.k = r.k; if (r.own) row.dataset.own = '1';
         row.appendChild(el('span', 'sk-info-i', IC[r.k] || '•'));
         var tx = el('div', 'sk-info-t');
         tx.appendChild(el('b', '', r.k));
@@ -403,7 +404,14 @@
       };
       fsGo([h1], FK[String(card.fs[0] | 0)]);
       fsGo([titles.querySelector('.sk-sub')], FK[String(card.fs[1] | 0)]);
-      fsGo(Array.prototype.slice.call(main.querySelectorAll('.sk-list > li')), FK[String(card.fs[2] | 0)]);
+      fsGo(Array.prototype.slice.call(main.querySelectorAll('.sk-list:not(.sk-greet) > li')), FK[String(card.fs[2] | 0)]);
+      // 11-27 칸마다 글씨 크기: [3] 인사말 · 일시 줄은 [1](부제목과 같은 칸) · [5] 장소 · [6] 회비 · [7] 계좌 · [8] 준비물 · [9] 특별당부
+      fsGo(Array.prototype.slice.call(main.querySelectorAll('.sk-greet > li')), FK[String(card.fs[3] | 0)]);
+      var FI = { '일시': 1, '날짜': 1, '시간': 1, '장소': 5, '회비': 6, '계좌': 7, '준비물': 8, '특별당부': 9 };
+      Array.prototype.forEach.call(main.querySelectorAll('.sk-info-r'), function (r) {
+        var ix = FI[r.dataset.k]; if (ix == null) return;
+        fsGo(Array.prototype.slice.call(r.querySelectorAll('.sk-info-t > b, .sk-info-v, .sk-info-t > small')), FK[String(card.fs[ix] | 0)]);
+      });
     }
 
     if (card.video && /^https:\/\//i.test(String(card.video))) { // 영상 주소는 https만 (javascript: 같은 위험한 주소 막기)

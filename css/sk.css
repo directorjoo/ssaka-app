@@ -865,3 +865,10 @@
 .sk-greet-solo li { margin: 0 0 8px; line-height: 1.75; font-size: 16.5px; }
 .sk-greet-solo li + li { border-top: 0; }
 .sk-greet-solo li::before { display: none !important; }
+
+/* 11-27 대표님: 미리보기에서 바로 고칠 때 고른 줄 위에 뜨는 글씨 −/＋ (만들기 화면 미리보기에서만 생김) */
+.sk-fsbar { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 6px 0 4px; font: 800 14px/1 system-ui, sans-serif; color: #6b4a3c; }
+.sk-fsbar b { margin-right: 2px; }
+.sk-fsbar button { min-width: 48px; min-height: 40px; border-radius: 12px; border: 2px solid #B3132B; background: #fff; color: #B3132B; font: 900 22px/1 system-ui, sans-serif; cursor: pointer; }
+.sk-pe .sk-info-r[data-own] { cursor: text; }
+.sk-pe .sk-info-v[contenteditable="true"] { outline: 2px solid #B3132B; outline-offset: 3px; border-radius: 4px; background: #fff; }

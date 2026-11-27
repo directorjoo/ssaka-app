@@ -104,21 +104,62 @@
   // 참석자 칸: 번호가 이미 붙어 있으면(카톡 이어가기 그대로) 번호를 떼고 다시 매김, 머리말·빈 번호 줄은 건너뜀
   // 11-27: 붙여 넣은 명단 — "1. 홍길동" · "1 홍길동" · 번호 없이 한 줄에 한 명 · "홍길동, 김철수" 한 줄에 여러 명 모두.
   //   번호 없는 머리말 줄(…참석자·명단·이어가기·현황)은 건너뛰고, '불참'·'못 가요' 머리말이 나오면 그 아래는 넣지 않음
-  function preParse(text) {
-    var rows = [], stop = false;
-    String(text || '').split('\n').forEach(function (l) {
-      l = l.trim(); if (!l || stop) return;
-      var numbered = /^\d{1,3}\s*[.)]?\s*[가-힣]/.test(l);
-      if (!numbered && /불참|못\s*가|미참/.test(l) && !/[,，、]/.test(l)) { stop = true; return; }
-      if (!numbered && /참석|참가|명단|이어가기|현황|신청|공지|일시|장소|회비/.test(l)) return;
-      l = l.replace(/^\d{1,3}\s*[.)]?\s*/, '');
-      if (/[,，、/]/.test(l)) l.split(/[,，、/]+/).forEach(function (x) { x = x.trim(); if (x) rows.push(x); });
-      else rows.push(l);
+  // 11-27 대표님(16명 붙여도 안 들어감): 더 많은 카톡 명단 모양을 읽음
+  //   ①②③ 번호 · 한 줄에 여러 번호(1.홍길동 2.김철수) · 이름 앞 이모지(✅홍길동) · 띄어 쓴 이름(이 영 희) · 영어 이름 · '님' 붙은 이름
+  //   번호 줄이 하나라도 있으면 번호 없는 줄은 머리말로 보고 건너뜀(쉼표로 여러 이름이 있는 줄만 이름으로)
+  //   preCheck(text) → { list, bad } — bad = 이름을 못 찾은 줄 (화면에 보여 주고 고치게)
+  var CIRC = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+  function preLines(text) {
+    var out = [];
+    String(text || '').replace(/\r/g, '').split('\n').forEach(function (l) {
+      l = l.replace(/[①-⑳]/g, function (c) { return ' ' + (CIRC.indexOf(c) + 1) + '. '; })
+        .replace(/[​﻿]/g, '').trim();
+      if (!l) return;
+      // 한 줄에 번호가 여럿이면 번호마다 나눔: "1.홍길동 2.김철수 3.이영희"
+      l.split(/\s+(?=\d{1,3}\s*[.)]\s*\S)/).forEach(function (x) { x = x.trim(); if (x) out.push(x); });
     });
-    return parse('참석자명단\n' + rows.map(function (l, i) { return (i + 1) + '.' + l; }).join('\n')).pre;
+    return out;
   }
+  function preClean(s) {
+    s = String(s || '')
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{2190}-\u{21FF}\u{25A0}-\u{25FF}]/gu, ' ')
+      .replace(/[★☆※▶▷●○◎■□♥♡✓✔☑]/g, ' ').replace(/^[\s\-–—·•:：]+/, '').replace(/\s+/g, ' ').trim();
+    // 띄어 쓴 이름: "이 영 희" → "이영희"
+    if (/^[가-힣](?: [가-힣]){1,4}(?:\s|$)/.test(s)) s = s.replace(/^([가-힣](?: [가-힣]){1,4})/, function (m) { return m.replace(/ /g, ''); });
+    // "홍길동님" → "홍길동" (두 글자 이름+님은 그대로 둘 수 없으니 세 글자 이상일 때만)
+    s = s.replace(/^([가-힣]{2,4})님(?=\s|$|[(+])/, '$1');
+    return s;
+  }
+  function preCheck(text) {
+    var lines = preLines(text), stop = false, rows = [], bad = [];
+    var anyNum = lines.some(function (l) { return /^\d{1,3}\s*[.)]?\s*\S/.test(l) && !/^\d{1,3}\s*[월일시:]/.test(l); });
+    lines.forEach(function (l) {
+      if (stop) return;
+      var numbered = /^\d{1,3}\s*[.)]?\s*\S/.test(l) && !/^\d{1,3}\s*[월일시:년]/.test(l);
+      var multi = /[,，、/]/.test(l);
+      if (!numbered && /불참|못\s*가|미참/.test(l) && !multi) { stop = true; return; }
+      if (!numbered && /참석|참가|명단|이어\s*가기|현황|신청|공지|일시|장소|회비/.test(l) && !multi) return;
+      if (!numbered && anyNum && !multi) return; // 번호 명단 속 번호 없는 줄 = 머리말
+      l = l.replace(/^\d{1,3}\s*[.)]?\s*/, '');
+      (multi ? l.split(/[,，、/]+/) : [l]).forEach(function (x) { x = preClean(x); if (x) rows.push(x); });
+    });
+    var list = [], seen = {};
+    rows.forEach(function (r) {
+      var p = parse('참석자명단\n1.' + r).pre[0];
+      if (!p) {
+        // 영어 이름 등: 글자로 시작하는 짧은 이름이면 그대로
+        var m = /^([A-Za-z][A-Za-z .'-]{0,19}|[가-힣][가-힣A-Za-z]{0,7})(?:\s*\+\s*(\d))?/.exec(r);
+        if (m && !/\d/.test(m[1])) p = { n: m[1].trim(), g: '', p: +(m[2] || 0), s: '', fam: 0 };
+      }
+      if (!p) { bad.push(r); return; }
+      if (seen[p.n]) return; seen[p.n] = 1;
+      list.push(p);
+    });
+    return { list: list, bad: bad };
+  }
+  function preParse(text) { return preCheck(text).list; }
 
-  var api = { parse: parse, preText: preText, preParse: preParse };
+  var api = { parse: parse, preText: preText, preParse: preParse, preCheck: preCheck };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   global.SsakaNotice = api;
 })(typeof window !== 'undefined' ? window : globalThis);

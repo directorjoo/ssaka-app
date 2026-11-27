@@ -2574,7 +2574,9 @@
       } catch (e) {}
       // 11-26: 미리보기는 지금 연 주소 그대로(같은 출처) — 보내는 링크만 sava.kr
       var url = new URL('../c/', location.href).href + '?d=' + SsakaCodec.encode(r.card);
-      if (url !== lastSrc && keepPv) { lastSrc = url; keepPv = false; } // 미리보기에서 직접 고친 건 이미 화면에 있음 → 새로 안 불러옴
+      // 미리보기에서 직접 고친 건 이미 화면에 있음 → 이번 한 번만 새로 안 불러옴
+      // 11-27 🐛 고침: 고친 게 없을 때(줄만 눌렀다 나옴) 이 표시가 남아, 다음에 붙인 참석자 명단·고친 글이 미리보기에 안 나오던 것 → 늘 이번 한 번으로 끝냄
+      if (keepPv) { lastSrc = url; keepPv = false; }
       if (url !== lastSrc) {
         // 미리보기를 다시 그려도 보던 자리 그대로 (고치다가 맨 위로 튀지 않게)
         var fr = $('frame'), y = 0;
@@ -2883,6 +2885,7 @@
     if (key === 'kick') {
       $('kick').value = text.slice(0, 20) || '없음';
     } else if (key === 'title' || key === 'subtitle') {
+      if ($(key).value.replace(/\s+/g, ' ').trim() === text.replace(/\s+/g, ' ').trim()) return; // 고친 게 없으면 아무것도 안 함
       $(key).value = text.slice(0, key === 'title' ? 40 : 60); $(key).classList.remove('missing');
     } else if (key === 'bodyAll') {
       $('body').value = text;
@@ -3132,7 +3135,7 @@
     if (!$('rosterOn').checked) { $('rosterOn').checked = true; $('rosterBox').hidden = false; $('rosterOn').dispatchEvent(new Event('change', { bubbles: true })); }
     peOpen('pre');
   });
-  $('peSheetOk').addEventListener('click', function () { peClose(); update(); toast('✏️ 고쳤어요'); });
+  $('peSheetOk').addEventListener('click', function () { peClose(); keepPv = false; update(); toast('✏️ 고쳤어요'); });
   $('peDone').addEventListener('click', function () { $('goEdit').click(); });
   // 제목·한 줄 소개 칸: 줄바꿈 넣으면 칸 높이가 따라 늘어남
   ['title', 'subtitle'].forEach(function (id) { var t = $(id), fit = function () { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }; t.addEventListener('input', fit); setTimeout(fit, 300); });

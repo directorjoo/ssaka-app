@@ -69,6 +69,14 @@
     .join { display: block; margin-top: 14px; padding: 16px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; font-size: 18px; font-weight: 900;
       background: linear-gradient(135deg, #D9B460, #B98A2E); text-shadow: 0 1px 3px rgba(90,55,5,.6); box-shadow: 0 10px 22px -14px rgba(120,80,10,.8); }
     .join small { display: block; margin-top: 3px; font-size: 15px; font-weight: 700; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 20px; padding: 5px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
+    .tabs button { padding: 12px 6px; border: 0; border-radius: 999px; background: transparent; color: #8A6A2A; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .tabs button[aria-selected="true"] { background: linear-gradient(135deg, #D0233F, #B3132B); color: #fff; box-shadow: 0 6px 14px -8px rgba(140,15,35,.9); }
+    .cats { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; margin: 0 -16px 14px; padding: 10px 16px; overflow-x: auto; background: #FBF4E2; scrollbar-width: none; }
+    .cats::-webkit-scrollbar { display: none; }
+    .cats a { flex: none; padding: 8px 14px; border-radius: 999px; background: #fff; color: #7A5410; font-size: 15px; font-weight: 800; text-decoration: none; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
+    .wsec { scroll-margin-top: 64px; margin-bottom: 30px; }
+    .sq strong.br { font-size: 17px; letter-spacing: .02em; }
   </style>
 </head>
 <body>
@@ -85,6 +93,11 @@
 <div class="lead"><p>나라가 인정한 명인의 손맛을 한자리에.<br>먼저 대한민국식품명인 열 분을 소개합니다.</p></div>
 <main class="w">
   <div id="appInst"></div><style>#appInst:empty{display:none}#appInst .si-chip{margin:0 0 16px;border-color:#E7CF8F;background:#FFFCF4}</style>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-t="mi" aria-selected="true">👑 명인 작품</button>
+    <button type="button" role="tab" data-t="world" aria-selected="false">🌍 세계 명품</button>
+  </div>
+  <section id="tab-mi">
   <div class="sec"><b>명인 열 분의 작품</b><span>농림축산식품부 지정</span></div>
   <div class="grid">
     <a class="mt" href="https://www.maesil.co.kr" target="_blank" rel="noopener" aria-label="홍쌍리 명인 매실농축액 — 명인 농원 누리집">
@@ -204,7 +217,141 @@
     아직 싸바비앙에서 파는 상품은 아니며, 명인께 한 분씩 입점을 여쭙고 있어요.<br>
     명인 제품이 궁금하면 <a href="https://kfgm.co.kr" target="_blank" rel="noopener">대한민국식품명인 누리집</a>에서 보실 수 있어요.
   </div>
+  </section>
+  <section id="tab-world" hidden>
+    <div class="cats" id="cats"></div>
+    <div id="world"></div>
+    <div class="note">세계에서 손꼽히는 명품 브랜드를 품목별로 모았어요. 칸을 누르면 그 브랜드 공식 누리집으로 이어져요.</div>
+  </section>
 </main>
+<script>
+  // 11-28 대표님: 싸바비앙 '🌍 세계 명품' 탭 — 품목 8개 × 10 브랜드, 누르면 공식 누리집
+  (function () {
+    var C = [
+      ['bag', '👜', '가방·가죽', ['#F3D9B1', '#E2B97F'], [
+        ['Hermès', '에르메스', '프랑스', 1837, '마구 공방에서 시작해 버킨·켈리 백으로 이어진 가죽의 정점.', 'hermes.com'],
+        ['Louis Vuitton', '루이비통', '프랑스', 1854, '여행 트렁크 장인이 만든 모노그램의 원조.', 'louisvuitton.com'],
+        ['Chanel', '샤넬', '프랑스', 1910, '퀼팅 2.55 백과 트위드 재킷의 파리 메종.', 'chanel.com'],
+        ['Dior', '디올', '프랑스', 1946, '뉴룩으로 세상을 바꾼 오트쿠튀르 하우스. 레이디 디올 백.', 'dior.com'],
+        ['Gucci', '구찌', '이탈리아', 1921, '피렌체 가죽 공방에서 시작한 홀스빗·대나무 손잡이.', 'gucci.com'],
+        ['Prada', '프라다', '이탈리아', 1913, '밀라노 가죽 상점에서 시작한 나일론 백의 전설.', 'prada.com'],
+        ['Bottega Veneta', '보테가 베네타', '이탈리아', 1966, '로고 없이 가죽을 엮는 인트레치아토 기법.', 'bottegaveneta.com'],
+        ['Celine', '셀린느', '프랑스', 1945, '절제된 파리 감성의 트리오페 가죽 제품.', 'celine.com'],
+        ['Loewe', '로에베', '스페인', 1846, '마드리드 가죽 장인들의 퍼즐 백.', 'loewe.com'],
+        ['Goyard', '고야드', '프랑스', 1853, '손으로 찍은 셰브론 무늬의 트렁크 메종.', 'goyard.com']
+      ]],
+      ['watch', '⌚', '시계', ['#D9DEE6', '#AEB7C5'], [
+        ['Patek Philippe', '파텍 필립', '스위스', 1839, '대를 물려 차는 시계. 세계 3대 시계 명가의 맏형.', 'patek.com'],
+        ['Audemars Piguet', '오데마 피게', '스위스', 1875, '팔각 베젤 로열 오크의 주인공.', 'audemarspiguet.com'],
+        ['Vacheron Constantin', '바쉐론 콘스탄틴', '스위스', 1755, '끊김 없이 이어 온 가장 오래된 시계 명가.', 'vacheron-constantin.com'],
+        ['Rolex', '롤렉스', '스위스', 1905, '서브마리너·데이저스트, 성공의 상징이 된 시계.', 'rolex.com'],
+        ['Omega', '오메가', '스위스', 1848, '달에 간 첫 시계 스피드마스터.', 'omegawatches.com'],
+        ['Breguet', '브레게', '스위스', 1775, '투르비용을 발명한 브레게가 세운 시계 명가.', 'breguet.com'],
+        ['Jaeger-LeCoultre', '예거 르쿨트르', '스위스', 1833, '뒤집히는 시계 리베르소. 시계 장인들의 시계.', 'jaeger-lecoultre.com'],
+        ['IWC', 'IWC', '스위스', 1868, '샤프하우젠의 파일럿 워치 명가.', 'iwc.com'],
+        ['TAG Heuer', '태그호이어', '스위스', 1860, '자동차 경주와 함께한 크로노그래프.', 'tagheuer.com'],
+        ['Tudor', '튜더', '스위스', 1926, '롤렉스 창업자가 세운 동생 브랜드.', 'tudorwatch.com']
+      ]],
+      ['jewel', '💎', '보석', ['#F6D3DC', '#E3A6B8'], [
+        ['Cartier', '까르띠에', '프랑스', 1847, '왕의 보석상. 러브 팔찌와 팬더.', 'cartier.com'],
+        ['Tiffany & Co.', '티파니', '미국', 1837, '블루 박스와 여섯 발 다이아몬드 반지.', 'tiffany.com'],
+        ['Bulgari', '불가리', '이탈리아', 1884, '로마의 화려한 색, 세르펜티 뱀 장식.', 'bulgari.com'],
+        ['Van Cleef & Arpels', '반클리프 아펠', '프랑스', 1906, '네잎클로버 알함브라 목걸이.', 'vancleefarpels.com'],
+        ['Chaumet', '쇼메', '프랑스', 1780, '나폴레옹 황후의 왕관을 만든 보석상.', 'chaumet.com'],
+        ['Boucheron', '부쉐론', '프랑스', 1858, '방돔 광장에 처음 문을 연 하이주얼리.', 'boucheron.com'],
+        ['Graff', '그라프', '영국', 1960, '세계적 대형 다이아몬드를 다루는 런던 보석상.', 'graff.com'],
+        ['Harry Winston', '해리 윈스턴', '미국', 1932, '다이아몬드의 왕. 할리우드 레드카펫의 보석.', 'harrywinston.com'],
+        ['Chopard', '쇼파드', '스위스', 1860, '구르는 다이아몬드 해피 다이아몬드.', 'chopard.com'],
+        ['Piaget', '피아제', '스위스', 1874, '얇은 시계와 장미 보석의 명가.', 'piaget.com']
+      ]],
+      ['scent', '🌸', '향수·화장품', ['#E6DCF2', '#C6B2E0'], [
+        ['Diptyque', '딥티크', '프랑스', 1961, '파리 생제르맹 거리의 향초·향수.', 'diptyqueparis.com'],
+        ['Jo Malone London', '조 말론 런던', '영국', 1994, '겹쳐 뿌리는 향, 선물 1순위 향수.', 'jomalone.com'],
+        ['Creed', '크리드', '프랑스', 1760, '왕실에 향을 바쳐 온 향수 가문.', 'creedfragrances.com'],
+        ['Maison Francis Kurkdjian', '메종 프란시스 커정', '프랑스', 2009, '바카라 루쥬 540의 조향사 메종.', 'franciskurkdjian.com'],
+        ['Byredo', '바이레도', '스웨덴', 2006, '스톡홀름의 담백한 향.', 'byredo.com'],
+        ['Le Labo', '르 라보', '미국', 2006, '매장에서 그 자리에서 섞어 주는 향수.', 'lelabofragrances.com'],
+        ['Tom Ford', '톰 포드', '미국', 2005, '관능적인 프라이빗 블렌드 향수.', 'tomford.com'],
+        ['Guerlain', '겔랑', '프랑스', 1828, '샬리마르를 만든 2백 년 향수 명가.', 'guerlain.com'],
+        ['La Mer', '라 메르', '미국', 1965, '바다 해초 크림으로 이름난 고급 화장품.', 'lamer.com'],
+        ['Sisley', '시슬리', '프랑스', 1976, '식물 성분 고급 화장품의 파리 가문.', 'sisley-paris.com']
+      ]],
+      ['wear', '👔', '옷', ['#DCE6D5', '#AFC3A2'], [
+        ['Burberry', '버버리', '영국', 1856, '트렌치코트와 체크무늬의 원조.', 'burberry.com'],
+        ['Giorgio Armani', '조르지오 아르마니', '이탈리아', 1975, '부드러운 어깨선의 밀라노 정장.', 'armani.com'],
+        ['Saint Laurent', '생 로랑', '프랑스', 1961, '여성 턱시도 르 스모킹의 파리 하우스.', 'ysl.com'],
+        ['Balenciaga', '발렌시아가', '프랑스', 1917, '스페인에서 시작해 파리에서 꽃핀 쿠튀르.', 'balenciaga.com'],
+        ['Givenchy', '지방시', '프랑스', 1952, '오드리 헵번의 리틀 블랙 드레스.', 'givenchy.com'],
+        ['Fendi', '펜디', '이탈리아', 1925, '로마의 모피·가죽 공방, 바게트 백.', 'fendi.com'],
+        ['Max Mara', '막스마라', '이탈리아', 1951, '평생 입는 낙타색 코트 101801.', 'maxmara.com'],
+        ['Moncler', '몽클레르', '이탈리아', 1952, '알프스 산악인을 위한 패딩에서 시작.', 'moncler.com'],
+        ['Thom Browne', '톰 브라운', '미국', 2001, '삼색 띠와 짧은 바지 정장.', 'thombrowne.com'],
+        ['Ralph Lauren', '랄프 로렌', '미국', 1967, '넥타이에서 시작한 미국 클래식.', 'ralphlauren.com']
+      ]],
+      ['shoe', '👞', '신발', ['#EAD7C7', '#CFA98C'], [
+        ['Christian Louboutin', '크리스찬 루부탱', '프랑스', 1991, '빨간 밑창 하이힐.', 'christianlouboutin.com'],
+        ['Jimmy Choo', '지미 추', '영국', 1996, '말레이시아 출신 장인이 런던에서 연 구두.', 'jimmychoo.com'],
+        ['Manolo Blahnik', '마놀로 블라닉', '영국', 1971, '런던 첼시의 손으로 만드는 구두.', 'manoloblahnik.com'],
+        ['Ferragamo', '페라가모', '이탈리아', 1927, '스타들의 구두장이, 바라 리본 펌프스.', 'ferragamo.com'],
+        ['Tod\'s', '토즈', '이탈리아', 1920, '밑창에 고무 돌기를 박은 드라이빙 슈즈.', 'tods.com'],
+        ['Roger Vivier', '로저 비비에', '프랑스', 1937, '스틸레토 힐을 처음 만든 구두 장인.', 'rogervivier.com'],
+        ['Berluti', '벨루티', '프랑스', 1895, '한 장 가죽 구두와 깊은 파티나 색.', 'berluti.com'],
+        ['John Lobb', '존 롭', '영국', 1866, '왕실 구두장이, 맞춤 신사화의 정점.', 'johnlobb.com'],
+        ['Church\'s', '처치스', '영국', 1873, '노샘프턴의 튼튼한 영국 신사화.', 'church-footwear.com'],
+        ['Alden', '알든', '미국', 1884, '코도반 가죽 구두로 이름난 미국 공방.', 'aldenshoes.com']
+      ]],
+      ['pen', '🖋', '만년필·문구', ['#D5E2EC', '#9FBAD0'], [
+        ['Montblanc', '몽블랑', '독일', 1906, '흰 별 마이스터스튁, 만년필의 대명사.', 'montblanc.com'],
+        ['Pelikan', '펠리칸', '독일', 1838, '줄무늬 몸통 수버렌 만년필.', 'pelikan.com'],
+        ['Parker', '파카', '영국', 1888, '미국에서 시작한 화살 클립 만년필.', 'parkerpen.com'],
+        ['Waterman', '워터맨', '프랑스', 1884, '잉크가 새지 않는 만년필을 처음 만든 곳.', 'waterman.com'],
+        ['Aurora', '아우로라', '이탈리아', 1919, '토리노의 만년필 공방.', 'aurorapen.it'],
+        ['Montegrappa', '몬테그라파', '이탈리아', 1912, '은세공으로 꾸민 이탈리아 만년필.', 'montegrappa.com'],
+        ['S.T. Dupont', '에스.티. 듀퐁', '프랑스', 1872, '뚜껑 열 때 "딩" 소리 나는 라이터와 펜.', 'st-dupont.com'],
+        ['Graf von Faber-Castell', '그라폰 파버카스텔', '독일', 1761, '연필 가문이 만드는 고급 필기구.', 'graf-von-faber-castell.com'],
+        ['Lamy', '라미', '독일', 1930, '바우하우스 디자인의 사파리 만년필.', 'lamy.com'],
+        ['Smythson', '스마이슨', '영국', 1887, '영국 왕실이 쓰는 가죽 수첩.', 'smythson.com']
+      ]],
+      ['home', '🍷', '식기·생활', ['#F1E3C4', '#DDBF82'], [
+        ['Christofle', '크리스토플', '프랑스', 1830, '은 식기와 커틀러리의 파리 명가.', 'christofle.com'],
+        ['Royal Copenhagen', '로얄 코펜하겐', '덴마크', 1775, '손으로 그린 푸른 무늬 도자기.', 'royalcopenhagen.com'],
+        ['Meissen', '마이센', '독일', 1710, '유럽 첫 경질 자기, 교차한 두 칼 표시.', 'meissen.com'],
+        ['Herend', '헤렌드', '헝가리', 1826, '왕실이 즐겨 쓴 손그림 자기.', 'herend.com'],
+        ['Baccarat', '바카라', '프랑스', 1764, '왕의 크리스털, 샹들리에와 잔.', 'baccarat.com'],
+        ['Riedel', '리델', '오스트리아', 1756, '포도 품종마다 다른 와인 잔.', 'riedel.com'],
+        ['Bernardaud', '베르나르도', '프랑스', 1863, '리모주 자기의 대표 가문.', 'bernardaud.com'],
+        ['Wedgwood', '웨지우드', '영국', 1759, '재스퍼웨어로 이름난 영국 도자기.', 'wedgwood.com'],
+        ['Le Creuset', '르크루제', '프랑스', 1925, '알록달록 무쇠 냄비.', 'lecreuset.com'],
+        ['Staub', '스타우브', '프랑스', 1974, '알자스의 검은 무쇠 냄비 꼬꼬떼.', 'staub-online.com']
+      ]]
+    ];
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var cats = '', html = '';
+    C.forEach(function (c) {
+      cats += '<a href="#w-' + c[0] + '">' + c[1] + ' ' + c[2] + '</a>';
+      html += '<div class="wsec" id="w-' + c[0] + '"><div class="sec"><b>' + c[1] + ' ' + c[2] + '</b><span>' + c[4].length + '곳</span></div><div class="grid">';
+      c[4].forEach(function (b) {
+        html += '<a class="mt" href="https://www.' + b[5] + '" target="_blank" rel="noopener" aria-label="' + esc(b[1]) + ' 공식 누리집">' +
+          '<div class="sq" style="background:radial-gradient(ellipse at 60% 35%,' + c[3][0] + ' 0%,' + c[3][1] + ' 100%)">' +
+          '<span class="no">' + esc(b[2]) + '</span><i aria-hidden="true">' + c[1] + '</i><strong class="br">' + esc(b[0]) + '</strong></div>' +
+          '<b>' + esc(b[1]) + '</b><span class="rg">' + esc(b[2]) + ' · ' + b[3] + '년부터</span>' +
+          '<p>' + esc(b[4]) + '</p><span class="go">공식 누리집 ›</span></a>';
+      });
+      html += '</div></div>';
+    });
+    document.getElementById('cats').innerHTML = cats;
+    document.getElementById('world').innerHTML = html;
+    var btns = document.querySelectorAll('.tabs button');
+    function show(t, push) {
+      btns.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-t') === t ? 'true' : 'false'); });
+      document.getElementById('tab-mi').hidden = t !== 'mi';
+      document.getElementById('tab-world').hidden = t !== 'world';
+      if (push) try { history.replaceState(null, '', t === 'world' ? '#world' : location.pathname + location.search); } catch (e) {}
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-t'), true); }); });
+    if (/^#w(orld|-)/.test(location.hash)) show('world');
+  })();
+</script>
 <script src="/js/launch.js?v=3"></script>
 <script src="/js/install.js?v=4" data-name="싸바비앙" data-mark="👑" data-icon="/img/bien-icon-192.png?v=1" data-url="sava.kr/savabien"></script>
 <script>

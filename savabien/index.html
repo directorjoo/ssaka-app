@@ -69,8 +69,8 @@
     .join { display: block; margin-top: 14px; padding: 16px; border-radius: 18px; text-align: center; text-decoration: none; color: #fff; font-size: 18px; font-weight: 900;
       background: linear-gradient(135deg, #D9B460, #B98A2E); text-shadow: 0 1px 3px rgba(90,55,5,.6); box-shadow: 0 10px 22px -14px rgba(120,80,10,.8); }
     .join small { display: block; margin-top: 3px; font-size: 15px; font-weight: 700; }
-    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 20px; padding: 5px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
-    .tabs button { padding: 12px 6px; border: 0; border-radius: 999px; background: transparent; color: #8A6A2A; font: inherit; font-size: 17px; font-weight: 900; cursor: pointer; }
+    .tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin: 0 0 20px; padding: 5px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #E7CF8F; }
+    .tabs button { padding: 12px 2px; border: 0; border-radius: 999px; background: transparent; color: #8A6A2A; font: inherit; font-size: 15px; white-space: nowrap; font-weight: 900; cursor: pointer; }
     .tabs button[aria-selected="true"] { background: linear-gradient(135deg, #D0233F, #B3132B); color: #fff; box-shadow: 0 6px 14px -8px rgba(140,15,35,.9); }
     .cats { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; margin: 0 -16px 14px; padding: 10px 16px; overflow-x: auto; background: #FBF4E2; scrollbar-width: none; }
     .cats::-webkit-scrollbar { display: none; }
@@ -79,7 +79,7 @@
     .sq strong.br { font-size: 17px; letter-spacing: .02em; }
     .sq.wb { color: #1A1A1A; }
     .sq img.sym { width: 46%; height: 46%; object-fit: contain; transform: translateY(-8px); border-radius: 14px; }
-    .sq.nosym strong.br { top: 50%; bottom: auto; transform: translateY(-50%); text-align: center; font-size: 22px; font-family: Georgia, "Times New Roman", serif; letter-spacing: .04em; }
+    .sq.nosym strong.br { font-family: Georgia, "Times New Roman", serif; letter-spacing: .03em; }
   </style>
 </head>
 <body>
@@ -99,6 +99,7 @@
   <div class="tabs" role="tablist">
     <button type="button" role="tab" data-t="mi" aria-selected="true">👑 명인 작품</button>
     <button type="button" role="tab" data-t="world" aria-selected="false">🌍 세계 명품</button>
+    <button type="button" role="tab" data-t="korea" aria-selected="false">🇰🇷 한국 브랜드</button>
   </div>
   <section id="tab-mi">
   <div class="sec"><b>명인 열 분의 작품</b><span>농림축산식품부 지정</span></div>
@@ -226,6 +227,11 @@
     <div id="world"></div>
     <div class="note">세계에서 손꼽히는 명품 브랜드를 품목별로 모았어요. 칸을 누르면 그 브랜드 공식 누리집으로 이어져요.</div>
   </section>
+  <section id="tab-korea" hidden>
+    <div class="cats" id="kcats"></div>
+    <div id="korea"></div>
+    <div class="note">세계가 찾는 한국 화장품·구두·패션잡화 브랜드를 모았어요. 칸을 누르면 공식 누리집(없으면 네이버)으로 이어져요.</div>
+  </section>
 </main>
 <script>
   // 11-28 대표님: 싸바비앙 '🌍 세계 명품' 탭 — 품목 8개 × 10 브랜드, 누르면 공식 누리집
@@ -328,37 +334,83 @@
         ['Staub', '스타우브', '프랑스', 1974, '알자스의 검은 무쇠 냄비 꼬꼬떼.', 'staub-online.com']
       ]]
     ];
+    // 11-28 대표님: 한국 화장품·구두·패션잡화 유명 브랜드 — [영문, 한글, 나라, 해(모르면 0), 한 줄, 누리집(없으면 '' → 네이버 검색)]
+    var K = [
+      ['kbeauty', '💄', '화장품', ['#F8DCE3', '#EDB3C3'], [
+        ['Sulwhasoo', '설화수', '한국', 1997, '인삼으로 빚은 한방 화장품, 윤조에센스.', 'sulwhasoo.com'],
+        ['The History of Whoo', '더 후', '한국', 2003, '궁중 비방을 담은 금빛 한방 화장품.', 'whoo.co.kr'],
+        ['HERA', '헤라', '한국', 1995, '서울 여성을 그린 쿠션·립 화장품.', 'hera.com'],
+        ['LANEIGE', '라네즈', '한국', 1994, '물 보습 슬리핑 마스크·립 마스크.', 'laneige.com'],
+        ['innisfree', '이니스프리', '한국', 2000, '제주 녹차·화산송이로 만든 자연 화장품.', 'innisfree.com'],
+        ['Dr.Jart+', '닥터자르트', '한국', 2004, '시카페어 크림으로 이름난 피부과 화장품.', 'drjart.com'],
+        ['TAMBURINS', '탬버린즈', '한국', 2017, '조약돌 모양 핸드크림과 향수.', 'tamburins.com'],
+        ['COSRX', '코스알엑스', '한국', 2013, '달팽이 점액 에센스로 세계에 알려진 화장품.', 'cosrx.com'],
+        ['Beauty of Joseon', '조선미녀', '한국', 0, '조선 여인의 피부 관리법을 담은 선크림·세럼.', 'beautyofjoseon.com'],
+        ['CLIO', '클리오', '한국', 1993, '아이라이너·쿠션으로 이름난 색조 화장품.', 'clubclio.co.kr'],
+        ['rom&nd', '롬앤', '한국', 2016, '쥬시 래스팅 틴트의 색조 화장품.', 'romand.co.kr'],
+        ['3CE', '쓰리씨이', '한국', 2009, '스타일난다의 감각적인 색조 화장품.', 'stylenanda.com']
+      ]],
+      ['kshoe', '👠', '구두·신발', ['#EAD7C7', '#CFA98C'], [
+        ['Kumkang', '금강제화', '한국', 1954, '대한민국 대표 구두, 랜드로바·리갈.', ''],
+        ['TANDY', '탠디', '한국', 0, '손으로 만드는 편안한 수제화.', 'tandy.co.kr'],
+        ['VAINER', '바이네르', '한국', 0, '푹신한 컴포트 수제화.', ''],
+        ['MISOPE', '미소페', '한국', 0, '발 편한 여성 구두.', ''],
+        ['SODA', '소다', '한국', 0, '세련된 남녀 구두·잡화.', ''],
+        ['FILA', '휠라', '한국', 0, '한국 회사가 이끄는 운동화, 디스럽터.', 'fila.co.kr']
+      ]],
+      ['kacc', '👜', '패션잡화', ['#E4DCCF', '#C9B89C'], [
+        ['GENTLE MONSTER', '젠틀몬스터', '한국', 2011, '세계 셀럽이 쓰는 선글라스·안경.', 'gentlemonster.com'],
+        ['MCM', 'MCM', '한국', 1976, '독일에서 시작해 한국이 키운 가죽 백팩.', 'mcmworldwide.com'],
+        ['ADER ERROR', '아더에러', '한국', 2014, '틀어진 감각의 서울 패션.', 'adererror.com'],
+        ['Marhen.J', '마르헨제이', '한국', 0, '사과 껍질 가죽 같은 비건 가방.', 'marhenj.com'],
+        ['Matin Kim', '마뗑킴', '한국', 0, '서울 젊은 층이 사랑하는 가방·옷.', 'matinkim.com'],
+        ['STAND OIL', '스탠드오일', '한국', 0, '작고 귀여운 가죽 가방.', 'standoil.kr'],
+        ['ANDERSSON BELL', '앤더슨벨', '한국', 0, '북유럽 감성의 서울 패션.', 'andersson-bell.com'],
+        ['J.ESTINA', '제이에스티나', '한국', 2003, '작은 왕관 장식의 주얼리·가방.', 'jestina.co.kr'],
+        ['DIDIER DUBOT', '디디에두보', '한국', 0, '고운 금빛 주얼리.', 'didierdubot.co.kr'],
+        ['VUNQUE', '분크', '한국', 0, '깔끔한 가죽 가방.', ''],
+        ['LOW CLASSIC', '로우클래식', '한국', 0, '절제된 서울 여성복·가방.', ''],
+        ['COURONNE', '쿠론', '한국', 0, '부드러운 가죽 핸드백.', '']
+      ]]
+    ];
     var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-    var cats = '', html = '';
-    C.forEach(function (c) {
-      cats += '<a href="#w-' + c[0] + '">' + c[1] + ' ' + c[2] + '</a>';
-      html += '<div class="wsec" id="w-' + c[0] + '"><div class="sec"><b>' + c[1] + ' ' + c[2] + '</b><span>' + c[4].length + '곳</span></div><div class="grid">';
-      c[4].forEach(function (b) {
-        html += '<a class="mt" href="https://www.' + b[5] + '" target="_blank" rel="noopener" aria-label="' + esc(b[1]) + ' 공식 누리집">' +
-          '<div class="sq wb" style="background:radial-gradient(ellipse at 50% 40%,#fff 0%,#fff 45%,' + c[3][0] + ' 100%)">' +
-          '<span class="no">' + esc(b[2]) + '</span><img class="sym" alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + b[5] + '&sz=128"><strong class="br">' + esc(b[0]) + '</strong></div>' +
-          '<b>' + esc(b[1]) + '</b><span class="rg">' + esc(b[2]) + ' · ' + b[3] + '년부터</span>' +
-          '<p>' + esc(b[4]) + '</p><span class="go">공식 누리집 ›</span></a>';
+    // 칸 그리기 (세계 명품·한국 브랜드 공용). 심볼을 못 불러오면 품목 그림 + 이름
+    function render(list, pre, catsId, rootId) {
+      var cats = '', html = '';
+      list.forEach(function (c) {
+        cats += '<a href="#' + pre + c[0] + '">' + c[1] + ' ' + c[2] + '</a>';
+        html += '<div class="wsec" id="' + pre + c[0] + '"><div class="sec"><b>' + c[1] + ' ' + c[2] + '</b><span>' + c[4].length + '곳</span></div><div class="grid">';
+        c[4].forEach(function (b) {
+          var url = b[5] ? 'https://www.' + b[5] : 'https://search.naver.com/search.naver?query=' + encodeURIComponent(b[1] + ' 공식');
+          html += '<a class="mt" href="' + url + '" target="_blank" rel="noopener" aria-label="' + esc(b[1]) + (b[5] ? ' 공식 누리집' : ' 네이버에서 보기') + '">' +
+            '<div class="sq wb' + (b[5] ? '' : ' nosym') + '" data-mark="' + c[1] + '" style="background:radial-gradient(ellipse at 50% 40%,#fff 0%,#fff 45%,' + c[3][0] + ' 100%)">' +
+            '<span class="no">' + esc(b[2]) + '</span>' + (b[5] ? '<img class="sym" alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + b[5] + '&sz=128">' : '<i aria-hidden="true">' + c[1] + '</i>') +
+            '<strong class="br">' + esc(b[0]) + '</strong></div>' +
+            '<b>' + esc(b[1]) + '</b><span class="rg">' + esc(b[2]) + (b[3] ? ' · ' + b[3] + '년부터' : '') + '</span>' +
+            '<p>' + esc(b[4]) + '</p><span class="go">' + (b[5] ? '공식 누리집 ›' : '네이버에서 보기 ›') + '</span></a>';
+        });
+        html += '</div></div>';
       });
-      html += '</div></div>';
-    });
-    document.getElementById('cats').innerHTML = cats;
-    document.getElementById('world').innerHTML = html;
-    // 11-28 대표님: 가방 그림 대신 각 브랜드 심볼 — 브랜드 누리집 아이콘을 불러옴, 못 불러오거나 빈 기본 그림(16px)이면 이름을 크게
-    document.querySelectorAll('#world img.sym').forEach(function (im) {
-      function bad() { im.closest('.sq').classList.add('nosym'); im.remove(); }
-      im.addEventListener('error', bad);
-      im.addEventListener('load', function () { if (im.naturalWidth && im.naturalWidth <= 16) bad(); });
-    });
-    var btns = document.querySelectorAll('.tabs button');
+      document.getElementById(catsId).innerHTML = cats;
+      var root = document.getElementById(rootId); root.innerHTML = html;
+      // 심볼을 못 불러오거나 빈 기본 그림(16px)이면 품목 그림 + 이름
+      root.querySelectorAll('img.sym').forEach(function (im) {
+        function bad() { var q = im.closest('.sq'); q.classList.add('nosym'); var i = document.createElement('i'); i.setAttribute('aria-hidden', 'true'); i.textContent = q.getAttribute('data-mark'); im.replaceWith(i); }
+        im.addEventListener('error', bad);
+        im.addEventListener('load', function () { if (im.naturalWidth && im.naturalWidth <= 16) bad(); });
+      });
+    }
+    render(C, 'w-', 'cats', 'world');
+    render(K, 'k-', 'kcats', 'korea');
+    var btns = document.querySelectorAll('.tabs button'), T = ['mi', 'world', 'korea'];
     function show(t, push) {
       btns.forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-t') === t ? 'true' : 'false'); });
-      document.getElementById('tab-mi').hidden = t !== 'mi';
-      document.getElementById('tab-world').hidden = t !== 'world';
-      if (push) try { history.replaceState(null, '', t === 'world' ? '#world' : location.pathname + location.search); } catch (e) {}
+      T.forEach(function (x) { document.getElementById('tab-' + x).hidden = t !== x; });
+      if (push) try { history.replaceState(null, '', t === 'mi' ? location.pathname + location.search : '#' + t); } catch (e) {}
     }
     btns.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-t'), true); }); });
     if (/^#w(orld|-)/.test(location.hash)) show('world');
+    if (/^#k(orea|-)/.test(location.hash)) show('korea');
   })();
 </script>
 <script src="/js/launch.js?v=3"></script>

@@ -777,7 +777,7 @@
         <input type="time" id="timeAt" hidden style="margin-top:8px">
       </details>
       </section>
-      <div class="rta"><textarea id="memo" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 2번 출구 앞 편의점!"></textarea><button type="button" id="cClear">지우기</button></div>
+      <div class="rta"><textarea id="memo" maxlength="100" rows="1" placeholder="한마디 (안 써도 돼요) 예: 2번 출구 앞 편의점!"></textarea><button type="button" id="cClear">지우기</button></div>
     </div>
 
     <div class="box stp-wrap" id="playBox" hidden>
@@ -816,7 +816,7 @@
       <section class="stp s3"><h3 class="stp-h"><span class="stp-n">3</span>어디서? <small>안 써도 돼요</small></h3>
         <input type="text" id="playPlace" maxlength="40" placeholder="예: 경로당, 시장 앞 다방, 공원 정자" aria-label="어디서">
         <button type="button" class="pbtn" id="playGps" style="width:100%;margin-top:8px">📍 내가 있는 곳으로 부르기</button>
-        <div class="rta"><textarea id="playText" maxlength="60" rows="1" placeholder="한마디 (안 써도 돼요) 예: 늦으면 전화해!"></textarea><button type="button" id="pClear">지우기</button></div>
+        <div class="rta"><textarea id="playText" maxlength="100" rows="1" placeholder="한마디 (안 써도 돼요) 예: 늦으면 전화해!"></textarea><button type="button" id="pClear">지우기</button></div>
       </section>
       <section class="stp opt"><h3 class="stp-h"><span class="stp-n">🎮</span>폰으로 같이 놀까? <small>선택 · 각자 폰으로 바로 한판</small></h3>
         <div class="acts">
@@ -2010,17 +2010,26 @@
       document.querySelectorAll('#timeChips .chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
       $('timeAt').hidden = c.dataset.t !== 'x';
       minutes = c.dataset.t === 'x' ? null : parseInt(c.dataset.t, 10);
-      if (c.dataset.t === 'x') $('timeAt').focus();
+      if (c.dataset.t === 'x') $('timeAt').focus(); else putIn('memo', c.textContent.trim());
     });
   });
 
+  // 11-28 대표님: 놀자!·여기야!에서 고른 말도 아래 글칸 끝에 이어 붙음 (고쳐 쓰고, 마음에 안 들면 모든 문자 지우기)
+  function putIn(id, t) {
+    var ta = $(id); if (!ta || !t) return;
+    var cur = ta.value.replace(/\s+$/, ''), next = (cur ? cur + ' ' : '') + t;
+    if (next.length > (ta.maxLength > 0 ? ta.maxLength : 100)) { toast('글이 너무 길어요. 조금 지우고 넣어 주세요'); return; }
+    ta.value = next; ta.dispatchEvent(new Event('input', { bubbles: true }));
+  }
   var act = '☕ 차 한잔', playW = 'now', playXY = null;
   document.querySelectorAll('#acts .act').forEach(function (b) {
-    b.addEventListener('click', function () { act = b.textContent; document.querySelectorAll('#acts .act').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); });
+    b.addEventListener('click', function () { act = b.textContent; document.querySelectorAll('#acts .act').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); putIn('playText', act.trim()); });
   });
   document.querySelectorAll('#playWhen .chip').forEach(function (c) {
-    c.addEventListener('click', function () { playW = c.dataset.w; document.querySelectorAll('#playWhen .chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); }); });
+    c.addEventListener('click', function () { playW = c.dataset.w; document.querySelectorAll('#playWhen .chip').forEach(function (x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); }); putIn('playText', c.textContent.replace(/^\s*✔\s*/, '').trim()); });
   });
+  $('playPlace').addEventListener('change', function () { var v = this.value.trim(); if (v) putIn('playText', v + '에서'); });
+  $('placeName').addEventListener('change', function () { var v = this.value.trim(); if (v) putIn('memo', v + '에서 만나!'); });
   $('playGps').addEventListener('click', function () {
     toast('위치를 확인하는 중…');
     getPos().then(function (pos) { playXY = pos; $('playGps').textContent = '📍 내 위치로 부를게요 ✓'; $('playGps').classList.add('on'); }, function (e) { toast(e.message); });
@@ -2172,6 +2181,6 @@
 })();
 </script>
 <script src="/js/home.js?v=18" defer data-home="/eodiya/"></script>
-<script src="/js/voice.js?v=10" defer></script>
+<script src="/js/voice.js?v=11" defer></script>
 </body>
 </html>

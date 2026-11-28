@@ -31,9 +31,12 @@
   function tip(m) { if (typeof window.toast === 'function') window.toast(m); else alert(m); }
   function who() { var b = document.querySelector('#gSubs .gsub[aria-pressed="true"] b'); return b ? b.textContent.replace(/에게|께/g, '').trim() : '친구'; }
   function dev() { try { var k = 'svDev', v = localStorage.getItem(k); if (!v) { v = Math.random().toString(36).slice(2, 12); localStorage.setItem(k, v); } return v; } catch (e) { return ''; } }
+  // 11-28 대표님: 싸바?·여기야!·놀자! 세 글칸 모두 — 누른 단추의 글칸(CUR)에
+  var CUR = 'gText';
+  function T() { return document.getElementById(CUR); }
   function put(text) {
-    var ta = document.getElementById('gText'); if (!ta) return;
-    ta.value = text.slice(0, 100); ta.dispatchEvent(new Event('input', { bubbles: true }));
+    var ta = T(); if (!ta) return;
+    ta.value = text.slice(0, ta.maxLength > 0 ? ta.maxLength : 100); ta.dispatchEvent(new Event('input', { bubbles: true }));
   }
   function polish(said) {
     show('말 다듬는 중', '“' + said + '”', true);
@@ -49,7 +52,7 @@
 
   var DEF = /^(싸바\?|어디야\?)?$/;
   function tidy() {
-    var ta = document.getElementById('gText'); if (!ta) return;
+    var ta = T(); if (!ta) return;
     var t = ta.value.replace(/\s+/g, ' ').trim();
     if (DEF.test(t) || t.length < 4) {
       // 11-28 대표님: 쓴 글은 지우지 말고 글칸 끝에 커서만
@@ -61,7 +64,7 @@
   }
   function noMic(why) {
     hide();
-    var ta = document.getElementById('gText');
+    var ta = T();
     tip(why || '여기서는 마이크가 막혀 있어요. 글칸을 누르고 키보드의 🎤 단추로 말해도 돼요');
     if (ta) { ta.focus(); }
   }
@@ -100,19 +103,19 @@
   ov.querySelector('.vc-x').addEventListener('click', function (e) { e.stopPropagation(); finish(); }); // 무슨 상태든 바로 닫힘 (11-21)
   ov.addEventListener('click', function (e) { if (e.target === ov) quit(); });
 
-  function mount() {
-    var ta = document.getElementById('gText'); if (!ta) return false;
+  function mount(id) {
+    var ta = document.getElementById(id); if (!ta) return false;
     var comp = ta.closest('.composer'); if (!comp) return false;
     var row = comp.querySelector('.chint'); if (!row || row.querySelector('.vc-btn')) return true;
     row.style.flexWrap = 'wrap'; row.style.rowGap = '6px';
     // 🎤 말하기(폰이 듣기 → 바로 다듬기) + ✨ 다듬기(키보드 🎤로 말했거나 쓴 글) 둘 다 (11-21)
     var lb = row.querySelector('span'); if (lb) lb.style.display = 'none'; // 11-28 단추 셋이 한 줄에 들어가게
     var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.innerHTML = '🎤 보낼 문장<br>말로 쓰기';
-    m.addEventListener('click', start);
+    m.addEventListener('click', function () { CUR = id; start(); });
     var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.innerHTML = '✨ 문자<br>다듬기';
-    b.addEventListener('click', tidy);
+    b.addEventListener('click', function () { CUR = id; tidy(); });
     var clr = row.querySelector(':scope > .cbtns') || row.querySelector(':scope > button:not(.vc-btn)'); row.insertBefore(m, clr || null); row.insertBefore(b, clr || null); // 11-28 지우기·문자 묶음(.cbtns) 앞에
     return true;
   }
-  var tries = 0; (function loop() { if (!mount() && ++tries < 20) setTimeout(loop, 300); })();
+  ['gText', 'memo', 'playText'].forEach(function (id) { var tries = 0; (function loop() { if (!mount(id) && ++tries < 20) setTimeout(loop, 300); })(); });
 })();

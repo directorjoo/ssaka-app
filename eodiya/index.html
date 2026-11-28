@@ -643,6 +643,11 @@
     .composer.kkc .composer-in .rta { flex: 1 1 100%; }
     .composer.kkc .chint { flex-wrap: nowrap !important; }
     .composer.kkc .chint button { flex: none; min-height: 38px; padding: 0 10px; font-size: 15.5px; white-space: nowrap; }
+    /* 11-28 단추 셋(말로 쓰기·문자 다듬기·모든 문자 지우기)은 같은 너비 세 칸, 글씨는 두 줄까지 */
+    .composer .chint button br { display: none; }
+    .composer.kkc .chint:has(.vc-btn) button br { display: inline; }
+    .composer.kkc .chint:has(.vc-btn) { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .composer.kkc .chint:has(.vc-btn) button { width: 100%; min-height: 46px; padding: 3px 4px; white-space: normal; line-height: 1.2; font-size: 15px; }
     .sv-more { margin: 14px 0 6px; padding: 14px 12px 12px; border-radius: 20px; background: #fff; box-shadow: 0 4px 14px -8px rgba(110,68,21,.35); }
     .sv-more > b { display: block; margin: 0 4px 10px; font-size: 18px; font-weight: 900; color: #3a2a1a; }
     .sv-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -1124,8 +1129,13 @@
     else { var a = Array.from(ta.value); a.pop(); v = a.join(''); } // 손으로 쓴 건 띄어쓰기까지 한 칸씩
     ta.value = v; if (after) after();
   };
-  window.savaBackBtn = function (btn, ta, phrases, after) {
+  window.savaBackBtn = function (btn, ta, phrases, after, all) {
     var t = 0, longed = false;
+    if (all) { // 11-28 대표님: 보내는 글칸은 '모든 문자 지우기' — 한 번 누르면 다 지우고 커서
+      btn.innerHTML = '⌫ 모든 문자 <br>지우기'; btn.title = '글칸의 글을 모두 지워요';
+      btn.addEventListener('click', function () { ta.value = ''; ta.dispatchEvent(new Event('input', { bubbles: true })); if (after) after(); ta.focus(); });
+      return;
+    }
     btn.textContent = '⌫ 지우기'; btn.title = '한 번 누르면 한 칸씩 · 꾹 누르면 모두 지우기';
     function down() { longed = false; clearTimeout(t); t = setTimeout(function () { longed = true; ta.value = ''; if (after) after(); try { navigator.vibrate && navigator.vibrate(30); } catch (e) {} toast('모두 지웠어요'); }, 650); }
     function up() { clearTimeout(t); }
@@ -1422,8 +1432,8 @@
   composer('gText', '✍️ 보낼 말 — 고친 뒤 보내기', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('askBox'); return m && !m.hidden && b && !b.hidden && b.offsetParent !== null; });
   composer('memo', '✍️ 한마디', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('comeBox'); return m && !m.hidden && b && !b.hidden; });
   composer('playText', '✍️ 한마디', 'sendKakao', '카톡<br>보내기', function () { var m = $('maker'), b = $('playBox'); return m && !m.hidden && b && !b.hidden; });
-  window.savaBackBtn($('cClear'), $('memo'), [], null);
-  window.savaBackBtn($('pClear'), $('playText'), [], null);
+  window.savaBackBtn($('cClear'), $('memo'), [], null, true);
+  window.savaBackBtn($('pClear'), $('playText'), [], null, true);
   composer('hereText', '✍️ 보낼 답장 — 고친 뒤 보내기', 'rSend', '답장<br>보내기', function () { var v = $('viewAsk'); return v && !v.hidden; });
   // 놀이터만 보기: 홈 '싸바 놀이터' 카드가 ../eodiya/#playground 로 들어옴
   function pgMode() { var on = location.hash === '#playground'; document.documentElement.classList.toggle('pg-only', on); if (on) window.scrollTo(0, 0); }
@@ -2085,7 +2095,7 @@
   }
   $('gText').addEventListener('input', gChanged);
   function gPhrases() { var a = WORLD_G.concat(LOC.items); SAY.forEach(function (w) { w.forEach(function (g) { a = a.concat(g.items); }); }); return a; }
-  window.savaBackBtn($('gClear'), $('gText'), gPhrases, function () { if (!askText()) gKinds = []; gChanged(); });
+  window.savaBackBtn($('gClear'), $('gText'), gPhrases, function () { if (!askText()) gKinds = []; gChanged(); }, true);
   paintGreet();
   $('goCome').addEventListener('click', function () { var m = document.querySelector('.mode[data-mode="come"]'); if (m) { m.click(); m.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
 
@@ -2162,6 +2172,6 @@
 })();
 </script>
 <script src="/js/home.js?v=18" defer data-home="/eodiya/"></script>
-<script src="/js/voice.js?v=8" defer></script>
+<script src="/js/voice.js?v=10" defer></script>
 </body>
 </html>

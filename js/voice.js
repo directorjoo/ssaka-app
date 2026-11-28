@@ -107,9 +107,9 @@
     row.style.flexWrap = 'wrap'; row.style.rowGap = '6px';
     // 🎤 말하기(폰이 듣기 → 바로 다듬기) + ✨ 다듬기(키보드 🎤로 말했거나 쓴 글) 둘 다 (11-21)
     var lb = row.querySelector('span'); if (lb) lb.style.display = 'none'; // 11-28 단추 셋이 한 줄에 들어가게
-    var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.textContent = '🎤 보낼 문장 말로 쓰기';
+    var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.innerHTML = '🎤 보낼 문장<br>말로 쓰기';
     m.addEventListener('click', start);
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.textContent = '✨ 다듬기';
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.innerHTML = '✨ 문자<br>다듬기';
     b.addEventListener('click', tidy);
     var clr = row.querySelector(':scope > .cbtns') || row.querySelector(':scope > button:not(.vc-btn)'); row.insertBefore(m, clr || null); row.insertBefore(b, clr || null); // 11-28 지우기·문자 묶음(.cbtns) 앞에
     return true;

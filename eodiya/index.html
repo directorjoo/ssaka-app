@@ -635,10 +635,14 @@
     .composer .csend i { font-style: normal; font-size: 18px; line-height: 1; }
     /* 11-28 대표님: 아래 글칸 — [지우기][문자로 보내기] 윗줄, 카톡 단추는 카톡 노랑 */
     .composer .chint > span { flex: 1; min-width: 0; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .composer .cbtns { display: flex; gap: 6px; flex: none; }
-    .composer .cbtns button { min-height: 40px; padding: 0 12px; font-size: 16px; }
-    .composer .cbtns .csms { border-color: #B3132B; color: #B3132B; background: #FFF5F6; }
-    .composer .csend.kk { background: #FEE500; color: #191919; box-shadow: 0 3px 0 #C9B400; }
+    .composer .csrow { max-width: 540px; margin: 0 auto 8px; display: flex; gap: 8px; }
+    .composer .csrow .csms { flex: none; display: grid; place-items: center; align-content: center; gap: 1px; width: 56px; min-height: 52px; padding: 2px 0; border: 1.5px solid #E9C9CE; border-radius: 16px; background: #fff; color: #8E0A1C; font: inherit; font-size: 13px; font-weight: 800; line-height: 1.1; cursor: pointer; }
+    .composer .csrow .csms i { font-style: normal; font-size: 16px; line-height: 1; }
+    .composer .csrow .csend.kk { flex: 1; width: auto; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-radius: 16px; background: #FEE500; color: #191919; font-size: 19px; font-weight: 900; box-shadow: 0 3px 0 #C9B400; }
+    .composer .csrow .csend.kk i { font-size: 22px; }
+    .composer.kkc .composer-in .rta { flex: 1 1 100%; }
+    .composer.kkc .chint { flex-wrap: nowrap !important; }
+    .composer.kkc .chint button { flex: none; min-height: 38px; padding: 0 10px; font-size: 15.5px; white-space: nowrap; }
     .sv-more { margin: 14px 0 6px; padding: 14px 12px 12px; border-radius: 20px; background: #fff; box-shadow: 0 4px 14px -8px rgba(110,68,21,.35); }
     .sv-more > b { display: block; margin: 0 4px 10px; font-size: 18px; font-weight: 900; color: #3a2a1a; }
     .sv-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -1396,15 +1400,19 @@
     c.innerHTML = '<div class="chint"><span>' + label + '</span></div><div class="composer-in"></div>';
     var inner = c.querySelector('.composer-in'); inner.appendChild(ta.parentNode);
     var clr = ta.parentNode.querySelector('button'), hb = c.querySelector('.chint');
-    if (sendId === 'sendKakao') { // 11-28 대표님: 지우기는 조금 왼쪽, 그 자리에 [문자로 보내기], 카톡 단추는 카톡 노랑
-      var g = document.createElement('div'); g.className = 'cbtns'; hb.appendChild(g); hb = g;
-      if (clr) g.appendChild(clr);
-      var sm = document.createElement('button'); sm.type = 'button'; sm.className = 'csms'; sm.textContent = '📱 문자로 보내기';
-      sm.addEventListener('click', function () { var t = $('sendSms'); if (t) t.click(); }); g.appendChild(sm);
-    } else if (clr) hb.appendChild(clr); // 지우기는 윗줄 오른쪽으로 (11-21)
+    if (clr) hb.appendChild(clr); // 지우기는 윗줄 오른쪽으로 (11-21)
+    var kk = sendId === 'sendKakao';
+    if (kk) { // 11-28 대표님: 글칸 위에 [📱 문자(작게)] [💬 카톡으로 보내기(크게, 카톡 노랑)], 글칸은 가로 전체
+      c.classList.add('kkc');
+      var row = document.createElement('div'); row.className = 'csrow'; c.insertBefore(row, inner);
+      var sm = document.createElement('button'); sm.type = 'button'; sm.className = 'csms'; sm.innerHTML = '<i>📱</i><span>문자</span>';
+      sm.setAttribute('aria-label', '문자로 보내기');
+      sm.addEventListener('click', function () { var t = $('sendSms'); if (t) t.click(); }); row.appendChild(sm);
+    }
     var sb = document.createElement('button'); sb.type = 'button'; sb.className = 'csend' + (sendId === 'sendKakao' ? ' kk' : ''); sb.innerHTML = '<i>💬</i><span>' + sendText + '</span>';
+    if (kk) sb.innerHTML = '<i>💬</i><span>카톡으로 보내기</span>';
     sb.addEventListener('click', function () { var t = $(sendId); if (t) t.click(); });
-    inner.appendChild(sb); document.body.appendChild(c);
+    (kk ? c.querySelector('.csrow') : inner).appendChild(sb); document.body.appendChild(c);
     function grow() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 4, 132) + 'px'; if (c.dataset.on) document.documentElement.style.setProperty('--composer-h', c.offsetHeight + 'px'); }
     ta.addEventListener('input', grow);
     function sync() { var on = showIf(); c.dataset.on = on ? '1' : ''; document.documentElement.classList.toggle('has-composer', !!document.querySelector('.composer[data-on="1"]')); c.style.display = on ? 'block' : 'none'; grow(); }
@@ -2154,6 +2162,6 @@
 })();
 </script>
 <script src="/js/home.js?v=18" defer data-home="/eodiya/"></script>
-<script src="/js/voice.js?v=6" defer></script>
+<script src="/js/voice.js?v=8" defer></script>
 </body>
 </html>

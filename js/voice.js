@@ -52,7 +52,8 @@
     var ta = document.getElementById('gText'); if (!ta) return;
     var t = ta.value.replace(/\s+/g, ' ').trim();
     if (DEF.test(t) || t.length < 4) {
-      ta.value = ''; ta.dispatchEvent(new Event('input', { bubbles: true })); ta.focus();
+      // 11-28 대표님: 쓴 글은 지우지 말고 글칸 끝에 커서만
+      ta.focus(); try { var n = ta.value.length; ta.setSelectionRange(n, n); } catch (e) {}
       tip('키보드의 🎤 단추를 누르고 말하세요. 예) 철수한테 토요일에 밥 먹자고 해 줘 → 그다음 ✨ 다듬기');
       return;
     }
@@ -105,8 +106,8 @@
     var row = comp.querySelector('.chint'); if (!row || row.querySelector('.vc-btn')) return true;
     row.style.flexWrap = 'wrap'; row.style.rowGap = '6px';
     // 🎤 말하기(폰이 듣기 → 바로 다듬기) + ✨ 다듬기(키보드 🎤로 말했거나 쓴 글) 둘 다 (11-21)
-    var lb = row.querySelector('span'); if (lb) lb.textContent = '✍️ 보낼 말';
-    var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.textContent = '🎤 말하기';
+    var lb = row.querySelector('span'); if (lb) lb.style.display = 'none'; // 11-28 단추 셋이 한 줄에 들어가게
+    var m = document.createElement('button'); m.type = 'button'; m.className = 'vc-btn'; m.textContent = '🎤 보낼 문장 말로 쓰기';
     m.addEventListener('click', start);
     var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.textContent = '✨ 다듬기';
     b.addEventListener('click', tidy);

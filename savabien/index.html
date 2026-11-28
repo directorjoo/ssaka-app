@@ -351,11 +351,11 @@
         ['3CE', '쓰리씨이', '한국', 2009, '스타일난다의 감각적인 색조 화장품.', 'stylenanda.com']
       ]],
       ['kshoe', '👠', '구두·신발', ['#EAD7C7', '#CFA98C'], [
-        ['Kumkang', '금강제화', '한국', 1954, '대한민국 대표 구두, 랜드로바·리갈.', ''],
+        ['Kumkang', '금강제화', '한국', 1954, '대한민국 대표 구두, 랜드로바·리갈.', 'kumkangshoe.com'],
         ['TANDY', '탠디', '한국', 0, '손으로 만드는 편안한 수제화.', 'tandy.co.kr'],
-        ['VAINER', '바이네르', '한국', 0, '푹신한 컴포트 수제화.', ''],
-        ['MISOPE', '미소페', '한국', 0, '발 편한 여성 구두.', ''],
-        ['SODA', '소다', '한국', 0, '세련된 남녀 구두·잡화.', ''],
+        ['VAINER', '바이네르', '한국', 0, '푹신한 컴포트 수제화.', 'vainer.shop'],
+        ['MISOPE', '미소페', '한국', 0, '발 편한 여성 구두.', 'misope.co.kr'],
+        ['SODA', '소다', '한국', 0, '세련된 남녀 구두·잡화.', 'sodamall.com'],
         ['FILA', '휠라', '한국', 0, '한국 회사가 이끄는 운동화, 디스럽터.', 'fila.co.kr']
       ]],
       ['kacc', '👜', '패션잡화', ['#E4DCCF', '#C9B89C'], [
@@ -368,9 +368,9 @@
         ['ANDERSSON BELL', '앤더슨벨', '한국', 0, '북유럽 감성의 서울 패션.', 'andersson-bell.com'],
         ['J.ESTINA', '제이에스티나', '한국', 2003, '작은 왕관 장식의 주얼리·가방.', 'jestina.co.kr'],
         ['DIDIER DUBOT', '디디에두보', '한국', 0, '고운 금빛 주얼리.', 'didierdubot.co.kr'],
-        ['VUNQUE', '분크', '한국', 0, '깔끔한 가죽 가방.', ''],
-        ['LOW CLASSIC', '로우클래식', '한국', 0, '절제된 서울 여성복·가방.', ''],
-        ['COURONNE', '쿠론', '한국', 0, '부드러운 가죽 핸드백.', '']
+        ['VUNQUE', '분크', '한국', 0, '깔끔한 가죽 가방.', 'vunque.com'],
+        ['LOW CLASSIC', '로우클래식', '한국', 0, '절제된 서울 여성복·가방.', 'lowclassic.com'],
+        ['COURONNE', '쿠론', '한국', 0, '부드러운 가죽 핸드백.', 'kolonmall.com/Brands/couronne/Special']
       ]]
     ];
     var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -384,7 +384,7 @@
           var url = b[5] ? 'https://www.' + b[5] : 'https://search.naver.com/search.naver?query=' + encodeURIComponent(b[1] + ' 공식');
           html += '<a class="mt" href="' + url + '" target="_blank" rel="noopener" aria-label="' + esc(b[1]) + (b[5] ? ' 공식 누리집' : ' 네이버에서 보기') + '">' +
             '<div class="sq wb' + (b[5] ? '' : ' nosym') + '" data-mark="' + c[1] + '" style="background:radial-gradient(ellipse at 50% 40%,#fff 0%,#fff 45%,' + c[3][0] + ' 100%)">' +
-            '<span class="no">' + esc(b[2]) + '</span>' + (b[5] ? '<img class="sym" alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + b[5] + '&sz=128">' : '<i aria-hidden="true">' + c[1] + '</i>') +
+            '<span class="no">' + esc(b[2]) + '</span>' + (b[5] ? '<img class="sym" alt="" loading="lazy" referrerpolicy="no-referrer" src="https://www.google.com/s2/favicons?domain=' + b[5].split('/')[0] + '&sz=128">' : '<i aria-hidden="true">' + c[1] + '</i>') +
             '<strong class="br">' + esc(b[0]) + '</strong></div>' +
             '<b>' + esc(b[1]) + '</b><span class="rg">' + esc(b[2]) + (b[3] ? ' · ' + b[3] + '년부터' : '') + '</span>' +
             '<p>' + esc(b[4]) + '</p><span class="go">' + (b[5] ? '공식 누리집 ›' : '네이버에서 보기 ›') + '</span></a>';

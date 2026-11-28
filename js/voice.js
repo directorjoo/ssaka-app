@@ -110,7 +110,7 @@
     m.addEventListener('click', start);
     var b = document.createElement('button'); b.type = 'button'; b.className = 'vc-btn vc-tidy'; b.textContent = '✨ 다듬기';
     b.addEventListener('click', tidy);
-    var clr = row.querySelector('button:not(.vc-btn)'); row.insertBefore(m, clr || null); row.insertBefore(b, clr || null);
+    var clr = row.querySelector(':scope > .cbtns') || row.querySelector(':scope > button:not(.vc-btn)'); row.insertBefore(m, clr || null); row.insertBefore(b, clr || null); // 11-28 지우기·문자 묶음(.cbtns) 앞에
     return true;
   }
   var tries = 0; (function loop() { if (!mount() && ++tries < 20) setTimeout(loop, 300); })();
